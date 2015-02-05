@@ -1,0 +1,10 @@
+class Jtest.compiler.2
+
+func int main(null)
+	x=sayhello(null)
+	print_num(x)
+	return 0
+
+func int sayhello
+	print("Hello world.")
+	return 0

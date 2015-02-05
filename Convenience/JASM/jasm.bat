@@ -1,0 +1,1 @@
+@java Jasm %* > build.asm

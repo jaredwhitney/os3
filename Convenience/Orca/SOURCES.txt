@@ -1,0 +1,5 @@
+Opcode reference:
+	NASM (http://www.nasm.us/)
+	Sparks and Flames' x86 opcode chart (http://sparksandflames.com/files/x86InstructionChart.html)
+	Intel's x86 Documentation (http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2a-manual.pdf)
+For call instruction: http://www.codeproject.com/Articles/662301/x-Instruction-Encoding-Revealed-Bit-Twiddling-fo
