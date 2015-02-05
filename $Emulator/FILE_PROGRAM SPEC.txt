@@ -1,0 +1,25 @@
+IN TERMS OF PROGRAMS
+
+they NEED to be loaded into a filesystem
+and dumped after the kernel.
+NOT compiled with it
+or there will be problems.
+
+programs dumped after kernel defined as :
+
+	dd size		; the file's size in bytes
+	dd "PRGM"	; the filetype
+	dd name, name	; the file's name ('XXXXXXXX')
+
+	db type		; the program's type
+	dd post_init.Loc	; pointer to the postinit function
+	
+	init:
+		; code
+	ret
+	
+	post_init:
+		; code
+	ret
+
+on boot the kernel will load the first program it finds (console)

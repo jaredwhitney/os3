@@ -1,0 +1,210 @@
+c000 -> d3ff	ebx	where program should go
+8a00 -> 9dff	ecx	programs location
+
+
+8ac2	console.asm.start + 0x24
+8abd	console.asm.start from ploc + 0x24
+8a9b	console.asm.start
+malloc says it should be 8ae4 / 8ae8
+			   ^ MALLOC IS NOT WORKING PROPERLY!!!
+				it should always return a sector...
+
+IGNORE THOSE CALCULATIONS, forgot to uncomment program.register in kernel
+
+8ac7	start + 0x24
+c024	ploc + 0x24...
+
+7c000014 is at c000 in memory
+
+
+11234ab is at where we (apparently shouldnt) start executing the program
+	^ messed up the # hex to # bytes... oops
+
+e8c30000 ... IS A CALL COMMAND! YES!
+	-> infinite reboot cycle again... k
+
+e8070000 is init call stat
+e83d0000 is post call stat	(can be reached with x24+x79+x13)
+ebfe.... is what we are looking for (jmp -1 -> jmp $)
+
+we are actually reading e83d0000? (theres an endian difference between the hex editor and my number display thing... and\or my number display is reading numbers backwards in memory for no reason at all...)
+
+read displayed (e8c30000) is from [c8b] in file
+it was actually from c0ad in memory (checks out with where it was told to  read from)
+
+x13 -> 00003de8 is at [cb4] in file
+x15 -> c3000000 is at [cb6] in file
+x15,x16, or x18 should load in the actual code (endianess...)
+	^ THEY ALL CAUSE TRIPLE FAULT
+x17 causes it to return normally... why?
+so far as i understand, x17 -> [xb8]...
+	! unless numOut IS right and endianess is just... hmm
+		nope x19 still returns normally...
+HOW ARE ANY OF THESE RETURNING NORMALLY?
+
+time for a table...
+x12 -> ..3de8c3
+x13 -> ....3de8
+x14 -> ......3d
+x15 -> c3......
+x16 -> ebc3....
+x17 -> feebc3..
+x18 -> b3feebc3
+x19 -> .fb3feeb
+x1A -> 88.fb3fe
+x1B -> 1d88.fb3
+x1C -> .21d88.f
+
+in terms of the jmp $ instruction (0xABCD) (0xebfe)
+x12 -> ........
+x13 -> ........
+x14 -> ........
+x15 -> ........	[potential]
+x16 -> AB......	[potential]
+x17 -> CDAB....
+x18 -> ..CDAB..
+x19 -> ....CDAB
+x1A -> ......CD	[potential]
+x1B -> ........	[potential]
+x1C -> ........
+
+so it's either 15, 16, 1a, or 1b
+ALREADY CHECKED 15 and 16
+forgot to check 1a or 1b earlier because accidentally jumped from x19 to x20 :\ oops
+
+1a returns like normal... still don't know how these aren't all triple faulting
+1b returns like normal too
+... how?!
+
+added some more jmp$ to console. now 1b freezes!
+dont know how that works... um
+
+-> so adding a jmp $ practically anywhere causes the code to crash.
+--------------------------
+jmp $ = (0xebfe) (feeb in mem)
+
+jmp $
+mov bl, 0xf
+x1B -> 1d88.fb3
+
+jmp $
+jmp $
+x1b -> .fb3feeb
+
+NEVERMIND that makes sense, x1b is showing things that come after the original jmp $
+---------------------------
+r = returns normally
+t = triple fault
+H = halts (what it should do)
+
+x10 -> t
+x11 ->  r
+x12 -> t
+x13 ->  r
+x14 ->  r
+x15 -> t
+x16 -> t
+x17 ->  r
+x18 -> t
+x19 ->  r
+x1A ->  r
+x1B ->  r
+x1C -> t
+x1D ->  r
+x1E -> t
+actually, it makes sense that so many things are returning properly, ret is a one byte instruction.
+
+so that didnt help at all.
+BUT none of the ones that triple faulted are worth checking out any more
+
+which leaves 11,13,14,17,19,1a,1b,1d
+------------------
+11	H
+13	H
+14	H
+17	H
+19	H
+1a	H
+1b		f
+1d	H
+
+so 1b can be eliminated, and everything but 1b is entering SOMEWHERE inside init
+
+------------------
+11	H
+13	H
+14	H
+17	H
+19	H
+1a	H
+1d	H
+
+so they're all before in the second half-ish of the program.
+
+------------------
+11		r
+13		r
+14			t
+17			t
+19		r
+1a			t
+1d			t
+so NONE of them is entering in the first quarter of the program!
+
+trying some more numbers then...
+------------------
+0			t
+1	H
+2			t
+3	H
+4			t
+5			t
+6			t
+7			t
+8	H
+9		r
+a		r
+b		r
+c		r
+d		r
+e		r
+f		r
+10		r
+
+did an additional test, 1 3 and 8 all failed it.
+GAH.
+--------------------
+combining the three numbers currently in use (hopefully simplifies things)
+x24,x79,the other one... saying it was x10
+
+time to look more carefully at where we're ending up in the file (code)
+
+-------------------------
+
+WAS AT 0xAD
+
+00 -> 7c000014
+it should be near 0...
+right time to clean up the console file anyway, invalidates all past work but it needs to be done
+-----------------------
+new tests!
+
+1d880fb3 when loaded through pload, it works
+1d880fb3 when loaded directly... it works
+
+8101c283 when loaded after preg :| uh
+so making a copy of the program is where its failing
+good to know...
+
+:o GUPPY MALLOC MESSES WITH REGISTERS AND DOESNT RESET THEM
+ITS BEEN MESSING UP ECX THIS WHOLE TIME
+
+NOW 1d880fb3 when loaded after preg
+
+its loaded and control is transferred properly!
+unfortunately relative addressing to things is messing it up. a lot.
+:(
+
+* working on a full rework in which programs are loaded in from the filesystem
+
+; END DOCUMENT

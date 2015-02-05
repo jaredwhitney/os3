@@ -1,0 +1,3 @@
+floppya: 1_44=os.img, status=inserted
+boot: a
+vga: extension=none

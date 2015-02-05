@@ -1,0 +1,4 @@
+program calls Keyboard.getDebounced
+it returns key (or 0x0) in ebx
+always returns 0x0 if program that called is not currently 'on top' (in windows terms)
+ProgramManager can always tell which program is running (callnum) and keeps track of which program is on top
