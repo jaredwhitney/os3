@@ -8,7 +8,8 @@ program.register :		; ebx contains location of program
 ;push ebx
 	mov ecx, ebx	; ecx contains program location
 	add ebx, 1	; >> should be 1
-	mov ah, 0xA;[ebx]	; should be program's size in sectors
+	mov eax, 0xA;[ebx]	; should be program's size in sectors
+		div 0x200	; 0x200 = sector size
 	mov al, 0x2	; SHOULD BE THE PROGRAM's PNUM
 	call Guppy.malloc
 	mov ebx, 0xe000	; ignoring the malloc for now.
