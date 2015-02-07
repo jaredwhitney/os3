@@ -307,7 +307,6 @@ ret
 %include "..\modules\Guppy.asm"
 %include "..\modules\Dolphin.asm"
 %include "..\modules\programLoader.asm"
-%include "..\programs\Console\console.asm"
 
 KERNEL_BOOT :
 db "Kernel Successfully Loaded!", 0
