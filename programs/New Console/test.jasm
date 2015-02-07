@@ -1,0 +1,28 @@
+class JASM.test
+
+func int main(null)
+	cls(null)
+	println("Booting Console...")
+	println("This was printed by a JASM program :D")
+	x = 1
+	while (x < 4)
+		println("        This should be printed 3x.")
+		print("           On time: ")
+		print_num(x)
+		newl(null)
+		x += 1
+	endwhile
+	emu = isEmu(null)
+	if (emu = 1)
+		println("Running on an emulator.")
+		return 0
+	endif
+	println("Running on a real computer.")
+	return 0
+	
+func int isEmu(null)
+	state = os.platform
+	if (state = os.EMULATOR)
+		return 1
+	endif
+	return 0
