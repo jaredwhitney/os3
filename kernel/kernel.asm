@@ -18,9 +18,9 @@ call Guppy.init
 ;call console.numOut
 ;jmp $
 
-mov ebx, console.asm.start
-call program.register
-call program.init
+	;mov ebx, console.asm.start		Should be rewritten to run with new console.
+	;call program.register
+	;call program.init
 
 ;call console.asm.init
 ;mov al, 'K'
@@ -62,19 +62,19 @@ and al, 0x20
 cmp al, 0x0
 je os.pollKeyboard.kcol
 mov eax, 0x0	; start mouse handle code
-in al, 0x60
-mov ebx, eax
-call console.numOut
-call console.newline
-in al, 0x60
-mov ebx, eax
-call console.numOut
-call console.newline
-in al, 0x60
-mov ebx, eax
-call console.numOut
-call console.newline
-call console.newline
+;in al, 0x60			needs to be remade so debugging does not rely on console.
+;mov ebx, eax
+;call console.numOut
+;call console.newline
+;in al, 0x60
+;mov ebx, eax
+;call console.numOut
+;call console.newline
+;in al, 0x60
+;mov ebx, eax
+;call console.numOut
+;call console.newline
+;call console.newline
 jmp os.pollKeyboard.return	; end mouse handle code
 os.pollKeyboard.kcol :
 in al, 0x60	; get last keycode
@@ -118,7 +118,7 @@ mov [0xA0000], bl
 ret
 
 
-console.doBackspace :
+console.doBackspace :	; NEEDS TO BE MIGRATED OVER!
 
 mov eax, [console.charPos]
 mov edx, 0x0
