@@ -10,6 +10,15 @@ program.register :		; ebx contains location of program
 	add ebx, 1	; >> should be 1
 	mov eax, 0xA;[ebx]	; should be program's size in sectors
 		div 0x200	; 0x200 = sector size
+	cmp eax, 0xFF
+	jl pregnoover
+		jmp $	;			should throw some error here with an error handler where the text displayed is "Program at [" + (ebx-1) + "] has a size of " + eax + " sectors, which is greater than the amount of RAM allowed to any single program.
+;							The program will not be loaded."
+	pregnoover :
+	cmp eax, 0x0
+	jl pregnoadd
+		add eax, 0x1
+	pregnoadd :
 	mov al, 0x2	; SHOULD BE THE PROGRAM's PNUM
 	call Guppy.malloc
 	mov ebx, 0xe000	; ignoring the malloc for now.
