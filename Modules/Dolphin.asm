@@ -55,6 +55,7 @@ jg Dolphin.update.loop1
 pop cx
 mov eax, [Dolphin.charposStor]
 mov [charpos], eax
+call debug.update	; ensuring that debug information stays 'on top'
 popa
 ret
 

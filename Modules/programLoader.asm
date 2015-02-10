@@ -9,7 +9,8 @@ program.register :		; ebx contains location of program
 	mov ecx, ebx	; ecx contains program location
 	add ebx, 1	; >> should be 1
 	mov eax, 0xA;[ebx]	; should be program's size in sectors
-		div 0x200	; 0x200 = sector size
+	mov edx, 0x200
+		div edx	; 0x200 = sector size
 	cmp eax, 0xFF
 	jl pregnoover
 		jmp $	;			should throw some error here with an error handler where the text displayed is "Program at [" + (ebx-1) + "] has a size of " + eax + " sectors, which is greater than the amount of RAM allowed to any single program.

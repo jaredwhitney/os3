@@ -29,7 +29,7 @@ cmp dx, 0x7
 jl drawCharloop
 mov ecx, [charpos]
 sub ecx, 0x8C0
-add ecx, 8
+add ecx, 6	; if newlines are broken, etc turn this back to 8
 mov [charpos], ecx
 popa
 ret
@@ -38,7 +38,7 @@ ret
 drawRow :	; ah contains row
 pusha
 mov ebx, [charpos]
-mov cl, 8
+mov cl, 6	; if newlines are broken, etc turn this back to 8
 drawRowloop :
 mov ch, ah
 sub cl, 0x1
@@ -118,7 +118,8 @@ db 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g'
 db 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o'
 db 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w'
 db 'X', 'x', 'Y', 'y', 'Z', 'z', ' ', '_', '.', '!', ',', ',', '1', '1'
-db '2', '2', '3', '3', '4', '4', '5', '5', '6', '6', '7', '7', '8', '8', '9', '9', '0', '0', '"', 0x27, ':', ':', '*'
+db '2', '2', '3', '3', '4', '4', '5', '5', '6', '6', '7', '7', '8', '8', '9', '9', '0', '0', '"', 0x27, ':', ':'
+db '(', '[', ')', ']', '*'
 
 charA :
 db 0x04, 0x0A, 0x11, 0x1F, 0x11, 0x11, 0x11
@@ -424,3 +425,27 @@ db 0b00000
 db 0b00000
 db 0b00100
 db 0b00000
+
+db 0b00111	; [
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00111
+
+db 0b11100	; ]
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b11100
+
+db 0b11111
+db 0b11111
+db 0b11111
+db 0b11111
+db 0b11111
+db 0b11111
+db 0b11111

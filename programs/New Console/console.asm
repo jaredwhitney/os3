@@ -10,8 +10,8 @@
 
 ; FILESYSTEM INFO
 	dd console.asm.end - console.asm.start
-	dd "PRGM"
-	dd "_CONSOLE"
+	db "PRGM"
+	db "_CONSOLE"
 
 ; FILE START TAG
 	console.asm.start :
@@ -22,7 +22,7 @@
 ; PROGRAM INFO
 	db LOOP_PROGRAM
 	dd console.asm.post_init
-
+	
 ; PROGRAM INIT
 	console.asm.init :
 		mov bl, 0xF
@@ -281,8 +281,75 @@
 		popa
 		ret
 		
+	console.doBackspace :	; NEEDS TO BE MIGRATED OVER!
+		mov eax, [console.charPos]
+		mov edx, 0x0
+		bsdloop :
+		push edx
+		mov edx, [console.width]
+		add edx, edx
+		sub eax, edx
+		pop edx
+		add edx, 0x1
+		cmp eax, 0
+		jg bsdloop
+		cmp eax, 0x0
+		mov ecx, 2
+		jne bsfnoloop
+		mov ebx, [console.charPos]
+		add ebx, [console.buffer]
+		mov [ebx], edx
+		mov eax, edx
+		push bx
+		push edx
+		mov edx, [console.width]
+		add edx, edx
+		mov bx, dx
+		pop edx
+		mul bx
+		pop bx
+		sub eax, 2
+		add eax, [console.buffer]
+		mov bx, 0x0
+		bsfcloop :
+		add ecx, 2
+		sub eax, 2
+		cmp [eax], bx
+		je bsfcloop
+		sub ecx, 2
+		bsfnoloop :
+		mov eax, [console.charPos]
+		sub eax, ecx
+		cmp eax, 0
+		jl console.doBackspace.stop
+		mov [console.charPos], eax
+		console.doBackspace.stop :
+		;add eax, [console.buffer]
+		;mov bx, 0x0
+		;mov [eax], bx
+		;add eax, 2
+		;mov [eax], bx
+		;call kernel.update
+		;	jmp os.pollKeyboard.drawKeyFinalize
+		ret
+		
 ; PROGRAM EXTERNAL FILES
-	%include "..\programs\Console\build.asm"
+	%include "..\..\programs\New Console\build.asm"
+	%include "..\..\modules\shlib.asm"
+	
+; PROGRAM DATA
+	console.width :
+		dd 0x0
+	console.height :
+		dd 0x0
+	console.pos :
+		dd 0x0
+	console.buffer :
+		dd 0x0
+	console.charPos :
+		dd 0xA2
+	console.line :
+		dd 0x0, 0x0, 0x0, 0x0
 
 ; FILE END TAG
 	console.asm.end :

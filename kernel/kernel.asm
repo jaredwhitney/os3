@@ -6,30 +6,35 @@ kernel :
 mov ebx, retfunc
 call os.setEcatch
 
-mov ebx, Dolphin.create
-mov [0x10C6], ebx
-
 ;call Mouse.init
 
 call Guppy.init
+call debug.init
 
-;mov ecx, console.asm.start
-;mov ebx, [ecx]
-;call console.numOut
-;jmp $
 
 	;mov ebx, console.asm.start		Should be rewritten to run with new console.
 	;call program.register
 	;call program.init
 
-;call console.asm.init
-;mov al, 'K'
-;mov ah, 0xF
-;mov ebx, 0xa0000
-;mov [charpos], ebx
-;call graphics.drawChar
-
-
+;mov ebx, os.setEcatch
+;call debug.num
+;call debug.newl
+;mov ebx, retfunc
+;call debug.num
+;call debug.newl
+;mov ebx, Dolphin.create
+;call debug.num
+;call debug.newl
+;mov ebx, Dolphin.textUpdate
+;call debug.num
+;call debug.newl
+;mov ebx, Dolphin.clear
+;call debug.num
+;call debug.newl
+;mov ebx, clearScreenG
+;call debug.num
+call Minnow.dtree
+call debug.update
 
 kernel.loop:
 call os.pollKeyboard
@@ -92,7 +97,7 @@ cmp cx, 0x0
 je os.pollKeyboard.return	; if not ready, a key is being held down, dont reprint it
 call os.keyboard.toChar
 cmp al, 0x0
-je console.doBackspace
+;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 cmp al, 0x1
 je os.doEnter
 mov bl, al
@@ -116,59 +121,6 @@ os.keyPress :
 mov [0xA0000], bl
 ;call console.cprint
 ret
-
-
-console.doBackspace :	; NEEDS TO BE MIGRATED OVER!
-
-mov eax, [console.charPos]
-mov edx, 0x0
-bsdloop :
-push edx
-mov edx, [console.width]
-add edx, edx
-sub eax, edx
-pop edx
-add edx, 0x1
-cmp eax, 0
-jg bsdloop
-cmp eax, 0x0
-mov ecx, 2
-jne bsfnoloop
-mov ebx, [console.charPos]
-add ebx, [console.buffer]
-mov [ebx], edx
-mov eax, edx
-push bx
-push edx
-mov edx, [console.width]
-add edx, edx
-mov bx, dx
-pop edx
-mul bx
-pop bx
-sub eax, 2
-add eax, [console.buffer]
-mov bx, 0x0
-bsfcloop :
-add ecx, 2
-sub eax, 2
-cmp [eax], bx
-je bsfcloop
-sub ecx, 2
-bsfnoloop :
-mov eax, [console.charPos]
-sub eax, ecx
-cmp eax, 0
-jl console.doBackspace.stop
-mov [console.charPos], eax
-console.doBackspace.stop :
-;add eax, [console.buffer]
-;mov bx, 0x0
-;mov [eax], bx
-;add eax, 2
-;mov [eax], bx
-;call kernel.update
-jmp os.pollKeyboard.drawKeyFinalize
 
 os.keyboard.toChar :
 cmp bl, 0x1E
@@ -307,6 +259,8 @@ ret
 %include "..\modules\Guppy.asm"
 %include "..\modules\Dolphin.asm"
 %include "..\modules\programLoader.asm"
+%include "..\modules\minnow.asm"
+%include "..\debug\print.asm"
 
 KERNEL_BOOT :
 db "Kernel Successfully Loaded!", 0
@@ -320,28 +274,11 @@ db "STATE: Hardware", 0
 BOCHS_BOOT :
 db "STATE: Emulator", 0
 
-console.width :
-dd 0x0
-
-console.height :
-dd 0x0
-
-console.pos :
-dd 0x0
-
-console.buffer :
-dd 0x0
 
 os.pollKeyboard.isReady :
 dd 0x0
 
-console.charPos :
-dd 0xA2
-
 os.ecatch :
 dd 0x10F0
 
-console.line :
-dd 0x0, 0x0, 0x0, 0x0
-
-times 0x1000-($-$$) db 0
+MINNOW_START :
