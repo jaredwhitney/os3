@@ -13,15 +13,17 @@ debug.num			equ		8
 debug.clear			equ		9
 
 it:
-	mov [locStor], ebx
+	mov [ebxStor], ebx
+	mov [eaxStor], eax
 	pop eax
 	pop ebx
 	push eax
+	mov eax, [eaxStor]
 	add ebx, ebx
 	add ebx, ebx
 	add ebx, 0x2000
 	mov eax, [ebx]
-	mov ebx, [locStor]
+	mov ebx, [ebxStor]
 	call eax
 	ret
 fmtEAX :
@@ -40,5 +42,8 @@ fmtEDX :
 	add edx, [0x3000]
 	sub edx, 0x10
 	ret
-locStor :
+	
+eaxStor :
+dd 0
+ebxStor :
 dd 0
