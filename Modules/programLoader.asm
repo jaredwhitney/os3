@@ -48,3 +48,28 @@ pinitnoz2 :
 mov [callLocation], bl
 ret
 
+program.post_init :		; THIS SHOULD BE MODIFIED MORE! (also init with multiple programs will kill it, etc)
+mov ebx, 0x0
+mov bl, [callLocation]
+mov eax, programLocations
+add eax, ebx ; SHOULD NOT BE COMMENTED OUT!
+mov ecx, [eax]
+cmp ecx, 0x0
+	je ppinitdonecall
+mov [0x3000], ecx	; so the program knows where it is in memory!
+add ecx, 0x5
+sub ecx, 4
+mov ecx, [ecx]
+
+pusha
+call ecx	; calling postinit
+popa
+
+ppinitdonecall :
+add bl, 0x4
+cmp bl, 44
+jl ppinitnoz2
+mov bl, 0x0
+ppinitnoz2 :
+mov [callLocation], bl
+ret

@@ -35,22 +35,23 @@
 			mov ebx, console.EXT_CALL
 			call fmtEBX	; need to reformat because it is a pointer to a location
 			call it
-			ret
 		
-		mov bl, 0xF
-		mov [0xa0002], bl
 		mov bl, 0x2				; setting the console as PNUM 2
 		push Dolphin.create
 		call it	; and creating a window
 		
-		mov ebx, 0x9000	; ignoring malloc for now
+		mov ebx, 0xA000	; ignoring malloc for now
 		mov [console.buffer], ebx	; storing our window's buffer position to be used later
 		
 		mov ebx, 0x18
 		mov [console.width], ebx
 		mov [console.height], ebx
 		mov ah, 0xB		; setting font color
+		
 		call JASM.console.init	; run JASM initialization code
+		call JASM.console.fullscrn
+		;call console.asm.post_init
+		ret
 		
 		mov ah, 0xE
 		
@@ -64,14 +65,15 @@
 	
 ; PROGRAM POST-INIT
 	console.asm.post_init :
-	
+	jmp $
 		;call os.pollKeyboard	; pulling keyboard data into the console's text buffer [function should be migrated into console.asm]
 	
 		mov eax, [console.buffer]
 		mov ebx, [console.pos]
 		mov ecx, [console.width]
 		mov edx, [console.height]
-		call Dolphin.textUpdate	; telling Dolphin (window manager) to update the window (text will be pushed from buffer to screen)		[Dolphin should eventually handle this automatically]
+		push Dolphin.textUpdate
+		call it; telling Dolphin (window manager) to update the window (text will be pushed from buffer to screen)		[Dolphin should eventually handle this automatically]
 			;	NOTE: JASM.console.post_init registers control to be transferred to JASM.console upon press of the ENTER key. The console's code then takes over.
 		ret
 	
@@ -100,7 +102,8 @@
 		add ebx, 0xa0000
 		mov ecx, [console.width]
 		mov edx, [console.height]
-		call Dolphin.clear
+		push Dolphin.clear
+		call it
 		popa
 		ret
 	
@@ -110,7 +113,8 @@
 		mov ebx, [console.pos]
 		mov ecx, [console.width]
 		mov edx, [console.height]
-		call Dolphin.textUpdate
+		push Dolphin.textUpdate
+		call it
 		popa
 		ret
 	
@@ -226,7 +230,8 @@
 		
 	console.clearScreen :
 		pusha
-		call clearScreenG
+		push clearScreenG
+		call it
 		mov eax, [console.buffer]
 		mov cx, 0x0
 		console.clearScreen.loop :

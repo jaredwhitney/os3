@@ -25,6 +25,9 @@ call debug.newl
 mov ebx, IT_WORKED_MSG
 call debug.println
 
+mov ebx, "HI!"
+mov [0xA000], ebx
+
 
 ;push ebx
 ;mov ebx, 6
@@ -34,12 +37,11 @@ call debug.println
 ;mov ebx, OK_MSG
 ;call it
 ;call debug.update
-;jmp $
 
 
 kernel.loop:
 call os.pollKeyboard
-;call console.asm.post_init
+call program.post_init
 jmp kernel.loop
 
 jmp $
