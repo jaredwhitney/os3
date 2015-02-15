@@ -27,17 +27,13 @@
 	console.asm.init :
 		mov bl, 0xF
 		mov [0xa0001], bl
-			mov ebx, debug.clear	; clearing the debug buffer
-			mov [locStor], ebx
+			push debug.clear	; clearing the debug buffer
 			call it
-			mov ebx, clearScreenG	; wiping the screen
-			mov [locStor], ebx
+			push clearScreenG	; wiping the screen
 			call it
-			mov ebx, debug.println	; printing a message
-			mov [locStor], ebx
+			push debug.println	; printing a message
 			mov ebx, console.EXT_CALL
-			add ebx, [0x3000]
-			sub ebx, 0x10
+			call fmtEBX	; need to reformat because it is a pointer to a location
 			call it
 			ret
 		
