@@ -43,22 +43,6 @@ call os.pollKeyboard
 jmp kernel.loop
 
 jmp $
-;it:
-	;push ebx
-	;mov ebx, [locStor]
-;	
-	;add ebx, ebx
-	;add ebx, ebx
-	;add ebx, 0x2000
-	;mov eax, [ebx]
-	;call debug.num
-	;call debug.update
-	;;jmp $
-	;pop ebx
-	;call eax
-	;ret
-;locStor :
-;dd 0
 
 Mouse.init :
 push ax
