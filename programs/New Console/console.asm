@@ -25,6 +25,9 @@
 	
 ; PROGRAM INIT
 	console.asm.init :
+		mov ebx, 0xDADA
+		mov [0x10C0], ebx
+		ret
 		mov bl, 0xF
 		mov [0xa0002], bl
 		mov bl, 0x2				; setting the console as PNUM 2

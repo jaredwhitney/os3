@@ -107,6 +107,27 @@ jmp graphicsgetposloop
 graphicsgetposret :
 ret
 
+os.seq :
+	;pusha
+	seq.loop_0.start :
+		mov cl, [eax]
+		mov dl, [ebx]
+		cmp cl, 0
+			je seq.loop_0.go
+		cmp cl, dl
+			jne seq.loop_0.end
+		add eax, 1
+		add ebx, 1
+		jmp seq.loop_0.start
+	seq.loop_0.go :
+		;popa
+		mov al, 0x1
+		ret
+	seq.loop_0.end :
+		;popa
+		mov al, 0x0
+		ret
+
 charpos :
 dd 0xa0000
 

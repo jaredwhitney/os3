@@ -11,11 +11,6 @@ call os.setEcatch
 call Guppy.init
 call debug.init
 
-
-	;mov ebx, console.asm.start		Should be rewritten to run with new console.
-	;call program.register
-	;call program.init
-
 ;mov ebx, os.setEcatch
 ;call debug.num
 ;call debug.newl
@@ -33,9 +28,21 @@ call debug.init
 ;call debug.newl
 ;mov ebx, clearScreenG
 ;call debug.num
+
 call Minnow.dtree
 call debug.update
 
+mov ebx, console_name
+call Minnow.byName
+	call debug.num
+	call debug.update
+call program.register
+call program.init
+	push ebx
+	mov ebx, [0x10C0]
+	call debug.num	; if this prints out 0xDADA, then the console's init function has been executed.
+	pop ebx
+	call debug.update
 kernel.loop:
 call os.pollKeyboard
 ;call console.asm.post_init
@@ -274,6 +281,8 @@ db "STATE: Hardware", 0
 BOCHS_BOOT :
 db "STATE: Emulator", 0
 
+console_name :
+db "_CONSOLE", 0
 
 os.pollKeyboard.isReady :
 dd 0x0
