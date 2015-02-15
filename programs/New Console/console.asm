@@ -25,13 +25,27 @@
 	
 ; PROGRAM INIT
 	console.asm.init :
-		mov ebx, 0xDADA
-		mov [0x10C0], ebx
-		ret
+		mov bl, 0xF
+		mov [0xa0001], bl
+			mov ebx, debug.clear	; clearing the debug buffer
+			mov [locStor], ebx
+			call it
+			mov ebx, clearScreenG	; wiping the screen
+			mov [locStor], ebx
+			call it
+			mov ebx, debug.println	; printing a message
+			mov [locStor], ebx
+			mov ebx, console.EXT_CALL
+			add ebx, [0x3000]
+			sub ebx, 0x10
+			call it
+			ret
+		
 		mov bl, 0xF
 		mov [0xa0002], bl
 		mov bl, 0x2				; setting the console as PNUM 2
-		call Dolphin.create		; and creating a window
+		push Dolphin.create
+		call it	; and creating a window
 		
 		mov ebx, 0x9000	; ignoring malloc for now
 		mov [console.buffer], ebx	; storing our window's buffer position to be used later
@@ -353,6 +367,8 @@
 		dd 0xA2
 	console.line :
 		dd 0x0, 0x0, 0x0, 0x0
+	console.EXT_CALL :
+		db "Hello from an external program!",0
 
 ; FILE END TAG
 	console.asm.end :

@@ -32,6 +32,7 @@ add eax, ebx ; SHOULD NOT BE COMMENTED OUT!
 mov ecx, [eax]
 cmp ecx, 0x0
 	je pinitdonecall
+mov [0x3000], ecx	; so the program knows where it is in memory!
 add ecx, 0x5
 
 pusha

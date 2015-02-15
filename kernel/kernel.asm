@@ -2,53 +2,63 @@
 [org 0x7e00]
 db 0x4a
 kernel :
+call writeLib
+call Guppy.init
+call debug.init
+;call Mouse.init
 
 mov ebx, retfunc
 call os.setEcatch
 
-;call Mouse.init
-
-call Guppy.init
-call debug.init
-
-;mov ebx, os.setEcatch
-;call debug.num
-;call debug.newl
-;mov ebx, retfunc
-;call debug.num
-;call debug.newl
-;mov ebx, Dolphin.create
-;call debug.num
-;call debug.newl
-;mov ebx, Dolphin.textUpdate
-;call debug.num
-;call debug.newl
-;mov ebx, Dolphin.clear
-;call debug.num
-;call debug.newl
-;mov ebx, clearScreenG
-;call debug.num
 
 call Minnow.dtree
 call debug.update
 
-mov ebx, console_name
-call Minnow.byName
-	call debug.num
-	call debug.update
-call program.register
-call program.init
-	push ebx
-	mov ebx, [0x10C0]
-	call debug.num	; if this prints out 0xDADA, then the console's init function has been executed.
-	pop ebx
-	call debug.update
+mov ebx, console_name	; console_name = "_CONSOLE"
+call Minnow.byName	; find the file
+call program.register	; register it as a program
+call program.init	; run it!
+
+call debug.clear
+call debug.newl
+call debug.newl
+mov ebx, IT_WORKED_MSG
+call debug.println
+
+
+;push ebx
+;mov ebx, 6
+;mov [locStor], ebx
+;pop ebx
+;
+;mov ebx, OK_MSG
+;call it
+;call debug.update
+;jmp $
+
+
 kernel.loop:
 call os.pollKeyboard
 ;call console.asm.post_init
 jmp kernel.loop
 
 jmp $
+;it:
+	;push ebx
+	;mov ebx, [locStor]
+;	
+	;add ebx, ebx
+	;add ebx, ebx
+	;add ebx, 0x2000
+	;mov eax, [ebx]
+	;call debug.num
+	;call debug.update
+	;;jmp $
+	;pop ebx
+	;call eax
+	;ret
+;locStor :
+;dd 0
 
 Mouse.init :
 push ax
@@ -267,6 +277,7 @@ ret
 %include "..\modules\Dolphin.asm"
 %include "..\modules\programLoader.asm"
 %include "..\modules\minnow.asm"
+%include "..\modules\extlib.asm"
 %include "..\debug\print.asm"
 
 KERNEL_BOOT :
@@ -283,6 +294,9 @@ db "STATE: Emulator", 0
 
 console_name :
 db "_CONSOLE", 0
+
+IT_WORKED_MSG :
+db "Returned to kernel.", 0
 
 os.pollKeyboard.isReady :
 dd 0x0
