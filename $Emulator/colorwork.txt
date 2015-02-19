@@ -1,0 +1,21 @@
+255	255	255
+0	0	0
+
+total of 255 slots
+
+tr*tb*tg must = 255
+
+cubert 255 = 6.34 -> 6 total colors in each
+
+only 216 (0xd8) colors will actually be used
+
+
+the space between each color should be 255/6 = 42.5 -> 42 (0x2a)
+
+so:
+255, 255, 255  (/42) -> 6, 6, 6 (infm) -> 0-6, 0-6, 0-6 -> 258 (overflow...)
+
+CLAMP anything over 216 to 216?
+
+255,255,255->216,216,216->5,5,5-> 215 -> 5,5,5->210,210,210 ...
+122, 0, 255->122,  0,216->2,0,5->  77 -> 2,0,5->

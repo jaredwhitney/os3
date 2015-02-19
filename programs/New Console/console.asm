@@ -41,15 +41,21 @@
 		call it	; and creating a window
 		
 		mov ebx, 0xA000	; ignoring malloc for now
-		mov [console.buffer], ebx	; storing our window's buffer position to be used later
+		mov eax, console.buffer
+			call fmtEAX
+		mov [eax], ebx	; storing our window's buffer position to be used later
 		
 		mov ebx, 0x18
-		mov [console.width], ebx
-		mov [console.height], ebx
+		mov eax, console.width
+			call fmtEAX
+		mov [eax], ebx
+		mov eax, console.height
+			call fmtEAX
+		mov [eax], ebx
 		mov ah, 0xB		; setting font color
 		
 		call JASM.console.init	; run JASM initialization code
-		call JASM.console.fullscrn
+		;call JASM.console.fullscrn
 		;call console.asm.post_init
 		ret
 		
@@ -65,7 +71,7 @@
 	
 ; PROGRAM POST-INIT
 	console.asm.post_init :
-	jmp $
+	;jmp $
 		;call os.pollKeyboard	; pulling keyboard data into the console's text buffer [function should be migrated into console.asm]
 	
 		mov eax, [console.buffer]
@@ -80,28 +86,40 @@
 ; PROGRAM EXTRA CODE
 	console.setWidth :
 		call console.wipe
-		mov [console.width], ebx
+		mov eax, console.width
+			call fmtEAX
+		mov [eax], ebx
 		call console.clearScreen
 		ret
 	
 	console.setHeight :
 		call console.wipe
-		mov [console.height], ebx
+		mov eax, console.height
+			call fmtEAX
+		mov [eax], ebx
 		call console.clearScreen
 		ret
 	
 	console.setPos :
 		call console.wipe
-		mov [console.pos], ebx
+		mov eax, console.pos
+			call fmtEAX
+		mov [eax], ebx
 		call console.clearScreen
 		ret
 		
 	console.wipe :
 		pusha
-		mov ebx, [console.pos]
+		mov eax, console.pos
+			call fmtEAX
+		mov ebx, [eax]
 		add ebx, 0xa0000
-		mov ecx, [console.width]
-		mov edx, [console.height]
+		mov eax, console.width
+			call fmtEAX
+		mov ecx, [eax]
+		mov eax, console.height
+			call fmtEAX
+		mov edx, [eax]
 		push Dolphin.clear
 		call it
 		popa
@@ -352,7 +370,7 @@
 		ret
 		
 ; PROGRAM EXTERNAL FILES
-	%include "..\..\programs\New Console\build.asm"
+	%include "jasmconsole.asm"
 	%include "..\..\modules\shlib.asm"
 	
 ; PROGRAM DATA

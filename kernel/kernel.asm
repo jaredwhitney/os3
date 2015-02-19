@@ -11,22 +11,29 @@ mov ebx, retfunc
 call os.setEcatch
 
 
-call Minnow.dtree
+;call Minnow.dtree
+
+mov ebx, bg_name
+call debug.print
 call debug.update
 
-mov ebx, console_name	; console_name = "_CONSOLE"
+mov ebx, bg_name	; bg_name = "TEAMBLDR"
 call Minnow.byName	; find the file
-call program.register	; register it as a program
-call program.init	; run it!
+call Dolphin.setVGApalette
+call Dolphin.makeBG
 
-call debug.clear
-call debug.newl
-call debug.newl
-mov ebx, IT_WORKED_MSG
-call debug.println
+call debug.update
 
-mov ebx, "HI!"
-mov [0xA000], ebx
+;call debug.update
+
+;call debug.clear
+;call debug.newl
+;call debug.newl
+;mov ebx, IT_WORKED_MSG
+;call debug.println
+
+;mov ebx, "HI!"
+;mov [0xA000], ebx
 
 
 ;push ebx
@@ -41,7 +48,7 @@ mov [0xA000], ebx
 
 kernel.loop:
 call os.pollKeyboard
-call program.post_init
+;call program.post_init
 jmp kernel.loop
 
 jmp $
@@ -278,8 +285,8 @@ db "STATE: Hardware", 0
 BOCHS_BOOT :
 db "STATE: Emulator", 0
 
-console_name :
-db "_CONSOLE", 0
+bg_name :
+db "TEAMBLDR", 0
 
 IT_WORKED_MSG :
 db "Returned to kernel.", 0

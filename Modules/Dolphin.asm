@@ -109,5 +109,54 @@ jg Dolphin.clear.loop0
 popa
 ret
 
+Dolphin.makeBG :	; ebx contains location of data
+pusha
+mov eax, 0xa0000
+Dolphin.makeBG.loop1 :
+mov cl, [ebx]
+mov [eax], cl
+add ebx, 1
+add eax, 1
+cmp eax, 0xaf000
+jl Dolphin.makeBG.loop1
+popa
+ret
+
+Dolphin.setVGApalette :
+pusha
+mov dx, 0x3c8
+mov al, 0x0
+out dx, al	; we are starting with index 0
+
+mov dx, 0x0	; red
+mov cx, 0x0	; blue
+mov bx, 0x0	; green
+mov ax, 0x0
+
+Dolphin.setVGApalette.loop1 :
+mov ax, dx
+push dx
+mov dx, 0x3c9
+out dx, ax	; red
+mov ax, bx
+out dx, ax	; green
+mov ax, cx
+out dx, ax	; blue
+pop dx
+add cx, 42
+cmp cx, 216
+jle Dolphin.setVGApalette.cont
+mov cx, 0x0
+add bx, 42
+cmp bx, 216
+jle Dolphin.setVGApalette.cont
+mov bx, 0x0
+add dx, 42
+Dolphin.setVGApalette.cont :
+cmp dx, 216
+jle Dolphin.setVGApalette.loop1
+popa
+ret
+
 Dolphin.charposStor :
 dw 0x0

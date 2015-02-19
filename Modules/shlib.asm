@@ -43,6 +43,10 @@ fmtEDX :
 	sub edx, 0x10
 	ret
 	
+mmtEBX :
+	call fmtEBX
+	mov ebx, [ebx]
+	
 eaxStor :
 dd 0
 ebxStor :

@@ -39,7 +39,7 @@ debug.update :
 	mov ecx, [debug.charpos]
 	mov [charpos], ecx
 	mov ebx, [debug.buffer]
-	mov ah, 0xF
+	mov ah, 255
 	mov edx, 0x0
 	debug.update_loop :
 		mov al, [ebx]

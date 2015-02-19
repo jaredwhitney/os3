@@ -101,7 +101,7 @@ push es
 mov ax, 0x0
 mov es, ax
 mov ah, 0x02	;telling bios we want to read from memory	|	location to read to sent in as BX
-mov al, 0x10		;the number of sectors to read				|	sent in as DH
+mov al, 0x40		;the number of sectors to read				|	sent in as DH
 mov dh, 0x0	;head to read from
 ;mov dl, 0x80	;drive to read from [0x80] if machine, [0x00] is bochs
 mov ch, 0	; track to read from

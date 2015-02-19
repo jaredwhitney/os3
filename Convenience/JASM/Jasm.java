@@ -8,8 +8,13 @@ static ArrayList decs = new ArrayList();
 static ArrayList<Var> vars = new ArrayList<Var>();
 static String inp = "";
 static boolean seq = false;
+static boolean ext = false;
 public static void main(String[] args) throws Exception
 {
+if (args.length > 0)
+	for (String a : args)
+		if (a.equalsIgnoreCase("-e"))
+			ext = true;
 if (new File("build.cfg").exists())
 {
 BufferedReader cin = new BufferedReader(new FileReader("build.cfg"));
@@ -51,9 +56,20 @@ while (inp != null)
 		inp = inp.split("=")[1].trim();
 		System.err.println("inp: " + inp+"\ntnp: "+tnp);
 		System.out.println("push eax");
+		if (ext)
+			System.out.println("push ebx");
 		System.out.println("mov eax, " + parse(inp));
 		inp = tnp;
-		System.out.println("mov [" + pname + "." + inp.split("\\Q=\\E")[0].trim()+"], eax");
+		if (ext)
+		{
+			System.out.println("mov ebx, " + pname + "." + inp.split("\\Q=\\E")[0].trim());
+			System.out.println("call fmtEBX");
+			System.out.println("mov [ebx], eax");
+		}
+		else
+			System.out.println("mov [" + pname + "." + inp.split("\\Q=\\E")[0].trim()+"], eax");
+		if (ext)
+			System.out.println("pop ebx");
 		System.out.println("pop eax");
 		boolean mnew = true;
 		for (Var v : vars)
@@ -194,7 +210,16 @@ while (inp != null)
 	{
 		System.err.println("<- " + inp.split("return ")[1]);
 		System.out.println("mov eax, " + parse(inp.split("return ")[1].replaceAll("\\Q;\\E","")));
-		System.out.println("mov [retval], eax");
+		if (ext)
+		{
+			System.out.println("push ebx");
+			System.out.println("mov ebx, retval");
+			System.out.println("fmtEBX");
+			System.out.println("mov [ebx], eax");
+			System.out.println("pop ebx");
+		}
+		else
+			System.out.println("mov [retval], eax");
 		System.out.println("popa");
 		System.out.println("ret");
 	}

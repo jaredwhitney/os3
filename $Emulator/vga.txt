@@ -1,0 +1,9 @@
+1 byte read, 2 byte writes
+0xa0000-0xbffff
+
+x3c8, x3c9, x3c7 control DAC
+	18 bits, 6 bits for each color component
+		color index to port 0x3C8
+		3 bytes to 0x3C9 in the order red, green, blue
+		first entry's index to 0x3C8 then write all values to 0x3C9 in the order red, green, blue, red, green, blue, and so on
+		To read the DAC entries, write the index to be read to 0x3C7, then read the bytes from port 0x3C9
