@@ -174,8 +174,7 @@ pop ebx
 		; print("Console: ")
 push ebx
 mov ebx, JASM.console.var_0
-;call console.print
-;jmp $
+call console.print
 pop ebx
 		; catch_enter(handleEnter)
 push ebx

@@ -4,11 +4,6 @@
 ;	contains the system's built in console
 ;	in standard program format
 ;
-
-dd console.asm.end-console.asm.start
-db "PRGM"
-db "ICONSOLE"
-
 console.asm.start :
 ; Program Constants:
 	LOOP_PROGRAM   equ 0x1
@@ -37,7 +32,8 @@ console.asm.init :
 	mov [0xa0002], bl
 	mov bl, 0x2				; setting the console as PNUM 2
 	call Dolphin.create		; and creating a window
-	;mov ebx, 0x9000	; ignoring malloc for now
+	
+	mov ebx, 0x9000	; ignoring malloc for now
 		;jmp $
 	;call console.numOut;test
 	;jmp $;test
@@ -49,16 +45,15 @@ console.asm.init :
 	mov ah, 0xB		; setting font color
 	call JASM.console.init	; run JASM initialization code
 	
-	
 	mov ah, 0xE
 	;call JASM.test.main	; running some JASM code tests [should be removed at some point?]
 	
 	call JASM.console.post_init	; finalizing the JASM initialization
-	;jmp $
+	
 	call console.asm.post_init
-	;jmp $
 	mov bl, 0xC
 	mov [0xa0003], bl
+	jmp $
 	ret
 	
 
@@ -297,23 +292,6 @@ console.getLine :
 	popa
 	ret
 	
-	%include "..\programs\console\build.asm"
-console.width :
-dd 0x0
-
-console.height :
-dd 0x0
-
-console.pos :
-dd 0x0
-
-console.buffer :
-dd 0x0
-
-console.charPos :
-dd 0xA2
-
-console.line :
-dd 0x0, 0x0, 0x0, 0x0
+	%include "..\programs\Console\build.asm"
 	
-console.asm.end :
+dd 0x4EBEDEAD	; magic number to end the program

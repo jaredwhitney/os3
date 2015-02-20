@@ -24,13 +24,31 @@ call Dolphin.makeBG
 
 call debug.update
 
-;call console.asm.init
+;call debug.update
 
-jmp $
+;call debug.clear
+;call debug.newl
+;call debug.newl
+;mov ebx, IT_WORKED_MSG
+;call debug.println
+
+;mov ebx, "HI!"
+;mov [0xA000], ebx
+
+
+;push ebx
+;mov ebx, 6
+;mov [locStor], ebx
+;pop ebx
+;
+;mov ebx, OK_MSG
+;call it
+;call debug.update
+
 
 kernel.loop:
-;call os.pollKeyboard
-;call console.asm.post_init
+call os.pollKeyboard
+;call program.post_init
 jmp kernel.loop
 
 jmp $
@@ -51,7 +69,6 @@ pusha
 mov eax, [os.ecatch]
 mov [eax], ebx
 popa
-ret
 
 os.pollKeyboard :
 pusha
@@ -112,7 +129,7 @@ jmp os.pollKeyboard.drawKeyFinalize
 
 os.keyPress :
 mov [0xA0000], bl
-call console.cprint	; should not rely on console...
+;call console.cprint
 ret
 
 os.keyboard.toChar :
@@ -254,7 +271,6 @@ ret
 %include "..\modules\programLoader.asm"
 %include "..\modules\minnow.asm"
 %include "..\modules\extlib.asm"
-%include "..\programs\console\console.asm"
 %include "..\debug\print.asm"
 
 KERNEL_BOOT :
