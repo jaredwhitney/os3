@@ -21,7 +21,6 @@ mov eax, [charpos]
 mov [Dolphin.charposStor], eax
 pop eax
 push cx
-
 Dolphin.update.loop1 :
 mov [charpos], ebx
 push eax
