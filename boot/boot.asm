@@ -94,13 +94,13 @@ ret
 
 boot.load :
 pusha
-
+push bx
 mov ah, 0	; reset floppy controller
 mov bl, dl
 mov dl, 0
 int 0x13
 mov dl, bl
-
+pop bx
 ;mov bx, 0x7e00
 push es
 mov ax, 0x0

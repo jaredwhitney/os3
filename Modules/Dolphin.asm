@@ -160,6 +160,9 @@ ret
 
 Dolphin.setGrayscalePalette :
 pusha
+mov ax, [0x1000]
+cmp ax, 0xF
+jne Dolphin.setGrayscalePalette2	; should be jne, swapped for testing
 mov dx, 0x3c8
 mov al, 0x0
 out dx, al	; we are starting with index 0
@@ -175,6 +178,16 @@ jle Dolphin.setGrayscalePalette.loop1
 popa
 ret
 
+Dolphin.setGrayscalePalette2 :
+mov ah, 0x1f
+call debug.useFallbackColor
+mov ebx, PALETTE_NODEFAULT
+call debug.log.info
+	; some alternate code should go here!
+popa
+ret
 
 Dolphin.charposStor :
 dw 0x0
+PALETTE_NODEFAULT :
+db "Falling back to secondary palette...", 0

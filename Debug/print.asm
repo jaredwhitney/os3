@@ -7,14 +7,14 @@ mov [debug.buffer], ebx
 call clearScreenG
 mov ebx, DEBUG_INIT_MSG
 call debug.log.system
-mov ax, 0x1000
+mov ax, [0x1000]
 cmp ax, 0xF
 jne debug.init.op1
-mov ebx, DEBUG_INIT_REALBOOT
+mov ebx, DEBUG_INIT_EMUBOOT
 call debug.log.info
 ret
 debug.init.op1 :
-mov ebx, DEBUG_INIT_EMUBOOT
+mov ebx, DEBUG_INIT_REALBOOT
 call debug.log.info
 ret
 
@@ -82,6 +82,7 @@ debug.update :
 	mov edx, 0x0
 	debug.update_loop :
 		mov ax, [ebx]
+		call debug.internal.fallcheck
 		cmp edx, 0x2000
 			jg debug.update_ret
 		add edx, 1
@@ -215,6 +216,22 @@ debug.restoreColor :
 	mov [debug.color], ah
 	pop ax
 	ret
+debug.useFallbackColor :
+	mov [debug.color.fallback], ah
+	push ax
+	mov ah, 0x1
+	mov [char.solid], ah
+	pop ax
+	ret
+debug.internal.fallcheck :
+	push bx
+	mov bl, [debug.color.fallback]
+	cmp bl, 0x0
+	je debug.internal.fallcheck.ret
+	mov ah, bl
+	debug.internal.fallcheck.ret :
+	pop bx
+	ret
 debug.charpos :
 dd 0xa0000
 debug.charpos.stor :
@@ -231,6 +248,8 @@ debug.color :
 db 0xDA
 debug.cstor :
 db 0xDA
+debug.color.fallback :
+db 0x0
 DEBUG_INFO_TAG :
 db "[ info ] ", 0
 DEBUG_SYSTEM_TAG :

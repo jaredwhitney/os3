@@ -48,7 +48,17 @@ cmp ch, 0b0
 je drawRownd
 mov dl, [colorS]
 mov [ebx], dl
+jmp drawRownddone
 drawRownd :
+push dx
+mov dl, [char.solid]
+cmp dl, 0x0
+je drawRownd.nodr
+mov dl, 0x0
+mov [ebx], dl
+drawRownd.nodr :
+pop dx
+drawRownddone :
 add ebx, 0x1
 cmp cl, 0x0
 jg drawRowloop
@@ -133,6 +143,9 @@ dd 0xa0000
 
 colorS :
 db 0xF
+
+char.solid :
+db 0x0
 
 fontOrder :
 db 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g'
