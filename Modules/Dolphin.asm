@@ -158,5 +158,23 @@ jle Dolphin.setVGApalette.loop1
 popa
 ret
 
+Dolphin.setGrayscalePalette :
+pusha
+mov dx, 0x3c8
+mov al, 0x0
+out dx, al	; we are starting with index 0
+mov ax, 0x0
+mov dx, 0x3c9
+Dolphin.setGrayscalePalette.loop1 :
+out dx, ax
+out dx, ax
+out dx, ax
+add ax, 1
+cmp ax, 255
+jle Dolphin.setGrayscalePalette.loop1
+popa
+ret
+
+
 Dolphin.charposStor :
 dw 0x0

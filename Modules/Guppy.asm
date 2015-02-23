@@ -40,7 +40,7 @@ mov eax, ebx
 mov ebx, 0x200	; size of a sector
 mul ebx
 mov ebx, eax
-add ebx, 0x7c00
+add ebx, 0xbffff
 pop eax
 pop ecx
 ret	; EBX = Start of allocated memory

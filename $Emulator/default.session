@@ -1,0 +1,14 @@
+<NotepadPlus>
+    <Session activeView="1">
+        <mainView activeIndex="0" />
+        <subView activeIndex="6">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Debug\print.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\programLoader.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\Minnow.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\programs\New Console\jasmconsole.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\image\league.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\iConsole.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="636" endPos="636" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\kernel\kernel.asm" />
+        </subView>
+    </Session>
+</NotepadPlus>

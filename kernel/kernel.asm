@@ -2,24 +2,31 @@
 [org 0x7e00]
 db 0x4a
 kernel :
+;mov bl, 0xF
+;mov [debug.color], bl	; temp
 call writeLib
 call Guppy.init
 call debug.init
 ;call Mouse.init
 
+
 mov ebx, retfunc
 call os.setEcatch
 
+call Dolphin.setGrayscalePalette
 
+call Minnow.dtree
 ;call Minnow.dtree
-
-mov ebx, bg_name
-call debug.print
+;call Minnow.dtree
 call debug.update
 
+mov ebx, FILE_DESCR
+call debug.print
 mov ebx, bg_name	; bg_name = "TEAMBLDR"
+call debug.println
+
 call Minnow.byName	; find the file
-call Dolphin.setVGApalette
+;call Dolphin.setVGApalette
 call Dolphin.makeBG
 
 call debug.update
@@ -45,6 +52,8 @@ call debug.update
 ;call it
 ;call debug.update
 
+mov ebx, LOAD_FINISH
+call debug.log.system
 
 kernel.loop:
 call os.pollKeyboard
@@ -288,8 +297,11 @@ db "STATE: Emulator", 0
 bg_name :
 db "TEAMBLDR", 0
 
-IT_WORKED_MSG :
-db "Returned to kernel.", 0
+LOAD_FINISH :
+db "Transferring control to user!", 0
+
+FILE_DESCR :
+db "File name: ", 0
 
 os.pollKeyboard.isReady :
 dd 0x0

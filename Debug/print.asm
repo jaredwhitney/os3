@@ -1,9 +1,21 @@
 debug.init :
 mov al, 1
 mov ah, 3
-call Guppy.malloc
+;call Guppy.malloc
+mov ebx, 0x80000
 mov [debug.buffer], ebx
 call clearScreenG
+mov ebx, DEBUG_INIT_MSG
+call debug.log.system
+mov ax, 0x1000
+cmp ax, 0xF
+jne debug.init.op1
+mov ebx, DEBUG_INIT_REALBOOT
+call debug.log.info
+ret
+debug.init.op1 :
+mov ebx, DEBUG_INIT_EMUBOOT
+call debug.log.info
 ret
 
 debug.println :
@@ -11,9 +23,36 @@ debug.println :
 	call debug.newl
 	call debug.update
 	ret
+	
+debug.log.system :
+	pusha
+	mov ah, 0xFF
+	call debug.setColor
+	push ebx
+	mov ebx, DEBUG_SYSTEM_TAG
+	call debug.print
+	pop ebx
+	call debug.println
+	call debug.restoreColor
+	popa
+	ret
+	
+debug.log.info :
+	pusha
+	mov ah, 0xE9
+	call debug.setColor
+	push ebx
+	mov ebx, DEBUG_INFO_TAG
+	call debug.print
+	pop ebx
+	call debug.println
+	call debug.restoreColor
+	popa
+	ret
 
 debug.print :	; string loc in ebx
 	pusha
+	mov ah, [debug.color]
 	mov ecx, [debug.buffer]
 	mov edx, [debug.bufferpos]
 	add ecx, edx
@@ -21,9 +60,9 @@ debug.print :	; string loc in ebx
 		mov al, [ebx]
 		cmp al, 0x0
 		je debug.print.ret
-		mov [ecx], al
+		mov [ecx], ax
 		add ebx, 0x1
-		add ecx, 0x1
+		add ecx, 0x2
 		jmp debug.print.loop
 		debug.print.ret :
 	mov edx, [debug.buffer]
@@ -42,8 +81,8 @@ debug.update :
 	mov ah, 255
 	mov edx, 0x0
 	debug.update_loop :
-		mov al, [ebx]
-		cmp edx, 0x1000
+		mov ax, [ebx]
+		cmp edx, 0x2000
 			jg debug.update_ret
 		add edx, 1
 		cmp al, 0x0
@@ -53,11 +92,11 @@ debug.update :
 		debug.update.nodraw :
 			push ecx
 			mov ecx, [charpos]
-			add ecx, 8
+			add ecx, 6
 			mov [charpos], ecx
 			pop ecx
 		debug.update.cont1 :
-		add ebx, 0x1
+		add ebx, 0x2
 		jmp debug.update_loop
 	debug.update_ret :
 	mov ecx, [debug.charpos.stor]
@@ -80,6 +119,9 @@ jmp debug.clear.loop
 debug.clear.ret :
 mov ecx, 0x0
 mov [debug.bufferpos], ecx
+mov [debug.nlcor], ecx
+mov cl, 0x1
+mov [debug.nlcnow], cl
 popa
 ret
 
@@ -123,21 +165,56 @@ debug.cprint :	; char in al
 	mov ecx, [debug.bufferpos]
 	mov ebx, [debug.buffer]
 	add ecx, ebx
-	mov [ecx], al
-	add ecx, 1
+	mov ah, [debug.color]
+	mov [ecx], ax
+	add ecx, 2	; there are now two bytes: char and color
 	sub ecx, ebx
 	mov [debug.bufferpos], ecx
 	popa
 	ret
-
+LINE_SEQ equ 0x3c0; 0x1e0 * 2 = 0x3c0
 debug.newl :
-	push ebx
+	pusha
 	mov ebx, [debug.bufferpos]
-	add ebx, 0x168
+	mov edx, 0x0
+	mov eax, ebx
+	mov ecx, LINE_SEQ
+	div ecx
+	mov ebx, eax
+	imul ebx, LINE_SEQ
+	add ebx, LINE_SEQ
+	
+		;mov eax, [debug.nlcor]
+		;sub ebx, eax
+		;mov al, [debug.nlcnow]
+		;cmp al, 1
+			;jne debug.newl.nocorrect	; 7/11 works kindof well
+		;mov eax, [debug.nlcor]
+		;add eax, 2
+		;mov [debug.nlcor], eax
+		;mov al, 0x1
+		;jmp debug.newl.donecorrecting
+		;debug.newl.nocorrect :
+			;add al, 0x1
+		;debug.newl.donecorrecting :
+			;mov [debug.nlcnow], al
+			
 	mov [debug.bufferpos], ebx
-	pop ebx
+	popa
 	ret
-
+debug.setColor :
+	push ax
+	mov ah, [debug.color]
+	mov [debug.cstor], ah
+	pop ax
+	mov [debug.color], ah
+	ret
+debug.restoreColor :
+	push ax
+	mov ah, [debug.cstor]
+	mov [debug.color], ah
+	pop ax
+	ret
 debug.charpos :
 dd 0xa0000
 debug.charpos.stor :
@@ -146,3 +223,21 @@ debug.buffer :
 dd 0x0
 debug.bufferpos :
 dd 0x0
+debug.nlcor :
+dd 0x0
+debug.nlcnow :
+db 0x1
+debug.color :
+db 0xDA
+debug.cstor :
+db 0xDA
+DEBUG_INFO_TAG :
+db "[ info ] ", 0
+DEBUG_SYSTEM_TAG :
+db "[system] ", 0
+DEBUG_INIT_MSG :
+db "Debugger online.", 0
+DEBUG_INIT_REALBOOT :
+db "Running on a real computer.", 0
+DEBUG_INIT_EMUBOOT :
+db "Running on an emulator.", 0

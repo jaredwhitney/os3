@@ -50,7 +50,12 @@ mov ax, 0x0			; changes to 0xF if booting from bochs
 mov [0x1000], ax
 
 mov dl, 0x80
+mov ch, 0
+mov bx, 0x7e00
 call boot.load
+	;mov ch, 2
+	;mov bx, 0xefff
+	;call boot.load
 mov bx, EnableA20
 call boot.print
 
@@ -96,7 +101,7 @@ mov dl, 0
 int 0x13
 mov dl, bl
 
-mov bx, 0x7e00
+;mov bx, 0x7e00
 push es
 mov ax, 0x0
 mov es, ax
@@ -104,7 +109,7 @@ mov ah, 0x02	;telling bios we want to read from memory	|	location to read to sen
 mov al, 0x40		;the number of sectors to read				|	sent in as DH
 mov dh, 0x0	;head to read from
 ;mov dl, 0x80	;drive to read from [0x80] if machine, [0x00] is bochs
-mov ch, 0	; track to read from
+;mov ch, 0	; track to read from
 mov cl, 2
 
 int 0x13
