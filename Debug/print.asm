@@ -110,10 +110,10 @@ pusha
 mov ebx, [debug.buffer]
 mov eax, [debug.bufferpos]
 add eax, ebx
-mov cl, 0x0
+mov cx, 0x0
 debug.clear.loop :
-mov [ebx], cl
-add ebx, 1
+mov [ebx], cx
+add ebx, 2
 cmp ebx, eax
 jg debug.clear.ret
 jmp debug.clear.loop

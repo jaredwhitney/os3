@@ -14,6 +14,7 @@ mov ebx, retfunc
 call os.setEcatch
 
 call Dolphin.setGrayscalePalette
+call Dolphin.setVGApalette
 
 call Minnow.dtree
 ;call Minnow.dtree
@@ -28,7 +29,6 @@ call debug.println
 call Minnow.byName	; find the file
 ;call Dolphin.setVGApalette
 call Dolphin.makeBG
-
 call debug.update
 
 ;call debug.update
@@ -54,6 +54,7 @@ call debug.update
 
 mov ebx, LOAD_FINISH
 call debug.log.system
+
 
 kernel.loop:
 call os.pollKeyboard

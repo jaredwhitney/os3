@@ -124,36 +124,62 @@ ret
 
 Dolphin.setVGApalette :
 pusha
+	mov dx, 0x3c6	; setting palette mask, unneeded on bochs
+	mov al, 0xff
+	out dx, al
+	mov dx, 0x3c8
+	out dx, al
+
+;mov ax, [0x1000]
+;cmp ax, 0xF
+;jne Dolphin.setGrayscalePalette2
 mov dx, 0x3c8
 mov al, 0x0
 out dx, al	; we are starting with index 0
 
-mov dx, 0x0	; red
-mov cx, 0x0	; blue
-mov bx, 0x0	; green
-mov ax, 0x0
+;mov dx, 0x0	; red
+;mov cx, 0x0	; blue
+;mov bx, 0x0	; green
+;mov ax, 0x0
+
 
 Dolphin.setVGApalette.loop1 :
-mov ax, dx
-push dx
+;mov ax, dx
+;push dx	; pushing dx breaks things!
 mov dx, 0x3c9
-out dx, ax	; red
-mov ax, bx
-out dx, ax	; green
-mov ax, cx
-out dx, ax	; blue
-pop dx
-add cx, 42
-cmp cx, 216
+mov ebx, Dolphin.tColor
+mov ax, [ebx]
+out dx, al	; red
+add ebx, 2
+mov ax, [ebx]
+out dx, al	; green
+add ebx, 2
+mov ax, [ebx]
+out dx, al	; blue
+add ebx, 2
+
+mov ebx, Dolphin.tColor
+mov cx, [ebx]	; r
+add cx, 21
+mov [ebx], cx
+cmp cx, 64
 jle Dolphin.setVGApalette.cont
 mov cx, 0x0
-add bx, 42
-cmp bx, 216
+mov [ebx], cx
+add ebx, 2
+mov cx, [ebx]	; g
+add cx, 21
+mov [ebx], cx
+cmp cx, 64
 jle Dolphin.setVGApalette.cont
-mov bx, 0x0
-add dx, 42
+mov cx, 0x0
+mov [ebx], cx
+add ebx, 2
+mov cx, [ebx]	; b
+add cx, 21
+mov [ebx], cx
 Dolphin.setVGApalette.cont :
-cmp dx, 216
+cmp cx, 64
 jle Dolphin.setVGApalette.loop1
 popa
 ret
@@ -163,15 +189,16 @@ pusha
 mov ax, [0x1000]
 cmp ax, 0xF
 jne Dolphin.setGrayscalePalette2	; should be jne, swapped for testing
+Dolphin.setGrayscalePalette.go :
 mov dx, 0x3c8
 mov al, 0x0
 out dx, al	; we are starting with index 0
 mov ax, 0x0
 mov dx, 0x3c9
 Dolphin.setGrayscalePalette.loop1 :
-out dx, ax
-out dx, ax
-out dx, ax
+out dx, al
+out dx, al
+out dx, al
 add ax, 1
 cmp ax, 255
 jle Dolphin.setGrayscalePalette.loop1
@@ -179,15 +206,27 @@ popa
 ret
 
 Dolphin.setGrayscalePalette2 :
-mov ah, 0x1f
-call debug.useFallbackColor
+;mov ah, 0x1f
+;call debug.useFallbackColor
 mov ebx, PALETTE_NODEFAULT
 call debug.log.info
+
+	mov dx, 0x3c6	; setting palette mask, unneeded on bochs
+	mov al, 0xff
+	out dx, al
+	mov dx, 0x3c8
+	out dx, al
+	
+	jmp Dolphin.setGrayscalePalette.go
 	; some alternate code should go here!
+	
+	
 popa
 ret
 
 Dolphin.charposStor :
 dw 0x0
+Dolphin.tColor :
+dd 0x0, 0x0, 0x0, 0x0
 PALETTE_NODEFAULT :
-db "Falling back to secondary palette...", 0
+db "Applying patch to palette...", 0
