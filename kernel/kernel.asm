@@ -27,30 +27,9 @@ mov ebx, bg_name	; bg_name = "TEAMBLDR"
 call debug.println
 
 call Minnow.byName	; find the file
-;call Dolphin.setVGApalette
 call Dolphin.makeBG
 call debug.update
 
-;call debug.update
-
-;call debug.clear
-;call debug.newl
-;call debug.newl
-;mov ebx, IT_WORKED_MSG
-;call debug.println
-
-;mov ebx, "HI!"
-;mov [0xA000], ebx
-
-
-;push ebx
-;mov ebx, 6
-;mov [locStor], ebx
-;pop ebx
-;
-;mov ebx, OK_MSG
-;call it
-;call debug.update
 
 mov ebx, LOAD_FINISH
 call debug.log.system
