@@ -1,0 +1,19 @@
+rgb 255 255 255 -> 63.75 (64)
+
+rgb 255 255 255 => 216
+
+6 options for each color
+
+000	-> 3 bits per is enough then
+6=110
+
+so shift each number and mask in
+
+//
+
+only using 3 options for now
+00 = 2 bits per 
+
+111111 = 255, 255, 255
+
+only a total of 64 (0-63) colors will be used

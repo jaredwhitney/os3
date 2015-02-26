@@ -13,7 +13,7 @@ only 216 (0xd8) colors will actually be used
 the space between each color should be 255/6 = 42.5 -> 42 (0x2a)
 
 so:
-255, 255, 255  (/42) -> 6, 6, 6 (infm) -> 0-6, 0-6, 0-6 -> 258 (overflow...)
+255, 255, 255  (/42) -> 6, 6, 6 (infm) -> 0-6, 0-6, 0-6 -> 258 (overflow...) EDIT: 5 should be used everywhere instead of 6; 5 colors + 0 = 6 colors
 
 CLAMP anything over 216 to 216?
 
