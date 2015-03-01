@@ -4,6 +4,7 @@ mov ah, 3
 ;call Guppy.malloc
 mov ebx, 0xA02000
 mov [debug.buffer], ebx
+call debug.flush
 call clearScreenG
 mov ebx, DEBUG_INIT_MSG
 call debug.log.system
@@ -74,6 +75,11 @@ debug.print :	; string loc in ebx
 	
 debug.update :
 	pusha
+		mov bl, [debug.nogo]
+		cmp bl, 0xFF
+		je debug.update.rret
+	mov bl, 0xF
+	mov [char.solid], bl
 	mov ecx, [charpos]
 	mov [debug.charpos.stor], ecx
 	mov ecx, [debug.charpos]
@@ -103,6 +109,9 @@ debug.update :
 	debug.update_ret :
 	mov ecx, [debug.charpos.stor]
 	mov [charpos], ecx
+	mov bl, 0x0
+	mov [char.solid], bl
+	debug.update.rret :
 	popa
 	ret
 
@@ -129,13 +138,12 @@ ret
 
 debug.flush :
 pusha
-mov eax, [debug.bufferpos]
-mov ecx, eax
-add eax, 0x1000
+mov eax, [debug.buffer]
+add eax, 0xf800
 mov [debug.bufferpos], eax
 call debug.clear
-mov [debug.bufferpos], ecx
 popa
+ret
 
 debug.num :		; num in ebx
 		pusha
@@ -243,8 +251,16 @@ debug.internal.fallcheck :
 	debug.internal.fallcheck.ret :
 	pop bx
 	ret
+debug.toggleView :
+	push bx
+	mov bl, [debug.nogo]
+	xor bl, 0xFF
+	mov [debug.nogo], bl
+	call Dolphin.updateScreen
+	pop bx
+	ret
 debug.charpos :
-dd 0xa0000
+dd SCREEN_BUFFER
 debug.charpos.stor :
 dd 0x0
 debug.buffer :
@@ -260,6 +276,8 @@ db 0xDA
 debug.cstor :
 db 0xDA
 debug.color.fallback :
+db 0x0
+debug.nogo :
 db 0x0
 DEBUG_INFO_TAG :
 db "[ info ] ", 0

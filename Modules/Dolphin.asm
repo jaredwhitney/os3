@@ -1,4 +1,5 @@
 [bits 32]
+SCREEN_BUFFER equ 0xA20000
 Dolphin.init :
 	; whatever needs to be done here
 
@@ -13,7 +14,8 @@ ret	; returns buffer location in ebx
 
 Dolphin.textUpdate :	; eax contains text buffer location, ebx contains pos, cx contains width, dx contains height
 pusha
-add ebx, 0xa0000
+call Dolphin.redrawBG	; ensuring that the background stays 'on bottom'
+add ebx, SCREEN_BUFFER
 call Dolphin.clear
 call Dolphin.drawBorder
 push eax
@@ -55,13 +57,12 @@ jg Dolphin.update.loop1
 pop cx
 mov eax, [Dolphin.charposStor]
 mov [charpos], eax
-call debug.update	; ensuring that debug information stays 'on top'
 popa
 ret
 
 Dolphin.drawBorder :
 pusha
-mov eax, 0xC0C0C0C
+mov eax, 0x03030303	; red
 sub ebx, 0x140
 add cx, cx
 push ebx
@@ -90,7 +91,7 @@ Dolphin.clear :
 pusha
 imul ecx, 8
 imul edx, 8
-mov al, 0x11
+mov al, 0x4A	; dark gray
 Dolphin.clear.loop0 :
 push ecx
 Dolphin.clear.loop1 :
@@ -109,15 +110,25 @@ jg Dolphin.clear.loop0
 popa
 ret
 
+Dolphin.redrawBG :
+push ebx
+mov ebx, [bglocstor]
+call Dolphin.makeBG
+pop ebx
+ret
+
 Dolphin.makeBG :	; ebx contains location of data
 pusha
-mov eax, 0xa0000
+mov [bglocstor], ebx
+mov eax, SCREEN_BUFFER
+mov edx, eax
+add edx, 0xf000
 Dolphin.makeBG.loop1 :
 mov cl, [ebx]
 mov [eax], cl
 add ebx, 1
 add eax, 1
-cmp eax, 0xaf000
+cmp eax, edx
 jl Dolphin.makeBG.loop1
 popa
 ret
@@ -224,9 +235,27 @@ call debug.log.info
 popa
 ret
 
+Dolphin.updateScreen :
+pusha
+call debug.update	; ensuring that debug information stays updated and 'on top'
+mov ebx, SCREEN_BUFFER
+mov eax, 0xa0000
+mov ecx, 0xaf800
+Dolphin.updateScreen.loop1 :
+mov edx, [ebx]
+mov [eax], edx
+add eax, 4
+add ebx, 4
+cmp eax, ecx
+jle Dolphin.updateScreen.loop1
+popa
+ret
+
 Dolphin.charposStor :
 dw 0x0
 Dolphin.tColor :
 dd 0x0, 0x0, 0x0, 0x0
+bglocstor :
+dd 0x0
 PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0

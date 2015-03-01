@@ -8,10 +8,29 @@ mov [console.height], ecx
 mov bl, 0x2
 call Dolphin.create
 mov [console.buffer], ebx
-mov ah, 0xB
+mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 call JASM.test.main	; testing some JASM code that interfaces with the console
 call JASM.console.post_init
+call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+call console.update
+ret
+
+console.loop :
+pusha
+mov ebx, [JASM.console.draw]
+cmp ebx, 0x0
+je console.loop.ret
+call os.getKey
+cmp bl, 0x0
+je console.loop.ret
+cmp bl, 0xff
+je console.doBackspace
+mov al, bl
+call console.cprint
+console.loop.ret :
+popa
+ret
 
 console.setWidth :
 call screen.wipe
@@ -34,15 +53,18 @@ ret
 screen.wipe :
 pusha
 mov ebx, [console.pos]
-add ebx, 0xa0000
+add ebx, SCREEN_BUFFER
 mov ecx, [console.width]
 mov edx, [console.height]
 call Dolphin.clear
 popa
 ret
 
-kernel.update :
+console.update :
 pusha
+mov ebx, [JASM.console.draw]
+cmp ebx, 0x0
+je console.loop.ret
 mov eax, [console.buffer]
 mov ebx, [console.pos]
 mov ecx, [console.width]
@@ -80,7 +102,7 @@ mov [console.charPos], ebx
 pop ebx
 jmp printitp
 printdonep :
-call kernel.update
+call console.update
 popa
 ret
 
@@ -189,13 +211,6 @@ mov [console.charPos], eax
 popa
 ret
 
-console.doEnter :
-mov eax, [os.ecatch]
-mov ebx, [eax]
-mov ah, 0xB
-call ebx
-jmp os.pollKeyboard.drawKeyFinalize
-
 console.doBackspace :
 
 mov eax, [console.charPos]
@@ -245,11 +260,11 @@ mov bx, 0x0
 mov [eax], bx
 add eax, 2
 mov [eax], bx
-call kernel.update
-jmp os.pollKeyboard.drawKeyFinalize
+call console.update
+jmp console.loop.ret
 
 console.cprint :
-mov ah, 0x0f
+mov ah, 0xff	; white
 mov ebx, [console.charPos]
 add ebx, [console.buffer]
 mov [ebx], ax
@@ -257,7 +272,7 @@ mov [ebx], ax
 mov ebx, [console.charPos]
 add ebx, 0x2
 mov [console.charPos], ebx
-call kernel.update
+call console.update
 ret
 
 console.clearScreen :

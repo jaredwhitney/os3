@@ -8,6 +8,9 @@ mov [0xa0000], ebx
 mov ebx, 0x0F0F0F0F
 mov [0xa0008], ebx
 
+call Dolphin.setGrayscalePalette
+call Dolphin.setVGApalette
+
 call debug.init
 call Guppy.init
 
@@ -18,9 +21,6 @@ call Guppy.init
 ;add ebx, 4
 ;cmp ebx, 0x10000
 ;jle lbl1
-
-call Dolphin.setGrayscalePalette
-call Dolphin.setVGApalette
 
 ;mov cx, 0	; cylinder number
 ;mov ah, 0	; head number
@@ -53,13 +53,16 @@ call Minnow.byName	; find the file
 mov ebx, 0x95f0
 call Dolphin.makeBG
 
+call console.init
+
 mov ebx, LOAD_FINISH
 call debug.log.system
 
 
 kernel.loop:
 call os.pollKeyboard
-;call program.post_init
+call console.loop
+call Dolphin.updateScreen
 jmp kernel.loop
 
 jmp $
@@ -87,21 +90,21 @@ in al, 0x64
 and al, 0x20
 cmp al, 0x0
 je os.pollKeyboard.kcol
-mov eax, 0x0	; start mouse handle code
-;in al, 0x60			needs to be remade so debugging does not rely on console.
-;mov ebx, eax
-;call console.numOut
-;call console.newline
-;in al, 0x60
-;mov ebx, eax
-;call console.numOut
-;call console.newline
-;in al, 0x60
-;mov ebx, eax
-;call console.numOut
-;call console.newline
-;call console.newline
-jmp os.pollKeyboard.return	; end mouse handle code
+	mov eax, 0x0	; start mouse handle code
+	;in al, 0x60			needs to be remade so debugging does not rely on console.
+	;mov ebx, eax
+	;call console.numOut
+	;call console.newline
+	;in al, 0x60
+	;mov ebx, eax
+	;call console.numOut
+	;call console.newline
+	;in al, 0x60
+	;mov ebx, eax
+	;call console.numOut
+	;call console.newline
+	;call console.newline
+	jmp os.pollKeyboard.return	; end mouse handle code
 os.pollKeyboard.kcol :
 in al, 0x60	; get last keycode
 mov bl, al	; storing code in bl
@@ -113,11 +116,18 @@ mov [os.pollKeyboard.isReady], cx	; store 1 so we know we are ready to read next
 jmp os.pollKeyboard.return
 
 os.pollKeyboard.checkKey :
+	; key in bl
+	mov al, [os.lastKey]
+	cmp al, bl
+	jne os.pollKeyboard.checkKey.override
+	;jmp os.pollKeyboard.return
 mov cx, [os.pollKeyboard.isReady]
 cmp cx, 0x0
 je os.pollKeyboard.return	; if not ready, a key is being held down, dont reprint it
+	os.pollKeyboard.checkKey.override :
+	push bx
 call os.keyboard.toChar
-cmp al, 0x0
+;cmp al, 0xFF
 ;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 cmp al, 0x1
 je os.doEnter
@@ -126,7 +136,8 @@ call os.keyPress	; keypress will be sent to the currently registered program in 
 os.pollKeyboard.drawKeyFinalize :
 mov cx, 0x0
 mov [os.pollKeyboard.isReady], cx	; so we know that we have already printed the character, and should not do so again
-
+pop bx
+mov [os.lastKey], bl
 os.pollKeyboard.return :
 popa
 ret
@@ -139,8 +150,25 @@ call ebx
 jmp os.pollKeyboard.drawKeyFinalize
 
 os.keyPress :
-mov [0xA0000], bl
-;call console.cprint
+pusha
+mov [0x1030], bl
+mov al, 0xFF
+mov [0x1031], al
+popa
+ret
+
+os.getKey :
+push eax
+;	 check the program is allowed to get keypresses here
+mov bl, 0x0
+mov al, [0x1031]
+cmp al, 0xFF
+jne os.getKey.ret
+mov bl, [0x1030]
+mov al, 0x0
+mov [0x1031], al
+os.getKey.ret :
+pop eax
 ret
 
 os.keyboard.toChar :
@@ -261,8 +289,8 @@ je os.keyboard.toChar.ret
 cmp bl, 0x0B
 mov al, '0'
 je os.keyboard.toChar.ret
-cmp bl, 0x0E
-mov al, 0x0
+cmp bl, 0x0E	; backspace
+mov al, 0xff
 je os.keyboard.toChar.ret
 cmp bl, 0x1C
 mov al, 0x1
@@ -281,6 +309,7 @@ ret
 %include "..\modules\Dolphin.asm"
 %include "..\modules\programLoader.asm"
 %include "..\modules\minnow.asm"
+%include "..\modules\iConsole.asm"
 %include "..\boot\realMode.asm"
 %include "..\debug\print.asm"
 
@@ -310,5 +339,8 @@ dd 0x0
 
 os.ecatch :
 dd 0x10F0
+
+os.lastKey :
+dw 0x0
 
 MINNOW_START :

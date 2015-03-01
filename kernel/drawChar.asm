@@ -3,14 +3,16 @@
 clearScreenG :
 pusha
 mov dx, 0x0
-mov ebx, 0xa0000
+mov ebx, SCREEN_BUFFER
+mov edx, ebx
+add edx, 0xf800
 csgloop :
 mov [ebx], dx
 add ebx, 0x2
-cmp ebx, 0xaf800
+cmp ebx, edx
 jl csgloop
 mov ecx, [charpos]
-mov ecx, 0xa0000
+mov ecx, SCREEN_BUFFER
 mov [charpos], ecx
 popa
 ret
@@ -27,13 +29,25 @@ add ebx, 0x1
 add dx, 0x1
 cmp dx, 0x7
 jl drawCharloop
+call drawFill
 mov ecx, [charpos]
-sub ecx, 0x8C0
+sub ecx, 0xB40
 add ecx, 6	; if newlines are broken, etc turn this back to 8
 mov [charpos], ecx
 popa
 ret
 
+drawFill :
+pusha
+mov dl, [char.solid]
+cmp dl, 0x0
+je drawFill.ret
+mov ah, 0x0
+call drawRow
+call drawRow
+drawFill.ret :
+popa
+ret
 
 drawRow :	; ah contains row
 pusha
@@ -79,12 +93,12 @@ add eax, 0x2
 gnldloop :
 sub eax, 0xA00
 add ecx, 0x1
-cmp eax, 0xa0000
+cmp eax, SCREEN_BUFFER
 jg gnldloop
 mov eax, ecx
 mov ebx, 0xA00
 mul ebx
-add eax, 0xa0000
+add eax, SCREEN_BUFFER
 mov [charpos], eax
 
 ret
@@ -139,7 +153,7 @@ os.seq :
 		ret
 
 charpos :
-dd 0xa0000
+dd SCREEN_BUFFER
 
 colorS :
 db 0xF

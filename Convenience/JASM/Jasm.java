@@ -320,6 +320,10 @@ else if (s.equals("setHeight"))
 return "console.setHeight";
 else if (s.equals("setPos"))
 return "console.setPos";
+else if (s.equals("toggleDebug"))
+return "debug.toggleView";
+else if (s.equals("update_bg"))
+return "Dolphin.redrawBG";
 else
 return pname + "." + s;
 }

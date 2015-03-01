@@ -158,6 +158,11 @@ mov [JASM.console.full], eax
 pop eax
 		; fullscrn(null)
 call JASM.console.fullscrn
+		; draw = 1
+push eax
+mov eax, 1
+mov [JASM.console.draw], eax
+pop eax
 		; return 0
 mov eax, 0
 mov [retval], eax
@@ -166,9 +171,9 @@ ret
 		; func int post_init(null)
 JASM.console.post_init :
 pusha
-		; color(0xE)
+		; color(0xF)
 push ebx
-mov ebx, 0xE
+mov ebx, 0xF
 call console.setColor
 pop ebx
 		; print("Console: ")
@@ -227,9 +232,9 @@ add ebx, 1
 jmp JASM.console.loop_3.start
 JASM.console.loop_3.go :
 popa
-		; color(0xB)
+		; color(0x3D)
 push ebx
-mov ebx, 0xB
+mov ebx, 0x3D
 call console.setColor
 pop ebx
 		; println("EXIT: Exits the console.")
@@ -252,6 +257,11 @@ push ebx
 mov ebx, JASM.console.var_5
 call console.println
 pop ebx
+		; println("DEBUG: Toggles the display of debug")
+push ebx
+mov ebx, JASM.console.var_6
+call console.println
+pop ebx
 		; done = 1
 push eax
 mov eax, 1
@@ -265,7 +275,7 @@ JASM.console.loop_3.EQend :
 		; if (inp seq_mem "EXIT")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_6
+mov ebx, JASM.console.var_7
 JASM.console.loop_4.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -283,6 +293,13 @@ push ebx
 mov ebx, retfunc
 call os.setEcatch
 pop ebx
+		; draw = 0
+push eax
+mov eax, 0
+mov [JASM.console.draw], eax
+pop eax
+		; update_bg(null)
+call Dolphin.redrawBG
 		; return 0
 mov eax, 0
 mov [retval], eax
@@ -296,7 +313,7 @@ JASM.console.loop_4.EQend :
 		; if (inp seq_mem "CLEAR")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_7
+mov ebx, JASM.console.var_8
 JASM.console.loop_5.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -324,7 +341,7 @@ JASM.console.loop_5.EQend :
 		; if (inp seq_mem "FULLSCRN")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_8
+mov ebx, JASM.console.var_9
 JASM.console.loop_6.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -344,6 +361,34 @@ jmp JASM.console.loop_6.EQend
 JASM.console.loop_6.end :
 popa
 JASM.console.loop_6.EQend :
+		; if (inp seq_mem "DEBUG")
+pusha
+mov eax, [JASM.console.inp]
+mov ebx, JASM.console.var_10
+JASM.console.loop_7.start :
+mov cl, [eax]
+mov dl, [ebx]
+cmp cl, dl
+jne JASM.console.loop_7.end
+cmp cl, 0
+je JASM.console.loop_7.go
+add eax, 1
+add ebx, 1
+jmp JASM.console.loop_7.start
+JASM.console.loop_7.go :
+popa
+		; toggleDebug(null)
+call debug.toggleView
+		; done = 1
+push eax
+mov eax, 1
+mov [JASM.console.done], eax
+pop eax
+		; endif
+jmp JASM.console.loop_7.EQend
+JASM.console.loop_7.end :
+popa
+JASM.console.loop_7.EQend :
 		; if (done = 0)
 push eax
 push ebx
@@ -352,20 +397,20 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_7.end
-		; color(0xC)
+jne JASM.console.loop_8.end
+		; color(0x3)
 push ebx
-mov ebx, 0xC
+mov ebx, 0x3
 call console.setColor
 pop ebx
 		; print("Unrecognized Command: ")
 push ebx
-mov ebx, JASM.console.var_9
+mov ebx, JASM.console.var_11
 call console.print
 pop ebx
 		; print("'")
 push ebx
-mov ebx, JASM.console.var_10
+mov ebx, JASM.console.var_12
 call console.print
 pop ebx
 		; print(inp)
@@ -375,19 +420,19 @@ call console.print
 pop ebx
 		; println("'")
 push ebx
-mov ebx, JASM.console.var_11
+mov ebx, JASM.console.var_13
 call console.println
 pop ebx
 		; endif
-JASM.console.loop_7.end :
-		; color(0xE)
+JASM.console.loop_8.end :
+		; color(0xF)
 push ebx
-mov ebx, 0xE
+mov ebx, 0xF
 call console.setColor
 pop ebx
 		; print("Console: ")
 push ebx
-mov ebx, JASM.console.var_12
+mov ebx, JASM.console.var_14
 call console.print
 pop ebx
 		; return 0
@@ -406,7 +451,7 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_8.end
+jne JASM.console.loop_9.end
 		; setPos(0x140)
 push ebx
 mov ebx, 0x140
@@ -428,7 +473,7 @@ mov eax, 2
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_8.end :
+JASM.console.loop_9.end :
 		; if (full = 1)
 push eax
 push ebx
@@ -437,7 +482,7 @@ mov ebx, 1
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_9.end
+jne JASM.console.loop_10.end
 		; setPos(0x6460)
 push ebx
 mov ebx, 0x6460
@@ -459,7 +504,7 @@ mov eax, 0
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_9.end :
+JASM.console.loop_10.end :
 		; if (full = 2)
 push eax
 push ebx
@@ -468,14 +513,14 @@ mov ebx, 2
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_10.end
+jne JASM.console.loop_11.end
 		; full = 1
 push eax
 mov eax, 1
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_10.end :
+JASM.console.loop_11.end :
 		; done = 1
 push eax
 mov eax, 1
@@ -488,6 +533,8 @@ popa
 ret
 
 JASM.console.full :
+db 0, 0, 0, 0
+JASM.console.draw :
 db 0, 0, 0, 0
 JASM.console.done :
 db 0, 0, 0, 0
@@ -506,18 +553,22 @@ db "HELP: Displays this prompt.", 0
 JASM.console.var_5 :
 db "FULLSCRN: Toggles fullscreen mode.", 0
 JASM.console.var_6 :
-db "EXIT", 0
+db "DEBUG: Toggles the display of debug", 0
 JASM.console.var_7 :
-db "CLEAR", 0
+db "EXIT", 0
 JASM.console.var_8 :
-db "FULLSCRN", 0
+db "CLEAR", 0
 JASM.console.var_9 :
-db "Unrecognized Command: ", 0
+db "FULLSCRN", 0
 JASM.console.var_10 :
-db "'", 0
+db "DEBUG", 0
 JASM.console.var_11 :
-db "'", 0
+db "Unrecognized Command: ", 0
 JASM.console.var_12 :
+db "'", 0
+JASM.console.var_13 :
+db "'", 0
+JASM.console.var_14 :
 db "Console: ", 0
 retval :
 dd 0x0

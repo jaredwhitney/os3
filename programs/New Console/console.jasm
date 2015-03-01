@@ -3,9 +3,10 @@ func int init(null)
 	newl(null)
 	full = 0
 	fullscrn(null)
+	draw = 1
 	return 0
 func int post_init(null)
-	color(0xE)
+	color(0xF)
 	print("Console: ")
 	catch_enter(handleEnter)
 	return 0
@@ -15,15 +16,18 @@ func int handleEnter(null)
 	newl(null)
 	inp += 9
 	if (inp seq_mem "HELP")
-		color(0xB)
+		color(0x3D)
 		println("EXIT: Exits the console.")
 		println("CLEAR: Clears the screen.")
 		println("HELP: Displays this prompt.")
 		println("FULLSCRN: Toggles fullscreen mode.")
+		println("DEBUG: Toggles the display of debug")
 		done = 1
 	endif
 	if (inp seq_mem "EXIT")
 		catch_enter(os.return)
+		draw = 0
+		update_bg(null)
 		return 0
 	endif
 	if (inp seq_mem "CLEAR")
@@ -33,14 +37,18 @@ func int handleEnter(null)
 	if (inp seq_mem "FULLSCRN")
 		fullscrn(null)
 	endif
+	if (inp seq_mem "DEBUG")
+		toggleDebug(null)
+		done = 1
+	endif
 	if (done = 0)
-		color(0xC)
+		color(0x3)
 		print("Unrecognized Command: ")
 		print("'")
 		print(inp)
 		println("'")
 	endif
-	color(0xE)
+	color(0xF)
 	print("Console: ")
 	return 0
 func int fullscrn(null)
