@@ -47,6 +47,7 @@ Minnow.dtree :
 	jmp Minnow.dtree.scr1done
 	
 	Minnow.dtree.ret :
+	call debug.update
 	popa
 	ret
 	

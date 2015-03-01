@@ -2,24 +2,44 @@
 [org 0x7e00]
 db 0x4a
 kernel :
-;mov bl, 0xF
-;mov [debug.color], bl	; temp
-call writeLib
+
+mov ebp, 0xf00000
+mov esp, ebp
+
 call Guppy.init
 call debug.init
-;call Mouse.init
 
-
-mov ebx, retfunc
-call os.setEcatch
+;mov ebx, 0xff00
+;mov eax, 0xFFFFFFFF
+;lbl1:
+;mov [ebx], eax
+;add ebx, 4
+;cmp ebx, 0x10000
+;jle lbl1
 
 call Dolphin.setGrayscalePalette
 call Dolphin.setVGApalette
 
+;mov cx, 0	; cylinder number
+;mov ah, 0	; head number
+;pusha
+;mov ebx, bg_name
+;call Minnow.byName
+;mov edi, 0xF00000;ebx	; where to read it to (start of image file in RAM)
+;popa
+;mov bh, 1	; sector number
+;mov bl, 1	; number of sectors to read
+;call os.load
+
+;call writeLib
+
+;call Mouse.init
+
+
+;mov ebx, retfunc
+;call os.setEcatch
+
 call Minnow.dtree
-;call Minnow.dtree
-;call Minnow.dtree
-call debug.update
 
 mov ebx, FILE_DESCR
 call debug.print
@@ -27,9 +47,8 @@ mov ebx, bg_name	; bg_name = "TEAMBLDR"
 call debug.println
 
 call Minnow.byName	; find the file
-call Dolphin.makeBG
-call debug.update
-
+mov ebx, 0x95f0
+call Dolphin.makeBG	
 
 mov ebx, LOAD_FINISH
 call debug.log.system
@@ -259,7 +278,7 @@ ret
 %include "..\modules\Dolphin.asm"
 %include "..\modules\programLoader.asm"
 %include "..\modules\minnow.asm"
-%include "..\modules\extlib.asm"
+%include "..\boot\realMode.asm"
 %include "..\debug\print.asm"
 
 KERNEL_BOOT :

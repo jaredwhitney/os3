@@ -1,0 +1,31 @@
+OLD
+bx 7e00			offset for dest
+dh 15 -> al 15		# sectors to read
+dh 0			head = 0
+cl 2			sector = 2
+ch 0			?? -forget (head?)
+ -and-			
+cl C			sector = 0xC
+ch 2			??
+dh 72 -> al 72		# sectors to read
+dh 0			head = 0
+es 0xffff		segment for dest
+bx 10			offset for dest
+ -and-			
+last again with		
+ch 0			??
+
+CURRENT
+bx 7e00			offset for dest
+al 0x80			# sectors to read
+dh __			head = 0x0 or 0x80
+cl 2			sector = 2
+ch 0			??
+es 0			segment for dest
+
+
+at 95f7
+size: fa00
+file end: 18ff7
+
+something is in memory at ~0x10000 that breaks the OS when overwritten

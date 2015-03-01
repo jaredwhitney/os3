@@ -52,9 +52,15 @@ mov [0x1000], ax
 mov dl, 0x80
 mov ch, 0
 mov bx, 0x7e00
+mov cl, 2
+mov dh, 0x40
 call boot.load
-	;mov ch, 2
-	;mov bx, 0xefff
+	;mov dl, 0x80
+	;mov ch, 2		;testing
+	;mov cl, 1
+	;mov bx, 0x0C00
+	;mov ax, 0x1000
+	;mov dh, 0x40
 	;call boot.load
 mov bx, EnableA20
 call boot.print
@@ -94,6 +100,7 @@ ret
 
 boot.load :
 pusha
+push ax
 push bx
 mov ah, 0	; reset floppy controller
 mov bl, dl
@@ -101,16 +108,16 @@ mov dl, 0
 int 0x13
 mov dl, bl
 pop bx
+pop ax
 ;mov bx, 0x7e00
 push es
-mov ax, 0x0
 mov es, ax
 mov ah, 0x02	;telling bios we want to read from memory	|	location to read to sent in as BX
-mov al, 0x40		;the number of sectors to read				|	sent in as DH
+mov al, dh		;the number of sectors to read				|	sent in as DH
 mov dh, 0x0	;head to read from
 ;mov dl, 0x80	;drive to read from [0x80] if machine, [0x00] is bochs
 ;mov ch, 0	; track to read from
-mov cl, 2
+;mov cl, 2
 
 int 0x13
 pop es
@@ -205,6 +212,7 @@ mov ss, ax
 
 mov ebp, 0x9000
 mov esp, ebp
+
 
 ;mov ebx, 'P'
 ;mov [0xb8000], ebx

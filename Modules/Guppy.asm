@@ -1,6 +1,6 @@
 [bits 32]
 
-Guppy.table equ 0xb000
+Guppy.table equ 0xf000
 ; Memory is labelled as sectors in use from 0x7c00 to 0x_____
 ; 0x7c00 - 0xc000 is reserved for the OS (34 sectors)
 Guppy.init :

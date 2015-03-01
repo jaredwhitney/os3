@@ -2,7 +2,7 @@ debug.init :
 mov al, 1
 mov ah, 3
 ;call Guppy.malloc
-mov ebx, 0x80000
+mov ebx, 0xF00000
 mov [debug.buffer], ebx
 call clearScreenG
 mov ebx, DEBUG_INIT_MSG
