@@ -1,6 +1,6 @@
 [bits 32]
 
-Guppy.table equ 0xf000
+Guppy.table equ 0xA10000
 ; Memory is labelled as sectors in use from 0x7c00 to 0x_____
 ; 0x7c00 - 0xc000 is reserved for the OS (34 sectors)
 Guppy.init :
@@ -38,9 +38,36 @@ pop ebx
 sub ebx, Guppy.table
 mov eax, ebx
 mov ebx, 0x200	; size of a sector
+	mov ecx, eax
+	pop eax
+	pusha
+	pusha
+	mov ebx, MALLOC
+	mov ah, 0x3
+	call debug.setColor
+	call debug.print
+	popa
+	shr eax, 8
+	and eax, 0xFF	; getting ah -> eax
+	add ebx, eax
+	mov ebx, 0x200
+	mul ebx
+	add ebx, 0xbffff
+	call debug.num
+	popa
+	push eax
+	mov eax, ecx
 mul ebx
 mov ebx, eax
-add ebx, 0xbffff
+add ebx, 0xbffff	; beginning of memory set for use
+	mov al, '-'
+	call debug.cprint
+	call debug.num
+	call debug.newl
+	call debug.restoreColor
 pop eax
 pop ecx
 ret	; EBX = Start of allocated memory
+
+MALLOC :
+db "Malloc: ", 0

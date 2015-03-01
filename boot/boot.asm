@@ -2,6 +2,8 @@
 [org 0x7c00]
 
 cli
+mov bp, 0x2000
+mov sp, bp
 mov ax, 0x0
 mov ds, ax
 mov es, ax
@@ -210,7 +212,7 @@ mov fs, ax
 mov gs, ax
 mov ss, ax
 
-mov ebp, 0x9000
+mov ebp, 0xA00000
 mov esp, ebp
 
 

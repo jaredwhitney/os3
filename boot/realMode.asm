@@ -34,3 +34,4 @@ mov ah, 0x3
 int 0x13
 
 jmp $
+[bits 32]

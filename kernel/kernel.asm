@@ -3,11 +3,13 @@
 db 0x4a
 kernel :
 
-mov ebp, 0xf00000
-mov esp, ebp
+mov ebx, 0xFFFFFFFF
+mov [0xa0000], ebx
+mov ebx, 0x0F0F0F0F
+mov [0xa0008], ebx
 
-call Guppy.init
 call debug.init
+call Guppy.init
 
 ;mov ebx, 0xff00
 ;mov eax, 0xFFFFFFFF
@@ -40,6 +42,7 @@ call Dolphin.setVGApalette
 ;call os.setEcatch
 
 call Minnow.dtree
+call debug.update
 
 mov ebx, FILE_DESCR
 call debug.print
@@ -48,7 +51,7 @@ call debug.println
 
 call Minnow.byName	; find the file
 mov ebx, 0x95f0
-call Dolphin.makeBG	
+call Dolphin.makeBG
 
 mov ebx, LOAD_FINISH
 call debug.log.system

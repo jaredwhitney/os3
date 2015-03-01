@@ -2,11 +2,12 @@ debug.init :
 mov al, 1
 mov ah, 3
 ;call Guppy.malloc
-mov ebx, 0xF00000
+mov ebx, 0xA02000
 mov [debug.buffer], ebx
 call clearScreenG
 mov ebx, DEBUG_INIT_MSG
 call debug.log.system
+;jmp $
 mov ax, [0x1000]
 cmp ax, 0xF
 jne debug.init.op1
@@ -125,6 +126,16 @@ mov cl, 0x1
 mov [debug.nlcnow], cl
 popa
 ret
+
+debug.flush :
+pusha
+mov eax, [debug.bufferpos]
+mov ecx, eax
+add eax, 0x1000
+mov [debug.bufferpos], eax
+call debug.clear
+mov [debug.bufferpos], ecx
+popa
 
 debug.num :		; num in ebx
 		pusha
