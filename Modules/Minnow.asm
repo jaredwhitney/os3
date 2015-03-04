@@ -36,7 +36,6 @@ Minnow.dtree :
 	call Minnow.dtree.nprint
 	
 	;add ebx, 8
-	add ah, 1
 	call debug.newl
 
 	add ebx, 8	; at start of file
@@ -68,10 +67,66 @@ Minnow.dtree.nprint :
 	Minnow.dtree.lnam.done :
 	popa
 	ret
+	
+Minnow.ctree :
+	pusha
+	call Minnow.navToFirst; at filesize
+	Minnow.ctree.scr1done :
+	mov edx, [ebx]
+	cmp edx, 0x0
+	push edx
+	je Minnow.ctree.ret
+	push ebx
+	push ebx
+	mov ebx, Minnow.stag
+	call console.print
+	pop ebx
+	;mov ebx, edx	; uncommented = size, commented = loc
+	add ebx, 0x10	; comment for size, uncomment for loc
+	call console.numOut
+	pop ebx
+	mov al, "]"
+	call console.cprint
+	add ebx, 4	; at filetype
+	mov ecx, 4
+	call Minnow.ctree.nprint
+	push ebx
+	mov ebx, Minnow.sep
+	call console.print
+	pop ebx
+	add ebx, 4	; at filename
+	mov ecx, 8
+	call Minnow.ctree.nprint
+	call console.newline
+	add ebx, 8	; at start of file
+	pop edx
+	add ebx, edx	; at header for next file
+	jmp Minnow.ctree.scr1done
+	Minnow.ctree.ret :
+	call console.update
+	pop edx
+	popa
+	ret
+Minnow.ctree.nprint :
+	pusha
+	mov edx, 0x0
+	Minnow.ctree.lnam :
+		mov al, [ebx]
+		cmp al, "_"
+		je Minnow.ctree.nprint.noprint
+			call console.cprint
+		Minnow.ctree.nprint.noprint :
+		add ebx, 1
+		add edx, 1
+		cmp edx, ecx
+		je Minnow.ctree.lnam.done
+		jmp Minnow.ctree.lnam
+	Minnow.ctree.lnam.done :
+	popa
+	ret
 
 Minnow.navToFirst :
 	mov ebx, MINNOW_START
-	mov ah, 0x0
 	Minnow.navToFirst.scr1 :
 		mov al, [ebx]
 		cmp al, 0x0
@@ -87,6 +142,11 @@ Minnow.byName :	; pointer to name in ebx, returns file location in ebx
 	
 	Minnow.byName.loop1 :
 	mov eax, [ebx]
+		push ecx
+		mov ecx, eax
+		cmp ecx, 0x0
+		pop ecx
+		je Minnow.byName.fileNotFound
 	add ebx, 4	; at filetype
 	add ebx, 4	; at filename
 	mov edx, [ebx]
@@ -119,7 +179,55 @@ Minnow.byName :	; pointer to name in ebx, returns file location in ebx
 	
 	Minnow.byName.kret :
 	ret
+	
+Minnow.byName.fileNotFound :
+	mov ebx, Minnow.FILE_NOT_FOUND
+	call debug.log.error
+	mov ebx, 0x0
+	ret
+	
+Minnow.getType :	; file location in ebx, returns pointer to type in ebx
+	push ecx
+	push eax
+	sub ebx, 12
+	mov eax, Minnow.ftypestor
+	mov ch, 0x0
+	Minnow.getType.loop1 :
+	mov cl, [ebx]
+	mov [eax], cl
+	add ebx, 1
+	add eax, 1
+	add ch, 1
+	cmp ch, 4
+	jl Minnow.getType.loop1
+	mov ebx, Minnow.ftypestor
+	pop eax
+	pop ecx
+	ret
 
+Minnow.getAttribute :	; file location in ebx, attribute number in ecx; returns attribute(s) in cx, dx
+	push eax
+	push ebx
+	add ebx, ecx
+	mov cx, [ebx]
+	add ebx, 2	; next word
+	mov dx, [ebx]
+	pop ebx
+	pop eax
+	ret
+	
+Minnow.FILE_NOT_FOUND :
+db "The specified file does not exist.", 0x0
+Minnow.ftypestor :
+db "____", 0x0
+Minnow.IMAGE :
+db "IMAG", 0x0
+Minnow.ANIMATION :
+db "ANIM", 0x0
+Minnow.TEXT :
+db "TEXT", 0x0
+Minnow.image.DIM :
+dd 0x0
 Minnow.sep :
 db ": ", 0
 Minnow.stag :

@@ -132,7 +132,9 @@ graphicsgetposret :
 ret
 
 os.seq :
-	;pusha
+	push ebx
+	push ecx
+	push edx
 	seq.loop_0.start :
 		mov cl, [eax]
 		mov dl, [ebx]
@@ -144,11 +146,15 @@ os.seq :
 		add ebx, 1
 		jmp seq.loop_0.start
 	seq.loop_0.go :
-		;popa
+		pop edx
+		pop ecx
+		pop ebx
 		mov al, 0x1
 		ret
 	seq.loop_0.end :
-		;popa
+		pop edx
+		pop ecx
+		pop ebx
 		mov al, 0x0
 		ret
 

@@ -42,7 +42,6 @@ call Guppy.init
 ;call os.setEcatch
 
 call Minnow.dtree
-call debug.update
 
 mov ebx, FILE_DESCR
 call debug.print
@@ -50,7 +49,7 @@ mov ebx, bg_name	; bg_name = "TEAMBLDR"
 call debug.println
 
 call Minnow.byName	; find the file
-mov ebx, 0x95f0
+;mov ebx, 0x95f0
 call Dolphin.makeBG
 
 call console.init
@@ -58,6 +57,9 @@ call console.init
 mov ebx, LOAD_FINISH
 call debug.log.system
 
+;mov ebx, txt_name
+;call View.file
+;jmp $
 
 kernel.loop:
 call os.pollKeyboard
@@ -83,6 +85,7 @@ pusha
 mov eax, [os.ecatch]
 mov [eax], ebx
 popa
+ret
 
 os.pollKeyboard :
 pusha
@@ -303,6 +306,23 @@ ret
 retfunc :
 ret
 
+os.String.removeColor :	; pointer to String in ebx
+pusha
+;mov eax, ebx
+;os.String.removeColor.loop1 :
+;mov cx, [ebx]
+;cmp cx, 0x0
+;je os.String.removeColor.loop1_end
+;mov [eax], cl
+;add ebx, 2
+;add eax, 1
+;jmp os.String.removeColor.loop1
+;os.String.removeColor.loop1_end :
+;mov [eax], cl
+popa
+ret
+
+
 %include "..\boot\init_GDT.asm"
 %include "..\kernel\drawChar.asm"
 %include "..\modules\Guppy.asm"
@@ -310,6 +330,7 @@ ret
 %include "..\modules\programLoader.asm"
 %include "..\modules\minnow.asm"
 %include "..\modules\iConsole.asm"
+%include "..\modules\View.asm"
 %include "..\boot\realMode.asm"
 %include "..\debug\print.asm"
 
@@ -327,6 +348,8 @@ db "STATE: Emulator", 0
 
 bg_name :
 db "TEAMBLDR", 0
+txt_name :
+db "HELOWRLD", 0
 
 LOAD_FINISH :
 db "Transferring control to user!", 0

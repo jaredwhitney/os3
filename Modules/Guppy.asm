@@ -44,7 +44,7 @@ mov eax, ebx			; move # start sector to eax
 	pusha
 	push ebx
 	mov ebx, MALLOC
-	mov ah, 0x3
+	mov ah, 0xB
 	call debug.setColor
 	call debug.print
 	pop ebx

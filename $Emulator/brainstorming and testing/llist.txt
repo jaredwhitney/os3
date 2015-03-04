@@ -1,0 +1,8 @@
+list of things to do :
++ drop to real mode, back up to pmode
++ disk I/O
++ mouse driver
++ basic USB driver
++ better window manager
++ multitasker
++ ability to execute programs from the filesystem

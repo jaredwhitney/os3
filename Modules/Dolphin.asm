@@ -11,6 +11,53 @@ call Guppy.malloc
 pop ax
 ret	; returns buffer location in ebx
 
+Dolphin.windowUpdate :	; eax contains buffer location, ebx contains pos, cx contains width, dx contains height
+pusha
+add ebx, SCREEN_BUFFER
+;call Dolphin.drawBorder	; both are expecting size in chars >_<
+;call Dolphin.clear
+Dolphin.wupdate.loop0 :
+push cx
+Dolphin.wupdate.loop1 :
+push eax
+mov al, [eax]
+mov [ebx], al
+pop eax
+add ebx, 1
+add eax, 1
+sub cx, 1
+cmp cx, 0
+jg Dolphin.wupdate.loop1
+pop cx
+sub dx, 1
+;sub ebx, 1
+;add ebx, 0x140
+push eax
+push ecx
+push edx
+mov eax, ebx
+sub eax, SCREEN_BUFFER
+mov ecx, 0x140
+push eax
+mov edx, 0x0
+div ecx
+pop eax
+cmp edx, 0
+je Debug.wupdate.noadd
+mov ecx, 0x140
+sub ecx, edx
+mov edx, ecx
+add eax, edx	; edx = remainder
+Debug.wupdate.noadd :
+add eax, SCREEN_BUFFER
+mov ebx, eax
+pop edx
+pop ecx
+pop eax
+cmp dx, 0
+jg Dolphin.wupdate.loop0
+popa
+ret
 
 Dolphin.textUpdate :	; eax contains text buffer location, ebx contains pos, cx contains width, dx contains height
 pusha
@@ -30,11 +77,18 @@ push eax
 mov ax, [eax]
 cmp al, 0x0
 je Dolphin.update.noDraw
+push bx
+mov bl, [Dolphin.colorOverride]
+cmp bl, 0x0
+pop bx
+je Dolphin.update.goDraw
+mov ah, [Dolphin.colorOverride]
+Dolphin.update.goDraw :
 call graphics.drawChar
 Dolphin.update.noDraw :
 pop eax
 sub cx, 0x1
-add eax, 0x2
+add eax, [Dolphin.tuskip]
 add ebx, 0x8	; usually 0x8, want it to be 0x6
 cmp cx, 0
 jg Dolphin.update.loop1
@@ -120,6 +174,9 @@ ret
 Dolphin.makeBG :	; ebx contains location of data
 pusha
 mov [bglocstor], ebx
+cmp ebx, 0x0
+je Dolphin.makeBG.ret
+add ebx, 4
 mov eax, SCREEN_BUFFER
 mov edx, eax
 add edx, 0xf000
@@ -130,6 +187,7 @@ add ebx, 1
 add eax, 1
 cmp eax, edx
 jl Dolphin.makeBG.loop1
+Dolphin.makeBG.ret :
 popa
 ret
 
@@ -251,6 +309,29 @@ jle Dolphin.updateScreen.loop1
 popa
 ret
 
+Dolphin.toggleColored :
+pusha
+mov eax, [Dolphin.tuskip]
+cmp eax, 0x2
+je Dolphin.toggleColored.toNonColored
+mov eax, 0x2
+mov [Dolphin.tuskip], eax
+mov al, 0x0
+mov [Dolphin.colorOverride], al
+jmp Dolphin.toggleColored.ret
+Dolphin.toggleColored.toNonColored :
+mov eax, 0x1
+mov [Dolphin.tuskip], eax
+mov al, 0xFF
+mov [Dolphin.colorOverride], al
+Dolphin.toggleColored.ret :
+popa
+ret
+
+Dolphin.colorOverride :
+db 0x0
+Dolphin.tuskip :
+dd 0x2
 Dolphin.charposStor :
 dw 0x0
 Dolphin.tColor :

@@ -262,7 +262,13 @@ return false;
 }
 public static String parse(String s)
 {
+boolean string = false;
 s=s.trim();
+if (s.contains("STRING:"))
+{
+	s = s.replaceAll("STRING:", "");
+	string = true;
+}
 if (contains(s, '(')  && contains(s, ')'))
 {
 	callmthd();
@@ -281,7 +287,10 @@ for (Var v : vars)
 {
 System.err.println(s + ", " + v.n);
 if (s.equals(v.n))
-return "[" + pname+"."+v.n + "]";
+if (!string)
+	return "[" + pname+"."+v.n + "]";
+else
+	return pname + "." + v.n;
 }
 }
 if (s.equals("os.platform"))
@@ -324,6 +333,12 @@ else if (s.equals("toggleDebug"))
 return "debug.toggleView";
 else if (s.equals("update_bg"))
 return "Dolphin.redrawBG";
+else if (s.equals("View.file"))
+return "View.file";
+else if (s.equals("String.mem"))
+return "os.String.removeColor";
+else if (s.equals("Minnow.tree"))
+return "Minnow.ctree";
 else
 return pname + "." + s;
 }

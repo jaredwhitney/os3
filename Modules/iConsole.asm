@@ -1,6 +1,7 @@
 [bits 32]
 
 console.init :
+pusha
 mov ecx, 20
 mov [console.width], ecx
 mov ecx, 20
@@ -10,10 +11,11 @@ call Dolphin.create
 mov [console.buffer], ebx
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
-call JASM.test.main	; testing some JASM code that interfaces with the console
+;call JASM.test.main	; testing some JASM code that interfaces with the console
 call JASM.console.post_init
 call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
+popa
 ret
 
 console.loop :
@@ -27,6 +29,7 @@ je console.loop.ret
 cmp bl, 0xff
 je console.doBackspace
 mov al, bl
+mov ah, 0xFF
 call console.cprint
 console.loop.ret :
 popa
@@ -147,6 +150,7 @@ ret
 
 console.numOut :
 pusha
+mov [console.cstor], ah
 mov cl, 28
 mov ch, 0x0
 
@@ -170,7 +174,10 @@ jmp console.numOut.goPrint
 console.numOut.g10 :
 add eax, 0x37
 console.numOut.goPrint :
+push ax
+mov ah, [console.cstor]
 call console.cprint
+pop ax
 pop ebx
 console.numOut.goCont :
 cmp cl, 0
@@ -264,7 +271,7 @@ call console.update
 jmp console.loop.ret
 
 console.cprint :
-mov ah, 0xff	; white
+pusha
 mov ebx, [console.charPos]
 add ebx, [console.buffer]
 mov [ebx], ax
@@ -273,6 +280,7 @@ mov ebx, [console.charPos]
 add ebx, 0x2
 mov [console.charPos], ebx
 call console.update
+popa
 ret
 
 console.clearScreen :
@@ -365,5 +373,8 @@ dd 0x0
 console.charPos :
 dd 0xA2
 
+console.cstor :
+db 0x0
+
 console.line :
-dd 0x0, 0x0, 0x0, 0x0
+dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0

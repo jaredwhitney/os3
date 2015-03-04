@@ -51,6 +51,19 @@ debug.log.info :
 	call debug.restoreColor
 	popa
 	ret
+	
+debug.log.error :
+	pusha
+	mov ah, 0x3
+	call debug.setColor
+	push ebx
+	mov ebx, DEBUG_ERROR_TAG
+	call debug.print
+	pop ebx
+	call debug.println
+	call debug.restoreColor
+	popa
+	ret
 
 debug.print :	; string loc in ebx
 	pusha
@@ -283,6 +296,8 @@ DEBUG_INFO_TAG :
 db "[ info ] ", 0
 DEBUG_SYSTEM_TAG :
 db "[system] ", 0
+DEBUG_ERROR_TAG :
+db "[error ] ", 0
 DEBUG_INIT_MSG :
 db "Debugger online.", 0
 DEBUG_INIT_REALBOOT :
