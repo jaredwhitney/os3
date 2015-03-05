@@ -4,11 +4,11 @@ Dolphin.init :
 	; whatever needs to be done here
 
 Dolphin.create :	; bl contains PNUM
-push ax
 mov al, bl
-mov ah, 0x2	; right now only doing text-based windows
+mov ah, 0x7D	; Window buffer
 call Guppy.malloc
-pop ax
+mov ecx, ebx
+mov ah, 0x7D	; text/image buffer
 ret	; returns buffer location in ebx
 
 Dolphin.windowUpdate :	; eax contains buffer location, ebx contains pos, cx contains width, dx contains height
@@ -61,8 +61,14 @@ ret
 
 Dolphin.textUpdate :	; eax contains text buffer location, ebx contains pos, cx contains width, dx contains height
 pusha
-call Dolphin.redrawBG	; ensuring that the background stays 'on bottom'
-add ebx, SCREEN_BUFFER
+;call Dolphin.redrawBG	; ensuring that the background stays 'on bottom'
+push eax
+push bx
+mov bl, 0x0
+call Dolphin.getWindowBuffer
+pop bx
+add ebx, eax
+pop eax
 call Dolphin.clear
 call Dolphin.drawBorder
 push eax
@@ -112,6 +118,11 @@ pop cx
 mov eax, [Dolphin.charposStor]
 mov [charpos], eax
 popa
+	pusha	; temporary test
+	mov bl, 0
+	call Dolphin.getWindowBuffer
+	call Dolphin.windowUpdate
+	popa
 ret
 
 Dolphin.drawBorder :
@@ -328,6 +339,38 @@ Dolphin.toggleColored.ret :
 popa
 ret
 
+Dolphin.registerWindow :	; bl = pnum, eax = pointer to windowStruct
+pusha
+mov edx, Dolphin.windowStructs
+mov cl, 0x0
+Dolphin.registerWindow.loop1 :
+mov ch, [edx]
+add edx, 1
+cmp ch, cl
+jne Dolphin.registerWindow.loop1
+sub edx, 1
+mov [edx], eax
+popa
+ret
+
+Dolphin.getWindowBuffer :	; bl = pWINnum, returns eax = buffer location
+push edx
+push ecx
+mov edx, Dolphin.windowStructs
+mov cl, bl
+Dolphin.getWindowBuffer.loop1 :
+mov ch, [edx]
+add edx, 1
+cmp ch, cl
+jne Dolphin.getWindowBuffer.loop1
+sub edx, 1
+mov eax, [edx]
+add eax, 26
+mov eax, [eax]
+pop ecx
+pop edx
+ret
+
 Dolphin.colorOverride :
 db 0x0
 Dolphin.tuskip :
@@ -338,5 +381,9 @@ Dolphin.tColor :
 dd 0x0, 0x0, 0x0, 0x0
 bglocstor :
 dd 0x0
+Dolphin.windowStructs :
+dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+Dolphin.cbuffer :
+dd SCREEN_BUFFER
 PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0

@@ -9,6 +9,10 @@ mov [console.height], ecx
 mov bl, 0x2
 call Dolphin.create
 mov [console.buffer], ebx
+mov [console.windowBuffer], ecx
+	mov bl, 0x2
+	mov eax, console.windowStruct
+	call Dolphin.registerWindow
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
@@ -367,9 +371,6 @@ dd 0x0
 console.pos :
 dd 0x0
 
-console.buffer :
-dd 0x0
-
 console.charPos :
 dd 0xA2
 
@@ -378,3 +379,16 @@ db 0x0
 
 console.line :
 dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+
+console.windowStruct :
+	dd "iConsole VER_1.0"	; title
+	dw 20	; width
+	dw 20	; height
+	dw 0	; xpos
+	dw 1	; ypos
+	db 0	; type: 0=text, 1=image
+	db 0	; depth, set by Dolphin
+	console.windowBuffer :
+	dd 0x0	; buffer location for storing the updated window
+	console.buffer :
+	dd 0x0	; buffer location for storing data

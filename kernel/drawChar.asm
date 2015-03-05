@@ -52,6 +52,8 @@ ret
 drawRow :	; ah contains row
 pusha
 mov ebx, [charpos]
+	sub ebx, SCREEN_BUFFER
+	add ebx, [Dolphin.cbuffer]
 mov cl, 6	; if newlines are broken, etc turn this back to 8
 drawRowloop :
 mov ch, ah
