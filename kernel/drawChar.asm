@@ -32,7 +32,7 @@ jl drawCharloop
 call drawFill
 mov ecx, [charpos]
 sub ecx, 0xB40
-add ecx, 6	; if newlines are broken, etc turn this back to 8
+add ecx, 6
 mov [charpos], ecx
 popa
 ret

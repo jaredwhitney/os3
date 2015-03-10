@@ -367,6 +367,7 @@ sub edx, 1
 mov eax, [edx]
 add eax, 26
 mov eax, [eax]
+mov ebx, eax
 pop ecx
 pop edx
 ret
