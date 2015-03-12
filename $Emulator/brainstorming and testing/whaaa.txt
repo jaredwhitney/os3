@@ -1,0 +1,4 @@
+ff53f000
+
+is jumping to 0x8102 for no apparent reason...
+somethng trashed the stack

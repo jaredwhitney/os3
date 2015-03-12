@@ -62,21 +62,24 @@ ret
 Dolphin.textUpdate :	; eax contains text buffer location, ebx contains pos, cx contains width, dx contains height
 pusha
 ;call Dolphin.redrawBG	; ensuring that the background stays 'on bottom'
-push eax
-push bx
-mov bl, 0x0
+push ebx
+mov ebx, 0x0
+mov [currentWindow], ebx
 call Dolphin.getWindowBuffer
-pop bx
-add ebx, eax
-pop eax
-call Dolphin.clear
-call Dolphin.drawBorder
+mov ebx, eax
+call debug.num
+call debug.newl
+pop ebx
+add ebx, [console.windowBuffer];eax
+call debug.num
+call debug.newl
+;call Dolphin.clear
+;call Dolphin.drawBorder
 push eax
 mov eax, [charpos]
 mov [Dolphin.charposStor], eax
 pop eax
 push cx
-
 Dolphin.update.loop1 :
 mov [charpos], ebx
 push eax
@@ -119,8 +122,9 @@ mov eax, [Dolphin.charposStor]
 mov [charpos], eax
 popa
 	pusha	; temporary test
-	mov bl, 0
-	call Dolphin.getWindowBuffer
+	;mov bl, 0
+	;call Dolphin.getWindowBuffer
+	mov ebx, [console.windowBuffer]
 	call Dolphin.windowUpdate
 	popa
 ret
@@ -171,7 +175,6 @@ add ebx, 0x140
 sub edx, 1
 cmp edx, 0
 jg Dolphin.clear.loop0
-
 popa
 ret
 
@@ -353,24 +356,59 @@ mov [edx], eax
 popa
 ret
 
-Dolphin.getWindowBuffer :	; bl = pWINnum, returns eax = buffer location
+Dolphin.getWindowBuffer :	; returns eax = buffer location
 push edx
 push ecx
-mov edx, Dolphin.windowStructs
-mov cl, bl
-Dolphin.getWindowBuffer.loop1 :
-mov ch, [edx]
-add edx, 1
-cmp ch, cl
-jne Dolphin.getWindowBuffer.loop1
-sub edx, 1
-mov eax, [edx]
+push ebx
+mov eax, [currentWindow]
+add eax, Dolphin.windowStructs
 add eax, 26
 mov eax, [eax]
-mov ebx, eax
+pop ebx
 pop ecx
 pop edx
 ret
+
+Dolphin.getAttribute :	; attribute num in bl, returns attribute data in eax
+push ecx
+push ebx
+mov ecx, [currentWindow]
+add ecx, Dolphin.windowStructs
+and ebx, 0xFF
+add ecx, ebx
+cmp bl, 16
+jl Dolphin.getAttribute.load2xDouble
+cmp bl, 24
+jl Dolphin.getAttribute.loadWord
+mov al, [ecx]
+jmp Dolphin.getAttribute.done
+Dolphin.getAttribute.loadWord :
+mov ax, [ecx]
+jmp Dolphin.getAttribute.done
+Dolphin.getAttribute.load2xDouble :
+mov eax, ecx
+Dolphin.getAttribute.done :
+pop ebx
+pop ecx
+ret
+
+Dolphin.TITLE :
+db 0
+Dolphin.WIDTH :
+db 16
+Dolphin.HEIGHT :
+db 18
+Dolphin.X_POS :
+db 20
+Dolphin.Y_POS :
+db 22
+Dolphin.TYPE :
+db 24
+DOLPHIN.DEPTH :
+db 25
+
+currentWindow :
+dd 0x0
 
 Dolphin.colorOverride :
 db 0x0
