@@ -55,7 +55,7 @@ call Minnow.getAttribute
 and ecx, 0xFFFF
 and edx, 0xFFFF
 mov ebx, 0x0
-call Dolphin.windowUpdate
+;call Dolphin.windowUpdate
 call View.file.modEcatch
 jmp View.file.return
 
@@ -70,7 +70,7 @@ mov eax, edx
 mov ebx, 0x140
 mov cx, 40
 mov dx, 25
-call Dolphin.textUpdate
+;call Dolphin.textUpdate
 call Dolphin.toggleColored
 call View.file.modEcatch
 jmp View.file.return

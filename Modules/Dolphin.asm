@@ -1,5 +1,7 @@
 [bits 32]
-SCREEN_BUFFER equ 0xA20000
+SCREEN_BUFFER	equ 0xA20000
+SCREEN_WIDTH	equ 0x140
+SCREEN_HEIGHT	equ 0xc8
 Dolphin.init :
 	; whatever needs to be done here
 
@@ -11,74 +13,57 @@ mov ecx, ebx
 mov ah, 0x7D	; text/image buffer
 ret	; returns buffer location in ebx
 
-Dolphin.windowUpdate :	; eax contains buffer location, ebx contains pos, cx contains width, dx contains height
-pusha
-add ebx, SCREEN_BUFFER
-;call Dolphin.drawBorder	; both are expecting size in chars >_<
-;call Dolphin.clear
-Dolphin.wupdate.loop0 :
-push cx
-Dolphin.wupdate.loop1 :
-push eax
-mov al, [eax]
-mov [ebx], al
-pop eax
-add ebx, 1
-add eax, 1
-sub cx, 1
-cmp cx, 0
-jg Dolphin.wupdate.loop1
-pop cx
-sub dx, 1
-;sub ebx, 1
-;add ebx, 0x140
-push eax
-push ecx
-push edx
-mov eax, ebx
-sub eax, SCREEN_BUFFER
-mov ecx, 0x140
-push eax
-mov edx, 0x0
-div ecx
-pop eax
-cmp edx, 0
-je Debug.wupdate.noadd
-mov ecx, 0x140
-sub ecx, edx
-mov edx, ecx
-add eax, edx	; edx = remainder
-Debug.wupdate.noadd :
-add eax, SCREEN_BUFFER
-mov ebx, eax
-pop edx
-pop ecx
-pop eax
-cmp dx, 0
-jg Dolphin.wupdate.loop0
-popa
+Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
+	pusha
+	mov [bstor], ebx
+	Dolphin.wupdate.loop0 :
+		push cx
+		Dolphin.wupdate.loop1 :
+			push eax
+			mov al, [eax]
+			mov [ebx], al
+			pop eax
+			add ebx, 1
+			add eax, 1
+			sub cx, 1
+			cmp cx, 0
+				jg Dolphin.wupdate.loop1
+			pop cx
+			sub dx, 1
+
+			push eax
+			push ecx
+			push edx
+			mov eax, ebx
+			sub eax, [bstor]
+			mov ecx, 0x140
+			push eax
+			mov edx, 0x0
+			div ecx
+			pop eax
+			cmp edx, 0
+				je Debug.wupdate.noadd
+			mov ecx, 0x140
+			sub ecx, edx
+			mov edx, ecx
+			add eax, edx	; edx = remainder
+		Debug.wupdate.noadd :
+			add eax, [bstor]
+			mov ebx, eax
+			pop edx
+			pop ecx
+			pop eax
+			cmp dx, 0
+				jg Dolphin.wupdate.loop0
+	popa
 ret
 
-Dolphin.textUpdate :	; eax contains text buffer location, ebx contains pos, cx contains width, dx contains height
+Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height
 pusha
-;call Dolphin.redrawBG	; ensuring that the background stays 'on bottom'
-push ebx
-mov ebx, 0x0
-mov [currentWindow], ebx
-call Dolphin.getWindowBuffer
-mov ebx, eax
-call debug.num
-call debug.newl
-pop ebx
-add ebx, [console.windowBuffer];eax
-call debug.num
-call debug.newl
-;call Dolphin.clear
-;call Dolphin.drawBorder
 push eax
-mov eax, [charpos]
-mov [Dolphin.charposStor], eax
-pop eax
+	mov eax, [charpos]	; store current charpos
+	mov [Dolphin.charposStor], eax
+	pop eax
 push cx
 Dolphin.update.loop1 :
 mov [charpos], ebx
@@ -121,12 +106,6 @@ pop cx
 mov eax, [Dolphin.charposStor]
 mov [charpos], eax
 popa
-	pusha	; temporary test
-	;mov bl, 0
-	;call Dolphin.getWindowBuffer
-	mov ebx, [console.windowBuffer]
-	call Dolphin.windowUpdate
-	popa
 ret
 
 Dolphin.drawBorder :
@@ -190,17 +169,11 @@ pusha
 mov [bglocstor], ebx
 cmp ebx, 0x0
 je Dolphin.makeBG.ret
-add ebx, 4
-mov eax, SCREEN_BUFFER
-mov edx, eax
-add edx, 0xf000
-Dolphin.makeBG.loop1 :
-mov cl, [ebx]
-mov [eax], cl
-add ebx, 1
-add eax, 1
-cmp eax, edx
-jl Dolphin.makeBG.loop1
+mov eax, ebx
+mov ebx, SCREEN_BUFFER
+mov ecx, SCREEN_WIDTH
+mov edx, SCREEN_HEIGHT
+call Dolphin.copyImage
 Dolphin.makeBG.ret :
 popa
 ret
@@ -309,17 +282,16 @@ ret
 
 Dolphin.updateScreen :
 pusha
+call Dolphin.redrawBG
+;
+;	Draw windows in here!
+;
 call debug.update	; ensuring that debug information stays updated and 'on top'
-mov ebx, SCREEN_BUFFER
-mov eax, 0xa0000
-mov ecx, 0xaf800
-Dolphin.updateScreen.loop1 :
-mov edx, [ebx]
-mov [eax], edx
-add eax, 4
-add ebx, 4
-cmp eax, ecx
-jle Dolphin.updateScreen.loop1
+mov eax, SCREEN_BUFFER
+mov ebx, 0xa0000
+mov ecx, SCREEN_WIDTH
+mov edx, SCREEN_HEIGHT
+call Dolphin.copyImage
 popa
 ret
 
@@ -409,7 +381,8 @@ db 25
 
 currentWindow :
 dd 0x0
-
+bstor :
+dd 0x0
 Dolphin.colorOverride :
 db 0x0
 Dolphin.tuskip :

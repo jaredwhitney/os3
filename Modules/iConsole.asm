@@ -17,7 +17,7 @@ mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
 call JASM.console.post_init
-call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
 popa
 ret
@@ -76,7 +76,7 @@ mov eax, [console.buffer]
 mov ebx, [console.pos]
 mov ecx, [console.width]
 mov edx, [console.height]
-call Dolphin.textUpdate
+;call Dolphin.textUpdate
 popa
 ret
 
