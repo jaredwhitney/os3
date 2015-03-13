@@ -50,39 +50,39 @@ popa
 ret
 
 drawRow :	; ah contains row
-pusha
-mov ebx, [charpos]
-	sub ebx, SCREEN_BUFFER
-	add ebx, [Dolphin.cbuffer]
-mov cl, 6	; if newlines are broken, etc turn this back to 8
-drawRowloop :
-mov ch, ah
-sub cl, 0x1
-shr ch, cl
-and ch, 0b1
-cmp ch, 0b0
-je drawRownd
-mov dl, [colorS]
-mov [ebx], dl
-jmp drawRownddone
-drawRownd :
-push dx
-mov dl, [char.solid]
-cmp dl, 0x0
-je drawRownd.nodr
-mov dl, 0x0
-mov [ebx], dl
-drawRownd.nodr :
-pop dx
-drawRownddone :
-add ebx, 0x1
-cmp cl, 0x0
-jg drawRowloop
-
-mov ecx, [charpos]
-add ecx, 0x140
-mov [charpos], ecx
-popa
+	pusha
+	mov ebx, [charpos]
+		;sub ebx, [bstor]
+		;add ebx, [Dolphin.cbuffer]
+	mov cl, 6
+	drawRowloop :
+		mov ch, ah
+		sub cl, 0x1
+		shr ch, cl
+		and ch, 0b1
+		cmp ch, 0b0
+			je drawRownd
+		mov dl, [colorS]
+		mov [ebx], dl
+		jmp drawRownddone
+	drawRownd :
+		push dx
+		mov dl, [char.solid]
+		cmp dl, 0x0
+			je drawRownd.nodr
+		mov dl, 0x0
+		mov [ebx], dl
+	drawRownd.nodr :
+		pop dx
+	drawRownddone :
+		add ebx, 0x1
+		cmp cl, 0x0
+			jg drawRowloop
+			
+	mov ecx, [charpos]
+	add ecx, 0x140
+	mov [charpos], ecx
+	popa
 ret
 
 graphics.newline :
@@ -161,7 +161,7 @@ os.seq :
 		ret
 
 charpos :
-dd SCREEN_BUFFER
+dd 0x0
 
 colorS :
 db 0xF

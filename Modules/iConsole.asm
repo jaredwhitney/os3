@@ -72,11 +72,14 @@ pusha
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.loop.ret
-mov eax, [console.buffer]
-mov ebx, [console.pos]
-mov ecx, [console.width]
-mov edx, [console.height]
-;call Dolphin.textUpdate
+	mov ebx, 0x0
+	mov [currentWindow], ebx	; should not be hard-coded
+	call Dolphin.getWindowBuffer
+	mov ebx, eax
+	mov eax, [console.buffer]
+	mov ecx, [console.width]
+	mov edx, [console.height]
+	call Dolphin.drawText
 popa
 ret
 

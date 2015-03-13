@@ -56,11 +56,46 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 			cmp dx, 0
 				jg Dolphin.wupdate.loop0
 	popa
-ret
+	ret
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height
+	pusha
+	mov ecx, [charpos]
+	mov [bstor], ebx
+	mov [debug.charpos.stor], ecx
+	mov ecx, ebx	; dest buffer
+	mov [charpos], ecx
+	mov ebx, eax	; src buffer
+	mov ah, 255
+	mov edx, 0x0
+	Dolphin.drawText_loop :
+		mov ax, [ebx]
+		cmp edx, 0x2000	; size of buffer, should be specified, not hardcoded
+			jg Dolphin.drawText_ret
+		add edx, 1
+		cmp al, 0x0
+			je Dolphin.drawText.nodraw
+		call graphics.drawChar
+		jmp Dolphin.drawText.cont1
+		Dolphin.drawText.nodraw :
+			push ecx
+			mov ecx, [charpos]
+			add ecx, 6
+			mov [charpos], ecx
+			pop ecx
+		Dolphin.drawText.cont1 :
+			add ebx, 0x2
+			jmp Dolphin.drawText_loop
+	Dolphin.drawText_ret :
+	mov ecx, [debug.charpos.stor]
+	mov [charpos], ecx
+	popa
+	ret
+	
+Dolphin.drawTextOLD :	; eax = text buffer, ebx = dest, cx = width, dx = height
 pusha
 push eax
+mov [bstor], ebx
 	mov eax, [charpos]	; store current charpos
 	mov [Dolphin.charposStor], eax
 	pop eax
@@ -282,9 +317,16 @@ ret
 
 Dolphin.updateScreen :
 pusha
-call Dolphin.redrawBG
+;call Dolphin.redrawBG
 ;
 ;	Draw windows in here!
+mov ebx, 0x0
+mov [currentWindow], ebx
+call Dolphin.getWindowBuffer
+mov ebx, SCREEN_BUFFER
+mov ecx, 500
+mov edx, 500
+call Dolphin.copyImage
 ;
 call debug.update	; ensuring that debug information stays updated and 'on top'
 mov eax, SCREEN_BUFFER
