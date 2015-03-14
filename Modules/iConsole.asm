@@ -2,7 +2,7 @@
 
 console.init :
 pusha
-mov ecx, 20
+mov ecx, 60
 mov [console.width], ecx
 mov ecx, 20
 mov [console.height], ecx
@@ -75,7 +75,12 @@ je console.loop.ret
 	mov ebx, 0x0
 	mov [currentWindow], ebx	; should not be hard-coded
 	call Dolphin.getWindowBuffer
+	mov ebx, [console.buffer]
+		call debug.num
+		call debug.newl
 	mov ebx, eax
+		call debug.num
+		call debug.newl
 	mov eax, [console.buffer]
 	mov ecx, [console.width]
 	mov edx, [console.height]
@@ -385,8 +390,8 @@ dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title
-	dw 20	; width
-	dw 20	; height
+	dw SCREEN_WIDTH	; width
+	dw SCREEN_HEIGHT	; height
 	dw 0	; xpos
 	dw 1	; ypos
 	db 0	; type: 0=text, 1=image

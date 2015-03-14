@@ -11,6 +11,7 @@ mov ah, 0x7D	; Window buffer
 call Guppy.malloc
 mov ecx, ebx
 mov ah, 0x7D	; text/image buffer
+call Guppy.malloc
 ret	; returns buffer location in ebx
 
 Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
@@ -58,10 +59,10 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	popa
 	ret
 
-Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height
+Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
 	pusha
-		popa
-		ret
+	;popa
+	;ret
 	mov ecx, [charpos]
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
@@ -78,6 +79,9 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height
 		cmp al, 0x0
 			je Dolphin.drawText.nodraw
 		call graphics.drawChar
+		mov ecx, [charpos]
+		add ecx, 0x280
+		mov [charpos], ecx
 		jmp Dolphin.drawText.cont1
 		Dolphin.drawText.nodraw :
 			push ecx

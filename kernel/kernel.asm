@@ -150,6 +150,10 @@ mov eax, [os.ecatch]
 mov ebx, [eax]
 mov ah, 0xB
 call ebx
+		; DEBUGGING ONLY	(THIS IS A TEST)
+			call debug.clear
+			mov ebx, console.line
+			call debug.println
 jmp os.pollKeyboard.drawKeyFinalize
 
 os.keyPress :
