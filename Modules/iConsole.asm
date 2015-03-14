@@ -75,12 +75,7 @@ je console.loop.ret
 	mov ebx, 0x0
 	mov [currentWindow], ebx	; should not be hard-coded
 	call Dolphin.getWindowBuffer
-	mov ebx, [console.buffer]
-		call debug.num
-		call debug.newl
 	mov ebx, eax
-		call debug.num
-		call debug.newl
 	mov eax, [console.buffer]
 	mov ecx, [console.width]
 	mov edx, [console.height]
@@ -207,6 +202,20 @@ jmp console.numOut.dontcare
 
 ; newline
 console.newline :
+	pusha
+	mov ebx, [console.charPos]
+	mov edx, 0x0
+	mov eax, ebx
+	mov ecx, LINE_SEQ
+	div ecx
+	mov ebx, eax
+	imul ebx, LINE_SEQ
+	add ebx, LINE_SEQ
+	mov [console.charPos], ebx
+	popa
+	ret
+
+console.newlineOLD :
 pusha
 mov edx, [console.width]
 add edx, edx
@@ -297,7 +306,6 @@ ret
 
 console.clearScreen :
 pusha
-call clearScreenG
 mov eax, [console.buffer]
 mov cx, 0x0
 console.clearScreen.loop :

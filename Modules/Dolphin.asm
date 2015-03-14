@@ -61,8 +61,6 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
 	pusha
-	;popa
-	;ret
 	mov ecx, [charpos]
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
@@ -325,7 +323,7 @@ Dolphin.updateScreen :
 pusha
 call Dolphin.redrawBG
 ;
-;	Draw windows in here!
+;	Draw windows in here!	(should NOT be hardcoded)
 	mov ebx, 0x0
 	mov [currentWindow], ebx
 
