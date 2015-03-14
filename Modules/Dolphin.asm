@@ -60,6 +60,8 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height
 	pusha
+		popa
+		ret
 	mov ecx, [charpos]
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
@@ -317,16 +319,26 @@ ret
 
 Dolphin.updateScreen :
 pusha
-;call Dolphin.redrawBG
+call Dolphin.redrawBG
 ;
 ;	Draw windows in here!
-mov ebx, 0x0
-mov [currentWindow], ebx
-call Dolphin.getWindowBuffer
-mov ebx, SCREEN_BUFFER
-mov ecx, 500
-mov edx, 500
-call Dolphin.copyImage
+	mov ebx, 0x0
+	mov [currentWindow], ebx
+
+	mov bl, [Dolphin.WIDTH]
+	call Dolphin.getAttribute
+	mov [atwstor], ax
+	
+	mov bl, [Dolphin.HEIGHT]
+	call Dolphin.getAttribute
+	mov [atwstor2], ax
+	
+	call Dolphin.getWindowBuffer
+	mov ebx, SCREEN_BUFFER
+	mov ecx, [atwstor]
+	mov edx, [atwstor2]
+	
+	call Dolphin.copyImage
 ;
 call debug.update	; ensuring that debug information stays updated and 'on top'
 mov eax, SCREEN_BUFFER
@@ -376,6 +388,7 @@ push ecx
 push ebx
 mov eax, [currentWindow]
 add eax, Dolphin.windowStructs
+mov eax, [eax]
 add eax, 26
 mov eax, [eax]
 pop ebx
@@ -388,6 +401,7 @@ push ecx
 push ebx
 mov ecx, [currentWindow]
 add ecx, Dolphin.windowStructs
+mov ecx, [ecx]
 and ebx, 0xFF
 add ecx, ebx
 cmp bl, 16
@@ -425,6 +439,10 @@ currentWindow :
 dd 0x0
 bstor :
 dd 0x0
+atwstor :
+dw 0x0
+atwstor2 :
+dw 0x0
 Dolphin.colorOverride :
 db 0x0
 Dolphin.tuskip :
