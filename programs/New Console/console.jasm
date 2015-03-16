@@ -77,15 +77,15 @@ func int handleEnter(null)
 		return 0
 func int fullscrn(null)
 	if (full = 0)
-			setPos(0x140)
-			setWidth(40)
-			setHeight(25)
+			setPos(0x0)
+			setWidth(0xa0)
+			setHeight(0xc8)
 			full = 2
 	endif
 	if (full = 1)
-		setPos(0x6460)
-		setWidth(18)
-		setHeight(7)
+		setPos(0x280)
+		setWidth(0x140)
+		setHeight(0xc8)
 		full = 0
 	endif	
 	if (full = 2)

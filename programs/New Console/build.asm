@@ -597,19 +597,19 @@ cmp eax, ebx
 pop ebx
 pop eax
 jne JASM.console.loop_13.end
-		; setPos(0x140)
+		; setPos(0x0)
 push ebx
-mov ebx, 0x140
+mov ebx, 0x0
 call console.setPos
 pop ebx
-		; setWidth(40)
+		; setWidth(0xa0)
 push ebx
-mov ebx, 40
+mov ebx, 0xa0
 call console.setWidth
 pop ebx
-		; setHeight(25)
+		; setHeight(0xc8)
 push ebx
-mov ebx, 25
+mov ebx, 0xc8
 call console.setHeight
 pop ebx
 		; full = 2
@@ -628,19 +628,19 @@ cmp eax, ebx
 pop ebx
 pop eax
 jne JASM.console.loop_14.end
-		; setPos(0x6460)
+		; setPos(0x280)
 push ebx
-mov ebx, 0x6460
+mov ebx, 0x280
 call console.setPos
 pop ebx
-		; setWidth(18)
+		; setWidth(0x140)
 push ebx
-mov ebx, 18
+mov ebx, 0x140
 call console.setWidth
 pop ebx
-		; setHeight(7)
+		; setHeight(0xc8)
 push ebx
-mov ebx, 7
+mov ebx, 0xc8
 call console.setHeight
 pop ebx
 		; full = 0

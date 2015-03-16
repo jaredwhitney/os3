@@ -88,6 +88,8 @@ debug.print :	; string loc in ebx
 	
 debug.update :
 	pusha
+	mov cx, SCREEN_WIDTH
+	mov [os.textwidth], cx
 		mov bl, [debug.nogo]
 		cmp bl, 0xFF
 		je debug.update.rret
@@ -205,7 +207,7 @@ debug.cprint :	; char in al
 	mov [debug.bufferpos], ecx
 	popa
 	ret
-LINE_SEQ equ 0x3c0; 0x1e0 * 2 = 0x3c0
+LINE_SEQ equ 0x3c0; 0x140 * 3 = 0x3c0
 debug.newl :
 	pusha
 	mov ebx, [debug.bufferpos]

@@ -58,9 +58,31 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 				jg Dolphin.wupdate.loop0
 	popa
 	ret
+	
+Dolphin.clearImage :	; eax = source, ecx = width, edx = height
+pusha
+imul ecx, edx
+sub ecx, 1
+mov edx, 0x0
+mov bl, 0x0
+Dolphin.clearImage_loop :
+mov [eax], bl
+add eax, 1
+add edx, 1
+cmp edx, ecx
+jle Dolphin.clearImage_loop
+popa
+ret
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
 	pusha
+	mov [os.textwidth], cx
+		pusha
+		mov eax, ebx
+		mov ecx, SCREEN_WIDTH
+		mov edx, SCREEN_HEIGHT
+		call Dolphin.clearImage
+		popa
 	mov ecx, [charpos]
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
@@ -78,7 +100,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
 			je Dolphin.drawText.nodraw
 		call graphics.drawChar
 		mov ecx, [charpos]
-		add ecx, 0x280
+			push ebx
+			xor ebx, ebx
+			mov bx, [os.textwidth]
+			imul ebx, 2
+			add ecx, ebx
+			;add ecx, 0xa0*2
+			pop ebx
 		mov [charpos], ecx
 		jmp Dolphin.drawText.cont1
 		Dolphin.drawText.nodraw :
@@ -96,76 +124,25 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
 	popa
 	ret
 	
-Dolphin.drawTextOLD :	; eax = text buffer, ebx = dest, cx = width, dx = height
+
+Dolphin.drawBorder :	; ebx = image buffer, cx = width, dx = height
 pusha
-push eax
-mov [bstor], ebx
-	mov eax, [charpos]	; store current charpos
-	mov [Dolphin.charposStor], eax
-	pop eax
-push cx
-Dolphin.update.loop1 :
-mov [charpos], ebx
-push eax
-mov ax, [eax]
-cmp al, 0x0
-je Dolphin.update.noDraw
-push bx
-mov bl, [Dolphin.colorOverride]
-cmp bl, 0x0
-pop bx
-je Dolphin.update.goDraw
-mov ah, [Dolphin.colorOverride]
-Dolphin.update.goDraw :
-call graphics.drawChar
-Dolphin.update.noDraw :
-pop eax
-sub cx, 0x1
-add eax, [Dolphin.tuskip]
-add ebx, 0x8	; usually 0x8, want it to be 0x6
-cmp cx, 0
-jg Dolphin.update.loop1
-add ebx, 0xA00
-pop cx
-
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-sub ebx, ecx
-
-sub dx, 1
-push cx
-cmp dx, 0
-jg Dolphin.update.loop1
-pop cx
-mov eax, [Dolphin.charposStor]
-mov [charpos], eax
-popa
-ret
-
-Dolphin.drawBorder :
-pusha
-mov eax, 0x03030303	; red
-sub ebx, 0x140
-add cx, cx
+and ecx, 0xFFFF
+push ecx
+mov al, 0x03	; red
 push ebx
 Dolphin.drawBorder.loop1 :
-mov [ebx], eax
-add ebx, 0x4
+mov [ebx], al
+add ebx, 0x1
 sub cx, 0x1
 cmp cx, 0x0
 jg Dolphin.drawBorder.loop1
 mov [ebx], al
 pop ebx
-
-imul dx, 0x8
+pop ecx
 Dolphin.drawBorder.loop2 :
 mov [ebx], al
-add ebx, 0x140
+add ebx, ecx
 sub dx, 0x1
 cmp dx, 0x0
 jg Dolphin.drawBorder.loop2
@@ -335,10 +312,14 @@ call Dolphin.redrawBG
 	call Dolphin.getAttribute
 	mov [atwstor2], ax
 	
-	call Dolphin.getWindowBuffer
-	mov ebx, SCREEN_BUFFER
+	call Dolphin.getWindowBuffer	; mov eax, windowBuffer
 	mov ecx, [atwstor]
 	mov edx, [atwstor2]
+		pusha
+		mov ebx, eax
+		call Dolphin.drawBorder
+		popa
+	mov ebx, SCREEN_BUFFER
 	
 	call Dolphin.copyImage
 ;

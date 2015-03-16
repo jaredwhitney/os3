@@ -2,10 +2,6 @@
 
 console.init :
 pusha
-mov ecx, 60
-mov [console.width], ecx
-mov ecx, 20
-mov [console.height], ecx
 mov bl, 0x2
 call Dolphin.create
 mov [console.buffer], ebx
@@ -17,8 +13,9 @@ mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
 call JASM.console.post_init
-;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
+
 popa
 ret
 
@@ -40,29 +37,25 @@ popa
 ret
 
 console.setWidth :
-call screen.wipe
-mov [console.width], ebx
+mov [console.width], bx
 call console.clearScreen
 ret
 
 console.setHeight :
-call screen.wipe
-mov [console.height], ebx
+mov [console.height], bx
 call console.clearScreen
 ret
 
 console.setPos :
-call screen.wipe
-mov [console.pos], ebx
-call console.clearScreen
+mov [console.pos], bx
 ret
 
 screen.wipe :
 pusha
 mov ebx, [console.pos]
 add ebx, SCREEN_BUFFER
-mov ecx, [console.width]
-mov edx, [console.height]
+mov cx, [console.width]
+mov dx, [console.height]
 call Dolphin.clear
 popa
 ret
@@ -77,8 +70,8 @@ je console.loop.ret
 	call Dolphin.getWindowBuffer
 	mov ebx, eax
 	mov eax, [console.buffer]
-	mov ecx, [console.width]
-	mov edx, [console.height]
+	mov cx, [console.width]
+	mov dx, [console.height]
 	call Dolphin.drawText
 popa
 ret
@@ -206,38 +199,21 @@ console.newline :
 	mov ebx, [console.charPos]
 	mov edx, 0x0
 	mov eax, ebx
-	mov ecx, LINE_SEQ
+		xor ecx, ecx
+		mov cx, [console.width]
+		imul ecx, 3
 	div ecx
 	mov ebx, eax
-	imul ebx, LINE_SEQ
-	add ebx, LINE_SEQ
+		push ecx
+		xor ecx, ecx
+		mov cx, [console.width]
+		imul ecx, 3
+		imul ebx, ecx
+		add ebx, ecx
+		pop ecx
 	mov [console.charPos], ebx
 	popa
 	ret
-
-console.newlineOLD :
-pusha
-mov edx, [console.width]
-add edx, edx
-mov eax, [console.charPos]
-add eax, [console.buffer]
-mov bx, 0x0
-mov [eax], bx
-mov eax, [console.charPos]
-mov ecx, 0x0
-add eax, 0x2
-dloop :
-sub eax, edx	; usually 0xA0
-add ecx, 0x1
-cmp eax, 0
-jg dloop
-mov eax, ecx
-mov ebx, edx	; usually 0xA0
-mul ebx
-mov [console.charPos], eax
-;call graphics.newline
-popa
-ret
 
 console.doBackspace :
 
@@ -245,8 +221,9 @@ mov eax, [console.charPos]
 mov edx, 0x0
 bsdloop :
 push edx
-mov edx, [console.width]
-add edx, edx
+xor edx, edx
+mov dx, [console.width]
+add dx, dx
 sub eax, edx
 pop edx
 add edx, 0x1
@@ -261,8 +238,9 @@ mov [ebx], edx
 mov eax, edx
 push bx
 push edx
-mov edx, [console.width]
-add edx, edx
+xor edx, edx
+mov dx, [console.width]
+add dx, dx
 mov bx, dx
 pop edx
 mul bx
@@ -335,8 +313,9 @@ mov ecx, 0x0
 add eax, 0x2
 gldloop :
 push edx
-mov edx, [console.width]
-add edx, edx
+xor edx, edx
+mov dx, [console.width]
+add dx, dx
 sub eax, edx
 pop edx
 add ecx, 0x1
@@ -345,15 +324,17 @@ jg gldloop
 mov eax, ecx
 
 push edx
-mov edx, [console.width]
-add edx, edx
+xor edx, edx
+mov dx, [console.width]
+add dx, dx
 mov ebx, edx
 pop edx
 mul ebx
 add eax, [console.buffer]
 push edx
-mov edx, [console.width]
-add edx, edx
+xor edx, edx
+mov dx, [console.width]
+add dx, dx
 sub eax, edx
 pop edx
 mov ebx, eax
@@ -378,13 +359,8 @@ ret
 
 %include "../programs/new console/build.asm"
 
-console.width :
-dd 0x0
 
-console.height :
-dd 0x0
-
-console.pos :
+console.pos :	; should be removed, use the window's position instead
 dd 0x0
 
 console.charPos :
@@ -398,8 +374,10 @@ dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title
-	dw SCREEN_WIDTH	; width
-	dw SCREEN_HEIGHT	; height
+	console.width :
+	dw 0xa0	; width
+	console.height :
+	dw 0xc8	; height
 	dw 0	; xpos
 	dw 1	; ypos
 	db 0	; type: 0=text, 1=image

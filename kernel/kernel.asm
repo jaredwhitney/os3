@@ -326,6 +326,12 @@ pusha
 popa
 ret
 
+os.halt :
+mov ebx, OK_MSG
+call debug.println
+call Dolphin.updateScreen
+jmp $
+
 
 %include "..\boot\init_GDT.asm"
 %include "..\kernel\drawChar.asm"
@@ -363,6 +369,9 @@ db "File name: ", 0
 
 os.pollKeyboard.isReady :
 dd 0x0
+
+os.textwidth :
+dw 0x0
 
 os.ecatch :
 dd 0x10F0

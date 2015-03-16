@@ -31,7 +31,12 @@ cmp dx, 0x7
 jl drawCharloop
 call drawFill
 mov ecx, [charpos]
-sub ecx, 0xB40
+	push eax
+	xor eax, eax
+	mov ax, [os.textwidth]
+	imul eax, 9
+	sub ecx, eax
+	pop eax
 add ecx, 6
 mov [charpos], ecx
 popa
@@ -80,7 +85,11 @@ drawRow :	; ah contains row
 			jg drawRowloop
 			
 	mov ecx, [charpos]
-	add ecx, 0x140
+	push eax
+	xor eax, eax
+	mov ax, [os.textwidth]
+	add ecx, eax
+	pop eax
 	mov [charpos], ecx
 	popa
 ret
@@ -506,10 +515,10 @@ db 0b00000
 db 0b00000
 db 0b00000
 
-db 0b11111
-db 0b11111
-db 0b11111
-db 0b11111
-db 0b11111
-db 0b11111
-db 0b11111
+db 0b10101
+db 0b01010
+db 0b10101
+db 0b01010
+db 0b10101
+db 0b01010
+db 0b10101
