@@ -60,19 +60,21 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	ret
 	
 Dolphin.clearImage :	; eax = source, ecx = width, edx = height; CURRENTLY VERY BROKEN!
-pusha
-imul ecx, edx
-sub ecx, 1
-mov edx, 0x0
-mov bl, 0x0
-Dolphin.clearImage_loop :
-mov [eax], bl
-add eax, 1
-add edx, 1
-cmp edx, ecx
-jle Dolphin.clearImage_loop
-popa
-ret
+	pusha
+	and ecx, 0xFFFF
+	and edx, 0xFFFF
+	imul ecx, edx
+	sub ecx, 1
+	mov edx, 0x0
+	mov bl, 0x0
+	Dolphin.clearImage_loop :
+	mov [eax], bl
+	add eax, 1
+	add edx, 1
+	cmp edx, ecx
+	jle Dolphin.clearImage_loop
+	popa
+	ret
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WINDOW HEIGHT IS CURRENTLY IGNORED!
 	pusha
@@ -331,6 +333,21 @@ call Dolphin.redrawBG
 			popa
 		mov ebx, SCREEN_BUFFER
 		
+		push eax
+		xor eax, eax
+		push bx
+		mov bl, [Dolphin.Y_POS]
+		call Dolphin.getAttribute
+		pop bx
+		imul eax, SCREEN_WIDTH
+		add ebx, eax	; add ypos
+		push bx
+		mov bl, [Dolphin.X_POS]
+		call Dolphin.getAttribute
+		pop bx
+		add ebx, eax
+		pop eax
+		
 		call Dolphin.copyImage
 		
 		pop ebx
@@ -477,6 +494,8 @@ Dolphin.charposStor :
 dw 0x0
 Dolphin.tColor :
 dd 0x0, 0x0, 0x0, 0x0
+Dolphin.activeWindow :	; winNum for the window that currently has focus (must be switched by Dolphin!)
+dd 0x0
 bglocstor :
 dd 0x0
 Dolphin.windowStructs :

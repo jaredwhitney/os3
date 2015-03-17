@@ -339,6 +339,8 @@ else if (s.equals("String.mem"))
 return "os.String.removeColor";
 else if (s.equals("Minnow.tree"))
 return "Minnow.ctree";
+else if (s.equals("console.test"))
+return "console.test";
 else
 return pname + "." + s;
 }

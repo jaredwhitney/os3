@@ -358,11 +358,11 @@ push eax
 mov eax, 0
 mov [JASM.console.draw], eax
 pop eax
-		; return 0
-mov eax, 0
-mov [retval], eax
-popa
-ret
+		; done = 1
+push eax
+mov eax, 1
+mov [JASM.console.done], eax
+pop eax
 		; endif
 jmp JASM.console.loop_5.EQend
 JASM.console.loop_5.end :
@@ -511,6 +511,34 @@ jmp JASM.console.loop_10.EQend
 JASM.console.loop_10.end :
 popa
 JASM.console.loop_10.EQend :
+		; if (inp seq_mem "TEST")
+pusha
+mov eax, [JASM.console.inp]
+mov ebx, JASM.console.var_16
+JASM.console.loop_11.start :
+mov cl, [eax]
+mov dl, [ebx]
+cmp cl, dl
+jne JASM.console.loop_11.end
+cmp cl, 0
+je JASM.console.loop_11.go
+add eax, 1
+add ebx, 1
+jmp JASM.console.loop_11.start
+JASM.console.loop_11.go :
+popa
+		; console.test(null)
+call console.test
+		; done = 1
+push eax
+mov eax, 1
+mov [JASM.console.done], eax
+pop eax
+		; endif
+jmp JASM.console.loop_11.EQend
+JASM.console.loop_11.end :
+popa
+JASM.console.loop_11.EQend :
 		; if (done = 0)
 push eax
 push ebx
@@ -519,7 +547,7 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_11.end
+jne JASM.console.loop_12.end
 		; color(0x3)
 push ebx
 mov ebx, 0x3
@@ -527,12 +555,12 @@ call console.setColor
 pop ebx
 		; print("Unrecognized Command: ")
 push ebx
-mov ebx, JASM.console.var_16
+mov ebx, JASM.console.var_17
 call console.print
 pop ebx
 		; print("'")
 push ebx
-mov ebx, JASM.console.var_17
+mov ebx, JASM.console.var_18
 call console.print
 pop ebx
 		; print(inp)
@@ -542,11 +570,11 @@ call console.print
 pop ebx
 		; println("'")
 push ebx
-mov ebx, JASM.console.var_18
+mov ebx, JASM.console.var_19
 call console.println
 pop ebx
 		; endif
-JASM.console.loop_11.end :
+JASM.console.loop_12.end :
 		; color(0xF)
 push ebx
 mov ebx, 0xF
@@ -560,10 +588,10 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_12.end
+jne JASM.console.loop_13.end
 		; print("Console: ")
 push ebx
-mov ebx, JASM.console.var_19
+mov ebx, JASM.console.var_20
 call console.print
 pop ebx
 		; return 0
@@ -572,10 +600,10 @@ mov [retval], eax
 popa
 ret
 		; endif
-JASM.console.loop_12.end :
+JASM.console.loop_13.end :
 		; print("File Name: ")
 push ebx
-mov ebx, JASM.console.var_20
+mov ebx, JASM.console.var_21
 call console.print
 pop ebx
 		; return 0
@@ -594,7 +622,7 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_13.end
+jne JASM.console.loop_14.end
 		; setPos(0x0)
 push ebx
 mov ebx, 0x0
@@ -616,7 +644,7 @@ mov eax, 2
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_13.end :
+JASM.console.loop_14.end :
 		; if (full = 1)
 push eax
 push ebx
@@ -625,7 +653,7 @@ mov ebx, 1
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_14.end
+jne JASM.console.loop_15.end
 		; setPos(0x280)
 push ebx
 mov ebx, 0x280
@@ -647,7 +675,7 @@ mov eax, 0
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_14.end :
+JASM.console.loop_15.end :
 		; if (full = 2)
 push eax
 push ebx
@@ -656,14 +684,14 @@ mov ebx, 2
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_15.end
+jne JASM.console.loop_16.end
 		; full = 1
 push eax
 mov eax, 1
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_15.end :
+JASM.console.loop_16.end :
 		; done = 1
 push eax
 mov eax, 1
@@ -718,14 +746,16 @@ db "VIEW", 0
 JASM.console.var_15 :
 db "TREE", 0
 JASM.console.var_16 :
-db "Unrecognized Command: ", 0
+db "TEST", 0
 JASM.console.var_17 :
-db "'", 0
+db "Unrecognized Command: ", 0
 JASM.console.var_18 :
 db "'", 0
 JASM.console.var_19 :
-db "Console: ", 0
+db "'", 0
 JASM.console.var_20 :
+db "Console: ", 0
+JASM.console.var_21 :
 db "File Name: ", 0
 retval :
 dd 0x0

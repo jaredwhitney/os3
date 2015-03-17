@@ -14,7 +14,7 @@ mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
 call JASM.console.post_init
-call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
 
 popa
@@ -49,6 +49,15 @@ ret
 
 console.setPos :
 mov [console.pos], bx
+ret
+
+console.test :	; command that can be used to test anything.
+pusha
+mov bl, [console.winNum]
+call Dolphin.unregisterWindow
+mov ebx, 0x0
+mov [JASM.console.draw], ebx
+popa
 ret
 
 screen.wipe :
@@ -299,7 +308,7 @@ mov [eax], cx
 add eax, 2
 push ebx
 mov ebx, [console.buffer]
-add ebx, 0x1000
+add ebx, 0xfa00
 cmp eax, ebx
 pop ebx
 jl console.clearScreen.loop
@@ -389,8 +398,8 @@ console.windowStruct :
 	dw 0xa0	; width
 	console.height :
 	dw 0xc8	; height
-	dw 0	; xpos
-	dw 1	; ypos
+	dw 0x30	; xpos
+	dw 0	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin
 	console.windowBuffer :
