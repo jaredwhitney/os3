@@ -358,8 +358,6 @@ push eax
 mov eax, 0
 mov [JASM.console.draw], eax
 pop eax
-		; update_bg(null)
-call Dolphin.redrawBG
 		; return 0
 mov eax, 0
 mov [retval], eax

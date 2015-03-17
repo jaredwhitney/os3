@@ -38,7 +38,6 @@ func int handleEnter(null)
 	if (inp seq_mem "EXIT")
 		catch_enter(os.return)
 		draw = 0
-		update_bg(null)
 		return 0
 	endif
 	if (inp seq_mem "CLEAR")

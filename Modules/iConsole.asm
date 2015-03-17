@@ -9,6 +9,7 @@ mov [console.windowBuffer], ecx
 	mov bl, 0x2
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
+	mov [console.winNum], bl
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
@@ -64,8 +65,9 @@ console.update :
 pusha
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
-je console.loop.ret
-	mov ebx, 0x0
+je console.update.gone
+	xor ebx, ebx
+	mov bl, [console.winNum]
 	mov [currentWindow], ebx	; should not be hard-coded
 	call Dolphin.getWindowBuffer
 	mov ebx, eax
@@ -73,6 +75,12 @@ je console.loop.ret
 	mov cx, [console.width]
 	mov dx, [console.height]
 	call Dolphin.drawText
+popa
+ret
+
+console.update.gone :	; THIS IS NEVER CALLED :|
+mov bl, [console.winNum]
+call Dolphin.unregisterWindow
 popa
 ret
 
@@ -304,7 +312,7 @@ console.setColor :
 mov ah, bl
 ret
 
-console.getLine :
+console.getLine :	; THIS IS BROKEN RIGHT NOW :|	! Fails on even numbered lines? YES, THIS IS CORRECT!
 pusha
 mov eax, [console.charPos]
 ;mov ebx, eax
@@ -312,31 +320,31 @@ mov eax, [console.charPos]
 mov ecx, 0x0
 add eax, 0x2
 gldloop :
-push edx
-xor edx, edx
-mov dx, [console.width]
-add dx, dx
-sub eax, edx
-pop edx
+	push edx
+	xor edx, edx
+	mov dx, [console.width]
+	;add dx, dx
+	sub eax, edx
+	pop edx
 add ecx, 0x1
 cmp eax, 0
 jg gldloop
 mov eax, ecx
 
-push edx
-xor edx, edx
-mov dx, [console.width]
-add dx, dx
-mov ebx, edx
-pop edx
+	push edx
+	xor edx, edx
+	mov dx, [console.width]
+	;add dx, dx
+	mov ebx, edx
+	pop edx
 mul ebx
 add eax, [console.buffer]
-push edx
-xor edx, edx
-mov dx, [console.width]
-add dx, dx
-sub eax, edx
-pop edx
+	push edx
+	xor edx, edx
+	mov dx, [console.width]
+	;add dx, dx
+	sub eax, edx
+	pop edx
 mov ebx, eax
 
 mov edx, console.line
@@ -371,6 +379,9 @@ db 0x0
 
 console.line :
 dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+
+console.winNum :
+db 0x0
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title

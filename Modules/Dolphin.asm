@@ -12,7 +12,7 @@ call Guppy.malloc
 mov ecx, ebx
 mov ah, 0x7D	; text/image buffer
 call Guppy.malloc
-ret	; returns buffer location in ebx
+ret	; returns buffer locations in ebx, ecx
 
 Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	pusha
@@ -59,7 +59,7 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	popa
 	ret
 	
-Dolphin.clearImage :	; eax = source, ecx = width, edx = height
+Dolphin.clearImage :	; eax = source, ecx = width, edx = height; CURRENTLY VERY BROKEN!
 pusha
 imul ecx, edx
 sub ecx, 1
@@ -74,7 +74,7 @@ jle Dolphin.clearImage_loop
 popa
 ret
 
-Dolphin.drawText :	; eax = text buffer, ebx = dest		;, cx = width, dx = height
+Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WINDOW HEIGHT IS CURRENTLY IGNORED!
 	pusha
 	mov [os.textwidth], cx
 		pusha
@@ -300,28 +300,42 @@ Dolphin.updateScreen :
 pusha
 call Dolphin.redrawBG
 ;
-;	Draw windows in here!	(should NOT be hardcoded)
-	mov ebx, 0x0
-	mov [currentWindow], ebx
-
-	mov bl, [Dolphin.WIDTH]
-	call Dolphin.getAttribute
-	mov [atwstor], ax
+;	Draw windows in here!	(should NOT be hardcoded
+		mov ebx, 0x0
+		Dolphin.updateScreen.checkWindow :
+			call Dolphin.windowExists
+			cmp ebx, 0xF*4	; num of windows * 4 bytes per windowStruct location
+			je Dolphin.doneDrawingWindows
+			cmp eax, 0x0
+			add ebx, 4
+				je Dolphin.updateScreen.checkWindow
+		push ebx
+		sub ebx, 4
+		
+		mov [currentWindow], ebx
 	
-	mov bl, [Dolphin.HEIGHT]
-	call Dolphin.getAttribute
-	mov [atwstor2], ax
-	
-	call Dolphin.getWindowBuffer	; mov eax, windowBuffer
-	mov ecx, [atwstor]
-	mov edx, [atwstor2]
-		pusha
-		mov ebx, eax
-		call Dolphin.drawBorder
-		popa
-	mov ebx, SCREEN_BUFFER
-	
-	call Dolphin.copyImage
+		mov bl, [Dolphin.WIDTH]
+		call Dolphin.getAttribute
+		mov [atwstor], ax
+		
+		mov bl, [Dolphin.HEIGHT]
+		call Dolphin.getAttribute
+		mov [atwstor2], ax
+		
+		call Dolphin.getWindowBuffer	; mov eax, windowBuffer
+		mov ecx, [atwstor]
+		mov edx, [atwstor2]
+			pusha
+			mov ebx, eax
+			call Dolphin.drawBorder
+			popa
+		mov ebx, SCREEN_BUFFER
+		
+		call Dolphin.copyImage
+		
+		pop ebx
+		jmp Dolphin.updateScreen.checkWindow
+Dolphin.doneDrawingWindows :
 ;
 call debug.update	; ensuring that debug information stays updated and 'on top'
 mov eax, SCREEN_BUFFER
@@ -330,6 +344,19 @@ mov ecx, SCREEN_WIDTH
 mov edx, SCREEN_HEIGHT
 call Dolphin.copyImage
 popa
+ret
+
+Dolphin.windowExists :	; windowNum in ebx, returns either 0x0 or 0xF (F|T) in eax
+push ebx
+add ebx, Dolphin.windowStructs
+mov eax, [ebx]
+pop ebx
+cmp eax, 0x0
+je Dolphin.windowExists.false
+mov eax, 0xF
+ret
+Dolphin.windowExists.false :
+mov eax, 0x0
 ret
 
 Dolphin.toggleColored :
@@ -351,18 +378,22 @@ Dolphin.toggleColored.ret :
 popa
 ret
 
-Dolphin.registerWindow :	; bl = pnum, eax = pointer to windowStruct
-pusha
+Dolphin.registerWindow :	; bl = pnum, eax = pointer to windowStruct; returns bl contains windowNum
+push ecx
+push edx
 mov edx, Dolphin.windowStructs
-mov cl, 0x0
 Dolphin.registerWindow.loop1 :
-mov ch, [edx]
-add edx, 1
-cmp ch, cl
+mov ecx, [edx]
+add edx, 4
+cmp ecx, 0x0
 jne Dolphin.registerWindow.loop1
-sub edx, 1
+sub edx, 4
 mov [edx], eax
-popa
+sub edx, Dolphin.windowStructs
+mov ebx, edx
+and ebx, 0xFF
+pop edx
+pop ecx
 ret
 
 Dolphin.getWindowBuffer :	; returns eax = buffer location
@@ -401,6 +432,18 @@ mov eax, ecx
 Dolphin.getAttribute.done :
 pop ebx
 pop ecx
+ret
+
+Dolphin.unregisterWindow :	; winNum in bl
+pusha
+mov ecx, 0x0
+and ebx, 0xFF
+mov eax, Dolphin.windowStructs
+add eax, ebx
+mov [eax], ecx
+mov ebx, UNREG_MSG
+call debug.log.system
+popa
 ret
 
 Dolphin.TITLE :
@@ -442,3 +485,5 @@ Dolphin.cbuffer :
 dd SCREEN_BUFFER
 PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0
+UNREG_MSG :
+db "A window has been unregistered!", 0
