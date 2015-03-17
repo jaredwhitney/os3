@@ -409,6 +409,7 @@ mov [edx], eax
 sub edx, Dolphin.windowStructs
 mov ebx, edx
 and ebx, 0xFF
+mov [Dolphin.activeWindow], bl
 pop edx
 pop ecx
 ret
@@ -430,6 +431,7 @@ ret
 Dolphin.getAttribute :	; attribute num in bl, returns attribute data in eax
 push ecx
 push ebx
+xor eax, eax
 mov ecx, [currentWindow]
 add ecx, Dolphin.windowStructs
 mov ecx, [ecx]
@@ -451,6 +453,28 @@ pop ebx
 pop ecx
 ret
 
+Dolphin.setAttribute :	; attribute num in bl, attribute data in eax
+	pusha
+	mov ecx, [currentWindow]
+	add ecx, Dolphin.windowStructs
+	mov ecx, [ecx]
+	and ebx, 0xFF
+	add ecx, ebx
+	cmp bl, 16
+	jl Dolphin.setAttribute.read2xDouble
+	cmp bl, 24
+	jl Dolphin.setAttribute.readWord
+	mov [ecx], al
+	jmp Dolphin.setAttribute.done
+	Dolphin.setAttribute.readWord :
+	mov [ecx], ax
+	jmp Dolphin.setAttribute.done
+	Dolphin.setAttribute.read2xDouble :
+	;mov eax, ecx	; currently unimplemented.
+	Dolphin.setAttribute.done :
+	popa
+	ret
+
 Dolphin.unregisterWindow :	; winNum in bl
 pusha
 mov ecx, 0x0
@@ -460,6 +484,41 @@ add eax, ebx
 mov [eax], ecx
 mov ebx, UNREG_MSG
 call debug.log.system
+popa
+ret
+
+Dolphin.moveWindow :	; xchange in eax, y change in ebx
+pusha
+mov edx, eax
+mov ecx, ebx
+mov bh, [Dolphin.activeWindow]
+mov [currentWindow], bh
+
+mov bl, [Dolphin.X_POS]
+call Dolphin.getAttribute
+add eax, edx
+call Dolphin.setAttribute
+
+mov bl, [Dolphin.Y_POS]
+call Dolphin.getAttribute
+add eax, ecx
+call Dolphin.setAttribute
+popa
+ret
+
+Dolphin.moveWindowAbsolutte :	; x in eax, y in ebx
+pusha
+mov ecx, ebx
+mov bh, [Dolphin.activeWindow]
+mov [currentWindow], bh
+
+mov bl, [Dolphin.X_POS]
+call Dolphin.setAttribute
+
+mov eax, ecx
+mov bl, [Dolphin.Y_POS]
+call Dolphin.setAttribute
+
 popa
 ret
 
@@ -495,7 +554,7 @@ dw 0x0
 Dolphin.tColor :
 dd 0x0, 0x0, 0x0, 0x0
 Dolphin.activeWindow :	; winNum for the window that currently has focus (must be switched by Dolphin!)
-dd 0x0
+db 0x0
 bglocstor :
 dd 0x0
 Dolphin.windowStructs :

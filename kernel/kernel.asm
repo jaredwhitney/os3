@@ -134,12 +134,24 @@ call os.keyboard.toChar
 ;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 cmp al, 0x1
 je os.doEnter
+	cmp bl, 0x50	; down key
+	je os.doArrow
+	cmp bl, 0x4d	; right key
+	je os.doArrow
+	cmp bl, 0x48	; up key
+	je os.doArrow
+	cmp bl, 0x4b	; left key
+	je os.doArrow
+	cmp bl, 0x0f	; tab key
+	je os.doArrow
 mov bl, al
 call os.keyPress	; keypress will be sent to the currently registered program in al
 os.pollKeyboard.drawKeyFinalize :
 mov cx, 0x0
 mov [os.pollKeyboard.isReady], cx	; so we know that we have already printed the character, and should not do so again
 pop bx
+cmp bl, 0xE0
+je os.pollKeyboard.return	; should not look to debounce a modifier byte ^_^
 mov [os.lastKey], bl
 os.pollKeyboard.return :
 popa
@@ -309,6 +321,42 @@ ret
 
 retfunc :
 ret
+
+os.doArrow :
+	pusha
+	cmp bl, 0x50
+	je os.doArrow.down
+	cmp bl, 0x48
+	je os.doArrow.up
+	cmp bl, 0x4d
+	je os.doArrow.right
+	cmp bl, 0x4b
+	je os.doArrow.left
+	;	else it is a tab, reset the window's position
+	mov eax, 0
+	mov ebx, 0
+	call Dolphin.moveWindowAbsolutte
+	jmp os.doArrow.ret	; not a huge problem that it calls moveWindow
+	os.doArrow.up :
+	mov eax, 0
+	mov ebx, -1
+	jmp os.doArrow.ret
+	os.doArrow.left :
+	mov eax, -1
+	mov ebx, 0
+	jmp os.doArrow.ret
+	os.doArrow.right :
+	mov eax, 1
+	mov ebx, 0
+	jmp os.doArrow.ret
+	os.doArrow.down :
+	mov eax, 0
+	mov ebx, 1
+	
+	os.doArrow.ret :
+	call Dolphin.moveWindow
+	popa
+	jmp os.pollKeyboard.drawKeyFinalize
 
 os.String.removeColor :	; pointer to String in ebx
 pusha
