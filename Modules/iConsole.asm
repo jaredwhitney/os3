@@ -239,7 +239,7 @@ bsdloop :
 push edx
 xor edx, edx
 mov dx, [console.width]
-add dx, dx
+;add dx, dx
 sub eax, edx
 pop edx
 add edx, 0x1
@@ -256,7 +256,7 @@ push bx
 push edx
 xor edx, edx
 mov dx, [console.width]
-add dx, dx
+;add dx, dx
 mov bx, dx
 pop edx
 mul bx

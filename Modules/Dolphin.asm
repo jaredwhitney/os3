@@ -59,7 +59,21 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	popa
 	ret
 	
-Dolphin.clearImage :	; eax = source, ecx = width, edx = height; CURRENTLY VERY BROKEN!
+Dolphin.copyImageLinear :	; eax = source, ebx = dest, ecx = width, edx = height
+	pusha
+	imul ecx, edx
+	Dolphin.copyImageLinear_loop :
+	mov dl, [eax]
+	mov [ebx], dl
+	add eax, 1
+	add ebx, 1
+	sub ecx, 1
+	cmp ecx, 0x0
+	jge Dolphin.copyImageLinear_loop
+	popa
+	ret
+	
+Dolphin.clearImage :	; eax = source, ecx = width, edx = height
 	pusha
 	and ecx, 0xFFFF
 	and edx, 0xFFFF
@@ -81,8 +95,6 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WIN
 	mov [os.textwidth], cx
 		pusha
 		mov eax, ebx
-		mov ecx, SCREEN_WIDTH
-		mov edx, SCREEN_HEIGHT
 		call Dolphin.clearImage
 		popa
 	mov ecx, [charpos]
@@ -302,7 +314,7 @@ Dolphin.updateScreen :
 pusha
 call Dolphin.redrawBG
 ;
-;	Draw windows in here!	(should NOT be hardcoded
+;	Draw windows in here!
 		mov ebx, 0x0
 		Dolphin.updateScreen.checkWindow :
 			call Dolphin.windowExists

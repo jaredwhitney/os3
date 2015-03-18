@@ -150,7 +150,7 @@ os.pollKeyboard.drawKeyFinalize :
 mov cx, 0x0
 mov [os.pollKeyboard.isReady], cx	; so we know that we have already printed the character, and should not do so again
 pop bx
-cmp bl, 0xE0
+cmp bl, 0x2a
 je os.pollKeyboard.return	; should not look to debounce a modifier byte ^_^
 mov [os.lastKey], bl
 os.pollKeyboard.return :
@@ -333,8 +333,8 @@ os.doArrow :
 	cmp bl, 0x4b
 	je os.doArrow.left
 	;	else it is a tab, reset the window's position
-	mov eax, 0
-	mov ebx, 0
+	mov eax, 0;SCREEN_WIDTH/4
+	mov ebx, 0;SCREEN_HEIGHT/4
 	call Dolphin.moveWindowAbsolutte
 	jmp os.doArrow.ret	; not a huge problem that it calls moveWindow
 	os.doArrow.up :
