@@ -37,10 +37,6 @@ call Guppy.init
 
 ;call Mouse.init
 
-
-;mov ebx, retfunc
-;call os.setEcatch
-
 call Minnow.dtree
 
 mov ebx, FILE_DESCR
@@ -49,10 +45,11 @@ mov ebx, bg_name	; bg_name = "TEAMBLDR"
 call debug.println
 
 call Minnow.byName	; find the file
-;mov ebx, 0x95f0
 call Dolphin.makeBG
 
+;	INITIALIZING PROGRAMS	;
 call console.init
+call View.init
 
 mov ebx, LOAD_FINISH
 call debug.log.system
@@ -380,6 +377,19 @@ call debug.println
 call Dolphin.updateScreen
 jmp $
 
+os.getProgramNumber :	; returns pnum in bl
+mov bl, [os.pnumCounter]
+add bl, 1
+mov [os.pnumCounter], bl
+push ebx
+mov ebx, PROGRAM_REGISTERED
+call debug.print
+pop ebx
+and ebx, 0xFF
+call debug.num
+call debug.newl
+ret
+
 
 %include "..\boot\init_GDT.asm"
 %include "..\kernel\drawChar.asm"
@@ -415,6 +425,9 @@ db "Transferring control to user!", 0
 FILE_DESCR :
 db "File name: ", 0
 
+PROGRAM_REGISTERED :
+db "A program has been registered: PNUM=", 0
+
 os.pollKeyboard.isReady :
 dd 0x0
 
@@ -426,5 +439,8 @@ dd 0x10F0
 
 os.lastKey :
 dw 0x0
+
+os.pnumCounter :
+db 0x0
 
 MINNOW_START :

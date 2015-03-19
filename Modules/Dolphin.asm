@@ -6,12 +6,14 @@ Dolphin.init :
 	; whatever needs to be done here
 
 Dolphin.create :	; bl contains PNUM
+push eax
 mov al, bl
 mov ah, 0x7D	; Window buffer
 call Guppy.malloc
 mov ecx, ebx
 mov ah, 0x7D	; text/image buffer
 call Guppy.malloc
+pop eax
 ret	; returns buffer locations in ebx, ecx
 
 Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
@@ -476,10 +478,15 @@ Dolphin.setAttribute :	; attribute num in bl, attribute data in eax
 	jl Dolphin.setAttribute.read2xDouble
 	cmp bl, 24
 	jl Dolphin.setAttribute.readWord
+	cmp bl, 26
+	jge Dolphin.setAttribute.readDouble
 	mov [ecx], al
 	jmp Dolphin.setAttribute.done
 	Dolphin.setAttribute.readWord :
 	mov [ecx], ax
+	jmp Dolphin.setAttribute.done
+	Dolphin.setAttribute.readDouble :
+	mov [ecx], eax
 	jmp Dolphin.setAttribute.done
 	Dolphin.setAttribute.read2xDouble :
 	;mov eax, ecx	; currently unimplemented.
@@ -496,6 +503,8 @@ add eax, ebx
 mov [eax], ecx
 mov ebx, UNREG_MSG
 call debug.log.system
+mov bl, 0		; SHOULD NOT BE HARDCODED!
+mov [Dolphin.activeWindow], bl
 popa
 ret
 
@@ -533,6 +542,24 @@ call Dolphin.setAttribute
 
 popa
 ret
+
+;Dolphin.newWindow :	; windowStruct in eax, pnum in bl, returns winNum
+;pusha
+;call Dolphin.create
+;and bx, 0xFF
+;mov [atwstor], bx
+;call Dolphin.registerWindow
+;push ebx
+;mov bl, 26
+;mov eax, ecx
+;call Dolphin.setAttribute
+;pop ebx
+;mov eax, ebx
+;mov bl, 30
+;call Dolphin.setAttribute
+;popa
+;mov bx, [atwstor]
+;ret
 
 Dolphin.TITLE :
 db 0

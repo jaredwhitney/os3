@@ -2,11 +2,12 @@
 
 console.init :
 pusha
-mov bl, 0x2
-call Dolphin.create
+	call os.getProgramNumber	; register program with the OS
+	mov [console.pnum], bl
+call Dolphin.create				; allocate memory for a window
 mov [console.buffer], ebx
 mov [console.windowBuffer], ecx
-	mov bl, 0x2
+	mov bl, [console.pnum]
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
 	mov [console.winNum], bl
@@ -389,6 +390,9 @@ console.line :
 dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
 
 console.winNum :
+db 0x0
+
+console.pnum :
 db 0x0
 
 console.windowStruct :

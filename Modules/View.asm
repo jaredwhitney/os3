@@ -1,5 +1,15 @@
 [bits 32]
 
+View.init :
+pusha
+	call os.getProgramNumber
+	mov [View.pnum], bl
+	call Dolphin.create
+	mov [View.buffer], ecx
+	mov [View.windowBuffer], ebx
+popa
+ret
+
 View.file :	; ebx contains file name
 pusha
 call Minnow.byName
@@ -43,10 +53,6 @@ jmp View.file.return
 
 View.winSetup :
 		pusha
-		mov bl, 0x3
-		call Dolphin.create
-		mov [View.buffer], ecx
-		mov [View.windowBuffer], ebx
 		mov eax, View.windowStruct
 		call Dolphin.registerWindow
 			mov [View.wnum], bl
@@ -132,6 +138,8 @@ db "[View] Succesfully loaded file.", 0x0
 View.file.ecatchStor :
 dd 0x0
 View.wnum :
+db 0x0
+View.pnum :
 db 0x0
 
 View.windowStruct :
