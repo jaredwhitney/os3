@@ -24,7 +24,7 @@ while (nam!=null)
 if (nam.contains(".jasm"))
 proccess(nam);
 else if (nam.contains(".asm"))
-Runtime.getRuntime().exec(new String[]{"C:\\Users\\Jared\\AppData\\Local\\nasm\\nasm.exe", "-o " + nam.split("\\Q.\\E")[0] + ".bin", "-f bin", nam}).waitFor();
+Runtime.getRuntime().exec(new String[]{"nasm.exe", "-o " + nam.split("\\Q.\\E")[0] + ".bin", "-f bin", nam}).waitFor();
 decs.clear();
 vars.clear();
 vnum = 0;
