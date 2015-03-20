@@ -18,7 +18,6 @@ func int handleEnter(null)
 	inp += 9
 	if (file = 1)
 		inp += 2
-		String.mem(inp)
 		View.file(inp)
 		println("See debug for details.")
 		file = 0

@@ -239,11 +239,6 @@ add eax, ebx
 mov [JASM.console.inp], eax
 pop ebx
 pop eax
-		; String.mem(inp)
-push ebx
-mov ebx, [JASM.console.inp]
-call os.String.removeColor
-pop ebx
 		; View.file(inp)
 push ebx
 mov ebx, [JASM.console.inp]
