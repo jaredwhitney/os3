@@ -1,0 +1,13 @@
+eax
+eax, ebx
+eax, ebx, ecx
+eax, ebx, ecx, edx
+[s1], eax, ebx, ecx, edx
+[s1], [s2], eax, ebx, ecx, edx
+etc, etc
+
+<return> <name>([args])
+{
+[code]
+<return> [value];
+}

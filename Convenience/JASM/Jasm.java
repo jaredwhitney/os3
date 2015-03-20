@@ -316,7 +316,7 @@ return "console.newline";
 else if (s.equals("cls"))
 return "console.clearScreen";
 else if (s.equals("catch_enter"))
-return "os.setEcatch";
+return "os.setEnterSub";
 else if (s.equals("getLine"))
 return "console.getLine";
 else if (s.equals("print_mem"))

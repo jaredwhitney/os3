@@ -111,13 +111,13 @@ View.file.modEcatch :
 	mov ebx, [ebx]
 	mov [View.file.ecatchStor], ebx
 	mov ebx, View.file.enter
-	call os.setEcatch
+	call os.setEnterSub
 	popa
 	ret
 View.file.enter :
 pusha
 mov ebx, [View.file.ecatchStor]
-call os.setEcatch
+call os.setEnterSub
 mov bl, [View.wnum]
 call Dolphin.unregisterWindow
 popa

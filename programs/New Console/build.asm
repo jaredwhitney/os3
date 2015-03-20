@@ -189,7 +189,7 @@ pop ebx
 		; catch_enter(handleEnter)
 push ebx
 mov ebx, JASM.console.handleEnter
-call os.setEcatch
+call os.setEnterSub
 pop ebx
 		; return 0
 mov eax, 0
@@ -351,7 +351,7 @@ popa
 		; catch_enter(os.return)
 push ebx
 mov ebx, retfunc
-call os.setEcatch
+call os.setEnterSub
 pop ebx
 		; draw = 0
 push eax

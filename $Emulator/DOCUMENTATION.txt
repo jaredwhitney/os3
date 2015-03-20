@@ -1,0 +1,14 @@
+	funcion				params			returns			modifies	description
+
+kernel.asm :
+	Kernel.init			none			HANGS			ebx			Sets up modules and programs and runs the main loop.
+	Mouse.init			none			none			none		Sets the connected PS2 mouse to send packets.
+	os.setEnterSub		ebx = subLoc	none			none		Changes the subroutine run on press of the enter key.
+	os.pollKeyboard		none			none			none		Polls the connected PS2 keyboard for the latest data.
+	os.doEnter			none			NOT STANDALONE	eax, ebx	Calls the subroutine registered to be run when the enter key is pressed.
+	os.keyPress			bl = keyCode	none			none		Stores a keypress for later proccessing.
+	os.getKey			none			char|0 in bl	bl			Returns the last key pressed (or 0, debounced).
+	retfunc				none			none			none		Simply... returns.
+	os.handleSpecial	bl = keyCode	NOT STANDALONE	none		Handles special keypresses (window movement keys, etc).
+	os.halt				none			HANGS			ebx			Prints a message to debug and halts the system.
+	os.getProgramNumber	none			pnum in bl		ebx			Reserves a unique program number for a program.

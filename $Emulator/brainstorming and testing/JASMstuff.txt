@@ -1,0 +1,10 @@
+int x=0;
+for (char c : inp.toCharArray)
+{
+	if (c==';')
+		hreak;
+	x++;	
+}
+String command = c.substring(start, x);
+// proccessing
+start = x;
