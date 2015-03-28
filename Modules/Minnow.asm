@@ -228,6 +228,8 @@ Minnow.TEXT :
 db "TEXT", 0x0
 Minnow.image.DIM :
 dd 0x0
+Minnow.attr.SIZE :
+dd 0xFFFFFFF6; -10
 Minnow.sep :
 db ": ", 0
 Minnow.stag :

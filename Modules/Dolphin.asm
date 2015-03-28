@@ -92,7 +92,7 @@ Dolphin.clearImage :	; eax = source, ecx = width, edx = height
 	popa
 	ret
 
-Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WINDOW HEIGHT IS CURRENTLY IGNORED!
+Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	pusha
 	mov [os.textwidth], cx
 		pusha
@@ -103,17 +103,32 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WIN
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
 	mov ecx, ebx	; dest buffer
+	call Dolphin.checkCharLine
 	mov [charpos], ecx
 	mov ebx, eax	; src buffer
 	mov ah, 255
+	mov [Dolphin.bsizstor], edx
 	mov edx, 0x0
 	Dolphin.drawText_loop :
 		mov ax, [ebx]
-		cmp edx, 0x2000	; size of buffer, should be specified, not hardcoded
+		push ebx
+		mov ebx, [Dolphin.bsizstor]
+		;call debug.num
+		cmp edx, 0x4000	; size of buffer
+		pop ebx
 			jg Dolphin.drawText_ret
 		add edx, 1
 		cmp al, 0x0
 			je Dolphin.drawText.nodraw
+		cmp al, 0xA0
+			je Dolphin.drawText.newl
+			push bx
+			mov bl, [Dolphin.colorOverride]
+			cmp bl, 0
+			je Dolphin.drawText_noOverride1
+			mov ah, bl
+			Dolphin.drawText_noOverride1 :
+			pop bx
 		call graphics.drawChar
 		mov ecx, [charpos]
 			push ebx
@@ -123,6 +138,8 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WIN
 			add ecx, ebx
 			;add ecx, 0xa0*2
 			pop ebx
+		Dolphin.drawText.doCheck :
+		call Dolphin.checkCharLine	; EXPERIMENTAL!!!
 		mov [charpos], ecx
 		jmp Dolphin.drawText.cont1
 		Dolphin.drawText.nodraw :
@@ -132,13 +149,89 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, dx = height; WIN
 			mov [charpos], ecx
 			pop ecx
 		Dolphin.drawText.cont1 :
-			add ebx, 0x2
+			add ebx, 0x1
+				push ax
+				mov al, [Dolphin.colorOverride]
+				cmp al, 0
+				jne Dolphin.drawText_noOverride2
+				add ebx, 0x1
+				Dolphin.drawText_noOverride2 :
+				pop ax
 			jmp Dolphin.drawText_loop
 	Dolphin.drawText_ret :
 	mov ecx, [debug.charpos.stor]
 	mov [charpos], ecx
 	popa
 	ret
+	
+	Dolphin.drawText.newl :	; move one space down, checkCharLine will move to the next line
+	push edx
+	mov ecx, [charpos]
+	mov edx, SCREEN_WIDTH
+	add ecx, edx
+	mov [charpos], ecx
+	pop edx
+	jmp Dolphin.drawText.doCheck
+	
+	Dolphin.checkCharLine :	; charpos in ecx, width in os.textwidth, buffer loc in bstor
+	push eax
+	push ebx
+	push edx
+		mov eax, [bstor]
+		sub ecx, eax
+		push eax
+		push ecx
+		add ecx, 6
+		mov eax, ecx
+		xor ebx, ebx
+		mov bx, [os.textwidth]
+		xor edx, edx
+		div ebx	; eax now contains the line number
+		
+		mov ecx, 9
+		xor edx, edx
+		idiv ecx
+		
+		cmp edx, 0x0
+		je Dolphin.checkCharLine.kret
+		; if the line is invalid :
+		mov ecx, edx	; ecx now contains the remainder, if non 0 the line is invalid
+		add eax, 1	; eax contains last valid line
+		xor edx, edx
+		imul eax, 9	; should be 8
+		
+		xor ecx, ecx
+		mov cx, [os.textwidth]
+		xor edx, edx
+		imul eax, ecx
+			mov ebx, eax
+		pop ecx
+		pop eax
+			mov ecx, ebx
+			add ecx, eax
+		;sub ecx, 6
+		;push ecx
+		;	mov eax, ecx
+			;xor ecx, ecx
+			;mov cx, [os.textwidth]
+			;idiv ecx
+			;cmp edx, 0x8
+			;pop ecx
+			;jge noreadd
+			;add ecx, 6
+		noreadd :
+		jmp Dolphin.checkCharLine.ret
+		
+		Dolphin.checkCharLine.kret :
+		pop ecx
+		pop eax
+		add ecx, eax
+	Dolphin.checkCharLine.ret :
+	pop edx
+	pop ebx
+	pop eax
+	ret
+	
 	
 
 Dolphin.drawBorder :	; ebx = image buffer, cx = width, dx = height
@@ -592,6 +685,8 @@ Dolphin.charposStor :
 dw 0x0
 Dolphin.tColor :
 dd 0x0, 0x0, 0x0, 0x0
+Dolphin.bsizstor :
+dd 0x0
 Dolphin.activeWindow :	; winNum for the window that currently has focus (must be switched by Dolphin!)
 db 0x0
 bglocstor :

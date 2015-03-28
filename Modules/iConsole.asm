@@ -14,6 +14,7 @@ mov [console.windowBuffer], ecx
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
+call console.clearScreen
 call JASM.console.post_init
 call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
@@ -40,12 +41,12 @@ ret
 
 console.setWidth :
 mov [console.width], bx
-call console.clearScreen
+;call console.clearScreen
 ret
 
 console.setHeight :
 mov [console.height], bx
-call console.clearScreen
+;call console.clearScreen
 ret
 
 console.setPos :
@@ -54,9 +55,14 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov eax, 5
-mov ebx, 5
-call Dolphin.moveWindow
+mov bx, 50
+mov eax, 0xa0000
+mov ecx, 0xa07d0
+mov [os.textwidth], bx
+mov [bstor], eax
+call Dolphin.checkCharLine
+mov ebx, ecx
+call debug.num
 popa
 ret
 
@@ -82,12 +88,12 @@ je console.update.gone
 	mov ebx, eax
 	mov eax, [console.buffer]
 	mov cx, [console.width]
-	mov dx, [console.height]
+	mov edx, 0x100
 	call Dolphin.drawText
 popa
 ret
 
-console.update.gone :	; THIS IS NEVER CALLED :|
+console.update.gone :
 mov bl, [console.winNum]
 call Dolphin.unregisterWindow
 popa
@@ -213,22 +219,32 @@ jmp console.numOut.dontcare
 ; newline
 console.newline :
 	pusha
-	mov ebx, [console.charPos]
-	mov edx, 0x0
-	mov eax, ebx
-		xor ecx, ecx
-		mov cx, [console.width]
-		imul ecx, 3
-	div ecx
-	mov ebx, eax
-		push ecx
-		xor ecx, ecx
-		mov cx, [console.width]
-		imul ecx, 3
-		imul ebx, ecx
-		add ebx, ecx
-		pop ecx
-	mov [console.charPos], ebx
+		mov edx, [console.buffer]
+		mov ecx, [console.charPos]
+		add edx, ecx
+		mov al, 0xA0
+		mov ah, 0xFF
+		mov [edx], ax
+		mov ebx, [console.charPos]
+		add ebx, 0x2
+		mov [console.charPos], ebx
+		;call console.update
+	;mov ebx, [console.charPos]
+	;mov edx, 0x0
+	;mov eax, ebx
+	;	xor ecx, ecx
+	;	mov cx, [console.width]
+	;	imul ecx, 3
+	;div ecx
+	;mov ebx, eax
+	;	push ecx
+	;	xor ecx, ecx
+	;	mov cx, [console.width]
+	;	imul ecx, 3
+	;	imul ebx, ecx
+	;	add ebx, ecx
+	;	pop ecx
+	;mov [console.charPos], ebx
 	popa
 	ret
 
@@ -321,7 +337,7 @@ console.setColor :
 mov ah, bl
 ret
 
-console.getLine :	; THIS IS BROKEN RIGHT NOW :|	! Fails on even numbered lines? YES, THIS IS CORRECT!
+console.getLine :	; Fixed.
 pusha
 mov eax, [console.charPos]
 ;mov ebx, eax

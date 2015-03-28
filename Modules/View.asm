@@ -15,6 +15,12 @@ pusha
 call Minnow.byName
 	cmp ebx, 0x0
 	je View.file.bad_file
+			pusha
+			sub ebx, 16
+			mov ebx, [ebx]
+			mov [fszstor], ebx
+			;call debug.num
+			popa
 mov edx, ebx
 call Minnow.getType
 call debug.println
@@ -98,8 +104,16 @@ mov ebx, [View.buffer]
 mov ecx, 0xa0
 mov edx, 0xc0
 call View.winSize
-
+	push bx
+	mov bx, 0xE0
+	mov [Dolphin.colorOverride], bl
+	pop bx
+mov edx, [fszstor]
 call Dolphin.drawText
+	push bx
+	mov bx, 0x0
+	mov [Dolphin.colorOverride], bl
+	pop bx
 call View.updateWindow
 
 call View.file.modEcatch
@@ -141,6 +155,8 @@ View.wnum :
 db 0x0
 View.pnum :
 db 0x0
+fszstor :
+dd 0x0
 
 View.windowStruct :
 	dd "VIEW ver_1.2.0__"	; title
