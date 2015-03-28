@@ -5,8 +5,8 @@ pusha
 	call os.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
 call Dolphin.create				; allocate memory for a window
-mov [console.buffer], ebx
-mov [console.windowBuffer], ecx
+mov [console.buffer], ecx
+mov [console.windowBuffer], ebx
 	mov bl, [console.pnum]
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
@@ -27,6 +27,13 @@ pusha
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.loop.ret
+	mov eax, [console.dat]
+	mov ebx, [console.width]
+	cmp eax, ebx
+	je console.loop.noChange
+	mov [console.dat], ebx
+	call console.update
+console.loop.noChange :
 call os.getKey
 cmp bl, 0x0
 je console.loop.ret
@@ -55,14 +62,9 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov bx, 50
-mov eax, 0xa0000
-mov ecx, 0xa07d0
-mov [os.textwidth], bx
-mov [bstor], eax
-call Dolphin.checkCharLine
-mov ebx, ecx
-call debug.num
+	mov eax, -10
+	mov ebx, 0
+	call Dolphin.sizeWindow
 popa
 ret
 
@@ -83,7 +85,7 @@ cmp ebx, 0x0
 je console.update.gone
 	xor ebx, ebx
 	mov bl, [console.winNum]
-	mov [currentWindow], ebx	; should not be hard-coded
+	mov [currentWindow], ebx
 	call Dolphin.getWindowBuffer
 	mov ebx, eax
 	mov eax, [console.buffer]
@@ -99,13 +101,13 @@ call Dolphin.unregisterWindow
 popa
 ret
 
-console.checkClear :
-mov ebx, [console.charPos]
-cmp ebx, 0x1000
-jle cseret
-call console.clearScreen
-cseret :
-ret
+;console.checkClear :
+;mov ebx, [console.charPos]
+;cmp ebx, 0x1000
+;jle cseret
+;call console.clearScreen
+;cseret :
+;ret
 
 console.print :
 pusha
@@ -340,36 +342,39 @@ ret
 console.getLine :	; Fixed.
 pusha
 mov eax, [console.charPos]
-;mov ebx, eax
-;call console.numOut
+mov edx, [console.buffer]
+add eax, edx
 mov ecx, 0x0
 add eax, 0x2
 gldloop :
-	push edx
-	xor edx, edx
-	mov dx, [console.width]
-	;add dx, dx
-	sub eax, edx
-	pop edx
+sub eax, 0x2
+mov bx, [eax]
+cmp bl, 0xa0
+jne gldloopnoadd
 add ecx, 0x1
-cmp eax, 0
+gldloopnoadd :
+cmp eax, edx
 jg gldloop
-mov eax, ecx
+mov eax, ecx	; eax now contains the line number!
 
-	push edx
-	xor edx, edx
-	mov dx, [console.width]
-	;add dx, dx
-	mov ebx, edx
-	pop edx
-mul ebx
-add eax, [console.buffer]
-	push edx
-	xor edx, edx
-	mov dx, [console.width]
-	;add dx, dx
-	sub eax, edx
-	pop edx
+	mov edx, [console.buffer]
+	mov ecx, 0x0
+	gldloop2 :
+	mov bx, [edx]
+	cmp bl, 0xa0
+	jne gldloop2noadd
+	add ecx, 1
+	gldloop2noadd :
+	add edx, 2
+	cmp ecx, eax
+	jl gldloop2
+	cmp eax, 0x0
+	jne gldloop2nofix
+	sub edx, 2
+	gldloop2nofix :
+mov eax, edx
+; eax now contains the beginning of the line
+
 mov ebx, eax
 
 mov edx, console.line
@@ -411,13 +416,16 @@ db 0x0
 console.pnum :
 db 0x0
 
+console.dat :
+dd 0x0
+
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title
 	console.width :
 	dw 0xa0	; width
 	console.height :
 	dw 0xc8	; height
-	dw 0x30	; xpos
+	dw 0x0	; xpos
 	dw 0	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin

@@ -75,14 +75,13 @@ Dolphin.copyImageLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	popa
 	ret
 	
-Dolphin.clearImage :	; eax = source, ecx = width, edx = height
+Dolphin.clearImage :	; eax = source, ecx = width, edx = height, bl = color
 	pusha
 	and ecx, 0xFFFF
 	and edx, 0xFFFF
 	imul ecx, edx
 	sub ecx, 1
 	mov edx, 0x0
-	mov bl, 0x0
 	Dolphin.clearImage_loop :
 	mov [eax], bl
 	add eax, 1
@@ -293,13 +292,22 @@ Dolphin.makeBG :	; ebx contains location of data
 pusha
 mov [bglocstor], ebx
 cmp ebx, 0x0
-je Dolphin.makeBG.ret
+je Dolphin.solidBG
 mov eax, ebx
 mov ebx, SCREEN_BUFFER
 mov ecx, SCREEN_WIDTH
 mov edx, SCREEN_HEIGHT
 call Dolphin.copyImage
 Dolphin.makeBG.ret :
+popa
+ret
+
+Dolphin.solidBG :
+mov eax, SCREEN_BUFFER
+mov ecx, SCREEN_WIDTH
+mov edx, SCREEN_HEIGHT
+mov bl, 0x10
+call Dolphin.clearImage
 popa
 ret
 
@@ -633,6 +641,25 @@ mov eax, ecx
 mov bl, [Dolphin.Y_POS]
 call Dolphin.setAttribute
 
+popa
+ret
+
+Dolphin.sizeWindow :	; xchange in eax, y change in ebx
+pusha
+mov edx, eax
+mov ecx, ebx
+mov bh, [Dolphin.activeWindow]
+mov [currentWindow], bh
+pusha
+mov bl, [Dolphin.WIDTH]
+call Dolphin.getAttribute
+add eax, edx
+call Dolphin.setAttribute
+popa
+mov bl, [Dolphin.HEIGHT]
+call Dolphin.getAttribute
+add eax, ecx
+call Dolphin.setAttribute
 popa
 ret
 

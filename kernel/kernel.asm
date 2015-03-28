@@ -14,9 +14,9 @@ Kernel.init :
 	call Dolphin.setVGApalette
 	
 	;	SETTING BAGROUND IMAGE	;
-	mov ebx, bg_name
-	call Minnow.byName
-	call Dolphin.makeBG
+	;mov ebx, bg_name
+	;call Minnow.byName
+	;call Dolphin.makeBG
 	
 	;	INITIALIZING PROGRAMS	;
 	call console.init
@@ -94,6 +94,8 @@ os.pollKeyboard :
 		os.pollKeyboard.checkKey.override :
 		push bx
 	call os.keyboard.toChar
+	cmp bl, 0x1d
+		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
 	;cmp al, 0xFF
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 	cmp al, 0x1
@@ -107,6 +109,8 @@ os.pollKeyboard :
 		cmp bl, 0x4b	; left key
 		je os.handleSpecial
 		cmp bl, 0x0f	; tab key
+		je os.handleSpecial
+		cmp bl, 0x3a	; caps lock
 		je os.handleSpecial
 	mov bl, al
 	call os.keyPress	; keypress will be sent to the currently registered program in al
@@ -277,6 +281,10 @@ os.keyboard.toChar :
 	je os.keyboard.toChar.ret
 	mov al, 0x3f
 	mov ecx, charSPACE
+	pusha
+	and ebx, 0xFF
+	call debug.num
+	popa
 	os.keyboard.toChar.ret :
 	ret
 
@@ -293,6 +301,8 @@ os.handleSpecial :
 	je os.handleSpecial.right
 	cmp bl, 0x4b
 	je os.handleSpecial.left
+	cmp bl, 0x3a
+	je os.handleSpecial.swapMode
 	;	else it is a tab, reset the window's position
 	mov eax, 0
 	mov ebx, 0
@@ -313,9 +323,24 @@ os.handleSpecial :
 	os.handleSpecial.down :
 	mov eax, 0
 	mov ebx, 1
-	
+	jmp os.handleSpecial.ret
+		os.handleSpecial.swapMode :
+		mov bl, [os.hsmode]
+		xor bl, 0xFF
+		mov [os.hsmode], bl
+		popa
+		jmp os.pollKeyboard.drawKeyFinalize
 	os.handleSpecial.ret :
-	call Dolphin.moveWindow
+		push bx
+		mov bl, [os.hsmode]
+		cmp bl, 0x0
+		pop bx
+			jne os.handleSpecial.size
+		call Dolphin.moveWindow
+		jmp os.handleSpecial.aret
+	os.handleSpecial.size :
+		call Dolphin.sizeWindow
+	os.handleSpecial.aret :
 	popa
 	jmp os.pollKeyboard.drawKeyFinalize
 
@@ -389,6 +414,9 @@ os.lastKey :
 dw 0x0
 
 os.pnumCounter :
+db 0x0
+
+os.hsmode :
 db 0x0
 
 MINNOW_START :

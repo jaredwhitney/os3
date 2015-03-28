@@ -85,7 +85,7 @@ func int fullscrn(null)
 			full = 2
 	endif
 	if (full = 1)
-		setPos(0x280)
+		setPos(0x0)
 		setWidth(0x140)
 		setHeight(0xc8)
 		full = 0
