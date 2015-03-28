@@ -9,20 +9,22 @@ public static void main(String[] args) throws Exception
 {
 gray = args.length > 1 && args[1].equalsIgnoreCase("-g");
 BufferedImage img = ImageIO.read(new File(args[0]));
+int WIDTH = (int)(img.getWidth()/12f);
+int HEIGHT = (int)(img.getHeight()/12f);
 File output = new File(args[0].split("\\Q.\\E")[0] + ".dsp");
 output.createNewFile();
 FileOutputStream out = new FileOutputStream(output);
-BufferedImage image = new BufferedImage(320, 200, BufferedImage.TYPE_INT_RGB);
+BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-Image scaled = img.getScaledInstance(320, 200, BufferedImage.SCALE_AREA_AVERAGING);
+Image scaled = img.getScaledInstance(WIDTH, HEIGHT, BufferedImage.SCALE_AREA_AVERAGING);
 
 Graphics2D g = image.createGraphics();
-g.drawImage(scaled, 0, 0, 320, 200, null);
+g.drawImage(scaled, 0, 0, WIDTH, HEIGHT, null);
 g.dispose();
 ImageIO.write(image, "bmp", new File("_step.bmp"));
-for (int y = 0; y < 200; y++)
+for (int y = 0; y < HEIGHT; y++)
 {
-for (int x = 0; x < 320; x++)
+for (int x = 0; x < WIDTH; x++)
 {
 Color c = new Color(image.getRGB(x, y));
 if (!gray)

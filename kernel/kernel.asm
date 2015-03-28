@@ -96,6 +96,8 @@ os.pollKeyboard :
 	call os.keyboard.toChar
 	cmp bl, 0x1d
 		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
+	cmp bl, 0x2a
+		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
 	;cmp al, 0xFF
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 	cmp al, 0x1
@@ -118,8 +120,6 @@ os.pollKeyboard :
 	mov cx, 0x0
 	mov [os.pollKeyboard.isReady], cx	; so we know that we have already printed the character, and should not do so again
 	pop bx
-	cmp bl, 0x2a
-	je os.pollKeyboard.return	; should not look to debounce a modifier byte ^_^
 	mov [os.lastKey], bl
 	os.pollKeyboard.return :
 	popa
