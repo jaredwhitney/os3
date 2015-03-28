@@ -5,7 +5,7 @@ pusha
 	call os.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
 call Dolphin.create				; allocate memory for a window
-mov [console.buffer], ecx
+mov [console.buffer], ecx 
 mov [console.windowBuffer], ebx
 	mov bl, [console.pnum]
 	mov eax, console.windowStruct
