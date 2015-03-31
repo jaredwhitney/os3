@@ -62,9 +62,35 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov eax, -10
-	mov ebx, 0
-	call Dolphin.sizeWindow
+	
+popa
+ret
+
+console.memstat :
+pusha
+	mov ebx, [Guppy.usedRAM]
+	mov edx, ebx
+	mov ebx, [Guppy.totalRAM]
+	mov ecx, ebx
+	cmp ecx, 0x0
+		je console.FUNCTION_UNSUPPORTED
+	push eax
+	mov eax, edx
+	imul eax, 100
+	xor edx, edx
+	idiv ecx
+	mov ebx, eax
+	pop eax
+	call console.numOut
+	mov ebx, Guppy.div3
+	call console.println
+popa
+ret
+
+console.FUNCTION_UNSUPPORTED :
+mov ah, 0x3	; RED
+mov ebx, console.UNSUP_MSG
+call console.println
 popa
 ret
 
@@ -418,6 +444,9 @@ db 0x0
 
 console.dat :
 dd 0x0
+
+console.UNSUP_MSG :
+db "The specified function is unsupported on your computer.", 0
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title

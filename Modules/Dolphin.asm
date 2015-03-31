@@ -238,6 +238,14 @@ pusha
 and ecx, 0xFFFF
 push ecx
 mov al, 0x03	; red
+	push ebx
+	mov bl, [Dolphin.activeWindow]
+	mov bh, [currentWindow]
+	cmp bl, bh
+	jne Dolphin.drawBorder.nonactive
+	mov al, 0x3d	; light blue
+	Dolphin.drawBorder.nonactive :
+	pop ebx
 push ebx
 Dolphin.drawBorder.loop1 :
 mov [ebx], al
@@ -491,6 +499,23 @@ Dolphin.windowExists.false :
 mov eax, 0x0
 ret
 
+Dolphin.activateNext :	; activates the next window in the list
+pusha
+xor ebx, ebx
+mov bl, [Dolphin.activeWindow]
+	Dolphin.activeNext.loop :
+	add bl, 1
+	cmp bl, 0x10
+		jl Dolphin.activateNext.cont_1
+	mov bl, 0x0
+	Dolphin.activateNext.cont_1 :
+	call Dolphin.windowExists
+	cmp eax, 0x0
+	je Dolphin.activeNext.loop
+	mov [Dolphin.activeWindow], bl
+popa
+ret
+
 Dolphin.toggleColored :
 pusha
 mov eax, [Dolphin.tuskip]
@@ -604,8 +629,7 @@ add eax, ebx
 mov [eax], ecx
 mov ebx, UNREG_MSG
 call debug.log.system
-mov bl, 0		; SHOULD NOT BE HARDCODED!
-mov [Dolphin.activeWindow], bl
+call Dolphin.activateNext
 popa
 ret
 

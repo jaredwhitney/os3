@@ -341,6 +341,8 @@ else if (s.equals("Minnow.tree"))
 return "Minnow.ctree";
 else if (s.equals("console.test"))
 return "console.test";
+else if (s.equals("console.memstat"))
+return "console.memstat";
 else
 return pname + "." + s;
 }

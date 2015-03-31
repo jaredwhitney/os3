@@ -28,6 +28,8 @@ int 0x10	; changing video mode
 mov bx, Greeting
 call boot.print
 
+call rm_detectRAM
+
 mov [boot_drive], dl
 
 ;mov ah, 0x41
@@ -255,6 +257,7 @@ popa
 ret
 
 %include "..\boot\init_GDT.asm"
+%include "..\boot\detection.asm"
 
 ENTER_PM :
 db "Booted into Protected Mode.", 0

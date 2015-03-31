@@ -32,6 +32,7 @@ func int handleEnter(null)
 		println("DEBUG: Toggles the display of debug")
 		println("VIEW: View a file")
 		println("TREE: Displays all mounted files")
+		println("MEMSTAT: Prints out the percentage of RAM in use")
 		done = 1
 	endif
 	if (inp seq_mem "EXIT")
@@ -61,6 +62,10 @@ func int handleEnter(null)
 	endif
 	if (inp seq_mem "TEST")
 		console.test(null)
+		done = 1
+	endif
+	if (inp seq_mem "MEMSTAT")
+		console.memstat(null)
 		done = 1
 	endif
 	if (done = 0)

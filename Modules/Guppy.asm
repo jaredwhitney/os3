@@ -1,7 +1,7 @@
 [bits 32]
 
 Guppy.table equ 0xA10000
-MEMORY_START equ 0xF00000
+MEMORY_START equ 0x1000000
 ; Memory is labelled as sectors in use from 0x7c00 to 0x_____
 ; 0x7c00 - 0xc000 is reserved for the OS (34 sectors)
 Guppy.init :
@@ -11,7 +11,25 @@ mov ah, 34
 call Guppy.malloc
 ;call console.numOut
 ;call console.newline
+
+	xor ebx, ebx
+	mov bx, [0x10c0]
+	imul ebx, 8000	; number of bytes of RAM
+	mov eax, ebx
+	mov ecx, 0x200	; number of bytes in a sector
+		xor edx, edx
+	idiv ecx
+	mov ebx, eax
+	mov [Guppy.totalRAM], ebx
+	call debug.num
+	mov ebx, Guppy.SEC_MSG
+	call debug.println
+
 popa
+ret
+
+Guppy.getTotalRam :
+mov ebx, [Guppy.totalRAM]
 ret
 
 Guppy.malloc :	; AL = PNUM, AH = Sectors requested
@@ -22,6 +40,13 @@ Guppy.malloc :	; AL = PNUM, AH = Sectors requested
 push eax
 push edx
 push ecx
+	pusha
+	shr eax, 2
+	and eax, 0xFF
+	mov ebx, [Guppy.usedRAM]
+	add ebx, eax
+	mov [Guppy.usedRAM], ebx
+	popa
 mov [aStor], eax
 mov ebx, Guppy.table
 Guppy.malloc.loop1 :
@@ -78,5 +103,19 @@ ret	; EBX = Start of allocated memory
 
 MALLOC :
 db "Malloc: ", 0
+Guppy.SEC_MSG :
+db " Sectors of RAM Avaliable.", 0
+Guppy.div0 :
+db "RAM (sectors): ", 0
+Guppy.div1 :
+db " used of ", 0
+Guppy.div2 :
+db " total", 0
+Guppy.div3 :
+db "% of RAM in use.", 0
+Guppy.totalRAM :
+dd 0x0
+Guppy.usedRAM :
+dd 0x0
 aStor :
 dd 0x0
