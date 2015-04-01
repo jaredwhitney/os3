@@ -33,6 +33,7 @@ Kernel.init :
 		call os.pollKeyboard
 		;	RUN REGISTERED PROGRAMS	;
 		call console.loop
+		call View.loop
 		;	PUSH BUFFER TO SCREEN	;
 		call Dolphin.updateScreen
 		;	REPEAT	;
@@ -100,8 +101,8 @@ os.pollKeyboard :
 		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
 	;cmp al, 0xFF
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
-	cmp al, 0x1
-	je os.doEnter
+	;cmp al, 0x1
+	;je os.doEnter
 		cmp bl, 0x50	; down key
 		je os.handleSpecial
 		cmp bl, 0x4d	; right key
@@ -114,6 +115,11 @@ os.pollKeyboard :
 		je os.handleSpecial
 		cmp bl, 0x3a	; caps lock
 		je os.handleSpecial
+		cmp bl, 0x29
+		jne os.handlecont
+		call Dolphin.activateNext
+		jmp os.pollKeyboard.drawKeyFinalize
+		os.handlecont :
 	mov bl, al
 	call os.keyPress	; keypress will be sent to the currently registered program in al
 	os.pollKeyboard.drawKeyFinalize :
@@ -127,11 +133,14 @@ os.pollKeyboard :
 
 	
 os.doEnter :
-	mov eax, [os.ecatch]
-	mov ebx, [eax]
-	mov ah, 0xB
-	call ebx
-	jmp os.pollKeyboard.drawKeyFinalize
+	ret
+	;mov bl, 0xFE
+	;jmp os.handlecont
+	;mov eax, [os.ecatch]
+	;mov ebx, [eax]
+	;mov ah, 0xB
+	;call ebx
+	;jmp os.pollKeyboard.drawKeyFinalize
 
 os.keyPress :
 	pusha
@@ -144,6 +153,15 @@ os.keyPress :
 os.getKey :
 	push eax
 	;	 check the program is allowed to get keypresses here
+	mov al, [currentWindow]
+	mov ah, [Dolphin.activeWindow]
+	cmp al, ah
+		je os.getKey.kcont
+	pop eax
+	mov bl, 0x0
+	ret
+	os.getKey.kcont :
+	;
 	mov bl, 0x0
 	mov al, [0x1031]
 	cmp al, 0xFF
@@ -277,7 +295,7 @@ os.keyboard.toChar :
 	mov al, 0xff
 	je os.keyboard.toChar.ret
 	cmp bl, 0x1C
-	mov al, 0x1
+	mov al, 0xfe
 	je os.keyboard.toChar.ret
 	mov al, 0x3f
 	mov ecx, charSPACE

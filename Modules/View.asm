@@ -59,6 +59,13 @@ jmp View.file.return
 
 View.winSetup :
 		pusha
+			xor ebx, ebx
+			mov bl, [View.wnum]
+			call Dolphin.windowExists
+			cmp eax, 0x0
+				je View.nocleanup
+			call Dolphin.unregisterWindow
+			View.nocleanup :
 		mov eax, View.windowStruct
 		call Dolphin.registerWindow
 			mov [View.wnum], bl
@@ -77,6 +84,10 @@ View.winSize :
 	popa
 	ret
 View.file.image :
+	push cx
+	mov cl, 'I'
+	mov [typestor], cl
+	pop cx
 call View.winSetup
 
 mov eax, edx	; file location
@@ -94,10 +105,28 @@ call View.file.modEcatch
 ;jmp $
 jmp View.file.return
 
+View.winUpdate :
+pusha
+mov cl, [typestor]
+cmp cl, 'I'
+jne View.winUpdate.notImage
+xor ecx, ecx
+xor edx, edx
+mov cx, [View.windowStruct.width]
+mov dx, [View.windowStruct.height]
+call View.updateWindow	; finish the proccess
+View.winUpdate.notImage :
+popa
+ret
+
 View.file.animation :
 jmp View.file.unknownFile
 
 View.file.text :
+	push cx
+	mov cl, 'T'
+	mov [typestor], cl
+	pop cx
 call View.winSetup
 mov eax, edx
 mov ebx, [View.buffer]
@@ -120,29 +149,47 @@ call View.file.modEcatch
 jmp View.file.return
 
 View.file.modEcatch :
-	pusha
-	mov ebx, [os.ecatch]
-	mov ebx, [ebx]
-	mov [View.file.ecatchStor], ebx
-	mov ebx, View.file.enter
-	call os.setEnterSub
-	popa
+;	pusha
+	;mov ebx, [os.ecatch]
+	;mov ebx, [ebx]
+	;mov [View.file.ecatchStor], ebx
+	;mov ebx, View.file.enter
+	;call os.setEnterSub
+	;popa
 	ret
-View.file.enter :
+	
+View.loop :
 pusha
-mov ebx, [View.file.ecatchStor]
-call os.setEnterSub
-mov bl, [View.wnum]
-call Dolphin.unregisterWindow
+	xor ebx, ebx
+	mov bl, [View.wnum]
+	mov [currentWindow], bl
+	call Dolphin.windowExists
+	cmp eax, 0x0
+		je View.loop.cont	; if no window to deal with, return
+		;	if we are here, the window is visible!
+			call View.winUpdate
+	call os.getKey
+	cmp bl, 0xfe	; enter
+	jne View.loop.cont
+		mov bl, [View.wnum]
+		call Dolphin.unregisterWindow
+	View.loop.cont :
 popa
 ret
 
+View.file.enter :
+;pusha
+;mov ebx, [View.file.ecatchStor]
+;call os.setEnterSub
+;mov bl, [View.wnum]
+;call Dolphin.unregisterWindow
+;popa
+ret
+
 View.updateWindow :
-pusha
 mov eax, [View.buffer]
 mov ebx, [View.windowBuffer]
 call Dolphin.copyImageLinear
-popa
 ret
 
 View.FILE_TYPE_UNSUPPORTED :
@@ -152,15 +199,19 @@ db "[View] Succesfully loaded file.", 0x0
 View.file.ecatchStor :
 dd 0x0
 View.wnum :
-db 0x0
+db 0xff
 View.pnum :
 db 0x0
 fszstor :
 dd 0x0
+typestor :
+db 0x0
 
 View.windowStruct :
 	dd "VIEW ver_1.2.0__"	; title
+	View.windowStruct.width :
 	dw SCREEN_WIDTH	; width
+	View.windowStruct.height :
 	dw SCREEN_HEIGHT	; height
 	dw 0	; xpos
 	dw 0	; ypos

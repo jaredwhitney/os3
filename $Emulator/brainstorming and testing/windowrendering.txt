@@ -1,4 +1,4 @@
-key that calls Dolphin.activateNext
+key that calls Dolphin.activateNext (DONE: '~' KEY)
 smart setting of window depth
 draw in an order based off of depth
 restrict recieving of keypresses based upon active window

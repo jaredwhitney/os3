@@ -34,11 +34,18 @@ je console.loop.ret
 	mov [console.dat], ebx
 	call console.update
 console.loop.noChange :
+mov bl, [console.winNum]
+mov [currentWindow], bl
 call os.getKey
 cmp bl, 0x0
 je console.loop.ret
 cmp bl, 0xff
 je console.doBackspace
+cmp bl, 0xfe
+jne console.loop.notEnter
+call JASM.console.handleEnter
+jmp console.loop.ret
+console.loop.notEnter :
 mov al, bl
 mov ah, 0xFF
 call console.cprint

@@ -504,8 +504,8 @@ pusha
 xor ebx, ebx
 mov bl, [Dolphin.activeWindow]
 	Dolphin.activeNext.loop :
-	add bl, 1
-	cmp bl, 0x10
+	add bl, 4
+	cmp bl, 0x40
 		jl Dolphin.activateNext.cont_1
 	mov bl, 0x0
 	Dolphin.activateNext.cont_1 :
@@ -513,6 +513,7 @@ mov bl, [Dolphin.activeWindow]
 	cmp eax, 0x0
 	je Dolphin.activeNext.loop
 	mov [Dolphin.activeWindow], bl
+	call debug.num
 popa
 ret
 
