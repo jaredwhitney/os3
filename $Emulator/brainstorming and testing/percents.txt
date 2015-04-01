@@ -1,0 +1,9 @@
+7 9
+700 9
+77%
+
+what is a/b in %?
+a*=100
+c=a/b
+c=%
+tada!

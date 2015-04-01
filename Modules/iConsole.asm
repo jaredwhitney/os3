@@ -207,6 +207,14 @@ mov ch, 0x0
 
 ; num out
 console.numOut.start :
+	cmp ebx, 0x0
+	jne console.numOut.cont
+	mov ah, [console.cstor]
+	mov al, '0'
+	call console.cprint
+	popa
+	ret
+	console.numOut.cont :
 mov edx, ebx
 shr edx, cl
 and edx, 0xF

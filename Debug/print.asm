@@ -165,6 +165,14 @@ debug.num :		; num in ebx
 		mov cl, 28
 		mov ch, 0x0
 		debug.num.start :
+			cmp ebx, 0x0
+			jne debug.num.cont
+			mov ah, [console.cstor]
+			mov al, '0'
+			call debug.cprint
+			popa
+			ret
+			debug.num.cont :
 		mov edx, ebx
 		shr edx, cl
 		and edx, 0xF
