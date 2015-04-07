@@ -122,6 +122,8 @@ ret
 View.file.animation :
 jmp View.file.unknownFile
 
+jmp View.file.return
+
 View.file.text :
 	push cx
 	mov cl, 'T'
@@ -138,6 +140,11 @@ call View.winSize
 	mov [Dolphin.colorOverride], bl
 	pop bx
 mov edx, [fszstor]
+push ebx
+mov ebx, edx
+call console.numOut
+sub edx, 1
+pop ebx
 call Dolphin.drawText
 	push bx
 	mov bx, 0x0

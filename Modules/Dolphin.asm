@@ -93,12 +93,21 @@ Dolphin.clearImage :	; eax = source, ecx = width, edx = height, bl = color
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	pusha
+	and ecx, 0xFFFF
+	mov [dstor], edx
+	;sub cx, 1
 	mov [os.textwidth], cx
 		pusha
 		mov eax, ebx
 		call Dolphin.clearImage
 		popa
 	mov ecx, [charpos]
+		push ecx
+		xor ecx, ecx
+		mov cx, [os.textwidth]
+		add ebx, ecx	; so the border isn't overlapping the text
+		add ebx, ecx
+		pop ecx
 	mov [bstor], ebx
 	mov [debug.charpos.stor], ecx
 	mov ecx, ebx	; dest buffer
@@ -113,7 +122,10 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		push ebx
 		mov ebx, [Dolphin.bsizstor]
 		;call debug.num
-		cmp edx, 0x4000	; size of buffer
+		push ecx
+		mov ecx, [dstor]
+		cmp edx, ecx	; size of buffer
+		pop ecx
 		pop ebx
 			jg Dolphin.drawText_ret
 		add edx, 1
@@ -724,6 +736,8 @@ db 25
 currentWindow :
 dd 0x0
 bstor :
+dd 0x0
+dstor :
 dd 0x0
 atwstor :
 dw 0x0

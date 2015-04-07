@@ -271,23 +271,6 @@ console.newline :
 		mov ebx, [console.charPos]
 		add ebx, 0x2
 		mov [console.charPos], ebx
-		;call console.update
-	;mov ebx, [console.charPos]
-	;mov edx, 0x0
-	;mov eax, ebx
-	;	xor ecx, ecx
-	;	mov cx, [console.width]
-	;	imul ecx, 3
-	;div ecx
-	;mov ebx, eax
-	;	push ecx
-	;	xor ecx, ecx
-	;	mov cx, [console.width]
-	;	imul ecx, 3
-	;	imul ebx, ecx
-	;	add ebx, ecx
-	;	pop ecx
-	;mov [console.charPos], ebx
 	popa
 	ret
 
@@ -462,6 +445,9 @@ dd 0x0
 
 console.UNSUP_MSG :
 db "The specified function is unsupported on your computer.", 0
+
+console.bufferstor :
+dd 0x0
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title
