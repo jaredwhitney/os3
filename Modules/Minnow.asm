@@ -181,8 +181,8 @@ Minnow.byName :	; pointer to name in ebx, returns file location in ebx
 	ret
 	
 Minnow.byName.fileNotFound :
-	mov ebx, Minnow.FILE_NOT_FOUND
-	call debug.log.error
+	mov eax, Minnow.FILE_NOT_FOUND
+	call Catfish.notify
 	mov ebx, 0x0
 	ret
 	

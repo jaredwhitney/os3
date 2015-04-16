@@ -23,48 +23,48 @@ func int handleEnter(null)
 		file = 0
 		done = 1
 	endif
-	if (inp seq_mem "HELP")
+	if (inp seq_mem "help")
 		color(0x3D)
-		println("EXIT: Exits the console.")
-		println("CLEAR: Clears the screen.")
-		println("HELP: Displays this prompt.")
-		println("FULLSCRN: Toggles fullscreen mode.")
-		println("DEBUG: Toggles the display of debug")
-		println("VIEW: View a file")
-		println("TREE: Displays all mounted files")
-		println("MEMSTAT: Prints out the percentage of RAM in use")
+		println("exit: Exits the console.")
+		println("clear: Clears the screen.")
+		println("help: Displays this prompt.")
+		println("fullscreen: Toggles fullscreen mode.")
+		println("debug: Toggles the display of debug")
+		println("view: View a file")
+		println("tree: Displays all mounted files")
+		println("memstat: Prints out the percentage of RAM in use")
 		done = 1
 	endif
-	if (inp seq_mem "EXIT")
+	if (inp seq_mem "exit")
 		catch_enter(os.return)
 		draw = 0
 		done = 1
 	endif
-	if (inp seq_mem "CLEAR")
+	if (inp seq_mem "clear")
 		cls(null)
 		done = 1
 	endif
-	if (inp seq_mem "FULLSCRN")
+	if (inp seq_mem "fullscreen")
 		fullscrn(null)
 	endif
-	if (inp seq_mem "DEBUG")
+	if (inp seq_mem "debug")
 		toggleDebug(null)
 		done = 1
 	endif
-	if (inp seq_mem "VIEW")
+	if (inp seq_mem "view")
 		file = 1
 		done = 1
 	endif
-	if (inp seq_mem "TREE")
+	if (inp seq_mem "tree")
 		color(0x9)
 		Minnow.tree(null)
 		done = 1
 	endif
-	if (inp seq_mem "TEST")
+	if (inp seq_mem "test")
 		console.test(null)
 		done = 1
 	endif
-	if (inp seq_mem "MEMSTAT")
+	if (inp seq_mem "memstat")
 		console.memstat(null)
 		done = 1
 	endif

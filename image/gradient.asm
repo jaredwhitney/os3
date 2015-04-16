@@ -1,7 +1,7 @@
 [bits 32]
 dd endt-start	; size of an image
 dd "IMAG"
-dd "GRADIENT"
+dd "gradient"
 start :
 ; IMAGE ATTRIBUTES
 dw 4

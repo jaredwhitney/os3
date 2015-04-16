@@ -261,7 +261,7 @@ mov [JASM.console.done], eax
 pop eax
 		; endif
 JASM.console.loop_3.end :
-		; if (inp seq_mem "HELP")
+		; if (inp seq_mem "help")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_2
@@ -282,42 +282,42 @@ push ebx
 mov ebx, 0x3D
 call console.setColor
 pop ebx
-		; println("EXIT: Exits the console.")
+		; println("exit: Exits the console.")
 push ebx
 mov ebx, JASM.console.var_3
 call console.println
 pop ebx
-		; println("CLEAR: Clears the screen.")
+		; println("clear: Clears the screen.")
 push ebx
 mov ebx, JASM.console.var_4
 call console.println
 pop ebx
-		; println("HELP: Displays this prompt.")
+		; println("help: Displays this prompt.")
 push ebx
 mov ebx, JASM.console.var_5
 call console.println
 pop ebx
-		; println("FULLSCRN: Toggles fullscreen mode.")
+		; println("fullscreen: Toggles fullscreen mode.")
 push ebx
 mov ebx, JASM.console.var_6
 call console.println
 pop ebx
-		; println("DEBUG: Toggles the display of debug")
+		; println("debug: Toggles the display of debug")
 push ebx
 mov ebx, JASM.console.var_7
 call console.println
 pop ebx
-		; println("VIEW: View a file")
+		; println("view: View a file")
 push ebx
 mov ebx, JASM.console.var_8
 call console.println
 pop ebx
-		; println("TREE: Displays all mounted files")
+		; println("tree: Displays all mounted files")
 push ebx
 mov ebx, JASM.console.var_9
 call console.println
 pop ebx
-		; println("MEMSTAT: Prints out the percentage of RAM in use")
+		; println("memstat: Prints out the percentage of RAM in use")
 push ebx
 mov ebx, JASM.console.var_10
 call console.println
@@ -332,7 +332,7 @@ jmp JASM.console.loop_4.EQend
 JASM.console.loop_4.end :
 popa
 JASM.console.loop_4.EQend :
-		; if (inp seq_mem "EXIT")
+		; if (inp seq_mem "exit")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_11
@@ -368,7 +368,7 @@ jmp JASM.console.loop_5.EQend
 JASM.console.loop_5.end :
 popa
 JASM.console.loop_5.EQend :
-		; if (inp seq_mem "CLEAR")
+		; if (inp seq_mem "clear")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_12
@@ -396,7 +396,7 @@ jmp JASM.console.loop_6.EQend
 JASM.console.loop_6.end :
 popa
 JASM.console.loop_6.EQend :
-		; if (inp seq_mem "FULLSCRN")
+		; if (inp seq_mem "fullscreen")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_13
@@ -419,7 +419,7 @@ jmp JASM.console.loop_7.EQend
 JASM.console.loop_7.end :
 popa
 JASM.console.loop_7.EQend :
-		; if (inp seq_mem "DEBUG")
+		; if (inp seq_mem "debug")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_14
@@ -447,7 +447,7 @@ jmp JASM.console.loop_8.EQend
 JASM.console.loop_8.end :
 popa
 JASM.console.loop_8.EQend :
-		; if (inp seq_mem "VIEW")
+		; if (inp seq_mem "view")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_15
@@ -478,7 +478,7 @@ jmp JASM.console.loop_9.EQend
 JASM.console.loop_9.end :
 popa
 JASM.console.loop_9.EQend :
-		; if (inp seq_mem "TREE")
+		; if (inp seq_mem "tree")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_16
@@ -511,7 +511,7 @@ jmp JASM.console.loop_10.EQend
 JASM.console.loop_10.end :
 popa
 JASM.console.loop_10.EQend :
-		; if (inp seq_mem "TEST")
+		; if (inp seq_mem "test")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_17
@@ -539,7 +539,7 @@ jmp JASM.console.loop_11.EQend
 JASM.console.loop_11.end :
 popa
 JASM.console.loop_11.EQend :
-		; if (inp seq_mem "MEMSTAT")
+		; if (inp seq_mem "memstat")
 pusha
 mov eax, [JASM.console.inp]
 mov ebx, JASM.console.var_18
@@ -746,39 +746,39 @@ db "Console: ", 0
 JASM.console.var_1 :
 db "See debug for details.", 0
 JASM.console.var_2 :
-db "HELP", 0
+db "help", 0
 JASM.console.var_3 :
-db "EXIT: Exits the console.", 0
+db "exit: Exits the console.", 0
 JASM.console.var_4 :
-db "CLEAR: Clears the screen.", 0
+db "clear: Clears the screen.", 0
 JASM.console.var_5 :
-db "HELP: Displays this prompt.", 0
+db "help: Displays this prompt.", 0
 JASM.console.var_6 :
-db "FULLSCRN: Toggles fullscreen mode.", 0
+db "fullscreen: Toggles fullscreen mode.", 0
 JASM.console.var_7 :
-db "DEBUG: Toggles the display of debug", 0
+db "debug: Toggles the display of debug", 0
 JASM.console.var_8 :
-db "VIEW: View a file", 0
+db "view: View a file", 0
 JASM.console.var_9 :
-db "TREE: Displays all mounted files", 0
+db "tree: Displays all mounted files", 0
 JASM.console.var_10 :
-db "MEMSTAT: Prints out the percentage of RAM in use", 0
+db "memstat: Prints out the percentage of RAM in use", 0
 JASM.console.var_11 :
-db "EXIT", 0
+db "exit", 0
 JASM.console.var_12 :
-db "CLEAR", 0
+db "clear", 0
 JASM.console.var_13 :
-db "FULLSCRN", 0
+db "fullscreen", 0
 JASM.console.var_14 :
-db "DEBUG", 0
+db "debug", 0
 JASM.console.var_15 :
-db "VIEW", 0
+db "view", 0
 JASM.console.var_16 :
-db "TREE", 0
+db "tree", 0
 JASM.console.var_17 :
-db "TEST", 0
+db "test", 0
 JASM.console.var_18 :
-db "MEMSTAT", 0
+db "memstat", 0
 JASM.console.var_19 :
 db "Unrecognized Command: ", 0
 JASM.console.var_20 :

@@ -1,0 +1,9 @@
+new window ("This is a notification!")
+move window to bottom of screen
+move window up 1 each loop until it's height+5 up
+wait like 10 tics
+unregister itx	d
+
+AAAH UNREGISTER IS FAILING AND THE WRONG WINDOWS
+ARE BEING UNREGISTERED AND UNREGISTERED WINDOWS CAN'T BE USED AGAIN D:
+EDIT: Fixed?

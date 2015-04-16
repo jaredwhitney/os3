@@ -1,7 +1,7 @@
 [bits 32]
 dd endt-start
 db "TEXT"
-db "HELOWRLD"
+db "HeloWrld"
 start :
 db "Hello world, I am a text file :)", 0xA0
 db "This is on a new line!", 0xA0

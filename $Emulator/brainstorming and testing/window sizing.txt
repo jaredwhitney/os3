@@ -1,0 +1,7 @@
+width always stays the same
+height can be calculated...
+
+calculating height:
+run through buffer in order
+every time a full line is reached (however many chars), add 1 to counter
+every time and 0xa0 is encountered, add 1 to counter, reset char counter to 0

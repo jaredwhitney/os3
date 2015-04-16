@@ -128,10 +128,10 @@ graphicsgetposloop :
 mov cl, [edx]
 cmp al, cl
 je graphicsgetposret
-add edx, 1
-mov cl, [edx]
-cmp al, cl
-je graphicsgetposret
+;add edx, 1
+;mov cl, [edx]
+;cmp al, cl
+;je graphicsgetposret
 add ebx, 7
 add edx, 1
 mov cl, [edx]
@@ -182,198 +182,407 @@ fontOrder :
 db 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g'
 db 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o'
 db 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w'
-db 'X', 'x', 'Y', 'y', 'Z', 'z', ' ', '_', '.', '!', ',', ',', '1', '1'
-db '2', '2', '3', '3', '4', '4', '5', '5', '6', '6', '7', '7', '8', '8', '9', '9', '0', '0', '"', 0x27, ':', ':'
-db '(', '[', ')', ']', '-', '~', '=', '=', '%', '%', '*'
+db 'X', 'x', 'Y', 'y', 'Z', 'z', ' ', '.', ',', '1'
+db '2', '3', '4', '5', '6', '7', '8', '9', '0', '"', 0x27, ':'
+db '[', ']', '-', '=', '%', '!', '?', '(', ')', '{', '}', '<', '>', '*'
 
 charA :
+; A
 db 0x04, 0x0A, 0x11, 0x1F, 0x11, 0x11, 0x11
-db 0x1E, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E	; B
-db 0x06, 0x09, 0x10, 0x10, 0x10, 0x09, 0x06	; C
-
-db 0b11100	; D
+; a
+db 0x0, 0x0, 0x0
+db 0b01100
+db 0b10010
+db 0b10010
+db 0b01110
+; B
+db 0x1E, 0x11, 0x11, 0x1E, 0x11, 0x11, 0x1E
+; b
+db 0b00000
+db 0b10000
+db 0b10000
+db 0b10000
+db 0b11100
+db 0b10010
+db 0b01100
+; C
+db 0x06, 0x09, 0x10, 0x10, 0x10, 0x09, 0x06
+; c
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b01100
+db 0b10000
+db 0b01100
+; D
+db 0b11100
 db 0b10010
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b10010
 db 0b11100
-
-db 0b11111	; E
+; d
+db 0b00000
+db 0b00001
+db 0b00001
+db 0b00001
+db 0b00111
+db 0b01001
+db 0b00110
+; E
+db 0b11111
 db 0b10000
 db 0b10000
 db 0b11100
 db 0b10000
 db 0b10000
 db 0b11111
-
-db 0b11111	; F
+; e
+db 0b00000
+db 0b00000
+db 0b11110
+db 0b10010
+db 0b11110
+db 0b10000
+db 0b11110
+; F
+db 0b11111
 db 0b10000
 db 0b10000
 db 0b11111
 db 0b10000
 db 0b10000
 db 0b10000
-
-db 0b01110	; G
+; f
+db 0b00000
+db 0b00011
+db 0b00100
+db 0b11111
+db 0b00100
+db 0b00100
+db 0b00100
+; G
+db 0b01110
 db 0b10001
 db 0b10000
 db 0b10111
 db 0b10001
 db 0b10001
 db 0b01111
-
-db 0b10001	; H
+; g
+db 0b00000
+db 0b00000
+db 0b01110
+db 0b01010
+db 0b01110
+db 0b00010
+db 0b01100
+; H
+db 0b10001
 db 0b10001
 db 0b10001
 db 0b11111
 db 0b10001
 db 0b10001
 db 0b10001
-
-db 0b11111	; I
+; h
+db 0b00000
+db 0b10000
+db 0b10000
+db 0b10000
+db 0b11110
+db 0b10010
+db 0b10010
+; I
+db 0b11111
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b11111
-
-db 0b00001	; J
+; i
+db 0b00000
+db 0b00000
+db 0b00100
+db 0b00000
+db 0b00100
+db 0b00100
+db 0b00100
+; J
+db 0b00001
 db 0b00001
 db 0b00001
 db 0b00001
 db 0b00001
 db 0b01001
 db 0b00110
-
-db 0b10001	; K
+; j
+db 0b00000
+db 0b00010
+db 0b00000
+db 0b00010
+db 0b00010
+db 0b10010
+db 0b01100
+; K
+db 0b10001
 db 0b10001
 db 0b10010
 db 0b11100
 db 0b10010
 db 0b10001
 db 0b10001
-
-db 0b10000	; L
+; k
+db 0b00000
+db 0b10000
+db 0b10010
+db 0b10100
+db 0b11000
+db 0b10100
+db 0b10010
+; L
+db 0b10000
 db 0b10000
 db 0b10000
 db 0b10000
 db 0b10000
 db 0b10000
 db 0b11111
-
-db 0b10001	; M
+; l
+db 0b00000
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+; M
+db 0b10001
 db 0b10001
 db 0b11011
 db 0b10101
 db 0b10001
 db 0b10001
 db 0b10001
-
-db 0b10001	; N
+; m
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b11010
+db 0b10101
+db 0b10001
+db 0b10001
+; N
+db 0b10001
 db 0b11001
 db 0b11001
 db 0b10101
 db 0b10101
 db 0b10011
 db 0b10001
-
-db 0b00100	; O
+; n
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b10000
+db 0b11110
+db 0b10010
+db 0b10010
+; O
+db 0b00100
 db 0b01010
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b01010
 db 0b00100
-
-db 0b11110	; P
+; o
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b01100
+db 0b10010
+db 0b10010
+db 0b01100
+; P
+db 0b11110
 db 0b10001
 db 0b10001
 db 0b11110
 db 0b10000
 db 0b10000
 db 0b10000
-
-db 0b01110	; Q
+; p
+db 0b00000
+db 0b00000
+db 0b11110
+db 0b10010
+db 0b11110
+db 0b10000
+db 0b10000
+; Q
+db 0b01110
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b10101
 db 0b10010
 db 0b01101
-
-db 0b11110	; R
+; q
+db 0b00000
+db 0b00000
+db 0b11110
+db 0b10010
+db 0b11110
+db 0b00010
+db 0b00010
+; R
+db 0b11110
 db 0b10001
 db 0b10001
 db 0b11110
 db 0b10001
 db 0b10001
 db 0b10001
-
-db 0b00111	; S
+; r
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b01110
+db 0b01000
+db 0b01000
+db 0b01000
+; S
+db 0b00111
 db 0b01000
 db 0b01000
 db 0b00100
 db 0b00010
 db 0b00010
 db 0b11100
-
-db 0b11111	; T
+; s
+db 0b00000
+db 0b00000
+db 0b11100
+db 0b10000
+db 0b11100
+db 0b00100
+db 0b11100
+; T
+db 0b11111
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b00100
 db 0b00100
-
-db 0b10001	; U
+; t
+db 0b00000
+db 0b00100
+db 0b00100
+db 0b11111
+db 0b00100
+db 0b00100
+db 0b00100
+; U
+db 0b10001
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b10001
 db 0b01110
-
-db 0b10001	; V
+; u
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b10010
+db 0b10010
+db 0b01110
+; V
+db 0b10001
 db 0b10001
 db 0b10001
 db 0b01010
 db 0b01010
 db 0b01010
 db 0b00100
-
-db 0b10001	; W
+; v
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b10001
+db 0b01010
+db 0b00100
+; W
+db 0b10001
 db 0b10001
 db 0b10001
 db 0b10101
 db 0b10101
 db 0b10101
 db 0b01010
-
-db 0b10001	; X
+; w
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b10001
+db 0b10101
+db 0b01010
+; X
+db 0b10001
 db 0b10001
 db 0b01010
 db 0b00100
 db 0b01010
 db 0b10001
 db 0b10001
-
-db 0b10001	; Y
+; x
+db 0b00000
+db 0b00000
+db 0b10001
+db 0b01010
+db 0b00100
+db 0b01010
+db 0b10001
+; Y
+db 0b10001
 db 0b10001
 db 0b01010
 db 0b01110
 db 0b00100
 db 0b00100
 db 0b00100
-
-db 0b11111	; Z
+; y
+db 0b00000
+db 0b00000
+db 0b10001
+db 0b01010
+db 0b00100
+db 0b01000
+db 0b10000
+; Z
+db 0b11111
 db 0b00001
 db 0b00010
 db 0b00100
 db 0b01000
 db 0b10000
 db 0b11111
+; z
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b11110
+db 0b00100
+db 0b01000
+db 0b11110
 
 charSPACE :
 db 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
@@ -483,6 +692,14 @@ db 0b00000
 db 0b00000
 db 0b00000
 
+db 0b00100	; "
+db 0b00100
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+
 db 0b00000	; :
 db 0b00100
 db 0b00000
@@ -530,6 +747,70 @@ db 0b00100
 db 0b01010
 db 0b10101
 db 0b10010
+
+db 0b00100	; !
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00100
+db 0b00000
+db 0b00100
+
+db 0b01100	; ?
+db 0b10010
+db 0b00110
+db 0b01000
+db 0b01000
+db 0b00000
+db 0b01000
+
+db 0b00100	; (
+db 0b01000
+db 0b10000
+db 0b10000
+db 0b10000
+db 0b01000
+db 0b00100
+
+db 0b00100	; )
+db 0b00010
+db 0b00001
+db 0b00001
+db 0b00001
+db 0b00010
+db 0b00100
+
+db 0b00100	; {
+db 0b01000
+db 0b10000
+db 0b01000
+db 0b10000
+db 0b10000
+db 0b01000
+
+db 0b00100	; }
+db 0b00010
+db 0b00001
+db 0b00010
+db 0b00001
+db 0b00010
+db 0b00100
+
+db 0b00001	; <
+db 0b00010
+db 0b00100
+db 0b01000
+db 0b00100
+db 0b00010
+db 0b00001
+
+db 0b10000	; >
+db 0b01000
+db 0b00100
+db 0b00010
+db 0b00100
+db 0b01000
+db 0b10000
 
 db 0b10101
 db 0b01010

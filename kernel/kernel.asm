@@ -27,6 +27,8 @@ Kernel.init :
 	mov ebx, LOAD_FINISH
 	call debug.log.system
 	
+	call Minnow.dtree
+	
 	;	MAIN LOOK	;
 	kernel.loop:
 	
@@ -81,6 +83,10 @@ os.pollKeyboard :
 	and al, 0x80	; 1 if release code, 0 if not
 	cmp al, 0x0	; if a key has not been released
 	je os.pollKeyboard.checkKey
+	xor bl, 0x80
+	cmp bl, 0x2a
+	je os.handleCaps.off
+	os.handleCaps.off.reentry :
 	mov cx, 0x1	; otherwise a key was released
 	mov [os.pollKeyboard.isReady], cx	; store 1 so we know we are ready to read next time
 	jmp os.pollKeyboard.return
@@ -99,8 +105,8 @@ os.pollKeyboard :
 	call os.keyboard.toChar
 	cmp bl, 0x1d
 		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
-	cmp bl, 0x2a
-		je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte
+	;cmp bl, 0x2a
+	;	je os.pollKeyboard.drawKeyFinalize	; should not print a modifier byte UMMM NEED TO LOOK INTO THIS!
 	;cmp al, 0xFF
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 	;cmp al, 0x1
@@ -122,6 +128,8 @@ os.pollKeyboard :
 		call Dolphin.activateNext
 		jmp os.pollKeyboard.drawKeyFinalize
 		os.handlecont :
+	jmp os.handleCaps
+	os.handleCaps.reentry :
 	mov bl, al
 	call os.keyPress	; keypress will be sent to the currently registered program in al
 	os.pollKeyboard.drawKeyFinalize :
@@ -136,13 +144,34 @@ os.pollKeyboard :
 	
 os.doEnter :
 	ret
-	;mov bl, 0xFE
-	;jmp os.handlecont
-	;mov eax, [os.ecatch]
-	;mov ebx, [eax]
-	;mov ah, 0xB
-	;call ebx
-	;jmp os.pollKeyboard.drawKeyFinalize
+
+os.handleCaps :	; charcode in bl
+	cmp bl, 0x2a
+	je os.handleCaps.on	; DONT JUMP, handle it
+	push ax
+	mov al, [os.caps]
+	cmp al, 0x0
+	pop ax
+	je os.handleCaps.ret
+	cmp al, 0x61
+	jl os.handleCaps.ret
+	cmp al, 0x7a
+	jg os.handleCaps.ret
+	sub al, 0x20
+	os.handleCaps.ret :
+	jmp os.handleCaps.reentry
+	os.handleCaps.on :
+		push ax
+		mov al, 0xFF
+		mov [os.caps], al
+		pop ax
+		jmp os.pollKeyboard.drawKeyFinalize
+	os.handleCaps.off :
+		push ax
+		mov al, 0x0
+		mov [os.caps], al
+		pop ax
+		jmp os.handleCaps.off.reentry
 
 os.keyPress :
 	pusha
@@ -177,82 +206,82 @@ os.getKey :
 
 os.keyboard.toChar :
 	cmp bl, 0x1E
-	mov al, 'A'
+	mov al, 'a'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x30
-	mov al, 'B'
+	mov al, 'b'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x2E
-	mov al, 'C'
+	mov al, 'c'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x20
-	mov al, 'D'
+	mov al, 'd'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x12
-	mov al, 'E'
+	mov al, 'e'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x21
-	mov al, 'F'
+	mov al, 'f'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x22
-	mov al, 'G'
+	mov al, 'g'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x23
-	mov al, 'H'
+	mov al, 'h'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x17
-	mov al, 'I'
+	mov al, 'i'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x24
-	mov al, 'J'
+	mov al, 'j'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x25
-	mov al, 'K'
+	mov al, 'k'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x26
-	mov al, 'L'
+	mov al, 'l'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x32
-	mov al, 'M'
+	mov al, 'm'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x31
-	mov al, 'N'
+	mov al, 'n'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x18
-	mov al, 'O'
+	mov al, 'o'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x19
-	mov al, 'P'
+	mov al, 'p'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x10
-	mov al, 'Q'
+	mov al, 'q'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x13
-	mov al, 'R'
+	mov al, 'r'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x1F
-	mov al, 'S'
+	mov al, 's'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x14
-	mov al, 'T'
+	mov al, 't'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x16
-	mov al, 'U'
+	mov al, 'u'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x2F
-	mov al, 'V'
+	mov al, 'v'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x11
-	mov al, 'W'
+	mov al, 'w'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x2D
-	mov al, 'X'
+	mov al, 'x'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x15
-	mov al, 'Y'
+	mov al, 'y'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x2C
-	mov al, 'Z'
+	mov al, 'z'
 	je os.keyboard.toChar.ret
 	cmp bl, 0x39
 	mov al, ' '
@@ -444,6 +473,9 @@ os.pnumCounter :
 db 0x0
 
 os.hsmode :
+db 0x0
+
+os.caps :
 db 0x0
 
 MINNOW_START :

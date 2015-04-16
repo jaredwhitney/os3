@@ -75,12 +75,10 @@ Dolphin.copyImageLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	popa
 	ret
 	
-Dolphin.clearImage :	; eax = source, ecx = width, edx = height, bl = color
+Dolphin.clearImage :	; eax = source, edx = size, bl = color
 	pusha
-	and ecx, 0xFFFF
-	and edx, 0xFFFF
-	imul ecx, edx
-	sub ecx, 1
+	mov ecx, edx
+	sub ecx, 2
 	mov edx, 0x0
 	Dolphin.clearImage_loop :
 	mov [eax], bl
@@ -95,10 +93,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	pusha
 	and ecx, 0xFFFF
 	mov [dstor], edx
-	;sub cx, 1
+	mov [bposstor], ebx
+	add ebx, 1
 	mov [os.textwidth], cx
 		pusha
 		mov eax, ebx
+		mov edx, 0xfa00
+		mov bl, 0x0
 		call Dolphin.clearImage
 		popa
 	mov ecx, [charpos]
@@ -128,6 +129,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		pop ecx
 		pop ebx
 			jg Dolphin.drawText_ret
+				pusha
+				mov eax, [charpos]	; where we are in destination buffer + destination buffer pos
+				mov ebx, [bposstor]
+				add ebx, 0xf000
+				cmp eax, ebx
+				popa
+					jge Dolphin.drawText_ret
 		add edx, 1
 		cmp al, 0x0
 			je Dolphin.drawText.nodraw
@@ -230,6 +238,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 			;pop ecx
 			;jge noreadd
 			;add ecx, 6
+		add ecx, 1
 		noreadd :
 		jmp Dolphin.checkCharLine.ret
 		
@@ -302,8 +311,7 @@ ret
 
 Dolphin.solidBG :
 mov eax, SCREEN_BUFFER
-mov ecx, SCREEN_WIDTH
-mov edx, SCREEN_HEIGHT
+mov edx, SCREEN_HEIGHT*SCREEN_WIDTH
 mov bl, 0x10
 call Dolphin.clearImage
 popa
@@ -701,6 +709,8 @@ db 25
 currentWindow :
 dd 0x0
 bstor :
+dd 0x0
+bposstor :
 dd 0x0
 dstor :
 dd 0x0

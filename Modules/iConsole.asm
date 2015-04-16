@@ -5,8 +5,8 @@ pusha
 	call os.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
 call Dolphin.create				; allocate memory for a window
-mov [console.buffer], ecx 
-mov [console.windowBuffer], ebx
+mov [console.buffer], ebx 
+mov [console.windowBuffer], ecx
 	mov bl, [console.pnum]
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
@@ -76,7 +76,8 @@ popa
 ret
 
 console.memstat :
-pusha
+	mov ah, 0xFF
+	pusha
 	mov ebx, [Guppy.usedRAM]
 	mov edx, ebx
 	mov ebx, [Guppy.totalRAM]
@@ -96,6 +97,13 @@ pusha
 popa
 ret
 
+console.checkColor :
+	cmp ah, 0x0
+		jne console.checkColor_ret
+	mov ah, 0xFF
+	console.checkColor_ret :
+	ret
+
 console.FUNCTION_UNSUPPORTED :
 mov ah, 0x3	; RED
 mov ebx, console.UNSUP_MSG
@@ -104,13 +112,13 @@ popa
 ret
 
 screen.wipe :
-pusha
-mov ebx, [console.pos]
-add ebx, SCREEN_BUFFER
-mov cx, [console.width]
-mov dx, [console.height]
-call Dolphin.clear
-popa
+;pusha
+;mov ebx, [console.pos]
+;add ebx, SCREEN_BUFFER
+;mov cx, [console.width]
+;mov dx, [console.height]
+;call Dolphin.clear
+;popa
 ret
 
 console.update :
@@ -125,7 +133,13 @@ je console.update.gone
 	mov ebx, eax
 	mov eax, [console.buffer]
 	mov cx, [console.width]
-	mov edx, 0x100
+	mov edx, [console.charPos]
+		;cmp edx, 0xA00
+		;jl console.size.noworry
+		;pusha
+			;call console.clearScreen
+		;popa
+		;console.size.noworry :
 	call Dolphin.drawText
 popa
 ret
@@ -146,6 +160,7 @@ ret
 
 console.print :
 pusha
+call console.checkColor
 mov edx, [console.buffer]
 mov ecx, [console.charPos]
 add edx, ecx
@@ -171,6 +186,7 @@ ret
 
 console.printMem :
 pusha
+call console.checkColor
 mov edx, [console.buffer]
 mov ecx, [console.charPos]
 add edx, ecx
@@ -210,6 +226,7 @@ ret
 
 console.numOut :
 pusha
+call console.checkColor
 mov [console.cstor], ah
 mov cl, 28
 mov ch, 0x0
