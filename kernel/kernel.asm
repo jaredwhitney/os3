@@ -8,6 +8,7 @@ Kernel.init :
 	;	INITIALIZING MODULES	;
 	call debug.init
 	call Guppy.init
+	call Catfish.init
 	
 	;	PALETTE SETTING		;
 	call Dolphin.setGrayscalePalette
@@ -34,6 +35,7 @@ Kernel.init :
 		;	RUN REGISTERED PROGRAMS	;
 		call console.loop
 		call View.loop
+		call Catfish.loop
 		;	PUSH BUFFER TO SCREEN	;
 		call Dolphin.updateScreen
 		;	REPEAT	;
@@ -322,9 +324,11 @@ os.handleSpecial :
 	cmp bl, 0x3a
 	je os.handleSpecial.swapMode
 	;	else it is a tab, reset the window's position
+	mov bh, [Dolphin.activeWindow]
+	mov [currentWindow], bh
 	mov eax, 0
 	mov ebx, 0
-	call Dolphin.moveWindowAbsolutte
+	call Dolphin.moveWindowAbsolute
 	jmp os.handleSpecial.ret	; not a huge problem that it calls moveWindow
 	os.handleSpecial.up :
 	mov eax, 0
@@ -349,6 +353,10 @@ os.handleSpecial :
 		popa
 		jmp os.pollKeyboard.drawKeyFinalize
 	os.handleSpecial.ret :
+		push bx
+			mov bh, [Dolphin.activeWindow]
+			mov [currentWindow], bh
+		pop bx
 		push bx
 		mov bl, [os.hsmode]
 		cmp bl, 0x0
@@ -390,6 +398,7 @@ os.getProgramNumber :	; returns pnum in bl
 %include "..\modules\minnow.asm"
 %include "..\modules\iConsole.asm"
 %include "..\modules\View.asm"
+%include "..\modules\Catfish.asm"
 %include "..\boot\realMode.asm"
 %include "..\debug\print.asm"
 

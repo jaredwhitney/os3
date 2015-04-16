@@ -67,12 +67,12 @@ sub ebx, Guppy.table	; ebx contains # start sector
 mov eax, ebx			; move # start sector to eax
 	mov ecx, eax		; store eax
 	pusha
-	push ebx
-	mov ebx, MALLOC
-	mov ah, 0xB
-	call debug.setColor
-	call debug.print
-	pop ebx
+	;push ebx
+	;mov ebx, MALLOC
+	;mov ah, 0xB
+	;call debug.setColor
+	;call debug.print
+	;pop ebx
 	mov eax, [aStor]
 	shr eax, 8
 	and eax, 0xFF	; getting ah -> eax
@@ -82,7 +82,7 @@ mov eax, ebx			; move # start sector to eax
 	mul ebx
 	mov ebx, eax
 	add ebx, MEMORY_START
-	call debug.num
+	;call debug.num
 	popa
 	mov ebx, 0x200
 	push eax
@@ -90,11 +90,11 @@ mov eax, ebx			; move # start sector to eax
 mul ebx
 mov ebx, eax
 add ebx, MEMORY_START	; beginning of memory set for use
-	mov al, '-'
-	call debug.cprint
-	call debug.num
-	call debug.newl
-	call debug.restoreColor
+	;mov al, '-'
+	;call debug.cprint
+	;call debug.num
+	;call debug.newl
+	;call debug.restoreColor
 pop eax
 pop ecx
 pop edx

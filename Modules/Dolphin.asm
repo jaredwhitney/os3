@@ -563,6 +563,11 @@ sub edx, Dolphin.windowStructs
 mov ebx, edx
 and ebx, 0xFF
 mov [Dolphin.activeWindow], bl
+	pusha
+	call debug.num
+	mov ebx, REG_MSG
+	call debug.log.system
+	popa
 pop edx
 pop ecx
 ret
@@ -640,8 +645,9 @@ and ebx, 0xFF
 mov eax, Dolphin.windowStructs
 add eax, ebx
 mov [eax], ecx
-mov ebx, UNREG_MSG
-call debug.log.system
+	call debug.num
+	mov ebx, UNREG_MSG
+	call debug.log.system
 call Dolphin.activateNext
 popa
 ret
@@ -650,8 +656,6 @@ Dolphin.moveWindow :	; xchange in eax, y change in ebx
 pusha
 mov edx, eax
 mov ecx, ebx
-mov bh, [Dolphin.activeWindow]
-mov [currentWindow], bh
 
 mov bl, [Dolphin.X_POS]
 call Dolphin.getAttribute
@@ -665,11 +669,9 @@ call Dolphin.setAttribute
 popa
 ret
 
-Dolphin.moveWindowAbsolutte :	; x in eax, y in ebx
+Dolphin.moveWindowAbsolute :	; x in eax, y in ebx
 pusha
 mov ecx, ebx
-mov bh, [Dolphin.activeWindow]
-mov [currentWindow], bh
 
 mov bl, [Dolphin.X_POS]
 call Dolphin.setAttribute
@@ -685,8 +687,6 @@ Dolphin.sizeWindow :	; xchange in eax, y change in ebx
 pusha
 mov edx, eax
 mov ecx, ebx
-mov bh, [Dolphin.activeWindow]
-mov [currentWindow], bh
 pusha
 mov bl, [Dolphin.WIDTH]
 call Dolphin.getAttribute
@@ -765,3 +765,5 @@ PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0
 UNREG_MSG :
 db "A window has been unregistered!", 0
+REG_MSG :
+db "A window has been registered!", 0

@@ -68,6 +68,8 @@ mov [console.pos], bx
 ret
 
 console.test :	; command that can be used to test anything.
+mov eax, Catfish.testMsg
+call Catfish.notify
 pusha
 	
 popa
