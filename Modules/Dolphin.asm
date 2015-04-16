@@ -279,28 +279,6 @@ mov [ebx], al
 popa
 ret
 
-Dolphin.clear :
-pusha
-imul ecx, 8
-imul edx, 8
-mov al, 0x4A	; dark gray
-Dolphin.clear.loop0 :
-push ecx
-Dolphin.clear.loop1 :
-mov [ebx], al
-add ebx, 1
-sub ecx, 1
-cmp ecx, 0x0
-jg Dolphin.clear.loop1
-pop ecx
-sub ebx, ecx
-add ebx, 0x140
-sub edx, 1
-cmp edx, 0
-jg Dolphin.clear.loop0
-popa
-ret
-
 Dolphin.redrawBG :
 push ebx
 mov ebx, [bglocstor]
@@ -339,22 +317,12 @@ pusha
 	mov dx, 0x3c8
 	out dx, al
 
-;mov ax, [0x1000]
-;cmp ax, 0xF
-;jne Dolphin.setGrayscalePalette2
 mov dx, 0x3c8
 mov al, 0x0
 out dx, al	; we are starting with index 0
 
-;mov dx, 0x0	; red
-;mov cx, 0x0	; blue
-;mov bx, 0x0	; green
-;mov ax, 0x0
-
 
 Dolphin.setVGApalette.loop1 :
-;mov ax, dx
-;push dx	; pushing dx breaks things!
 mov dx, 0x3c9
 mov ebx, Dolphin.tColor
 mov ax, [ebx]
@@ -397,7 +365,7 @@ Dolphin.setGrayscalePalette :
 pusha
 mov ax, [0x1000]
 cmp ax, 0xF
-jne Dolphin.setGrayscalePalette2	; should be jne, swapped for testing
+jne Dolphin.setGrayscalePalette2
 Dolphin.setGrayscalePalette.go :
 mov dx, 0x3c8
 mov al, 0x0
@@ -414,7 +382,7 @@ jle Dolphin.setGrayscalePalette.loop1
 popa
 ret
 
-Dolphin.setGrayscalePalette2 :
+Dolphin.setGrayscalePalette2 :	; no longer needed, remove
 ;mov ah, 0x1f
 ;call debug.useFallbackColor
 mov ebx, PALETTE_NODEFAULT
@@ -427,9 +395,6 @@ call debug.log.info
 	out dx, al
 	
 	jmp Dolphin.setGrayscalePalette.go
-	; some alternate code should go here!
-	
-	
 popa
 ret
 
