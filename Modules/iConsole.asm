@@ -284,7 +284,7 @@ console.newline :
 		mov edx, [console.buffer]
 		mov ecx, [console.charPos]
 		add edx, ecx
-		mov al, 0xA0
+		mov al, 0x0A
 		mov ah, 0xFF
 		mov [edx], ax
 		mov ebx, [console.charPos]
@@ -392,7 +392,7 @@ add eax, 0x2
 gldloop :
 sub eax, 0x2
 mov bx, [eax]
-cmp bl, 0xa0
+cmp bl, 0x0a
 jne gldloopnoadd
 add ecx, 0x1
 gldloopnoadd :
@@ -404,7 +404,7 @@ mov eax, ecx	; eax now contains the line number!
 	mov ecx, 0x0
 	gldloop2 :
 	mov bx, [edx]
-	cmp bl, 0xa0
+	cmp bl, 0x0a
 	jne gldloop2noadd
 	add ecx, 1
 	gldloop2noadd :
