@@ -139,7 +139,9 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		add edx, 1
 		cmp al, 0x0
 			je Dolphin.drawText.nodraw
-		cmp al, 0xA0
+		cmp al, 0xD
+			je Dolphin.drawText.nodraw
+		cmp al, 0x0A
 			je Dolphin.drawText.newl
 			push bx
 			mov bl, [Dolphin.colorOverride]
@@ -618,10 +620,14 @@ and ebx, 0xFF
 mov eax, Dolphin.windowStructs
 add eax, ebx
 mov [eax], ecx
+mov bh, [Dolphin.activeWindow]
+cmp bl, bh
+jne Dolphin.registerWindow.noActiveChange
+call Dolphin.activateNext
+Dolphin.registerWindow.noActiveChange :
 	call debug.num
 	mov ebx, UNREG_MSG
 	call debug.log.system
-call Dolphin.activateNext
 popa
 ret
 

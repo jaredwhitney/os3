@@ -7,6 +7,6 @@
 @C:\Users\%USERNAME%\AppData\Local\nasm\nasm.exe -o fstest.bin -f bin "Hello World.asm"
 @cd %x%
 @pause
-@cat boot.bin kernel.bin fstest.bin ../image/sine.bin ../image/gradient.bin ../image/jax.file ../image/league.file > os.img
+@cat boot.bin kernel.bin fstest.bin ../image/sine.bin ../image/iConsole.file ../image/gradient.bin ../image/jax.file ../image/league.file > os.img
 @pause
 @start run.bxrc

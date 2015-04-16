@@ -115,7 +115,29 @@ xor edx, edx
 mov cx, [View.windowStruct.width]
 mov dx, [View.windowStruct.height]
 call View.updateWindow	; finish the proccess
+jmp View.winUpdate.ret
 View.winUpdate.notImage :
+cmp cl, 'T'
+jne View.winUpdate.notText
+; if the window is a text window
+	xor ecx, ecx
+	mov cx, [View.windowStruct.width]
+	mov eax, [View.fpos]
+	mov ebx, [View.buffer]
+	mov edx, [fszstor]
+		push bx
+		mov bx, 0xE0
+		mov [Dolphin.colorOverride], bl
+		pop bx
+	call Dolphin.drawText
+		push bx
+		mov bx, 0x0
+		mov [Dolphin.colorOverride], bl
+		pop bx
+	call View.updateWindow
+	jmp View.winUpdate.ret
+View.winUpdate.notText :
+View.winUpdate.ret :
 popa
 ret
 
@@ -131,6 +153,7 @@ View.file.text :
 	pop cx
 call View.winSetup
 mov eax, edx
+mov [View.fpos], eax
 mov ebx, [View.buffer]
 mov ecx, 0xa0
 mov edx, 0xc0
@@ -209,6 +232,8 @@ View.wnum :
 db 0xff
 View.pnum :
 db 0x0
+View.fpos :
+dd 0x0
 fszstor :
 dd 0x0
 typestor :

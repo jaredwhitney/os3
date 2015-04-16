@@ -121,6 +121,7 @@ call drawChar
 popa
 ret
 
+
 graphics.getPos :
 mov ebx, charA
 mov edx, fontOrder
@@ -128,10 +129,6 @@ graphicsgetposloop :
 mov cl, [edx]
 cmp al, cl
 je graphicsgetposret
-;add edx, 1
-;mov cl, [edx]
-;cmp al, cl
-;je graphicsgetposret
 add ebx, 7
 add edx, 1
 mov cl, [edx]
@@ -184,7 +181,7 @@ db 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o
 db 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w'
 db 'X', 'x', 'Y', 'y', 'Z', 'z', ' ', '.', ',', '1'
 db '2', '3', '4', '5', '6', '7', '8', '9', '0', '"', 0x27, ':'
-db '[', ']', '-', '=', '%', '!', '?', '(', ')', '{', '}', '<', '>', '*'
+db '[', ']', '-', '=', '%', '!', '?', '(', ')', '{', '}', '<', '>', 0x9, ';', '*'
 
 charA :
 ; A
@@ -811,6 +808,22 @@ db 0b00010
 db 0b00100
 db 0b01000
 db 0b10000
+
+db 0b00000	; TAB
+db 0b00100
+db 0b00010
+db 0b11111
+db 0b00010
+db 0b00100
+db 0b00000
+
+db 0b00000	; SEMICOLON
+db 0b00000
+db 0b00010
+db 0b00000
+db 0b00010
+db 0b00100
+db 0b01000
 
 db 0b10101
 db 0b01010
