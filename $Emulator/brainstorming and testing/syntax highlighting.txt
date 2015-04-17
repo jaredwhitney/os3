@@ -1,0 +1,43 @@
+ORANGE: add, sub, mov, call, jmp, jl, je, jne, jg, jle, jge, ret, push, pop, pusha, popa, mul, div, imul, idiv, cmp
+BLUE:   anything prefaced by a 0123456789
+GREEN: Anything following a ';'
+PINK: db, dw, dd, [bits xy], equ
+
+
+cmp char 0x0A
+if equal: over = false, set = false
+cmp char ";"
+if equal: Color = GREEN, over = true
+if over
+	skip
+if char == ' ' OR char == TAB: set = false
+	break
+if set = true
+	break
+if char == digit
+	Color = BLUE
+	set = true
+for word : ORANGE
+	if equal: Color = ORANGE
+	set = true
+for word : PINK
+	if equal: Color = PINK
+	set = true
+if !set
+	Color = WHITE
+
+
+
+
+
+Syntax_ORANGE :
+db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, 0xFF
+Syntax_PINK :
+db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, 0xFF
+
+
+b  g  r
+0 1 2 3
+4 5 6 7
+8 9 A B
+C D E F

@@ -1,5 +1,11 @@
 [bits 32]
 
+WHITE equ 0xFF
+GREEN equ 0xC
+PINK equ 0x40
+BLUE equ 0x03
+ORANGE equ 0x4c
+
 View.init :
 pusha
 	call os.getProgramNumber
@@ -126,13 +132,17 @@ jne View.winUpdate.notText
 	mov ebx, [View.buffer]
 	mov edx, [fszstor]
 		push bx
-		mov bx, 0xE0
+		mov bl, 0xE0
 		mov [Dolphin.colorOverride], bl
+		mov bl, 0xFF
+		mov [highlight], bl
 		pop bx
 	call Dolphin.drawText
 		push bx
 		mov bx, 0x0
 		mov [Dolphin.colorOverride], bl
+		mov bl, 0x0
+		mov [highlight], bl
 		pop bx
 	call View.updateWindow
 	jmp View.winUpdate.ret
@@ -155,7 +165,7 @@ call View.winSetup
 mov eax, edx
 mov [View.fpos], eax
 mov ebx, [View.buffer]
-mov ecx, 0xa0
+mov ecx, 0x140
 mov edx, 0xc0
 call View.winSize
 	push bx
@@ -222,6 +232,136 @@ mov ebx, [View.windowBuffer]
 call Dolphin.copyImageLinear
 ret
 
+Syntax.reset :
+		push dx
+		xor dl, dl
+		mov [Syntax.highlight.over], dl
+		mov [Syntax.highlight.set], dl
+		mov dl, 0xFF
+		mov [scStor], dl
+		pop dx
+		ret
+
+Syntax.highlight :	; position in buffer in ebx, return color in ah
+push ebx
+push ecx
+push edx
+		push ebx
+		mov bl, [highlight]
+		cmp bl, 0x0
+		pop ebx
+			je Syntax.highlight.ret
+	mov ecx, ebx	; keep a copy in ecx
+	mov bh, [ecx]
+	cmp bh, 0x0A
+	jne Syntax.highlight_1
+		call Syntax.reset
+	Syntax.highlight_1 :
+	cmp bh, ';'
+	jne Syntax.highlight_2
+	mov bl, GREEN
+	mov dl, 0xFF
+	mov [Syntax.highlight.over], dl
+		jmp Syntax.highlight.done
+	Syntax.highlight_2 :
+	mov dl, [Syntax.highlight.over]
+	cmp dl, 0xFF
+	mov bl, [scStor]
+	je Syntax.highlight.done
+	; END OF TESTED CODE
+	cmp bh, ' '
+	je Syntax.highlight_3
+	cmp bh, 0x9	; TAB
+	jne Syntax.highlight_4
+	Syntax.highlight_3 :
+		call Syntax.reset
+		jmp Syntax.highlight.ret
+	Syntax.highlight_4 :
+	mov dl, [Syntax.highlight.set]
+	cmp dl, 0xFF
+	je Syntax.highlight.done
+	cmp bh, 0x30
+	jl Syntax.highlight_5
+	cmp bh, 0x39
+	jg Syntax.highlight_5
+	mov bl, BLUE
+	mov dl, 0xFF
+	mov [Syntax.highlight.set], dl
+				;jmp Syntax.highlight.done
+	Syntax.highlight_5 :
+				;mov bl, 0xFF	; END FOR NOW!!!
+				;jmp Syntax.highlight.done
+		push eax
+		;mov eax, Syntax_ORANGE	; make use orange color too@@@!
+		;call Syntax.highlight.internal_1
+		mov eax, Syntax_PINK
+		call Syntax.highlight.internal_1
+		pop eax
+		mov bl, dl
+	mov dl, [Syntax.highlight.set]
+	cmp dl, 0xFF
+	je Syntax.highlight.done
+		mov dh, 0xFF
+		mov [Syntax.highlight.set], dh
+	mov bl, WHITE
+	Syntax.highlight.done :
+	mov ah, bl
+	mov [scStor], bl
+Syntax.highlight.ret :
+pop edx
+pop ecx
+pop ebx
+ret
+	Syntax.highlight.internal_1 :
+		push eax
+		push ebx
+		push ecx
+		mov ebx, ecx
+				;pusha
+				;push eax
+				;mov al, [eax]
+				;call debug.cprint
+				;pop eax
+				;add eax, 1
+				;push eax
+				;mov al, [eax]
+				;call debug.cprint
+				;pop eax
+				;add eax, 1
+				;push eax
+				;mov al, [eax]
+				;call debug.cprint
+				;add eax, 1
+				;pop eax
+				;call debug.newl
+				;popa
+		Syntax.highlight_6 :
+		call os.lenientStringMatch	; returns 0x0 or 0xFF in dh, auto-increments eax
+		cmp dh, 0xFF
+		jne Syntax.highlight_7
+		mov dl, 0x2	;color
+		mov dh, 0xFF
+		mov [Syntax.highlight.set], dh
+		jmp Syntax.highlight_8
+		Syntax.highlight_7 :
+		mov cl, [eax]
+		cmp cl, 0xFF
+		jne Syntax.highlight_6
+		Syntax.highlight_8 :
+		pop ecx
+		pop ebx
+		pop eax
+		ret
+	Syntax.highlight.over :
+		db 0x0
+	Syntax.highlight.set :
+		db 0x0
+	;Syntax_ORANGE :
+		;db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, 0xFF
+	Syntax_PINK :
+		;db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, 0xFF
+		db "mov", 0, 0xFF, 0xFF, 0xFF
+
 View.FILE_TYPE_UNSUPPORTED :
 db "[View] Unrecognized filetype.", 0x0
 View.OK :
@@ -237,6 +377,10 @@ dd 0x0
 fszstor :
 dd 0x0
 typestor :
+db 0x0
+highlight :
+db 0x0
+scStor :
 db 0x0
 
 View.windowStruct :

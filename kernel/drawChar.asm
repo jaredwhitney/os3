@@ -166,6 +166,41 @@ os.seq :
 		mov al, 0x0
 		ret
 
+os.lenientStringMatch :	; eax is null-terminated, ebx is NOT; return in dh
+	push ecx
+	push ebx
+	os.lenientStringMatch.loop :
+		mov cl, [eax]
+		mov ch, [ebx]
+		
+		cmp cl, ch
+		add eax, 1
+		add ebx, 1
+			je os.lenientStringMatch.loop
+		cmp cl, 0x0
+			jne os.lenientStringMatch.equal
+	mov dh, 0xFF
+	;mov ebx, tada_msg
+	;call debug.println
+	jmp os.lenientStringMatch.ret
+	os.lenientStringMatch.equal :
+	mov dh, 0x0
+			pusha
+			mov al, cl
+			call debug.cprint
+			mov al, ch
+			call debug.cprint
+			popa
+		;add eax, 1
+		;mov bl, [eax]
+		;and ebx, 0xFF
+		;call debug.num
+	os.lenientStringMatch.ret :
+	call debug.newl
+	pop ebx
+	pop ecx
+	ret
+		
 charpos :
 dd 0x0
 
@@ -174,6 +209,9 @@ db 0xF
 
 char.solid :
 db 0x0
+
+tada_msg :
+db "Something matched!", 0x0
 
 fontOrder :
 db 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g'

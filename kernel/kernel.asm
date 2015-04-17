@@ -27,7 +27,7 @@ Kernel.init :
 	mov ebx, LOAD_FINISH
 	call debug.log.system
 	
-	call Minnow.dtree
+	call debug.clear	; REMOVE
 	
 	;	MAIN LOOK	;
 	kernel.loop:

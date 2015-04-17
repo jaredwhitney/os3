@@ -91,6 +91,7 @@ Dolphin.clearImage :	; eax = source, edx = size, bl = color
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	pusha
+	call Syntax.reset
 	and ecx, 0xFFFF
 	mov [dstor], edx
 	mov [bposstor], ebx
@@ -150,7 +151,8 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 			mov ah, bl
 			Dolphin.drawText_noOverride1 :
 			pop bx
-		call graphics.drawChar
+			call Syntax.highlight
+			call graphics.drawChar
 		mov ecx, [charpos]
 			push ebx
 			xor ebx, ebx
@@ -186,6 +188,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	ret
 	
 	Dolphin.drawText.newl :	; move one space down, checkCharLine will move to the next line
+	call Syntax.highlight
 	push edx
 	mov ecx, [charpos]
 	mov edx, SCREEN_WIDTH
