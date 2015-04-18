@@ -68,10 +68,23 @@ mov [console.pos], bx
 ret
 
 console.test :	; command that can be used to test anything.
-mov eax, Catfish.testMsg
-call Catfish.notify
+;mov eax, Catfish.testMsg
+;call Catfish.notify
 pusha
-	
+mov eax, TESTMSG_1
+	mov ebx, eax
+	call console.numOut
+mov ebx, TESTMSG_2
+call os.lenientStringMatch
+pusha
+mov ebx, eax
+call console.numOut
+call console.newline
+popa
+mov ebx, edx
+and ebx, 0xFFFF
+shr ebx, 8
+call console.numOut
 popa
 ret
 
@@ -467,6 +480,11 @@ db "The specified function is unsupported on your computer.", 0
 
 console.bufferstor :
 dd 0x0
+
+TESTMSG_1 :
+db "TEqt", 0
+TESTMSG_2 :
+db "TESt"
 
 console.windowStruct :
 	dd "iConsole VER_1.0"	; title

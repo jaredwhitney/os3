@@ -2,9 +2,9 @@
 
 WHITE equ 0xFF
 GREEN equ 0xC
-PINK equ 0x40
+PINK equ 0x17
 BLUE equ 0x03
-ORANGE equ 0x4c
+ORANGE equ 0xF
 
 View.init :
 pusha
@@ -256,6 +256,7 @@ push edx
 	cmp bh, 0x0A
 	jne Syntax.highlight_1
 		call Syntax.reset
+		jmp Syntax.highlight.done
 	Syntax.highlight_1 :
 	cmp bh, ';'
 	jne Syntax.highlight_2
@@ -271,11 +272,14 @@ push edx
 	; END OF TESTED CODE
 	cmp bh, ' '
 	je Syntax.highlight_3
+	cmp bh, '['
+	je Syntax.highlight_3
 	cmp bh, 0x9	; TAB
 	jne Syntax.highlight_4
 	Syntax.highlight_3 :
 		call Syntax.reset
-		jmp Syntax.highlight.ret
+		mov bl, 0xFF
+		jmp Syntax.highlight.done
 	Syntax.highlight_4 :
 	mov dl, [Syntax.highlight.set]
 	cmp dl, 0xFF
@@ -292,9 +296,11 @@ push edx
 				;mov bl, 0xFF	; END FOR NOW!!!
 				;jmp Syntax.highlight.done
 		push eax
-		;mov eax, Syntax_ORANGE	; make use orange color too@@@!
-		;call Syntax.highlight.internal_1
+		mov eax, Syntax_ORANGE	; make use orange color too@@@!
+		mov bl, ORANGE
+		call Syntax.highlight.internal_1
 		mov eax, Syntax_PINK
+		mov bl, PINK
 		call Syntax.highlight.internal_1
 		pop eax
 		mov bl, dl
@@ -316,6 +322,7 @@ ret
 		push eax
 		push ebx
 		push ecx
+		mov [Shclstor], bl
 		mov ebx, ecx
 				;pusha
 				;push eax
@@ -339,12 +346,17 @@ ret
 		call os.lenientStringMatch	; returns 0x0 or 0xFF in dh, auto-increments eax
 		cmp dh, 0xFF
 		jne Syntax.highlight_7
-		mov dl, 0x2	;color
+		mov dl, [Shclstor]	;color
 		mov dh, 0xFF
 		mov [Syntax.highlight.set], dh
 		jmp Syntax.highlight_8
 		Syntax.highlight_7 :
 		mov cl, [eax]
+			pusha
+			mov bl, cl
+			and ebx, 0xFF
+			call debug.num
+			popa
 		cmp cl, 0xFF
 		jne Syntax.highlight_6
 		Syntax.highlight_8 :
@@ -356,11 +368,12 @@ ret
 		db 0x0
 	Syntax.highlight.set :
 		db 0x0
-	;Syntax_ORANGE :
-		;db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, 0xFF
+	Shclstor :
+		db 0x0
+	Syntax_ORANGE :
+		db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, 0xFF
 	Syntax_PINK :
-		;db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, 0xFF
-		db "mov", 0, 0xFF, 0xFF, 0xFF
+		db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, 0xFF
 
 View.FILE_TYPE_UNSUPPORTED :
 db "[View] Unrecognized filetype.", 0x0

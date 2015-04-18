@@ -173,18 +173,24 @@ os.lenientStringMatch :	; eax is null-terminated, ebx is NOT; return in dh
 		mov cl, [eax]
 		mov ch, [ebx]
 		
-		cmp cl, ch
 		add eax, 1
 		add ebx, 1
+		cmp cl, ch
 			je os.lenientStringMatch.loop
 		cmp cl, 0x0
-			jne os.lenientStringMatch.equal
-	mov dh, 0xFF
+			je os.lenientStringMatch.equal
+		sub eax, 1
+		os.lenientStringMatch.eloop :
+		mov cl, [eax]
+		add eax, 1
+		cmp cl, 0x0
+		jne os.lenientStringMatch.eloop
+	mov dh, 0x0
 	;mov ebx, tada_msg
 	;call debug.println
 	jmp os.lenientStringMatch.ret
 	os.lenientStringMatch.equal :
-	mov dh, 0x0
+	mov dh, 0xFF
 			pusha
 			mov al, cl
 			call debug.cprint
