@@ -91,6 +91,7 @@ Dolphin.clearImage :	; eax = source, edx = size, bl = color
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	pusha
+	sub edx, 1
 	call Syntax.reset
 	and ecx, 0xFFFF
 	mov [dstor], edx
@@ -413,11 +414,13 @@ ret
 
 Dolphin.updateScreen :
 pusha
+			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
 call Dolphin.redrawBG
 ;
 ;	Draw windows in here!
 		mov ebx, 0x0
 		Dolphin.updateScreen.checkWindow :
+						; loop through each window, find the one with the highest depth, then highest depth lower than that depth, etc. (run through all of the windows in order of decreasing depth)
 			call Dolphin.windowExists
 			cmp ebx, 0xF*4	; num of windows * 4 bytes per windowStruct location
 			je Dolphin.doneDrawingWindows

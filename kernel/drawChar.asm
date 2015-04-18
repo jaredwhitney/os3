@@ -186,21 +186,9 @@ os.lenientStringMatch :	; eax is null-terminated, ebx is NOT; return in dh
 		cmp cl, 0x0
 		jne os.lenientStringMatch.eloop
 	mov dh, 0x0
-	;mov ebx, tada_msg
-	;call debug.println
 	jmp os.lenientStringMatch.ret
 	os.lenientStringMatch.equal :
 	mov dh, 0xFF
-			pusha
-			mov al, cl
-			call debug.cprint
-			mov al, ch
-			call debug.cprint
-			popa
-		;add eax, 1
-		;mov bl, [eax]
-		;and ebx, 0xFF
-		;call debug.num
 	os.lenientStringMatch.ret :
 	call debug.newl
 	pop ebx
@@ -225,7 +213,7 @@ db 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o
 db 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w'
 db 'X', 'x', 'Y', 'y', 'Z', 'z', ' ', '.', ',', '1'
 db '2', '3', '4', '5', '6', '7', '8', '9', '0', '"', 0x27, ':'
-db '[', ']', '-', '=', '%', '!', '?', '(', ')', '{', '}', '<', '>', 0x9, ';', '*'
+db '[', ']', '-', '=', '%', '!', '?', '(', ')', '{', '}', '<', '>', 0x9, ';', '_', '*'
 
 charA :
 ; A
@@ -854,11 +842,11 @@ db 0b01000
 db 0b10000
 
 db 0b00000	; TAB
-db 0b00100
-db 0b00010
-db 0b11111
-db 0b00010
-db 0b00100
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
 db 0b00000
 
 db 0b00000	; SEMICOLON
@@ -868,6 +856,14 @@ db 0b00000
 db 0b00010
 db 0b00100
 db 0b01000
+
+db 0b00000	; _
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b00000
+db 0b11111
 
 db 0b10101
 db 0b01010

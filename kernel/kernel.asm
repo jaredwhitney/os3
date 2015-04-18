@@ -328,6 +328,12 @@ os.keyboard.toChar :
 	cmp bl, 0x1C
 	mov al, 0xfe
 	je os.keyboard.toChar.ret
+	cmp bl, 0x51	; pgdown
+	mov al, 0xfd
+	je os.keyboard.toChar.ret
+	cmp bl, 0x49	; pgup
+	mov al, 0xfc
+	je os.keyboard.toChar.ret
 	mov al, 0x3f
 	mov ecx, charSPACE
 	pusha

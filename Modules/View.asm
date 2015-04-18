@@ -3,7 +3,7 @@
 WHITE equ 0xFF
 GREEN equ 0xC
 PINK equ 0x17
-BLUE equ 0x03
+BLUE equ 0x30
 ORANGE equ 0xF
 
 View.init :
@@ -131,6 +131,10 @@ jne View.winUpdate.notText
 	mov eax, [View.fpos]
 	mov ebx, [View.buffer]
 	mov edx, [fszstor]
+			cmp edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)	; dont worry about drawing characters where they would simply be drawn off-screen
+			jle View.winUpdate.np
+			mov edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)
+			View.winUpdate.np :
 		push bx
 		mov bl, 0xE0
 		mov [Dolphin.colorOverride], bl
@@ -164,6 +168,10 @@ View.file.text :
 call View.winSetup
 mov eax, edx
 mov [View.fpos], eax
+mov [View.fllim], eax
+	mov ebx, [fszstor]
+	add edx, ebx
+	mov [View.fhlim], edx
 mov ebx, [View.buffer]
 mov ecx, 0x140
 mov edx, 0xc0
@@ -205,7 +213,7 @@ pusha
 	mov [currentWindow], bl
 	call Dolphin.windowExists
 	cmp eax, 0x0
-		je View.loop.cont	; if no window to deal with, return
+		je View.loop.ret	; if no window to deal with, return
 		;	if we are here, the window is visible!
 			call View.winUpdate
 	call os.getKey
@@ -214,6 +222,42 @@ pusha
 		mov bl, [View.wnum]
 		call Dolphin.unregisterWindow
 	View.loop.cont :
+		cmp bl, 0xfd
+			jne View.loop.notScrollDown
+				;pusha
+				;mov eax, View.OK
+				;call Catfish.notify
+				;popa
+		mov ebx, [View.fpos]
+		View.loop.nextLine :
+			mov cl, [ebx]
+			add ebx, 1
+			cmp cl, 0x0a
+			jne View.loop.nextLine
+			cmp ebx, [View.fhlim]
+			jle View.loop.ScrollDown.cont
+			mov ebx, [View.fhlim]
+			View.loop.ScrollDown.cont :
+		mov [View.fpos], ebx
+		call View.winUpdate
+	View.loop.notScrollDown :
+		cmp bl, 0xfc
+			jne View.loop.ret
+			mov ebx, [View.fpos]
+			sub ebx, 2
+			View.loop.lastLine :
+			mov cl, [ebx]
+			sub ebx, 1
+			cmp cl, 0x0a
+			jne View.loop.lastLine
+			add ebx, 2
+			cmp ebx, [View.fllim]
+			jge View.loop.ScrollUp.cont
+			mov ebx, [View.fllim]
+			View.loop.ScrollUp.cont :
+		mov [View.fpos], ebx
+		call View.winUpdate
+View.loop.ret :
 popa
 ret
 
@@ -274,10 +318,13 @@ push edx
 	je Syntax.highlight_3
 	cmp bh, '['
 	je Syntax.highlight_3
+	cmp bh, ']'
+	je Syntax.highlight_3.partial
 	cmp bh, 0x9	; TAB
 	jne Syntax.highlight_4
 	Syntax.highlight_3 :
 		call Syntax.reset
+		Syntax.highlight_3.partial :
 		mov bl, 0xFF
 		jmp Syntax.highlight.done
 	Syntax.highlight_4 :
@@ -291,7 +338,7 @@ push edx
 	mov bl, BLUE
 	mov dl, 0xFF
 	mov [Syntax.highlight.set], dl
-				;jmp Syntax.highlight.done
+	jmp Syntax.highlight.done
 	Syntax.highlight_5 :
 				;mov bl, 0xFF	; END FOR NOW!!!
 				;jmp Syntax.highlight.done
@@ -301,6 +348,9 @@ push edx
 		call Syntax.highlight.internal_1
 		mov eax, Syntax_PINK
 		mov bl, PINK
+		call Syntax.highlight.internal_1
+		mov eax, Syntax_BLUE
+		mov bl, 0x13
 		call Syntax.highlight.internal_1
 		pop eax
 		mov bl, dl
@@ -324,24 +374,6 @@ ret
 		push ecx
 		mov [Shclstor], bl
 		mov ebx, ecx
-				;pusha
-				;push eax
-				;mov al, [eax]
-				;call debug.cprint
-				;pop eax
-				;add eax, 1
-				;push eax
-				;mov al, [eax]
-				;call debug.cprint
-				;pop eax
-				;add eax, 1
-				;push eax
-				;mov al, [eax]
-				;call debug.cprint
-				;add eax, 1
-				;pop eax
-				;call debug.newl
-				;popa
 		Syntax.highlight_6 :
 		call os.lenientStringMatch	; returns 0x0 or 0xFF in dh, auto-increments eax
 		cmp dh, 0xFF
@@ -352,11 +384,6 @@ ret
 		jmp Syntax.highlight_8
 		Syntax.highlight_7 :
 		mov cl, [eax]
-			pusha
-			mov bl, cl
-			and ebx, 0xFF
-			call debug.num
-			popa
 		cmp cl, 0xFF
 		jne Syntax.highlight_6
 		Syntax.highlight_8 :
@@ -371,9 +398,11 @@ ret
 	Shclstor :
 		db 0x0
 	Syntax_ORANGE :
-		db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, 0xFF
+		db "add", 0, "sub", 0, "mov", 0, "call", 0, "jmp", 0, "jl", 0, "je", 0, "jne", 0, "jg", 0, "jle", 0, "jge", 0, "ret", 0, "push", 0, "pop", 0, "pusha", 0, "popa", "mul", 0, "div", 0, "imul", 0, "idiv", 0, "cmp", 0, "test", 0, "and", 0, "or", 0, "xor", 0, 0xFF
+	Syntax_BLUE :
+		db "ah", 0, "al", 0, "ax", 0, "eax", 0, "bh", 0, "bl", 0, "bx", 0, "ebx", 0, "ch", 0, "cl", 0, "cx", 0, "ecx", 0, "dh", 0, "dl", 0, "dx", 0, "edx", 0, "cr0", 0, "si", 0, "esi", 0, "di", 0, "edi", 0, "es", 0, "gs", 0, "ss", 0, "ds", 0, "fs", 0, 0xFF
 	Syntax_PINK :
-		db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, 0xFF
+		db "db", 0, "dw", 0, "dd", 0, "bits", 0, "equ", 0, "lgdt", 0, 0xFF
 
 View.FILE_TYPE_UNSUPPORTED :
 db "[View] Unrecognized filetype.", 0x0
@@ -386,6 +415,10 @@ db 0xff
 View.pnum :
 db 0x0
 View.fpos :
+dd 0x0
+View.fllim :
+dd 0x0
+View.fhlim :
 dd 0x0
 fszstor :
 dd 0x0
