@@ -419,6 +419,7 @@ call Dolphin.redrawBG
 ;
 ;	Draw windows in here!
 		mov ebx, 0x0
+		mov ecx, 0x0
 		Dolphin.updateScreen.checkWindow :
 						; loop through each window, find the one with the highest depth, then highest depth lower than that depth, etc. (run through all of the windows in order of decreasing depth)
 			call Dolphin.windowExists
@@ -470,6 +471,11 @@ call Dolphin.redrawBG
 		jmp Dolphin.updateScreen.checkWindow
 Dolphin.doneDrawingWindows :
 ;
+	call Dolphin.anyActiveWindows
+	cmp eax, 0x0	; no windows to draw :(
+		jne Dolphin.doneDrawingWindows.cont
+	call Manager.freezePanic
+Dolphin.doneDrawingWindows.cont :
 call debug.update	; ensuring that debug information stays updated and 'on top'
 mov eax, SCREEN_BUFFER
 mov ebx, 0xa0000
@@ -496,7 +502,15 @@ Dolphin.activateNext :	; activates the next window in the list
 pusha
 xor ebx, ebx
 mov bl, [Dolphin.activeWindow]
+mov cl, bl
+mov ch, 0x0
 	Dolphin.activeNext.loop :
+	cmp ch, 0x0
+	je Dolphin.activeNext.loop.ncjo
+	cmp bl, cl
+		je Dolphin.activeNext.ret
+	Dolphin.activeNext.loop.ncjo :
+	add ch, 1
 	add bl, 4
 	cmp bl, 0x40
 		jl Dolphin.activateNext.cont_1
@@ -505,6 +519,7 @@ mov bl, [Dolphin.activeWindow]
 	call Dolphin.windowExists
 	cmp eax, 0x0
 	je Dolphin.activeNext.loop
+	Dolphin.activeNext.ret :
 	mov [Dolphin.activeWindow], bl
 	call debug.num
 popa
@@ -666,6 +681,33 @@ mov bl, [Dolphin.Y_POS]
 call Dolphin.setAttribute
 
 popa
+ret
+
+Dolphin.anyActiveWindows :	; eax ret
+push ebx
+push ecx
+push edx
+xor edx, edx
+mov ebx, Dolphin.windowStructs
+Dolphin.anyActiveWindows.loop :
+mov ecx, [ebx]
+cmp ecx, 0x0
+	jne Dolphin.anyActiveWindows.yes
+add edx, 1
+add ebx, 4
+cmp edx, 0x10
+	jl Dolphin.anyActiveWindows.loop
+mov eax, 0x0
+pop edx
+pop ecx
+pop ebx
+ret
+Dolphin.anyActiveWindows.yes :
+mov eax, edx
+add eax, 1
+pop edx
+pop ecx
+pop ebx
 ret
 
 Dolphin.sizeWindow :	; xchange in eax, y change in ebx

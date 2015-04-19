@@ -7,10 +7,7 @@ pusha
 call Dolphin.create				; allocate memory for a window
 mov [console.buffer], ebx 
 mov [console.windowBuffer], ecx
-	mov bl, [console.pnum]
-	mov eax, console.windowStruct
-	call Dolphin.registerWindow
-	mov [console.winNum], bl
+	call console.createWindow
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
@@ -22,11 +19,26 @@ call console.update
 popa
 ret
 
+console.createWindow :
+	pusha
+	mov ebx, 0x1
+	mov [JASM.console.draw], ebx
+	mov bl, [console.pnum]
+	mov eax, console.windowStruct
+	call Dolphin.registerWindow
+	mov [console.winNum], bl
+	call console.clearScreen
+	call JASM.console.post_init
+	call console.update
+	popa
+	ret
+	
+
 console.loop :
 pusha
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
-je console.loop.ret
+je console.update.gone
 	mov eax, [console.dat]
 	mov ebx, [console.width]
 	cmp eax, ebx
@@ -69,11 +81,7 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov ebx, [counter1]
-add ebx, 1
-call debug.num
-mov [counter1], ebx
-call debug.newl
+call Manager.lock
 popa
 ret
 
@@ -148,7 +156,11 @@ ret
 
 console.update.gone :
 mov bl, [console.winNum]
+call Dolphin.windowExists
+cmp eax, 0x0
+je console.update.gone.ret
 call Dolphin.unregisterWindow
+console.update.gone.ret :
 popa
 ret
 

@@ -33,6 +33,7 @@ func int handleEnter(null)
 		println("view: View a file")
 		println("tree: Displays all mounted files")
 		println("memstat: Prints out the percentage of RAM in use")
+		println("lock: Locks the computer.")
 		done = 1
 	endif
 	if (inp seq_mem "exit")
@@ -66,6 +67,10 @@ func int handleEnter(null)
 	endif
 	if (inp seq_mem "memstat")
 		console.memstat(null)
+		done = 1
+	endif
+	if (inp seq_mem "lock")
+		Manager.lock(null)
 		done = 1
 	endif
 	if (done = 0)

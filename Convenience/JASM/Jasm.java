@@ -343,6 +343,8 @@ else if (s.equals("console.test"))
 return "console.test";
 else if (s.equals("console.memstat"))
 return "console.memstat";
+else if (s.equals("Manager.lock"))
+return "Manager.lock";
 else
 return pname + "." + s;
 }

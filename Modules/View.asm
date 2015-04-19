@@ -215,6 +215,7 @@ pusha
 	cmp eax, 0x0
 		je View.loop.ret	; if no window to deal with, return
 		;	if we are here, the window is visible!
+					; should not be updating every single frame!
 			call View.winUpdate
 	call os.getKey
 	cmp bl, 0xfe	; enter
@@ -239,7 +240,6 @@ pusha
 			mov ebx, [View.fhlim]
 			View.loop.ScrollDown.cont :
 		mov [View.fpos], ebx
-		call View.winUpdate
 	View.loop.notScrollDown :
 		cmp bl, 0xfc
 			jne View.loop.ret
@@ -256,7 +256,6 @@ pusha
 			mov ebx, [View.fllim]
 			View.loop.ScrollUp.cont :
 		mov [View.fpos], ebx
-		call View.winUpdate
 View.loop.ret :
 popa
 ret

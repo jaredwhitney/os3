@@ -28,15 +28,31 @@ Kernel.init :
 	call debug.log.system
 	
 	
+	;	LOCK THE COMPUTER	;
+	call Manager.lock
+	
 	;	MAIN LOOK	;
 	kernel.loop:
-	
+				push bx
+				mov bl, 0x0
+				mov [os.mlloc], bl
+				pop bx
+		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
+		call Manager.handleLock
 		;	POLL KEYBOARD FOR DATA	;
 		call os.pollKeyboard
+				push bx
+				mov bl, 0x1
+				mov [os.mlloc], bl
+				pop bx
 		;	RUN REGISTERED PROGRAMS	;
 		call console.loop
 		call View.loop
 		call Catfish.loop
+				push bx
+				mov bl, 0x2
+				mov [os.mlloc], bl
+				pop bx
 		;	PUSH BUFFER TO SCREEN	;
 		call Dolphin.updateScreen
 		;	REPEAT	;
@@ -66,8 +82,8 @@ Mouse.init :
 os.setEnterSub :
 	pusha
 	
-	mov eax, [os.ecatch]
-	mov [eax], ebx
+	;mov eax, [os.ecatch]
+	;mov [eax], ebx
 	
 	popa
 	ret
@@ -337,7 +353,12 @@ os.keyboard.toChar :
 	mov ecx, charSPACE
 	pusha
 	and ebx, 0xFF
-	call debug.num
+		push ebx
+		mov ebx, INVALID_CHAR
+		call debug.print
+		pop ebx
+		call debug.num
+		call debug.newl
 	popa
 	os.keyboard.toChar.ret :
 	ret
@@ -433,6 +454,7 @@ os.getProgramNumber :	; returns pnum in bl
 %include "..\modules\iConsole.asm"
 %include "..\modules\View.asm"
 %include "..\modules\Catfish.asm"
+%include "..\modules\Manager.asm"
 %include "..\boot\realMode.asm"
 %include "..\debug\print.asm"
 
@@ -462,6 +484,9 @@ db "File name: ", 0
 PROGRAM_REGISTERED :
 db "A program has been registered: PNUM=", 0
 
+INVALID_CHAR :
+db "Unrecognized keycode: ", 0
+
 os.pollKeyboard.isReady :
 dd 0x0
 
@@ -481,6 +506,9 @@ os.hsmode :
 db 0x0
 
 os.caps :
+db 0x0
+
+os.mlloc :
 db 0x0
 
 MINNOW_START :
