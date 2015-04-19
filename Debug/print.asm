@@ -105,7 +105,7 @@ debug.update :
 	debug.update_loop :
 		mov ax, [ebx]
 		call debug.internal.fallcheck
-		cmp edx, 0x2000
+		cmp edx, 0x2A00
 			jg debug.update_ret
 		add edx, 1
 		cmp al, 0x0
@@ -227,21 +227,21 @@ debug.newl :
 	imul ebx, LINE_SEQ
 	add ebx, LINE_SEQ
 	
-		;mov eax, [debug.nlcor]
-		;sub ebx, eax
-		;mov al, [debug.nlcnow]
-		;cmp al, 1
-			;jne debug.newl.nocorrect	; 7/11 works kindof well
-		;mov eax, [debug.nlcor]
-		;add eax, 2
-		;mov [debug.nlcor], eax
-		;mov al, 0x1
-		;jmp debug.newl.donecorrecting
-		;debug.newl.nocorrect :
-			;add al, 0x1
-		;debug.newl.donecorrecting :
-			;mov [debug.nlcnow], al
-			
+		pusha
+		;mov ebx, [debug.bufferpos]
+		cmp ebx, 0x17*0x3c0
+		jl debug.newl.noshift
+		mov ebx, [debug.buffer]
+		add ebx, 0x3c0	; not the correct number!
+		mov [debug.buffer], ebx
+		;call debug.clear
+		popa
+		sub ebx, LINE_SEQ
+		jmp debug.newl.shiftdone
+		debug.newl.noshift :
+		popa
+	debug.newl.shiftdone :
+		
 	mov [debug.bufferpos], ebx
 	popa
 	ret
