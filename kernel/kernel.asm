@@ -1,10 +1,18 @@
 [bits 32]
-[org 0x7e00]
-db 0x4a
-
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
 
+		mov ebx, VESA_SUPPORTED_MSG
+		call debug.print
+		xor ebx, ebx
+		mov bx, [VESA_SUPPORTED]
+		call debug.num
+		call debug.newl
+		cmp bx, 0xff
+		jne ccacont
+		call Dolphin.doVESAtest
+		jmp $
+		ccacont :
 	;	INITIALIZING MODULES	;
 	call debug.init
 	call Guppy.init
@@ -27,11 +35,10 @@ Kernel.init :
 	mov ebx, LOAD_FINISH
 	call debug.log.system
 	
-	
 	;	LOCK THE COMPUTER	;
 	call Manager.lock
 	
-	;	MAIN LOOK	;
+	;	MAIN LOOP	;
 	kernel.loop:
 				push bx
 				mov bl, 0x0
@@ -445,7 +452,6 @@ os.getProgramNumber :	; returns pnum in bl
 	ret
 
 
-%include "..\boot\init_GDT.asm"
 %include "..\kernel\drawChar.asm"
 %include "..\modules\Guppy.asm"
 %include "..\modules\Dolphin.asm"
@@ -510,5 +516,11 @@ db 0x0
 
 os.mlloc :
 db 0x0
+
+VESA_SUPPORTED_MSG :
+db "VESA Support: ", 0x0
+
+VESA_SUPPORTED :
+dw 0x4d
 
 MINNOW_START :

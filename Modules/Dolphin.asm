@@ -39,14 +39,14 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 			push edx
 			mov eax, ebx
 			sub eax, [bstor]
-			mov ecx, 0x140
+			mov ecx, SCREEN_WIDTH
 			push eax
 			mov edx, 0x0
 			div ecx
 			pop eax
 			cmp edx, 0
 				je Debug.wupdate.noadd
-			mov ecx, 0x140
+			mov ecx, SCREEN_WIDTH
 			sub ecx, edx
 			mov edx, ecx
 			add eax, edx	; edx = remainder
@@ -725,6 +725,32 @@ call Dolphin.getAttribute
 add eax, ecx
 call Dolphin.setAttribute
 popa
+ret
+
+Dolphin.doVESAtest :
+pusha
+mov eax, [0x80000+40]
+mov edx, 0x0
+Dolphin.doVESAtest.loop_1 :
+mov ebx, 0x0
+call Dolphin.doVESAtest.sub
+add edx, 1
+cmp edx, 0x400
+jl Dolphin.doVESAtest.loop_1
+popa
+ret
+Dolphin.doVESAtest.sub :
+xor ecx, ecx
+Dolphin.doVESAtest.loop :
+mov [eax], ebx
+add eax, 8
+cmp ebx, 0xFFFFFF
+jge Dolphin.doVESAtest.skip
+add ebx, 0x010101
+Dolphin.doVESAtest.skip :
+add ecx, 1
+cmp ecx, 0x500
+jl Dolphin.doVESAtest.loop
 ret
 
 ;Dolphin.newWindow :	; windowStruct in eax, pnum in bl, returns winNum

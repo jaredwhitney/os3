@@ -33,7 +33,7 @@ pusha
 
 mov edx, SCREEN_WIDTH*SCREEN_HEIGHT
 mov eax, 0xa0000
-mov bl, 0x0;0xD0
+mov bl, 0x0
 call Dolphin.clearImage
 mov eax, 0xa0000+SCREEN_WIDTH/2+((SCREEN_HEIGHT/4)-4)*SCREEN_WIDTH-3*37
 mov ebx, Manager.lockMsg

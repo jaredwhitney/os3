@@ -1,0 +1,20 @@
+Assembler
+	for each line
+		run along using Syntax-like searching to find keywords
+		create machine-code equivalent
+		save to RAM (allocated earlier) (how to determine how much to allocate?)
+Text editor
+	runs much like iConsole
+	enter key simply adds 0x0A
+	some key (CTRL+S ?) calculates size and dumps text buffer to the end of the filesystem (this is not the best way to do this, but it is the simplest)
+Window Manager
+	SHIFT should be a required modifier on all CAPS, TAB, and ARROW presses
+	ESCAPE should close the current window
+	SHIFT+ESCAPE should lock the computer
+	(GUI+UP ?) should maximize the window
+	(GUI+DOWN ?) should minimize the window
+
+To-Do list :
+	VESA modes
+	Paging
+	That stuff ^
