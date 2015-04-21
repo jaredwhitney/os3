@@ -1,7 +1,7 @@
 [bits 32]
 SCREEN_BUFFER	equ 0xA20000
-SCREEN_WIDTH	equ 0x140
-SCREEN_HEIGHT	equ 0xc8
+;SCREEN_WIDTH	equ 0x140
+;SCREEN_HEIGHT	equ 0xc8
 Dolphin.init :
 	; whatever needs to be done here
 
@@ -23,12 +23,12 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 		push cx
 		Dolphin.wupdate.loop1 :
 			push eax
-			mov al, [eax]
-			mov [ebx], al
+			mov eax, [eax]
+			mov [ebx], eax
 			pop eax
-			add ebx, 1
-			add eax, 1
-			sub cx, 1
+			add ebx, 4
+			add eax, 4
+			sub cx, 4
 			cmp cx, 0
 				jg Dolphin.wupdate.loop1
 			pop cx
@@ -39,14 +39,14 @@ Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 			push edx
 			mov eax, ebx
 			sub eax, [bstor]
-			mov ecx, SCREEN_WIDTH
+			mov ecx, [SCREEN_WIDTH]
 			push eax
 			mov edx, 0x0
 			div ecx
 			pop eax
 			cmp edx, 0
 				je Debug.wupdate.noadd
-			mov ecx, SCREEN_WIDTH
+			mov ecx, [SCREEN_WIDTH]
 			sub ecx, edx
 			mov edx, ecx
 			add eax, edx	; edx = remainder
@@ -75,15 +75,15 @@ Dolphin.copyImageLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	popa
 	ret
 	
-Dolphin.clearImage :	; eax = source, edx = size, bl = color
+Dolphin.clearImage :	; eax = source, edx = size, ebx = color
 	pusha
 	mov ecx, edx
 	sub ecx, 2
 	mov edx, 0x0
 	Dolphin.clearImage_loop :
-	mov [eax], bl
-	add eax, 1
-	add edx, 1
+	mov [eax], ebx
+	add eax, 4
+	add edx, 4
 	cmp edx, ecx
 	jle Dolphin.clearImage_loop
 	popa
@@ -96,12 +96,11 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	and ecx, 0xFFFF
 	mov [dstor], edx
 	mov [bposstor], ebx
-	add ebx, 1
 	mov [os.textwidth], cx
 		pusha
 		mov eax, ebx
 		mov edx, 0xfa00
-		mov bl, 0x0
+		mov ebx, 0x0
 		call Dolphin.clearImage
 		popa
 	mov ecx, [charpos]
@@ -192,7 +191,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	call Syntax.highlight
 	push edx
 	mov ecx, [charpos]
-	mov edx, SCREEN_WIDTH
+	mov edx, [SCREEN_WIDTH]
 	add ecx, edx
 	mov [charpos], ecx
 	pop edx
@@ -308,8 +307,8 @@ cmp ebx, 0x0
 je Dolphin.solidBG
 mov eax, ebx
 mov ebx, SCREEN_BUFFER
-mov ecx, SCREEN_WIDTH
-mov edx, SCREEN_HEIGHT
+mov ecx, [SCREEN_WIDTH]
+mov edx, [SCREEN_HEIGHT]
 call Dolphin.copyImage
 Dolphin.makeBG.ret :
 popa
@@ -317,8 +316,8 @@ ret
 
 Dolphin.solidBG :
 mov eax, SCREEN_BUFFER
-mov edx, SCREEN_HEIGHT*SCREEN_WIDTH
-mov bl, 0x10
+mov edx, [SCREEN_SIZE]
+mov ebx, 0x10101010
 call Dolphin.clearImage
 popa
 ret
@@ -456,7 +455,7 @@ call Dolphin.redrawBG
 		mov bl, [Dolphin.Y_POS]
 		call Dolphin.getAttribute
 		pop bx
-		imul eax, SCREEN_WIDTH
+		imul eax, [SCREEN_WIDTH]
 		add ebx, eax	; add ypos
 		push bx
 		mov bl, [Dolphin.X_POS]
@@ -478,9 +477,9 @@ Dolphin.doneDrawingWindows :
 Dolphin.doneDrawingWindows.cont :
 call debug.update	; ensuring that debug information stays updated and 'on top'
 mov eax, SCREEN_BUFFER
-mov ebx, 0xa0000
-mov ecx, SCREEN_WIDTH
-mov edx, SCREEN_HEIGHT
+mov ebx, [SCREEN_MEMPOS]
+mov ecx, [SCREEN_WIDTH]
+mov edx, [SCREEN_HEIGHT]
 call Dolphin.copyImage
 popa
 ret
@@ -729,29 +728,30 @@ ret
 
 Dolphin.doVESAtest :
 pusha
-mov eax, [0x80000+40]
-mov edx, 0x0
-Dolphin.doVESAtest.loop_1 :
-mov ebx, 0x0
+mov eax, [SCREEN_MEMPOS]
+mov ebx, 0x000000
+xor edx, edx
+Dolphin.VESAloop :
 call Dolphin.doVESAtest.sub
-add edx, 1
-cmp edx, 0x400
-jl Dolphin.doVESAtest.loop_1
+add ebx, 0x1
+add edx, 0x1
+cmp edx, [SCREEN_HEIGHT]
+jle Dolphin.VESAloop
 popa
 ret
 Dolphin.doVESAtest.sub :
-xor ecx, ecx
-Dolphin.doVESAtest.loop :
-mov [eax], ebx
-add eax, 8
-cmp ebx, 0xFFFFFF
-jge Dolphin.doVESAtest.skip
-add ebx, 0x010101
-Dolphin.doVESAtest.skip :
-add ecx, 1
-cmp ecx, 0x500
-jl Dolphin.doVESAtest.loop
-ret
+	xor ecx, ecx
+	Dolphin.doVESAtest.loop :
+	mov [eax], ebx
+	add eax, 4
+	;cmp ecx, 0x250
+	;	jle Dolphin.doVESAtest.skip
+	;mov ebx, 0xFFFFFF
+	;Dolphin.doVESAtest.skip :
+	add ecx, 1
+	cmp ecx, [SCREEN_WIDTH]
+		jl Dolphin.doVESAtest.loop
+	ret
 
 ;Dolphin.newWindow :	; windowStruct in eax, pnum in bl, returns winNum
 ;pusha
@@ -770,6 +770,16 @@ ret
 ;popa
 ;mov bx, [atwstor]
 ;ret
+
+SCREEN_MEMPOS :
+dd 0xa0000
+SCREEN_WIDTH :
+dd 0x140
+SCREEN_HEIGHT :
+dd 0xc0
+SCREEN_SIZE :
+dd 0xf000
+
 
 Dolphin.TITLE :
 db 0
@@ -814,8 +824,6 @@ bglocstor :
 dd 0x0
 Dolphin.windowStructs :
 dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-Dolphin.cbuffer :
-dd SCREEN_BUFFER
 PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0
 UNREG_MSG :

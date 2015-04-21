@@ -66,8 +66,12 @@ popa
 ret
 
 console.setWidth :
+pusha
+and ebx, 0xFFFF
+mov eax, [pxsize]
+imul ebx, eax
 mov [console.width], bx
-;call console.clearScreen
+popa
 ret
 
 console.setHeight :

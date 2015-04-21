@@ -11,8 +11,20 @@ Kernel.init :
 		cmp bx, 0xff
 		jne ccacont
 		call Dolphin.doVESAtest
-		jmp $
+		mov ebx, 0x500*0x4
+		mov [SCREEN_WIDTH], ebx
+		mov ebx, 0x400;*0x4
+		mov [SCREEN_HEIGHT], ebx
+		mov ebx, 0x140000*0x4
+		mov [SCREEN_SIZE], ebx
+		mov ebx, [0x80000+40]
+		mov [SCREEN_MEMPOS], ebx
+		mov bl, 1
+		mov [VESA_MODE], bl
+		mov ebx, 0x4
+		mov [pxsize], ebx
 		ccacont :
+
 	;	INITIALIZING MODULES	;
 	call debug.init
 	call Guppy.init
@@ -37,6 +49,8 @@ Kernel.init :
 	
 	;	LOCK THE COMPUTER	;
 	call Manager.lock
+	;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
+	call Manager.handleLock
 	
 	;	MAIN LOOP	;
 	kernel.loop:
@@ -44,8 +58,6 @@ Kernel.init :
 				mov bl, 0x0
 				mov [os.mlloc], bl
 				pop bx
-		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
-		call Manager.handleLock
 		;	POLL KEYBOARD FOR DATA	;
 		call os.pollKeyboard
 				push bx
@@ -62,6 +74,8 @@ Kernel.init :
 				pop bx
 		;	PUSH BUFFER TO SCREEN	;
 		call Dolphin.updateScreen
+		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
+		call Manager.handleLock
 		;	REPEAT	;
 		jmp kernel.loop
 	
@@ -85,7 +99,7 @@ Mouse.init :
 	ret
 
 	
-;	MODIFY WHICH SUBROUTIGE IS CALLED ON PRESS OF THE ENTER KEY	;
+;	MODIFY WHICH SUBROUTINE IS CALLED ON PRESS OF THE ENTER KEY	;	DEPRECATED.
 os.setEnterSub :
 	pusha
 	
@@ -133,6 +147,12 @@ os.pollKeyboard :
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 	;cmp al, 0x1
 	;je os.doEnter
+	push ax
+	mov al, [os.caps]
+	cmp al, 0x0
+	pop ax
+	je os.handlecont
+		
 		cmp bl, 0x50	; down key
 		je os.handleSpecial
 		cmp bl, 0x4d	; right key
@@ -150,6 +170,8 @@ os.pollKeyboard :
 		call Dolphin.activateNext
 		jmp os.pollKeyboard.drawKeyFinalize
 		os.handlecont :
+		cmp bl, 0x3a
+		je os.pollKeyboard.drawKeyFinalize
 	jmp os.handleCaps
 	os.handleCaps.reentry :
 	mov bl, al
@@ -394,19 +416,19 @@ os.handleSpecial :
 	jmp os.handleSpecial.ret	; not a huge problem that it calls moveWindow
 	os.handleSpecial.up :
 	mov eax, 0
-	mov ebx, -1
+	mov ebx, -4
 	jmp os.handleSpecial.ret
 	os.handleSpecial.left :
-	mov eax, -1
+	mov eax, -4
 	mov ebx, 0
 	jmp os.handleSpecial.ret
 	os.handleSpecial.right :
-	mov eax, 1
+	mov eax, 4
 	mov ebx, 0
 	jmp os.handleSpecial.ret
 	os.handleSpecial.down :
 	mov eax, 0
-	mov ebx, 1
+	mov ebx, 4
 	jmp os.handleSpecial.ret
 		os.handleSpecial.swapMode :
 		mov bl, [os.hsmode]
@@ -497,7 +519,7 @@ os.pollKeyboard.isReady :
 dd 0x0
 
 os.textwidth :
-dw 0x0
+dd 0x0
 
 os.ecatch :
 dd 0x10F0
@@ -522,5 +544,8 @@ db "VESA Support: ", 0x0
 
 VESA_SUPPORTED :
 dw 0x4d
+
+VESA_MODE :
+db 0x0
 
 MINNOW_START :

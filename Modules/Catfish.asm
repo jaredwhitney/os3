@@ -19,7 +19,7 @@ Catfish.createWindow :
 		call Dolphin.registerWindow
 		mov [Catfish.wnum], bl
 			mov [currentWindow], bl
-			mov eax, SCREEN_WIDTH/2-5	; xpos
+			mov eax, 0;SCREEN_WIDTH/2-5	; xpos	THIS NEEDS TO BE FIXED!!!
 			mov ebx, SCREEN_HEIGHT	; ypos
 			call Dolphin.moveWindowAbsolute
 	mov [Dolphin.activeWindow], ecx
@@ -133,10 +133,10 @@ Catfish.active :
 Catfish.windowStruct :
 	dd "CATFISH VER_1.00"	; title
 	Catfish.width :
-	dw SCREEN_WIDTH/2	; width
+	dw 0x140/2	; width		SHOULD NOT BE HARDCODED???
 	Catfish.height :
 	dw 40	; height
-	dw SCREEN_WIDTH/2	; xpos
+	dw 0	; xpos		GENERALLY NOT 0
 	dw SCREEN_HEIGHT	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin

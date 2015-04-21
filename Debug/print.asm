@@ -1,8 +1,8 @@
 debug.init :
 mov al, 1
-mov ah, 3
-;call Guppy.malloc
-mov ebx, 0xA02000
+mov ah, 0x80
+call Guppy.malloc
+;mov ebx, 0xA02000
 mov [debug.buffer], ebx
 call debug.flush
 call clearScreenG
@@ -88,8 +88,8 @@ debug.print :	; string loc in ebx
 	
 debug.update :
 	pusha
-	mov cx, SCREEN_WIDTH
-	mov [os.textwidth], cx
+	mov ecx, [SCREEN_WIDTH]
+	mov [os.textwidth], ecx
 		mov bl, [debug.nogo]
 		cmp bl, 0xFF
 		je debug.update.rret
@@ -215,7 +215,7 @@ debug.cprint :	; char in al
 	mov [debug.bufferpos], ecx
 	popa
 	ret
-LINE_SEQ equ 0x3c0; 0x140 * 3 = 0x3c0
+LINE_SEQ equ  0x140 * 3;	EQU [SCREEN_WIDTH] * 3
 debug.newl :
 	pusha
 	mov ebx, [debug.bufferpos]
@@ -229,10 +229,10 @@ debug.newl :
 	
 		pusha
 		;mov ebx, [debug.bufferpos]
-		cmp ebx, 0x17*0x3c0
+		cmp ebx, 0x17*LINE_SEQ
 		jl debug.newl.noshift
 		mov ebx, [debug.buffer]
-		add ebx, 0x3c0	; not the correct number!
+		add ebx, LINE_SEQ
 		mov [debug.buffer], ebx
 		;call debug.clear
 		popa

@@ -131,9 +131,10 @@ jne View.winUpdate.notText
 	mov eax, [View.fpos]
 	mov ebx, [View.buffer]
 	mov edx, [fszstor]
-			cmp edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)	; dont worry about drawing characters where they would simply be drawn off-screen
-			jle View.winUpdate.np
-			mov edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)
+				; THE NEXT THREE LINES SHOULT *NOT* BE COMMENTED OUT
+			;cmp edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)	; dont worry about drawing characters where they would simply be drawn off-screen
+			;jle View.winUpdate.np
+			;mov edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)
 			View.winUpdate.np :
 		push bx
 		mov bl, 0xE0

@@ -37,7 +37,15 @@ mov ecx, [charpos]
 	imul eax, 9
 	sub ecx, eax
 	pop eax
-add ecx, 6
+	push edx
+	push ecx
+	push eax
+	mov edx, [pxsize]
+	imul edx, 6
+	pop eax
+	pop ecx
+	add ecx, edx
+	pop edx
 mov [charpos], ecx
 popa
 ret
@@ -67,8 +75,15 @@ drawRow :	; ah contains row
 		and ch, 0b1
 		cmp ch, 0b0
 			je drawRownd
-		mov dl, [colorS]
-		mov [ebx], dl
+				mov dl, [VESA_MODE]
+				cmp dl, 0x0
+				jne drawRowVESA
+				mov dl, [colorS]
+				mov [ebx], dl
+				jmp drawRownddone
+				drawRowVESA :
+				mov edx, 0xFFFFFF
+				mov [ebx], edx
 		jmp drawRownddone
 	drawRownd :
 		push dx
@@ -80,7 +95,7 @@ drawRow :	; ah contains row
 	drawRownd.nodr :
 		pop dx
 	drawRownddone :
-		add ebx, 0x1
+		add ebx, [pxsize]
 		cmp cl, 0x0
 			jg drawRowloop
 			
@@ -88,6 +103,15 @@ drawRow :	; ah contains row
 	push eax
 	xor eax, eax
 	mov ax, [os.textwidth]
+		;push edx
+		;push ecx
+		;mov dl, [VESA_MODE]
+		;cmp dl, 0x0
+		;je drawRownnddoneNOVESA
+		;imul eax, 0x2
+		;drawRownnddoneNOVESA :
+		;pop ecx
+		;pop edx
 	add ecx, eax
 	pop eax
 	mov [charpos], ecx
@@ -197,6 +221,9 @@ os.lenientStringMatch :	; eax is null-terminated, ebx is NOT; return in dh
 		
 charpos :
 dd 0x0
+
+pxsize :
+dd 0x1
 
 colorS :
 db 0xF
