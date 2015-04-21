@@ -1,60 +1,77 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Os3 by jaredwhitney</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="Os3 : A custom-built operating system.">
 
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Os3</title>
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/jaredwhitney/os3">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/jaredwhitney/os3/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/jaredwhitney/os3/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
 
-    <div class="wrapper">
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jaredwhitney/os3">View on GitHub</a>
 
-      <section>
-        <div id="title">
-          <h1>Os3</h1>
-          <p>A custom-built operating system.</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/jaredwhitney">jaredwhitney</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
-        <center>
-          <h2>
-            This page does not yet exist.
-          </h2>
-        </center>
-      </section>
+          <h1 id="project_title">Os3</h1>
+          <h2 id="project_tagline">A custom-built operating system.</h2>
 
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jaredwhitney/os3/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jaredwhitney/os3/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-61296022-1', 'auto');
-  ga('send', 'pageview');
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a id="intent" class="anchor" href="#intent" aria-hidden="true"><span class="octicon octicon-link"></span></a>Intent</h2>
 
-</script>
+<p>Os3 is an operating system written in x86 assembly code (Intel syntax). It is was started as a project whose main intents are to both educate the author on the workings of and challenges involved in developing the low-level components of an operating system, and explore unorthodox implementations of such systems.</p>
+
+<h2>
+<a id="compatability" class="anchor" href="#compatability" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compatability</h2>
+
+<p>As such, systems are being redesigned where possible, so Os3 is not likely to be compatible with any existing software. It uses a custom filesystem, and as such will also not be able to load external files that have not been modified to match its specifications.</p>
+
+<h2>
+<a id="development-builds" class="anchor" href="#development-builds" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development Builds</h2>
+
+<p>No stable release of Os3 is available at the moment, so use the development version with caution. The current version has been tested with, and runs properly on: Bochs (Emulator), and Pentium 4 processors. In order to run Os3, computers will need a minimum of 6.4 megabytes of RAM.</p>
+
+<h2>
+<a id="acknowledgements" class="anchor" href="#acknowledgements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgements</h2>
+
+<p>While Os3 is being developed by a single developer, its creation would not have been possible without help from a number of outside sources. Integral to its development have been: "Writing a Simple Operating System from Scratch" by Nick Blundell (<a href="http://www.cs.bham.ac.uk/%7Eexr/lectures/opsys/10_11/lectures/os-dev.pdf">http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf</a>), and both the forums and wiki of <a href="http://osdev.org">http://osdev.org</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Os3 maintained by <a href="https://github.com/jaredwhitney">jaredwhitney</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-61296022-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
   </body>
 </html>
