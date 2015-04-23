@@ -1,6 +1,19 @@
 debug.init :
+mov ebx, [SCREEN_BUFFER]
+	pusha
+	mov bl, [VESA_MODE]
+	cmp bl, 0x0
+	je debug.initNOVESA
+	mov ebx, [SCREEN_WIDTH]
+	imul ebx, 3
+	mov [LINE_SEQ], ebx
+	imul ebx, 0x17
+	mov [LINE_MAX], ebx
+debug.initNOVESA :
+popa
+mov [debug.charpos], ebx
 mov al, 1
-mov ah, 0x80
+mov ebx, 0x80
 call Guppy.malloc
 ;mov ebx, 0xA02000
 mov [debug.buffer], ebx
@@ -88,6 +101,9 @@ debug.print :	; string loc in ebx
 	
 debug.update :
 	pusha
+	;mov bl, [VESA_MODE]
+	;cmp bl, 0x0
+		;jne debug.update_ret	; debug is very broken in VESA mode, needs a rework
 	mov ecx, [SCREEN_WIDTH]
 	mov [os.textwidth], ecx
 		mov bl, [debug.nogo]
@@ -105,7 +121,7 @@ debug.update :
 	debug.update_loop :
 		mov ax, [ebx]
 		call debug.internal.fallcheck
-		cmp edx, 0x2A00
+		cmp edx, 0x2A00	; WHERE IN THE WORLD DID THIS NUMBER COME FROM?!?! :( [this is what I get for not commenting code]
 			jg debug.update_ret
 		add edx, 1
 		cmp al, 0x0
@@ -215,28 +231,28 @@ debug.cprint :	; char in al
 	mov [debug.bufferpos], ecx
 	popa
 	ret
-LINE_SEQ equ  0x140 * 3;	EQU [SCREEN_WIDTH] * 3
+;LINE_SEQ equ  0x140 * 3;	EQU [SCREEN_WIDTH] * 3
 debug.newl :
 	pusha
 	mov ebx, [debug.bufferpos]
 	mov edx, 0x0
 	mov eax, ebx
-	mov ecx, LINE_SEQ
+	mov ecx, [LINE_SEQ]
 	div ecx
 	mov ebx, eax
-	imul ebx, LINE_SEQ
-	add ebx, LINE_SEQ
+	imul ebx, [LINE_SEQ]
+	add ebx, [LINE_SEQ]
 	
 		pusha
 		;mov ebx, [debug.bufferpos]
-		cmp ebx, 0x17*LINE_SEQ
+		cmp ebx, [LINE_MAX];0x17*LINE_SEQ
 		jl debug.newl.noshift
 		mov ebx, [debug.buffer]
-		add ebx, LINE_SEQ
+		add ebx, [LINE_SEQ]
 		mov [debug.buffer], ebx
 		;call debug.clear
 		popa
-		sub ebx, LINE_SEQ
+		sub ebx, [LINE_SEQ]
 		jmp debug.newl.shiftdone
 		debug.newl.noshift :
 		popa
@@ -282,8 +298,12 @@ debug.toggleView :
 	call Dolphin.updateScreen
 	pop bx
 	ret
+LINE_SEQ :
+dd 0x140*3
+LINE_MAX :
+dd 0x140*3*0x17
 debug.charpos :
-dd SCREEN_BUFFER
+dd 0
 debug.charpos.stor :
 dd 0x0
 debug.buffer :

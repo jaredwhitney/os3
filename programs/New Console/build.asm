@@ -684,11 +684,6 @@ cmp eax, ebx
 pop ebx
 pop eax
 jne JASM.console.loop_16.end
-		; setPos(0x0)
-push ebx
-mov ebx, 0x0
-call console.setPos
-pop ebx
 		; setWidth(0xa0)
 push ebx
 mov ebx, 0xa0
@@ -720,16 +715,8 @@ push ebx
 mov ebx, 0x0
 call console.setPos
 pop ebx
-		; setWidth(0x140)
-push ebx
-mov ebx, 0x140
-call console.setWidth
-pop ebx
-		; setHeight(0xc8)
-push ebx
-mov ebx, 0xc8
-call console.setHeight
-pop ebx
+		; safeFullscreen(null)
+call JASM.console.safeFullscreen
 		; full = 0
 push eax
 mov eax, 0

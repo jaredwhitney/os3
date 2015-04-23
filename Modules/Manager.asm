@@ -137,6 +137,7 @@ add eax, [Manager.cvalstor]
 		pop edx
 ;add eax, SCREEN_WIDTH*8-24
 mov ebx, Manager.LOC
+mov [Manager.cvalstor], eax
 call drawStringDirect
 mov bl, [Manager.faultloc]
 cmp bl, 0x0
@@ -181,7 +182,28 @@ Manager.doLock.cont :
 call debug.println
 mov eax, [SCREEN_MEMPOS]
 call drawStringDirect
-
+; ***************************************************************
+		mov eax, [Manager.cvalstor]
+		push edx
+		mov edx, [SCREEN_WIDTH]
+		imul edx, 8
+		add eax, edx
+		pop edx
+				mov cl, 0xD0
+				mov ebx, Manager.ACTIVE_WINS
+				call drawStringDirect
+						push edx
+						mov edx, 16*6
+						imul edx, [pxsize]
+						add eax, edx
+						pop edx
+			push eax
+			call Dolphin.activeWinNum
+			mov ebx, eax
+			pop eax
+			mov cl, 0xD0
+			call Manager.direct.num
+; ***************************************************************
 	mov ah, [Dolphin.activeWindow]
 	mov [currentWindow], ah
 	LockLoop :
@@ -196,6 +218,16 @@ call drawStringDirect
 			jne Manager.doLock.post.notFP
 		call console.createWindow
 	Manager.doLock.post.notFP :
+	
+	mov eax, [SCREEN_MEMPOS]	; clear out residual data from the lock screen
+	mov edx, [SCREEN_SIZE]
+	mov ebx, 0x0
+	call Dolphin.clearImage
+	mov eax, [SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
+	mov edx, [SCREEN_SIZE]
+	mov ebx, 0x0
+	call Dolphin.clearImage
+	
 popa
 pop ebx
 ret
@@ -329,6 +361,8 @@ Manager.EDX :
 	db "EDX: ", 0
 Manager.LOC :
 	db "Fault raised by ", 0
+Manager.ACTIVE_WINS :
+	db "Active windows: ", 0
 Manager.PROGRAM :
 	db "a program", 0
 Manager.OS :

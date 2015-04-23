@@ -1,0 +1,3 @@
+"If each section specifies which virtual address to load it in to, you may be wondering how multiple DLLs can exist in one virtual address space without conflict. It is true that most code you'll find in a PE file (DLL or otherwise) is position dependent and linked to a specific address. However to resolve this issue there exist a structure called a Relocation Table that is attached to each section entry. The table is basically a HUGE long list of every address stored in that section so you can offset it to the location where you loaded the section."
+
+That's horrible... and also what I was attempting to do earlier xD

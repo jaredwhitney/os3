@@ -1,0 +1,52 @@
+window buffer #1 (OLD):
+0 0 0 0 0 0 1 0
+0 1 0 0 0 1 0 0
+0 0 1 0 1 0 0 0
+0 0 0 1 0 0 0 0
+
+window buffer #2 (NEW):
+0 0 1 0 0 1 0 0
+0 0 0 0 0 0 0 0
+0 0 1 1 0 1 1 1
+0 0 0 1 1 0 0 0
+
+window buffer #3 (XOR):
+0 0 1 0 0 1 1 0
+0 1 0 0 0 1 0 0
+0 0 0 1 1 1 1 1
+0 0 0 0 1 0 0 0
+
+Screen size:			28 units
+Actual amount of data pushed:	11 units
+RAM used:			84 units (56 units if XOR is pushed directly)
+
+Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffer3
+	pusha
+	mov [Dolphin.xbufsize], ecx
+	mov [Dolphin.xbuf1pos], eax
+	mov [Dolphin.xbuf2pos], ebx
+	mov [Dolphin.xbuf3pos], ecx
+	
+	mov ecx, [eax]
+	mov edx, [ebx]
+	push eax
+	mov eax, [buffer3]
+	xor ecx, edx
+	cmp ecx, 0x0
+		je Dolphin.xorImage.noUpdate
+	mov [eax], edx
+	Dolphin.xorImage.noUpdate :
+	add eax, 4
+	mov [buffer3], eax
+	mov eax, [Dolphin.xbufsize]
+	sub eax, 4
+	mov [Dolphin.xbufsize], eax
+	cmp eax, 0x0
+		jle Dolphin.xorImage.ret
+	pop eax
+	add eax, 4
+	add ebx, 4
+	Dolphin.xorImage.ret :
+	pop eax
+	popa
+	ret

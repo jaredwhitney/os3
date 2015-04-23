@@ -3,16 +3,16 @@
 clearScreenG :
 pusha
 mov dx, 0x0
-mov ebx, SCREEN_BUFFER
+mov ebx, [SCREEN_BUFFER]
 mov edx, ebx
-add edx, 0xf800
+add edx, [SCREEN_SIZE]
 csgloop :
 mov [ebx], dx
 add ebx, 0x2
 cmp ebx, edx
 jl csgloop
 mov ecx, [charpos]
-mov ecx, SCREEN_BUFFER
+mov ecx, [SCREEN_BUFFER]
 mov [charpos], ecx
 popa
 ret
@@ -128,12 +128,12 @@ add eax, 0x2
 gnldloop :
 sub eax, 0xA00
 add ecx, 0x1
-cmp eax, SCREEN_BUFFER
+cmp eax, [SCREEN_BUFFER]
 jg gnldloop
 mov eax, ecx
 mov ebx, 0xA00
 mul ebx
-add eax, SCREEN_BUFFER
+add eax, [SCREEN_BUFFER]
 mov [charpos], eax
 
 ret
@@ -226,7 +226,7 @@ pxsize :
 dd 0x1
 
 colorS :
-db 0xF
+dd 0xFFFFFF
 
 char.solid :
 db 0x0

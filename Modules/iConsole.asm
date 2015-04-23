@@ -80,12 +80,25 @@ mov [console.height], bx
 ret
 
 console.setPos :
-mov [console.pos], bx
+mov al, [console.winNum]
+mov [currentWindow], al
+mov eax, ebx
+call Dolphin.moveWindowAbsolute
+ret
+
+JASM.console.safeFullscreen :
+mov ebx, [SCREEN_WIDTH]
+mov [console.width], bx
+mov ebx, [SCREEN_HEIGHT]
+call console.setHeight
 ret
 
 console.test :	; command that can be used to test anything.
 pusha
-call Manager.lock
+;call Manager.lock
+mov al, '!'
+mov al, 0xFF
+call debug.cprint
 popa
 ret
 
@@ -128,7 +141,7 @@ ret
 screen.wipe :
 ;pusha
 ;mov ebx, [console.pos]
-;add ebx, SCREEN_BUFFER
+;add ebx, [SCREEN_BUFFER]
 ;mov cx, [console.width]
 ;mov dx, [console.height]
 ;call Dolphin.clear

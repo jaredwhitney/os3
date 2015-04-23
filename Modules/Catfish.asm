@@ -20,7 +20,7 @@ Catfish.createWindow :
 		mov [Catfish.wnum], bl
 			mov [currentWindow], bl
 			mov eax, 0;SCREEN_WIDTH/2-5	; xpos	THIS NEEDS TO BE FIXED!!!
-			mov ebx, SCREEN_HEIGHT	; ypos
+			mov ebx, [SCREEN_HEIGHT]	; ypos
 			call Dolphin.moveWindowAbsolute
 	mov [Dolphin.activeWindow], ecx
 	mov eax, 0xFF
@@ -31,15 +31,15 @@ Catfish.createWindow :
 	ret
 Catfish.loop :
 	pusha
+	mov eax, [Catfish.active]
+	cmp eax, 0
+		je Catfish.loop.ret
 	xor ebx, ebx
 	mov bl, [Catfish.wnum]
 	mov [currentWindow], bl
 	;call Dolphin.windowExists
 	;cmp eax, 0x0
 	;	je Catfish.loop.ret	; if no window to deal with, return
-	mov eax, [Catfish.active]
-	cmp eax, 0
-		je Catfish.loop.ret
 	;	if we are here, the window is visible!
 	call Catfish.updateWindow
 	mov eax, [Catfish.count]

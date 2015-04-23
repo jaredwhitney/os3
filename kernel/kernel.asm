@@ -26,6 +26,7 @@ Kernel.init :
 		ccacont :
 
 	;	INITIALIZING MODULES	;
+	call Dolphin.init
 	call debug.init
 	call Guppy.init
 	call Catfish.init
@@ -420,10 +421,12 @@ os.handleSpecial :
 	jmp os.handleSpecial.ret
 	os.handleSpecial.left :
 	mov eax, -4
+	imul eax, [pxsize]
 	mov ebx, 0
 	jmp os.handleSpecial.ret
 	os.handleSpecial.right :
 	mov eax, 4
+	imul eax, [pxsize]
 	mov ebx, 0
 	jmp os.handleSpecial.ret
 	os.handleSpecial.down :

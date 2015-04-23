@@ -1,0 +1,55 @@
+push ebx	->	53
+mov ebx, msg	->	bb -- 0e 00 00 00
+call [0x1000]	->	ff 15 00 10 00 00	
+pop ebx		->	5b
+ret		->	c3
+
+mov ebx, msg	->	bb 0e 00 00 00
+                           |_________|
+			offset to string
+
+mov ebx, [msg]	->	8b 1d 0f 00 00 00
+			      |_________|
+			    offset to string
+
+MOV COMMANDS USING REL:
+b8, b9, ba, bb			[all 4 byte op]
+66 b8, 66 b9, 66 ba, 66 bb	[all 2 byte op]
+b0, b1, b2, b3, b4, b5, b6, b7	[all 1 byte op]
+
+JMP COMMANDS :
+all relative!
+
+MOV reg, [mem]:
+a0, 
+
+
+
+
+
+mov eax, [pPos]	; ******* MOV reg, label **********
+pReform.loop :
+mov bl, [eax]
+cmp bl, 0xb8
+jl nom32fix
+cmp bl, 0xbb
+jle 32fix
+nom32fix :
+cmp bl, 0x66	; should mark next as being m16 if it would show as m32
+jmp do16prep
+cmp bl, 0xb7
+jl nom8fix
+cmp bl, 0xb7
+jle 8fix
+
+
+
+
+
+add eax, 1
+mov ecx, [eax]
+add ecx, [pOrigin]
+mov eax, [ecx]
+add eax, 4
+cmp eax, [pSize]
+jl pReform.loop

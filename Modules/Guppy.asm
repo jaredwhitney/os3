@@ -7,7 +7,7 @@ MEMORY_START equ 0x1000000
 Guppy.init :
 pusha
 mov al, 0x1
-mov ah, 34
+mov ebx, 34
 call Guppy.malloc
 ;call console.numOut
 ;call console.newline
@@ -32,7 +32,7 @@ Guppy.getTotalRam :
 mov ebx, [Guppy.totalRAM]
 ret
 
-Guppy.malloc :	; AL = PNUM, AH = Sectors requested
+Guppy.malloc :	; AL = PNUM, EBX = Sectors requested (used to be ah)
 ;pusha;test
 ;mov ebx, [Guppy.table]
 ;call console.numOut
@@ -41,13 +41,15 @@ push eax
 push edx
 push ecx
 	pusha
-	shr eax, 2
-	and eax, 0xFF
-	mov ebx, [Guppy.usedRAM]
+	;shr eax, 2
+	;and eax, 0xFF
+	mov eax, [Guppy.usedRAM]
 	add ebx, eax
 	mov [Guppy.usedRAM], ebx
 	popa
-mov [aStor], eax
+	push ax
+mov [aStor], ebx
+mov eax, ebx
 mov ebx, Guppy.table
 Guppy.malloc.loop1 :
 mov cl, [ebx]
@@ -55,12 +57,14 @@ add ebx, 1
 cmp cl, 0x0
 jne Guppy.malloc.loop1
 sub ebx, 1
+pop ax
 push ebx	; right now just finding the first unallocated sector
+mov ecx, [aStor]
 Guppy.malloc.loop2 :
 mov [ebx], al
-sub ah, 0x1
+sub ecx, 0x1
 add ebx, 0x1
-cmp ah, 0x0
+cmp ecx, 0x0
 jg Guppy.malloc.loop2	; after this loop completes the memory should be registered as the program's to use
 pop ebx
 sub ebx, Guppy.table	; ebx contains # start sector
@@ -74,8 +78,8 @@ mov eax, ebx			; move # start sector to eax
 	call debug.print
 	pop ebx
 	mov eax, [aStor]
-	shr eax, 8
-	and eax, 0xFF	; getting ah -> eax
+	;shr eax, 8
+	;and eax, 0xFF	; getting ah -> eax
 	add ebx, eax
 	mov eax, ebx
 	mov ebx, 0x200
@@ -102,7 +106,7 @@ pop eax
 ret	; EBX = Start of allocated memory
 
 MALLOC :
-db "Malloc: ", 0
+db "malloc: ", 0
 Guppy.SEC_MSG :
 db " Sectors of RAM Avaliable.", 0
 Guppy.div0 :

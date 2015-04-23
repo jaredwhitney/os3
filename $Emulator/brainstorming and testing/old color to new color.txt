@@ -1,0 +1,6 @@
+0b00000011 -> old color (0xF)
+r 0 g 0 b 4	/4
+->
+r 0 g 0 b 255	/255
+->
+0x0000FF -> new color (0xFF)

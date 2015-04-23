@@ -1,20 +1,59 @@
 [bits 32]
-SCREEN_BUFFER	equ 0xA20000
+;SCREEN_BUFFER	equ 0xA20000
 ;SCREEN_WIDTH	equ 0x140
 ;SCREEN_HEIGHT	equ 0xc8
 Dolphin.init :
 	; whatever needs to be done here
+pusha
+mov bl, [VESA_MODE]
+cmp bl, 0x0
+je Dolphin.NONVESAinit
+mov al, 0x1
+mov ebx, 0x2800
+call Guppy.malloc
+mov [SCREEN_BUFFER], ebx
+mov ebx, 0x2800
+call Guppy.malloc
+mov [SCREEN_FLIPBUFFER], ebx
+popa
+ret
+
+Dolphin.NONVESAinit :
+mov al, 0x1
+mov ebx, 0x7D
+call Guppy.malloc
+mov [SCREEN_BUFFER], ebx
+mov ebx, 0x7D
+call Guppy.malloc
+mov [SCREEN_FLIPBUFFER], ebx
+popa
+ret
 
 Dolphin.create :	; bl contains PNUM
 push eax
+push dx
+mov dl, [VESA_MODE]
+cmp dl, 0x0
+pop dx
+	je Dolphin.NONVESAcreate
 mov al, bl
-mov ah, 0x7D	; Window buffer
+mov ebx, 0x2800	; Window buffer
 call Guppy.malloc
 mov ecx, ebx
-mov ah, 0x7D	; text/image buffer
+mov ebx, 0x2800	; text/image buffer
 call Guppy.malloc
 pop eax
 ret	; returns buffer locations in ebx, ecx
+
+Dolphin.NONVESAcreate :
+mov al, bl
+mov ebx, 0x7D	; Window buffer
+call Guppy.malloc
+mov ecx, ebx
+mov ebx, 0x7D	; text/image buffer
+call Guppy.malloc
+pop eax
+ret
 
 Dolphin.copyImage :	; eax = source, ebx = dest, cx = width, dx = height
 	pusha
@@ -65,11 +104,11 @@ Dolphin.copyImageLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	pusha
 	imul ecx, edx
 	Dolphin.copyImageLinear_loop :
-	mov dl, [eax]
-	mov [ebx], dl
-	add eax, 1
-	add ebx, 1
-	sub ecx, 1
+	mov edx, [eax]
+	mov [ebx], edx
+	add eax, 4
+	add ebx, 4
+	sub ecx, 4
 	cmp ecx, 0x0
 	jge Dolphin.copyImageLinear_loop
 	popa
@@ -89,9 +128,8 @@ Dolphin.clearImage :	; eax = source, edx = size, ebx = color
 	popa
 	ret
 
-Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
+Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize (chars)
 	pusha
-	sub edx, 1
 	call Syntax.reset
 	and ecx, 0xFFFF
 	mov [dstor], edx
@@ -99,7 +137,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	mov [os.textwidth], cx
 		pusha
 		mov eax, ebx
-		mov edx, 0xfa00
+		mov edx, [SCREEN_SIZE]
 		mov ebx, 0x0
 		call Dolphin.clearImage
 		popa
@@ -133,7 +171,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 				pusha
 				mov eax, [charpos]	; where we are in destination buffer + destination buffer pos
 				mov ebx, [bposstor]
-				add ebx, 0xf000
+				add ebx, [SCREEN_SIZE]
 				cmp eax, ebx
 				popa
 					jge Dolphin.drawText_ret
@@ -306,7 +344,7 @@ mov [bglocstor], ebx
 cmp ebx, 0x0
 je Dolphin.solidBG
 mov eax, ebx
-mov ebx, SCREEN_BUFFER
+mov ebx, [SCREEN_BUFFER]
 mov ecx, [SCREEN_WIDTH]
 mov edx, [SCREEN_HEIGHT]
 call Dolphin.copyImage
@@ -315,9 +353,14 @@ popa
 ret
 
 Dolphin.solidBG :
-mov eax, SCREEN_BUFFER
+mov eax, [SCREEN_BUFFER]
 mov edx, [SCREEN_SIZE]
 mov ebx, 0x10101010
+mov cl, [VESA_MODE]
+cmp cl, 0x0
+	je Dolphin.solidBGNOVESA
+mov ebx, 0x0000C7
+Dolphin.solidBGNOVESA :
 call Dolphin.clearImage
 popa
 ret
@@ -414,7 +457,7 @@ ret
 Dolphin.updateScreen :
 pusha
 			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
-call Dolphin.redrawBG
+call Dolphin.redrawBG	; should only be updated if one of the windows has been moved!
 ;
 ;	Draw windows in here!
 		mov ebx, 0x0
@@ -431,7 +474,6 @@ call Dolphin.redrawBG
 		sub ebx, 4
 		
 		mov [currentWindow], ebx
-	
 		mov bl, [Dolphin.WIDTH]
 		call Dolphin.getAttribute
 		mov [atwstor], ax
@@ -447,7 +489,7 @@ call Dolphin.redrawBG
 			mov ebx, eax
 			call Dolphin.drawBorder
 			popa
-		mov ebx, SCREEN_BUFFER
+		mov ebx, [SCREEN_BUFFER]
 		
 		push eax
 		xor eax, eax
@@ -476,13 +518,51 @@ Dolphin.doneDrawingWindows :
 	call Manager.freezePanic
 Dolphin.doneDrawingWindows.cont :
 call debug.update	; ensuring that debug information stays updated and 'on top'
-mov eax, SCREEN_BUFFER
-mov ebx, [SCREEN_MEMPOS]
+		mov eax, [SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
+		mov ebx, [SCREEN_BUFFER]
+		mov ecx, [SCREEN_SIZE]
+		mov edx, [SCREEN_MEMPOS]
+		call Dolphin.xorImage
+mov eax, [SCREEN_BUFFER]
+mov ebx, [SCREEN_FLIPBUFFER]
 mov ecx, [SCREEN_WIDTH]
 mov edx, [SCREEN_HEIGHT]
-call Dolphin.copyImage
+call Dolphin.copyImageLinear	; need to be checking each frame and only updating memory that has changed
+
 popa
 ret
+
+Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffer3
+	pusha
+	mov [Dolphin.xbufsize], ecx
+	mov [Dolphin.xbuf1pos], eax
+	mov [Dolphin.xbuf2pos], ebx
+	mov [Dolphin.xbuf3pos], edx
+	Dolphin.xorImage.loop :
+	mov ecx, [eax]
+	mov edx, [ebx]
+	push eax
+	mov eax, [Dolphin.xbuf3pos]
+	xor ecx, edx
+	cmp ecx, 0x0
+		je Dolphin.xorImage.noUpdate
+	mov [eax], edx
+	Dolphin.xorImage.noUpdate :
+	add eax, 4
+	mov [Dolphin.xbuf3pos], eax
+	mov eax, [Dolphin.xbufsize]
+	sub eax, 4
+	mov [Dolphin.xbufsize], eax
+	cmp eax, 0x4
+		jle Dolphin.xorImage.ret
+	pop eax
+	add eax, 4
+	add ebx, 4
+	jmp Dolphin.xorImage.loop
+	Dolphin.xorImage.ret :
+	pop eax
+	popa
+	ret
 
 Dolphin.windowExists :	; windowNum in ebx, returns either 0x0 or 0xF (F|T) in eax
 push ebx
@@ -709,6 +789,34 @@ pop ecx
 pop ebx
 ret
 
+Dolphin.activeWinNum :
+	pusha
+	xor edx, edx
+	mov [Dolphin.awctcnt], edx
+	mov ebx, Dolphin.windowStructs
+	Dolphin.awct.loop :
+	mov ecx, [ebx]
+	cmp ecx, 0x0
+		jne Dolphin.awct.yes
+	Dolphin.awct.yre :
+	add edx, 1
+	add ebx, 4
+	cmp edx, 0x10
+		jl Dolphin.awct.loop
+	mov eax, 0x0
+	popa
+	mov eax, [Dolphin.awctcnt]
+	ret
+	Dolphin.awct.yes :
+	push eax
+	mov eax, [Dolphin.awctcnt]
+	add eax, 1
+	mov [Dolphin.awctcnt], eax
+	pop eax
+	jmp Dolphin.awct.yre
+	Dolphin.awctcnt :
+	dd 0x0
+
 Dolphin.sizeWindow :	; xchange in eax, y change in ebx
 pusha
 mov edx, eax
@@ -779,6 +887,10 @@ SCREEN_HEIGHT :
 dd 0xc0
 SCREEN_SIZE :
 dd 0xf000
+SCREEN_BUFFER :
+dd 0x0
+SCREEN_FLIPBUFFER :
+dd 0x0
 
 
 Dolphin.TITLE :
@@ -808,6 +920,15 @@ atwstor :
 dw 0x0
 atwstor2 :
 dw 0x0
+Dolphin.xbufsize :
+dd 0x0
+Dolphin.xbuf1pos :
+dd 0x0
+Dolphin.xbuf2pos :
+dd 0x0
+Dolphin.xbuf3pos :
+dd 0x0
+
 Dolphin.colorOverride :
 db 0x0
 Dolphin.tuskip :
@@ -824,6 +945,7 @@ bglocstor :
 dd 0x0
 Dolphin.windowStructs :
 dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
 PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0
 UNREG_MSG :
