@@ -12,6 +12,8 @@ mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
 ;call JASM.test.main	; testing some JASM code that interfaces with the console
 call console.clearScreen
+	mov ah, 0xFF
+	call Time.printToConsole
 call JASM.console.post_init
 call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
@@ -95,10 +97,8 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-;call Manager.lock
-mov al, '!'
-mov al, 0xFF
-call debug.cprint
+	mov ebx, INT_CALL
+	int 0x9
 popa
 ret
 
@@ -254,6 +254,23 @@ console.println :
 call console.print
 call console.newline
 ret
+
+console.numOutFakeDecimal :	; just go base 10 -> the same characters in hex (ONLY WORKS WITH 2-DIGIT DECIMAL NUMBERS)
+pusha
+	mov eax, ebx
+	xor edx, edx
+	mov ecx, 0xA
+	push ebx
+	idiv ecx
+	pop ebx
+	imul eax, 0x6
+	add [cnOFDchange], eax
+add ebx, [cnOFDchange]
+call console.numOut
+popa
+ret
+cnOFDchange :
+dd 0x0
 
 console.numOut :
 pusha

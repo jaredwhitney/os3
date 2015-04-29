@@ -28,6 +28,13 @@ mov [Manager.reason], bl
 pop ebx
 ret
 
+Manager.customLock :
+push ebx
+call Manager.lock
+mov [Manager.reason], bl
+pop ebx
+ret
+
 Manager.doLock :
 pusha
 

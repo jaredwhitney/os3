@@ -517,7 +517,7 @@ Dolphin.doneDrawingWindows :
 		jne Dolphin.doneDrawingWindows.cont
 	call Manager.freezePanic
 Dolphin.doneDrawingWindows.cont :
-call debug.update	; ensuring that debug information stays updated and 'on top'
+;call debug.update	; ensuring that debug information stays updated and 'on top'
 		mov eax, [SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
 		mov ebx, [SCREEN_BUFFER]
 		mov ecx, [SCREEN_SIZE]

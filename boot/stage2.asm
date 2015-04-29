@@ -79,7 +79,7 @@ boot.Protected_Mode :
 	or eax, 1
 	mov cr0, eax
 	
-	; Clear and disable interrupts (will not work in pmode until an IVT is created)
+	; Clear and disable interrupts (will not work in pmode until an IDT is created)
 	cli
 	
 	; Perform a long jump to 32-bit code.

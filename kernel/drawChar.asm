@@ -77,12 +77,12 @@ drawRow :	; ah contains row
 			je drawRownd
 				mov dl, [VESA_MODE]
 				cmp dl, 0x0
-				jne drawRowVESA
+					jne drawRowVESA
 				mov dl, [colorS]
 				mov [ebx], dl
 				jmp drawRownddone
 				drawRowVESA :
-				mov edx, 0xFFFFFF
+				mov edx, [colorS]
 				mov [ebx], edx
 		jmp drawRownddone
 	drawRownd :

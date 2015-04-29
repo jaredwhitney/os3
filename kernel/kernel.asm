@@ -24,10 +24,10 @@ Kernel.init :
 		mov ebx, 0x4
 		mov [pxsize], ebx
 		ccacont :
-
+	
 	;	INITIALIZING MODULES	;
 	call Dolphin.init
-	call debug.init
+	;call debug.init
 	call Guppy.init
 	call Catfish.init
 	
@@ -40,9 +40,13 @@ Kernel.init :
 	;call Minnow.byName
 	;call Dolphin.makeBG
 	
+	
 	;	INITIALIZING PROGRAMS	;
 	call console.init
 	call View.init
+	
+	;	TESTING INTERRUPTS!!!	;
+	call loadIDT
 	
 	;	ALERT DEBUG OF SYSTEM START		;
 	mov ebx, LOAD_FINISH
@@ -50,17 +54,12 @@ Kernel.init :
 	
 	;	LOCK THE COMPUTER	;
 	call Manager.lock
+	
 	;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
 	
 	;	MAIN LOOP	;
 	kernel.loop:
-				push bx
-				mov bl, 0x0
-				mov [os.mlloc], bl
-				pop bx
-		;	POLL KEYBOARD FOR DATA	;
-		call os.pollKeyboard
 				push bx
 				mov bl, 0x1
 				mov [os.mlloc], bl
@@ -486,7 +485,8 @@ os.getProgramNumber :	; returns pnum in bl
 %include "..\modules\View.asm"
 %include "..\modules\Catfish.asm"
 %include "..\modules\Manager.asm"
-%include "..\boot\realMode.asm"
+%include "..\modules\Time.asm"
+%include "..\IDT\IDTmain.asm"
 %include "..\debug\print.asm"
 
 KERNEL_BOOT :

@@ -80,6 +80,8 @@ debug.log.error :
 
 debug.print :	; string loc in ebx
 	pusha
+		popa
+		ret
 	mov ah, [debug.color]
 	mov ecx, [debug.buffer]
 	mov edx, [debug.bufferpos]
@@ -101,6 +103,8 @@ debug.print :	; string loc in ebx
 	
 debug.update :
 	pusha
+		popa
+		ret
 	;mov bl, [VESA_MODE]
 	;cmp bl, 0x0
 		;jne debug.update_ret	; debug is very broken in VESA mode, needs a rework
@@ -148,6 +152,8 @@ debug.update :
 
 debug.clear :
 pusha
+	popa
+	ret
 mov ebx, [debug.buffer]
 mov eax, [debug.bufferpos]
 add eax, ebx
@@ -178,6 +184,8 @@ ret
 
 debug.num :		; num in ebx
 		pusha
+			popa
+			ret
 		mov cl, 28
 		mov ch, 0x0
 		debug.num.start :
@@ -221,6 +229,8 @@ debug.num :		; num in ebx
 		ret
 debug.cprint :	; char in al
 	pusha
+		popa
+		ret
 	mov ecx, [debug.bufferpos]
 	mov ebx, [debug.buffer]
 	add ecx, ebx
@@ -234,6 +244,8 @@ debug.cprint :	; char in al
 ;LINE_SEQ equ  0x140 * 3;	EQU [SCREEN_WIDTH] * 3
 debug.newl :
 	pusha
+		popa
+		ret
 	mov ebx, [debug.bufferpos]
 	mov edx, 0x0
 	mov eax, ebx

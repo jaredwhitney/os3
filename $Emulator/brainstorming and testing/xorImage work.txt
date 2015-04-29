@@ -20,6 +20,8 @@ Screen size:			28 units
 Actual amount of data pushed:	11 units
 RAM used:			84 units (56 units if XOR is pushed directly)
 
+this MAY be a lot faster, or it may be a LOT slower... 
+
 Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffer3
 	pusha
 	mov [Dolphin.xbufsize], ecx

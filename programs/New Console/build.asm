@@ -302,22 +302,22 @@ push ebx
 mov ebx, JASM.console.var_6
 call console.println
 pop ebx
-		; println("debug: Toggles the display of debug")
+		; println("debug: Toggles the display of debug.")
 push ebx
 mov ebx, JASM.console.var_7
 call console.println
 pop ebx
-		; println("view: View a file")
+		; println("view: View a file.")
 push ebx
 mov ebx, JASM.console.var_8
 call console.println
 pop ebx
-		; println("tree: Displays all mounted files")
+		; println("tree: Displays all mounted files.")
 push ebx
 mov ebx, JASM.console.var_9
 call console.println
 pop ebx
-		; println("memstat: Prints out the percentage of RAM in use")
+		; println("memstat: Prints out the percentage of RAM in use.")
 push ebx
 mov ebx, JASM.console.var_10
 call console.println
@@ -325,6 +325,11 @@ pop ebx
 		; println("lock: Locks the computer.")
 push ebx
 mov ebx, JASM.console.var_11
+call console.println
+pop ebx
+		; println("time: Prints out the current time.")
+push ebx
+mov ebx, JASM.console.var_12
 call console.println
 pop ebx
 		; done = 1
@@ -340,7 +345,7 @@ JASM.console.loop_4.EQend :
 		; if (inp seq_mem "exit")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_12
+mov ebx, JASM.console.var_13
 JASM.console.loop_5.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -376,7 +381,7 @@ JASM.console.loop_5.EQend :
 		; if (inp seq_mem "clear")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_13
+mov ebx, JASM.console.var_14
 JASM.console.loop_6.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -404,7 +409,7 @@ JASM.console.loop_6.EQend :
 		; if (inp seq_mem "fullscreen")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_14
+mov ebx, JASM.console.var_15
 JASM.console.loop_7.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -427,7 +432,7 @@ JASM.console.loop_7.EQend :
 		; if (inp seq_mem "debug")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_15
+mov ebx, JASM.console.var_16
 JASM.console.loop_8.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -455,7 +460,7 @@ JASM.console.loop_8.EQend :
 		; if (inp seq_mem "view")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_16
+mov ebx, JASM.console.var_17
 JASM.console.loop_9.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -486,7 +491,7 @@ JASM.console.loop_9.EQend :
 		; if (inp seq_mem "tree")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_17
+mov ebx, JASM.console.var_18
 JASM.console.loop_10.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -519,7 +524,7 @@ JASM.console.loop_10.EQend :
 		; if (inp seq_mem "test")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_18
+mov ebx, JASM.console.var_19
 JASM.console.loop_11.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -547,7 +552,7 @@ JASM.console.loop_11.EQend :
 		; if (inp seq_mem "memstat")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_19
+mov ebx, JASM.console.var_20
 JASM.console.loop_12.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -575,7 +580,7 @@ JASM.console.loop_12.EQend :
 		; if (inp seq_mem "lock")
 pusha
 mov eax, [JASM.console.inp]
-mov ebx, JASM.console.var_20
+mov ebx, JASM.console.var_21
 JASM.console.loop_13.start :
 mov cl, [eax]
 mov dl, [ebx]
@@ -600,6 +605,34 @@ jmp JASM.console.loop_13.EQend
 JASM.console.loop_13.end :
 popa
 JASM.console.loop_13.EQend :
+		; if (inp seq_mem "time")
+pusha
+mov eax, [JASM.console.inp]
+mov ebx, JASM.console.var_22
+JASM.console.loop_14.start :
+mov cl, [eax]
+mov dl, [ebx]
+cmp cl, dl
+jne JASM.console.loop_14.end
+cmp cl, 0
+je JASM.console.loop_14.go
+add eax, 1
+add ebx, 1
+jmp JASM.console.loop_14.start
+JASM.console.loop_14.go :
+popa
+		; Time.printToConsole(null)
+call Time.printToConsole
+		; done = 1
+push eax
+mov eax, 1
+mov [JASM.console.done], eax
+pop eax
+		; endif
+jmp JASM.console.loop_14.EQend
+JASM.console.loop_14.end :
+popa
+JASM.console.loop_14.EQend :
 		; if (done = 0)
 push eax
 push ebx
@@ -608,7 +641,7 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_14.end
+jne JASM.console.loop_15.end
 		; color(0x3)
 push ebx
 mov ebx, 0x3
@@ -616,12 +649,12 @@ call console.setColor
 pop ebx
 		; print("Unrecognized Command: ")
 push ebx
-mov ebx, JASM.console.var_21
+mov ebx, JASM.console.var_23
 call console.print
 pop ebx
 		; print("'")
 push ebx
-mov ebx, JASM.console.var_22
+mov ebx, JASM.console.var_24
 call console.print
 pop ebx
 		; print(inp)
@@ -631,11 +664,11 @@ call console.print
 pop ebx
 		; println("'")
 push ebx
-mov ebx, JASM.console.var_23
+mov ebx, JASM.console.var_25
 call console.println
 pop ebx
 		; endif
-JASM.console.loop_14.end :
+JASM.console.loop_15.end :
 		; color(0xF)
 push ebx
 mov ebx, 0xF
@@ -649,10 +682,10 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_15.end
+jne JASM.console.loop_16.end
 		; print("Console: ")
 push ebx
-mov ebx, JASM.console.var_24
+mov ebx, JASM.console.var_26
 call console.print
 pop ebx
 		; return 0
@@ -661,10 +694,10 @@ mov [retval], eax
 popa
 ret
 		; endif
-JASM.console.loop_15.end :
+JASM.console.loop_16.end :
 		; print("File Name: ")
 push ebx
-mov ebx, JASM.console.var_25
+mov ebx, JASM.console.var_27
 call console.print
 pop ebx
 		; return 0
@@ -683,7 +716,7 @@ mov ebx, 0
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_16.end
+jne JASM.console.loop_17.end
 		; setWidth(0xa0)
 push ebx
 mov ebx, 0xa0
@@ -700,7 +733,7 @@ mov eax, 2
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_16.end :
+JASM.console.loop_17.end :
 		; if (full = 1)
 push eax
 push ebx
@@ -709,7 +742,7 @@ mov ebx, 1
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_17.end
+jne JASM.console.loop_18.end
 		; setPos(0x0)
 push ebx
 mov ebx, 0x0
@@ -723,7 +756,7 @@ mov eax, 0
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_17.end :
+JASM.console.loop_18.end :
 		; if (full = 2)
 push eax
 push ebx
@@ -732,14 +765,14 @@ mov ebx, 2
 cmp eax, ebx
 pop ebx
 pop eax
-jne JASM.console.loop_18.end
+jne JASM.console.loop_19.end
 		; full = 1
 push eax
 mov eax, 1
 mov [JASM.console.full], eax
 pop eax
 		; endif
-JASM.console.loop_18.end :
+JASM.console.loop_19.end :
 		; done = 1
 push eax
 mov eax, 1
@@ -776,42 +809,46 @@ db "help: Displays this prompt.", 0
 JASM.console.var_6 :
 db "fullscreen: Toggles fullscreen mode.", 0
 JASM.console.var_7 :
-db "debug: Toggles the display of debug", 0
+db "debug: Toggles the display of debug.", 0
 JASM.console.var_8 :
-db "view: View a file", 0
+db "view: View a file.", 0
 JASM.console.var_9 :
-db "tree: Displays all mounted files", 0
+db "tree: Displays all mounted files.", 0
 JASM.console.var_10 :
-db "memstat: Prints out the percentage of RAM in use", 0
+db "memstat: Prints out the percentage of RAM in use.", 0
 JASM.console.var_11 :
 db "lock: Locks the computer.", 0
 JASM.console.var_12 :
-db "exit", 0
+db "time: Prints out the current time.", 0
 JASM.console.var_13 :
-db "clear", 0
+db "exit", 0
 JASM.console.var_14 :
-db "fullscreen", 0
+db "clear", 0
 JASM.console.var_15 :
-db "debug", 0
+db "fullscreen", 0
 JASM.console.var_16 :
-db "view", 0
+db "debug", 0
 JASM.console.var_17 :
-db "tree", 0
+db "view", 0
 JASM.console.var_18 :
-db "test", 0
+db "tree", 0
 JASM.console.var_19 :
-db "memstat", 0
+db "test", 0
 JASM.console.var_20 :
-db "lock", 0
+db "memstat", 0
 JASM.console.var_21 :
-db "Unrecognized Command: ", 0
+db "lock", 0
 JASM.console.var_22 :
-db "'", 0
+db "time", 0
 JASM.console.var_23 :
-db "'", 0
+db "Unrecognized Command: ", 0
 JASM.console.var_24 :
-db "Console: ", 0
+db "'", 0
 JASM.console.var_25 :
+db "'", 0
+JASM.console.var_26 :
+db "Console: ", 0
+JASM.console.var_27 :
 db "File Name: ", 0
 retval :
 dd 0x0

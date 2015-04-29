@@ -349,6 +349,8 @@ else if (s.equals("console.memstat"))
 return "console.memstat";
 else if (s.equals("Manager.lock"))
 return "Manager.lock";
+else if (contains(s, '.'))
+return s;
 else
 return pname + "." + s;
 }

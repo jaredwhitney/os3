@@ -29,11 +29,12 @@ func int handleEnter(null)
 		println("clear: Clears the screen.")
 		println("help: Displays this prompt.")
 		println("fullscreen: Toggles fullscreen mode.")
-		println("debug: Toggles the display of debug")
-		println("view: View a file")
-		println("tree: Displays all mounted files")
-		println("memstat: Prints out the percentage of RAM in use")
+		println("debug: Toggles the display of debug.")
+		println("view: View a file.")
+		println("tree: Displays all mounted files.")
+		println("memstat: Prints out the percentage of RAM in use.")
 		println("lock: Locks the computer.")
+		println("time: Prints out the current time.")
 		done = 1
 	endif
 	if (inp seq_mem "exit")
@@ -71,6 +72,10 @@ func int handleEnter(null)
 	endif
 	if (inp seq_mem "lock")
 		Manager.lock(null)
+		done = 1
+	endif
+	if (inp seq_mem "time")
+		Time.printToConsole(null)
 		done = 1
 	endif
 	if (done = 0)
