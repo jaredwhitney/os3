@@ -8,7 +8,7 @@ ORANGE equ 0xF
 
 View.init :
 pusha
-	call os.getProgramNumber
+	call ProgramManager.getProgramNumber
 	mov [View.pnum], bl
 	call Dolphin.create
 	mov [View.buffer], ecx
@@ -80,7 +80,7 @@ View.winSetup :
 View.winSize :
 	pusha
 		mov bl, [View.wnum]
-		mov [currentWindow], bl
+		mov [Dolphin.currentWindow], bl
 		mov eax, ecx
 		mov bl, [Dolphin.WIDTH]
 		call Dolphin.setAttribute
@@ -105,7 +105,7 @@ add eax, 4
 	and edx, 0xFFFF	; image height
 	call View.winSize
 mov ebx, [View.buffer]
-call Dolphin.copyImageLinear
+call Image.copyLinear
 call View.updateWindow
 call View.file.modEcatch
 ;jmp $
@@ -132,9 +132,9 @@ jne View.winUpdate.notText
 	mov ebx, [View.buffer]
 	mov edx, [fszstor]
 				; THE NEXT THREE LINES SHOULT *NOT* BE COMMENTED OUT
-			;cmp edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)	; dont worry about drawing characters where they would simply be drawn off-screen
+			;cmp edx, (Graphics.SCREEN_HEIGHT/9)*(Graphics.SCREEN_HEIGHT/6)	; dont worry about drawing characters where they would simply be drawn off-screen
 			;jle View.winUpdate.np
-			;mov edx, (SCREEN_HEIGHT/9)*(SCREEN_HEIGHT/6)
+			;mov edx, (Graphics.SCREEN_HEIGHT/9)*(Graphics.SCREEN_HEIGHT/6)
 			View.winUpdate.np :
 		push bx
 		mov bl, 0xE0
@@ -211,14 +211,14 @@ View.loop :
 pusha
 	xor ebx, ebx
 	mov bl, [View.wnum]
-	mov [currentWindow], bl
+	mov [Dolphin.currentWindow], bl
 	call Dolphin.windowExists
 	cmp eax, 0x0
 		je View.loop.ret	; if no window to deal with, return
 		;	if we are here, the window is visible!
 					; should not be updating every single frame!
 			call View.winUpdate
-	call os.getKey
+	call Keyboard.getKey
 	cmp bl, 0xfe	; enter
 	jne View.loop.cont
 		mov bl, [View.wnum]
@@ -273,7 +273,7 @@ ret
 View.updateWindow :
 mov eax, [View.buffer]
 mov ebx, [View.windowBuffer]
-call Dolphin.copyImageLinear
+call Image.copyLinear
 ret
 
 Syntax.reset :
@@ -432,9 +432,9 @@ db 0x0
 View.windowStruct :
 	dd "VIEW ver_1.2.0__"	; title
 	View.windowStruct.width :
-	dw SCREEN_WIDTH	; width
+	dw Graphics.SCREEN_WIDTH	; width
 	View.windowStruct.height :
-	dw SCREEN_HEIGHT	; height
+	dw Graphics.SCREEN_HEIGHT	; height
 	dw 0	; xpos
 	dw 0	; ypos
 	db 1	; type: 0=text, 1=image

@@ -18,9 +18,9 @@ Catfish.createWindow :
 		mov eax, Catfish.windowStruct
 		call Dolphin.registerWindow
 		mov [Catfish.wnum], bl
-			mov [currentWindow], bl
-			mov eax, 0;SCREEN_WIDTH/2-5	; xpos	THIS NEEDS TO BE FIXED!!!
-			mov ebx, [SCREEN_HEIGHT]	; ypos
+			mov [Dolphin.currentWindow], bl
+			mov eax, 0;Graphics.SCREEN_WIDTH/2-5	; xpos	THIS NEEDS TO BE FIXED!!!
+			mov ebx, [Graphics.SCREEN_HEIGHT]	; ypos
 			call Dolphin.moveWindowAbsolute
 	mov [Dolphin.activeWindow], ecx
 	mov eax, 0xFF
@@ -36,7 +36,7 @@ Catfish.loop :
 		je Catfish.loop.ret
 	xor ebx, ebx
 	mov bl, [Catfish.wnum]
-	mov [currentWindow], bl
+	mov [Dolphin.currentWindow], bl
 	;call Dolphin.windowExists
 	;cmp eax, 0x0
 	;	je Catfish.loop.ret	; if no window to deal with, return
@@ -72,7 +72,7 @@ Catfish.loop :
 	ret
 	Catfish.movWin :
 		mov bh, [Catfish.wnum]
-		mov [currentWindow], bh
+		mov [Dolphin.currentWindow], bh
 		xor eax, eax
 		mov ebx, edx
 		call Dolphin.moveWindow
@@ -93,7 +93,7 @@ Catfish.loop :
 			;xor edx, edx
 			;mov cx, [Catfish.width]
 			;mov dx, [Catfish.height]
-		;call Dolphin.copyImageLinear
+		;call Image.copyLinear
 		ret
 Catfish.getLength :	; String in eax, return length in edx
 	push eax
@@ -113,7 +113,7 @@ Catfish.getLength :	; String in eax, return length in edx
 	pop eax
 	ret
 Catfish.init :
-	call os.getProgramNumber
+	call ProgramManager.getProgramNumber
 	mov [Catfish.pnum], bl
 	call Dolphin.create
 	mov [Catfish.buffer], ecx
@@ -137,7 +137,7 @@ Catfish.windowStruct :
 	Catfish.height :
 	dw 40	; height
 	dw 0	; xpos		GENERALLY NOT 0
-	dw SCREEN_HEIGHT	; ypos
+	dw Graphics.SCREEN_HEIGHT	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin
 	Catfish.windowBuffer :

@@ -300,9 +300,9 @@ return "0xF";
 if (s.equals("os.return"))
 return "retfunc";
 if (s.equals("Dolphin.screenWidth"))
-return "[SCREEN_WIDTH]";
+return "[Graphics.SCREEN_WIDTH]";
 if (s.equals("Dolphin.screenHeight"))
-return "[SCREEN_HEIGHT]";
+return "[Graphics.SCREEN_HEIGHT]";
 System.err.println("Unrecognized token: " + s);
 return pname + "." + s;	// assume its a method
 }

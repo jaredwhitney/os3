@@ -1,12 +1,12 @@
 @SET x=%cd%
-@cd "../programs/new console"
+@cd "..\Modules\console"
 @java Jasm > build.asm
 @cd %x%
 @nasm.exe -o kernel.bin -f bin ..\boot\stage2.asm
 @nasm.exe -o boot.bin -f bin ..\boot\boot.asm
-@nasm.exe -o fstest.bin -f bin "Hello World.asm"
+@nasm.exe -o fstest.bin -f bin "../_not os code/Hello World.asm"
 @cd %x%
 @pause
-@cat boot.bin kernel.bin fstest.bin ../image/sine.bin ../image/iConsole.file ../image/gradient.bin ../image/jax.file ../image/league.file > os.img
+@cat boot.bin kernel.bin fstest.bin "../_not os code/image/sine.bin" "../_not os code/image/iConsole.file" "../_not os code/image/gradient.bin" "../_not os code/image/jax.file" "../_not os code/image/league.file" > os.img
 @pause
 @start run.bxrc

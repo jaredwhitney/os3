@@ -1,3 +1,8 @@
+
+Manager.CONTROL_OS		equ 0x0
+Manager.CONTROL_MODULES	equ 0x1
+Manager.CONTROL_DOLPHIN	equ 0x2
+
 Manager.handleLock :
 push ebx
 mov bl, [Manager.locked]
@@ -38,59 +43,59 @@ ret
 Manager.doLock :
 pusha
 
-mov edx, [SCREEN_SIZE]
-mov eax, [SCREEN_MEMPOS]
+mov edx, [Graphics.SCREEN_SIZE]
+mov eax, [Graphics.SCREEN_MEMPOS]
 mov ebx, 0x0
-call Dolphin.clearImage
+call Image.clear
 		pusha
-		mov eax, [SCREEN_MEMPOS]
-		mov [Manager.cvalstor], eax		; SCREEN_MEMPOS
+		mov eax, [Graphics.SCREEN_MEMPOS]
+		mov [Manager.cvalstor], eax		; Graphics.SCREEN_MEMPOS
 		
-		mov eax, [SCREEN_WIDTH]
+		mov eax, [Graphics.SCREEN_WIDTH]
 		mov ecx, 2
 		xor edx, edx
 		idiv ecx
 		mov ecx, [Manager.cvalstor]
 		add ecx, eax
-		mov [Manager.cvalstor], ecx		; + SCREEN_WIDTH/2
+		mov [Manager.cvalstor], ecx		; + Graphics.SCREEN_WIDTH/2
 		
-		mov eax, [SCREEN_HEIGHT]
+		mov eax, [Graphics.SCREEN_HEIGHT]
 		mov ecx, 3
 		xor edx, edx
 		idiv ecx
 		sub eax, 4
-		mov ebx, [SCREEN_WIDTH]
+		mov ebx, [Graphics.SCREEN_WIDTH]
 		imul eax, ebx
 		mov ecx, [Manager.cvalstor]
 		add ecx, eax
-		mov [Manager.cvalstor], ecx		; + ((SCREEN_HEIGHT/4)-4)*SCREEN_WIDTH
+		mov [Manager.cvalstor], ecx		; + ((Graphics.SCREEN_HEIGHT/4)-4)*Graphics.SCREEN_WIDTH
 		
 		mov eax, 3	; font width/2
 		mov ebx, 37	; string length
 		imul eax, ebx
-		mov ebx, [pxsize]
+		mov ebx, [Graphics.bytesPerPixel]
 		imul eax, ebx
 		mov ecx, [Manager.cvalstor]
 		sub ecx, eax
 		mov [Manager.cvalstor], ecx
 		
 		popa
-mov eax, [Manager.cvalstor] ; SCREEN_MEMPOS + SCREEN_WIDTH/2 + ((SCREEN_HEIGHT/4)-4)*SCREEN_WIDTH - 3*37	; FIX THIS!
+mov eax, [Manager.cvalstor] ; Graphics.SCREEN_MEMPOS + Graphics.SCREEN_WIDTH/2 + ((Graphics.SCREEN_HEIGHT/4)-4)*Graphics.SCREEN_WIDTH - 3*37	; FIX THIS!
 mov ebx, Manager.lockMsg
 mov cl, WHITE
 call drawStringDirect
 mov cl, 0xD0
 	push edx
-	mov edx, [SCREEN_WIDTH]
+	mov edx, [Graphics.SCREEN_WIDTH]
 	imul edx, 16
 	add eax, edx
 	pop edx
-	;add eax, SCREEN_WIDTH*16	[see above code]
+	;add eax, Graphics.SCREEN_WIDTH*16	[see above code]
 mov ebx, Manager.EAX
 call drawStringDirect
 push ebx
 	mov ebx, 6*5	; char width times 5 chars per "E_X: "
-	imul ebx, [pxsize]
+	imul ebx, [Graphics.bytesPerPixel]
 	mov [Manager.cvalstor], ebx
 pop ebx
 add eax, [Manager.cvalstor]
@@ -98,12 +103,12 @@ add eax, [Manager.cvalstor]
 	mov ebx, [Manager.astor]
 	call Manager.direct.num
 		push edx
-		mov edx, [SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, 8
 		sub edx, [Manager.cvalstor]
 		add eax, edx
 		pop edx
-;add eax, SCREEN_WIDTH*8-24	 [see above code]
+;add eax, Graphics.SCREEN_WIDTH*8-24	 [see above code]
 mov ebx, Manager.EBX
 call drawStringDirect
 add eax, [Manager.cvalstor]
@@ -111,12 +116,12 @@ add eax, [Manager.cvalstor]
 	mov ebx, [Manager.bstor]
 	call Manager.direct.num
 		push edx
-		mov edx, [SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, 8
 		sub edx, [Manager.cvalstor]
 		add eax, edx
 		pop edx
-;add eax, SCREEN_WIDTH*8-24
+;add eax, Graphics.SCREEN_WIDTH*8-24
 mov ebx, Manager.ECX
 call drawStringDirect
 add eax, [Manager.cvalstor]
@@ -124,12 +129,12 @@ add eax, [Manager.cvalstor]
 	mov ebx, [Manager.cstor]
 	call Manager.direct.num
 		push edx
-		mov edx, [SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, 8
 		sub edx, [Manager.cvalstor]
 		add eax, edx
 		pop edx
-;add eax, SCREEN_WIDTH*8-24
+;add eax, Graphics.SCREEN_WIDTH*8-24
 mov ebx, Manager.EDX
 call drawStringDirect
 add eax, [Manager.cvalstor]
@@ -137,12 +142,12 @@ add eax, [Manager.cvalstor]
 	mov ebx, [Manager.dstor]
 	call Manager.direct.num
 		push edx
-		mov edx, [SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, 8
 		sub edx, [Manager.cvalstor]
 		add eax, edx
 		pop edx
-;add eax, SCREEN_WIDTH*8-24
+;add eax, Graphics.SCREEN_WIDTH*8-24
 mov ebx, Manager.LOC
 mov [Manager.cvalstor], eax
 call drawStringDirect
@@ -163,7 +168,7 @@ mov ebx, Manager.DOLPHIN
 Manager.doLock.cl3 :
 push ebx
 mov ebx, 16*6
-imul ebx, [pxsize]
+imul ebx, [Graphics.bytesPerPixel]
 add eax, ebx
 pop ebx
 call drawStringDirect
@@ -187,12 +192,12 @@ mov ebx, Manager.UNKNOWN_LOCK_MESSAGE
 mov cl, 0x3
 Manager.doLock.cont :
 call debug.println
-mov eax, [SCREEN_MEMPOS]
+mov eax, [Graphics.SCREEN_MEMPOS]
 call drawStringDirect
 ; ***************************************************************
 		mov eax, [Manager.cvalstor]
 		push edx
-		mov edx, [SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, 8
 		add eax, edx
 		pop edx
@@ -201,7 +206,7 @@ call drawStringDirect
 				call drawStringDirect
 						push edx
 						mov edx, 16*6
-						imul edx, [pxsize]
+						imul edx, [Graphics.bytesPerPixel]
 						add eax, edx
 						pop edx
 			push eax
@@ -212,10 +217,10 @@ call drawStringDirect
 			call Manager.direct.num
 ; ***************************************************************
 	mov ah, [Dolphin.activeWindow]
-	mov [currentWindow], ah
+	mov [Dolphin.currentWindow], ah
 	LockLoop :
-		call os.pollKeyboard
-		call os.getKey
+		call Keyboard.poll
+		call Keyboard.getKey
 		cmp bl, 0xfe
 		jne LockLoop
 	mov bl, 0x0
@@ -226,14 +231,14 @@ call drawStringDirect
 		call console.createWindow
 	Manager.doLock.post.notFP :
 	
-	mov eax, [SCREEN_MEMPOS]	; clear out residual data from the lock screen
-	mov edx, [SCREEN_SIZE]
+	mov eax, [Graphics.SCREEN_MEMPOS]	; clear out residual data from the lock screen
+	mov edx, [Graphics.SCREEN_SIZE]
 	mov ebx, 0x0
-	call Dolphin.clearImage
-	mov eax, [SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
-	mov edx, [SCREEN_SIZE]
+	call Image.clear
+	mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
+	mov edx, [Graphics.SCREEN_SIZE]
 	mov ebx, 0x0
-	call Dolphin.clearImage
+	call Image.clear
 	
 popa
 pop ebx
@@ -242,23 +247,23 @@ ret
 drawStringDirect :
 pusha
 push eax
-mov eax, [SCREEN_WIDTH]
-mov [os.textwidth], eax
+mov eax, [Graphics.SCREEN_WIDTH]
+mov [TextHandler.textWidth], eax
 pop eax
-mov [charpos], eax
+mov [TextHandler.charpos], eax
 drawStringDirect.loop :
 mov al, [ebx]
 cmp al, 0x0
 je drawStringDirect.ret
 mov ah, cl
-call graphics.drawChar
+call TextHandler.drawChar
 			push ecx
-			mov ecx, [charpos]
+			mov ecx, [TextHandler.charpos]
 			push ebx
-			mov ebx, [SCREEN_WIDTH]
-			add ebx, [SCREEN_WIDTH]
+			mov ebx, [Graphics.SCREEN_WIDTH]
+			add ebx, [Graphics.SCREEN_WIDTH]
 			add ecx, ebx
-			mov [charpos], ecx
+			mov [TextHandler.charpos], ecx
 			pop ebx
 			pop ecx
 add ebx, 1
@@ -269,23 +274,23 @@ ret
 
 Manager.direct.num :		; num in ebx
 		pusha
-		mov [colorS], cl
+		mov [TextHandler.selectedColor], cl
 		mov cl, 28
 		mov ch, 0x0
-		mov [charpos], eax
+		mov [TextHandler.charpos], eax
 		Manager.direct.num.start :
 			cmp ebx, 0x0
 			jne Manager.direct.num.cont
-			mov ah, [colorS]
+			mov ah, [TextHandler.selectedColor]
 			mov al, '0'
-			call graphics.drawChar
+			call TextHandler.drawChar
 					push ecx
-					mov ecx, [charpos]
+					mov ecx, [TextHandler.charpos]
 					push ebx
-					mov ebx, [SCREEN_WIDTH]
-					add ebx, [SCREEN_WIDTH]
+					mov ebx, [Graphics.SCREEN_WIDTH]
+					add ebx, [Graphics.SCREEN_WIDTH]
 					add ecx, ebx
-					mov [charpos], ecx
+					mov [TextHandler.charpos], ecx
 					pop ebx
 					pop ecx
 			popa
@@ -307,15 +312,15 @@ Manager.direct.num :		; num in ebx
 		Manager.direct.num.g10 :
 		add eax, 0x37
 		Manager.direct.num.goPrint :
-		mov ah, [colorS]
-		call graphics.drawChar
+		mov ah, [TextHandler.selectedColor]
+		call TextHandler.drawChar
 			push ecx
-			mov ecx, [charpos]
+			mov ecx, [TextHandler.charpos]
 			push ebx
-			mov ebx, [SCREEN_WIDTH]
-			add ebx, [SCREEN_WIDTH]
+			mov ebx, [Graphics.SCREEN_WIDTH]
+			add ebx, [Graphics.SCREEN_WIDTH]
 			add ecx, ebx
-			mov [charpos], ecx
+			mov [TextHandler.charpos], ecx
 			pop ebx
 			pop ecx
 		pop ebx

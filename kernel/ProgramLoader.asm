@@ -1,7 +1,7 @@
 ;	programLoader.asm
 ;
 ;	loads programs into memory and executes them
-;
+;	NEEDS REFORMATTING!
 
 
 program.register :		; ebx contains location of program
@@ -73,3 +73,23 @@ mov bl, 0x0
 ppinitnoz2 :
 mov [callLocation], bl
 ret
+
+ProgramManager.getProgramNumber :	; returns pnum in bl
+	mov bl, [ProgramManager.PnumCounter]
+	add bl, 1
+	mov [ProgramManager.PnumCounter], bl
+	push ebx
+	mov ebx, ProgramManager.PROGRAM_REGISTERED
+	call debug.print
+	pop ebx
+	and ebx, 0xFF
+	call debug.num
+	call debug.newl
+	ret
+	
+	
+ProgramManager.PROGRAM_REGISTERED :
+db "A program has been registered: PNUM=", 0
+
+ProgramManager.PnumCounter :
+db 0x0

@@ -9,7 +9,6 @@ func int init(null)
 func int post_init(null)
 	color(0xF)
 	print("Console: ")
-	catch_enter(handleEnter)
 	return 0
 func int handleEnter(null)
 	done = 0
@@ -38,7 +37,6 @@ func int handleEnter(null)
 		done = 1
 	endif
 	if (inp seq_mem "exit")
-		catch_enter(os.return)
 		draw = 0
 		done = 1
 	endif

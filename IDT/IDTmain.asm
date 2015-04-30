@@ -186,7 +186,7 @@ _IRQ0 :
 	
 _IRQ1 :
 	pusha
-	call os.pollKeyboard
+	call Keyboard.poll
 	call IRQ_FINISH
 	popa
 	iret

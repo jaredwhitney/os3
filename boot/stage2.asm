@@ -51,7 +51,7 @@ VESA.mode :	; mode in bx
 	je VESA.mode.good
 	mov ax, 0x0
 	VESA.mode.good :
-	mov [VESA_SUPPORTED], ax
+	mov [Graphics.VESA_SUPPORTED], ax
 	popa
 	ret
 	
@@ -110,6 +110,8 @@ enter_PM :
 	mov [0xb8000], al
 	cmp al, 0x4a
 	jne stop
+	
+	call loadIDT
 	
 	jmp Kernel.init
 	

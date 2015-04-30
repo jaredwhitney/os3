@@ -2,7 +2,7 @@
 
 console.init :
 pusha
-	call os.getProgramNumber	; register program with the OS
+	call ProgramManager.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
 call Dolphin.create				; allocate memory for a window
 mov [console.buffer], ebx 
@@ -49,8 +49,8 @@ je console.update.gone
 	call console.update
 console.loop.noChange :
 mov bl, [console.winNum]
-mov [currentWindow], bl
-call os.getKey
+mov [Dolphin.currentWindow], bl
+call Keyboard.getKey
 cmp bl, 0x0
 je console.loop.ret
 cmp bl, 0xff
@@ -70,7 +70,7 @@ ret
 console.setWidth :
 pusha
 and ebx, 0xFFFF
-mov eax, [pxsize]
+mov eax, [Graphics.bytesPerPixel]
 imul ebx, eax
 mov [console.width], bx
 popa
@@ -83,15 +83,15 @@ ret
 
 console.setPos :
 mov al, [console.winNum]
-mov [currentWindow], al
+mov [Dolphin.currentWindow], al
 mov eax, ebx
 call Dolphin.moveWindowAbsolute
 ret
 
 JASM.console.safeFullscreen :
-mov ebx, [SCREEN_WIDTH]
+mov ebx, [Graphics.SCREEN_WIDTH]
 mov [console.width], bx
-mov ebx, [SCREEN_HEIGHT]
+mov ebx, [Graphics.SCREEN_HEIGHT]
 call console.setHeight
 ret
 
@@ -141,7 +141,7 @@ ret
 screen.wipe :
 ;pusha
 ;mov ebx, [console.pos]
-;add ebx, [SCREEN_BUFFER]
+;add ebx, [Dolphin.SCREEN_BUFFER]
 ;mov cx, [console.width]
 ;mov dx, [console.height]
 ;call Dolphin.clear
@@ -155,12 +155,12 @@ cmp ebx, 0x0
 je console.update.gone
 	xor ebx, ebx
 	mov bl, [console.winNum]
-	mov [currentWindow], ebx
+	mov [Dolphin.currentWindow], ebx
 	call Dolphin.getWindowBuffer
 	mov ebx, eax
 	mov eax, [console.buffer]
 	mov cx, [console.width]
-	mov edx, [console.charPos]
+	mov edx, [console.TextHandler.charpos]
 		;cmp edx, 0xA00
 		;jl console.size.noworry
 		;pusha
@@ -182,7 +182,7 @@ popa
 ret
 
 ;console.checkClear :
-;mov ebx, [console.charPos]
+;mov ebx, [console.TextHandler.charpos]
 ;cmp ebx, 0x1000
 ;jle cseret
 ;call console.clearScreen
@@ -193,7 +193,7 @@ console.print :
 pusha
 call console.checkColor
 mov edx, [console.buffer]
-mov ecx, [console.charPos]
+mov ecx, [console.TextHandler.charpos]
 add edx, ecx
 printitp :
 mov al, [ebx]
@@ -201,13 +201,13 @@ mov al, [ebx]
 cmp al, 0
 je printdonep
 mov [edx], ax
-;call graphics.drawChar
+;call TextHandler.drawChar
 add ebx, 1
 add edx, 2
 push ebx
-mov ebx, [console.charPos]
+mov ebx, [console.TextHandler.charpos]
 add ebx, 0x2
-mov [console.charPos], ebx
+mov [console.TextHandler.charpos], ebx
 pop ebx
 jmp printitp
 printdonep :
@@ -219,7 +219,7 @@ console.printMem :
 pusha
 call console.checkColor
 mov edx, [console.buffer]
-mov ecx, [console.charPos]
+mov ecx, [console.TextHandler.charpos]
 add edx, ecx
 printitpMem :
 mov al, [ebx]
@@ -230,9 +230,9 @@ mov [edx], ax
 add ebx, 2
 add edx, 2
 push ebx
-mov ebx, [console.charPos]
+mov ebx, [console.TextHandler.charpos]
 add ebx, 0x2
-mov [console.charPos], ebx
+mov [console.TextHandler.charpos], ebx
 pop ebx
 jmp printitpMem
 printdonepMem :
@@ -242,7 +242,7 @@ ret
 console.drawCursor :
 pusha
 mov edx, [console.buffer]
-mov ecx, [console.charPos]
+mov ecx, [console.TextHandler.charpos]
 add edx, ecx
 mov cl, 0x5f
 mov ch, 0x0F
@@ -330,20 +330,20 @@ jmp console.numOut.dontcare
 console.newline :
 	pusha
 		mov edx, [console.buffer]
-		mov ecx, [console.charPos]
+		mov ecx, [console.TextHandler.charpos]
 		add edx, ecx
 		mov al, 0x0A
 		mov ah, 0xFF
 		mov [edx], ax
-		mov ebx, [console.charPos]
+		mov ebx, [console.TextHandler.charpos]
 		add ebx, 0x2
-		mov [console.charPos], ebx
+		mov [console.TextHandler.charpos], ebx
 	popa
 	ret
 
 console.doBackspace :
 
-mov eax, [console.charPos]
+mov eax, [console.TextHandler.charpos]
 mov edx, 0x0
 bsdloop :
 push edx
@@ -358,7 +358,7 @@ jg bsdloop
 cmp eax, 0x0
 mov ecx, 2
 jne bsfnoloop
-mov ebx, [console.charPos]
+mov ebx, [console.TextHandler.charpos]
 add ebx, [console.buffer]
 mov [ebx], edx
 mov eax, edx
@@ -381,11 +381,11 @@ cmp [eax], bx
 je bsfcloop
 sub ecx, 2
 bsfnoloop :
-mov eax, [console.charPos]
+mov eax, [console.TextHandler.charpos]
 sub eax, ecx
 cmp eax, 0
 jl console.doBackspace.stop
-mov [console.charPos], eax
+mov [console.TextHandler.charpos], eax
 console.doBackspace.stop :
 add eax, [console.buffer]
 mov bx, 0x0
@@ -397,13 +397,13 @@ jmp console.loop.ret
 
 console.cprint :
 pusha
-mov ebx, [console.charPos]
+mov ebx, [console.TextHandler.charpos]
 add ebx, [console.buffer]
 mov [ebx], ax
-;call graphics.drawChar
-mov ebx, [console.charPos]
+;call TextHandler.drawChar
+mov ebx, [console.TextHandler.charpos]
 add ebx, 0x2
-mov [console.charPos], ebx
+mov [console.TextHandler.charpos], ebx
 call console.update
 popa
 ret
@@ -422,7 +422,7 @@ cmp eax, ebx
 pop ebx
 jl console.clearScreen.loop
 mov ecx, 0x0
-mov [console.charPos], ecx
+mov [console.TextHandler.charpos], ecx
 popa
 ret
 
@@ -432,7 +432,7 @@ ret
 
 console.getLine :	; Fixed.
 pusha
-mov eax, [console.charPos]
+mov eax, [console.TextHandler.charpos]
 mov edx, [console.buffer]
 add eax, edx
 mov ecx, 0x0
@@ -486,13 +486,13 @@ mov [retval], eax
 popa
 ret
 
-%include "../programs/new console/build.asm"
+%include "../Modules/console/build.asm"
 
 
 console.pos :	; should be removed, use the window's position instead
 dd 0x0
 
-console.charPos :
+console.TextHandler.charpos :
 dd 0xA2
 
 console.cstor :
