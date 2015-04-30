@@ -20,4 +20,4 @@
 
 %include "..\kernel\ProgramLoader.asm"
 %include "..\debug\print.asm"
-%include "..\IDT\IDTmain.asm"
+%include "..\boot\IDTmain.asm"
