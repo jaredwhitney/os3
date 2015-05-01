@@ -12,3 +12,5 @@ kernel.asm :
 	os.handleSpecial	bl = keyCode	NOT STANDALONE	none		Handles special keypresses (window movement keys, etc).
 	os.halt				none			HANGS			ebx			Prints a message to debug and halts the system.
 	os.getProgramNumber	none			pnum in bl		ebx			Reserves a unique program number for a program.
+
+	NEEDS TO BE UPDATED WITH CURRENT INFORMATION! (and finished...)

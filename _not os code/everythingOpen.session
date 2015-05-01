@@ -1,0 +1,36 @@
+<NotepadPlus>
+    <Session activeView="1">
+        <mainView activeIndex="0" />
+        <subView activeIndex="0">
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="84" endPos="84" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\kernel\kernel.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\System\View.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="833" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\System\Time.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="833" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\System\Minnow.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="833" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\System\Guppy.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="833" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\String\EqualityTests.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="833" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Tools\Security\Manager.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\kernel\ProgramLoader.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Graphics\Image\Tools.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Graphics\Font\SysDefault.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Graphics\TextHandler.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Drivers\PS2\Generic_Mouse.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="835" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Drivers\PS2\Generic_Keyboard.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Drivers\HDD\disk.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Drivers\GFX\Generic_Display.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Debug\print.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\stage2.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\realMode.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\init_GDT.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\IDTmain.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\detection.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\boot\boot.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\xlib\shlib.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\xlib\ExtLib.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\dolphin\Dolphin.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\dolphin\Catfish.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="0" endPos="0" selMode="0" lang="Assembly" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\console\iConsole.asm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="206" endPos="206" selMode="0" lang="JASM" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\console\test.jasm" />
+            <File firstVisibleLine="0" xOffset="0" scrollWidth="1038" startPos="384" endPos="384" selMode="0" lang="JASM" encoding="-1" filename="C:\Users\Jared\Documents\GitHub\os3\Modules\console\console.jasm" />
+        </subView>
+    </Session>
+</NotepadPlus>

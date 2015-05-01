@@ -1,6 +1,5 @@
 
 loadIDT :
-	call copyIDTloop
 	lidt [IDT_INFO]
 	; need to init Programmable Interrupt Chip (PIC) before enabling interrupts
 	sti
@@ -9,30 +8,11 @@ loadIDT :
 	;int 0x1
 	;hlt
 	ret
-
-copyIDTloop :
-	pusha
-	mov ecx, IDTCOPYSTART
-	xor edx, edx
-	copyIDTloop.loop :
-		mov ebx, IDTDescriptor_GENERIC
-		mov eax, [ebx]
-		mov [ecx], eax
-		add ebx, 4
-		add ecx, 4
-		mov eax, [ebx]
-		mov [ecx], eax
-		add ecx, 4
-		add edx, 1
-		cmp edx, 0x40-1
-			jl copyIDTloop.loop
-	popa
-	ret
 	
 setupPIT :
 	pusha
 	cli
-		mov al, 0b00110110	; they do 0100
+		mov al, 0b00110110
 		mov dx, 0x43
 		out dx, al
 		mov ax, 0x0	; lowest possible tick rate (dont need to spam the interrupt too quickly)
@@ -99,74 +79,408 @@ setupPIC :
 IDTSTART :
 
 	_IDT0 :
-		dw (0x7e00+_IRQ0-$$) & 0xFFFF
+		dw (0x7e00+_IRQ0-$$) & 0xFFFF	; INT 0
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+_IRQ0-$$) >> 16
 
-		dw (0x7e00+_IRQ1-$$) & 0xFFFF
+		dw (0x7e00+_IRQ1-$$) & 0xFFFF	; INT 1
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+_IRQ1-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 4
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 5
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 6
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 7
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+EXCEPTION8HANDLER-$$) & 0xFFFF
+		dw (0x7e00+EXCEPTION8HANDLER-$$) & 0xFFFF	; INT 8
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+EXCEPTION8HANDLER-$$) >> 16
 		
-		dw (0x7e00+_PRINTSTRING-$$) & 0xFFFF
+		dw (0x7e00+_PRINTSTRING-$$) & 0xFFFF	; INT 9
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+_PRINTSTRING-$$) >> 16
-	IDTDescriptor_GENERIC :
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF
+
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT A
 		dw 0x8
 		db 0x0
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-	IDTCOPYSTART :
-		times 0x40 dq 0	; the remaining INTS (subtract 1 more for every hard-coded ISR)
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT B
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT C
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT D
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT E
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT F
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 10
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 11
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 12
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 13
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 14
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 15
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 16
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 17
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 18
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 19
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1A
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1B
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1C
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1D
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1E
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1F
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 20
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 21
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 22
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 23
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 24
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 25
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 26
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 27
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 28
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 29
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2A
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2B
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2C
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2D
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2E
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2F
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+_HANDLEFUNC1-$$) & 0xFFFF	; INT 30
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+_HANDLEFUNC1-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 31
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 32
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 33
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 34
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 35
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 36
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 37
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 38
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 39
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3A
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3B
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3C
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3D
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3E
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3F
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 40
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 41
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+		
+		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 42
+		dw 0x8
+		db 0x0
+		db 0b10001110
+		dw (0x7e00+IDTHANDLER-$$) >> 16
+
 IDTEND :
 
 
@@ -185,10 +499,12 @@ _IRQ0 :
 	iret
 	
 _IRQ1 :
-	pusha
+	push ax
+	push dx
 	call Keyboard.poll
 	call IRQ_FINISH
-	popa
+	pop dx
+	pop ax
 	iret
 	
 _PRINTSTRING :

@@ -98,7 +98,8 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	mov ebx, INT_CALL
-	int 0x9
+		mov word [System.function], 24
+		int 0x30
 popa
 ret
 

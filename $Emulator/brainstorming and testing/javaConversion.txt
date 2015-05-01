@@ -1,0 +1,43 @@
+main :
+	mov bl, JFrame.TYPE_IMAGE
+	mov word [System.function], JFrame.new			; (JFrame) frame = new JFrame();
+	int 0x30
+    mov [frame], bl
+
+	mov word [System.function], JFrame.getGraphics		; (Graphics) <edx> = frame.getGraphics();
+	int 0x30
+
+    mov eax, hello_text
+    mov bx, 0x0
+    mov cx, 0x0
+	mov word [System.function], JFrame.drawString		; <edx>.drawString("Hello everyone!", 0, 0);
+	int 0x30
+
+    mov bl, [frame]
+	mov word [System.function], JFrame.repaint		; frame.repaint();
+	int 0x30
+
+    ret
+
+hello_text :
+"Hello everyone!", 0
+
+~~~~~~~~~~~~ EQUALS ~~~~~~~~~~~~~~~
+(JFrame) frame = new JFrame();
+(Graphics) <edx> = frame.getGraphics();
+<edx>.drawString("Hello everyone!", 0, 0);
+frame.repaint();
+return 0;
+
+- which could be generated from -
+
+public class Test
+{
+	public static void main(String[] args)
+	{
+		JFrame frame = new JFrame();
+		Graphics _edx = frame.getGraphics();
+		_edx.drawString("Hello everyone!", 0, 0);
+		frame.repaint();
+	}
+}

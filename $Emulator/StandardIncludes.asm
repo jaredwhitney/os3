@@ -1,6 +1,7 @@
 %include "..\modules\dolphin\Dolphin.asm"
 %include "..\modules\dolphin\Catfish.asm"
 %include "..\modules\console\iConsole.asm"
+%include "..\modules\xlib\int30.asm"
 
 %include "..\Graphics\Image\Tools.asm"
 %include "..\Graphics\TextHandler.asm"
