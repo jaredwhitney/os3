@@ -75,6 +75,12 @@ Time.printToConsole :
 				mov ebx, Time.pm
 				mov [Time.swapped], ebx
 			pop ebx
+			cmp ebx, 0x20
+				jl Time.printToConsole.doPM.kgo
+			cmp ebx, 0x21
+				jg Time.printToConsole.doPM.kgo
+			sub ebx, 0x6
+			Time.printToConsole.doPM.kgo :
 			sub ebx, 0x12
 	Time.printToConsole.hhandleDone :
 	call console.numOut

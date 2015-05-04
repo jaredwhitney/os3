@@ -24,6 +24,7 @@ main :
 		int 0x30
 	mov word [System.function], System.exit
 		int 0x30
+	jmp $
 		
 %include "shlib_standard.asm"
 
