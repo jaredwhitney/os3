@@ -15,7 +15,9 @@ db "PROGRAM", 0
 db "Hello world", 0
 
 ;	Then the program header		;
+db 0x01
 dd main
+db "Hello World", 0
 
 main :
 	mov ebx, hello_text

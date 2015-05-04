@@ -1,0 +1,20 @@
+
+;In order for a file to be viewable in os3, it must begin with an appropriate file header.
+
+;File headers are formatted as follows :
+;	
+;	dd fileSize	; (NOT including the header, sizez of the actual data)
+;	times ? db fileType, 0
+;	times ? db fileName, 0
+;
+;EX:
+;	dd 0x48000
+;	db "Image", 0
+;	db "SplashScreen", 0
+
+
+;	TIPS :
+;		- The file header MUST be the first thing present in a file.
+;		- Instead of generating file headers by hand, use the FileHeaderTool.
+;		- By giving a file a commonly used type, it will be openable in more applications.
+

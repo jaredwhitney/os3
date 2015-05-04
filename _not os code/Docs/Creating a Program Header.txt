@@ -1,0 +1,19 @@
+
+;Programs must supply the following in their Program Header:
+;
+;	db requestedPriority
+;	dd entryPoint
+;	times ? db programName, 0
+;
+;EX: 
+;	db 0x05
+;	dd console.init
+;	db "iConsole", 0
+
+
+;	TIPS:
+;		- The different parts of a ProgramHeader must always come in the order listed above.
+;		- The program's listed name may be of any (reasonable) length, but must be null-terminated.
+;		- The user may need to authorize initialization of your program if you set the priority level above 3.
+;		- In order to be recognized as a program by os3, your file must be of type "PROGRAM" and contain a properly formatted file header (see Creating A File.txt).
+
