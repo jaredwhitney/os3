@@ -22,7 +22,7 @@ call Minnow.byName
 	cmp ebx, 0x0
 	je View.file.bad_file
 			pusha
-			sub ebx, 16
+			sub ebx, 16	; THIS IS WRONG!
 			mov ebx, [ebx]
 			mov [fszstor], ebx
 			;call debug.num

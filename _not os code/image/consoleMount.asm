@@ -1,4 +1,4 @@
 [bits 32]
-dd 8622
-db "TEXT"
-db "iConsole"
+dd 9690
+db "TEXT", 0
+db "iConsole", 0

@@ -1,7 +1,7 @@
 [bits 32]
 dd endt-start	; size of an image
-dd "ANIM"
-dd "____SINE"
+db "ANIM", 0
+db "SINE", 0
 start :
 dd 0, 0
 dd 41, 5

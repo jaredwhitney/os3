@@ -18,6 +18,7 @@
 
 %include "..\Tools\Security\Manager.asm"
 %include "..\Tools\String\EqualityTests.asm"
+%include "..\Tools\String\General.asm"
 
 %include "..\kernel\ProgramLoader.asm"
 %include "..\debug\print.asm"

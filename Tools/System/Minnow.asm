@@ -1,6 +1,7 @@
-Minnow.dtree :
+Minnow.dtree :	; deprecated.
 	pusha
-
+	popa
+	ret
 	call Minnow.navToFirst; at filesize
 	
 	Minnow.dtree.scr1done :
@@ -89,16 +90,18 @@ Minnow.ctree :
 	call console.cprint
 	add ebx, 4	; at filetype
 	mov ecx, 4
-	call Minnow.ctree.nprint
+	call console.print
 	push ebx
 	mov ebx, Minnow.sep
 	call console.print
 	pop ebx
-	add ebx, 4	; at filename
+	call String.getLength
+	add ebx, edx	; at filename
 	mov ecx, 8
-	call Minnow.ctree.nprint
+	call console.print
 	call console.newline
-	add ebx, 8	; at start of file
+	call String.getLength
+	add ebx, edx	; at start of file
 	pop edx
 	add ebx, edx	; at header for next file
 	jmp Minnow.ctree.scr1done
@@ -205,6 +208,10 @@ Minnow.getType :	; file location in ebx, returns pointer to type in ebx
 	pop ecx
 	ret
 
+Minnow.getSize :	; fileName in ebx, returns fileSize in ebx NOT FULLY IMPLEMENTED!
+call Minnow.navToFirst
+
+	
 Minnow.getAttribute :	; file location in ebx, attribute number in ecx; returns attribute(s) in cx, dx
 	push eax
 	push ebx
