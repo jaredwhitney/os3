@@ -97,9 +97,7 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov ebx, INT_CALL
-		mov word [System.function], 24
-		int 0x30
+	call goRealMode
 popa
 ret
 

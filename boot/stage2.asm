@@ -4,6 +4,7 @@ db 0x4a
 
 stage2:
 	;	Perform extraneous tasks here	;
+	sgdt [RMGDTSAVE]
 	call VESA.getMode
 	call boot.useVGAmode
 	mov bx, 0x11b
@@ -227,5 +228,9 @@ STOPm :
 
 SUCCESS :
 	db "Success!", 0xD, 0xA, 0
+
+RMGDTSAVE :
+	dd 0x0
+	dd 0x0
 	
 %include "..\kernel\kernel.asm"

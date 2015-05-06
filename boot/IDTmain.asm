@@ -60,7 +60,7 @@ setupPIC :
 	out dx, al
 	
 	mov dx, 0x21
-	mov al, 0b11111101
+	mov al, 0b11111101	; 01
 	out dx, al
 	mov dx, 0xa1
 	mov al, 0b11111111

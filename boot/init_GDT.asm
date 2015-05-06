@@ -31,3 +31,32 @@ dd init_GDT
 
 segOFFcode equ GDTcode - init_GDT ; offset from the start of the GDT to the code segment
 segOFFdata equ GDTdata - init_GDT ; offset from the start of the GDT to the data segment
+
+rmGDT :
+
+	dd 0x0
+	dd 0x0
+	
+	GDTcodeRM :
+		dw 0xffff
+		dw 0x0
+		db 0x0
+		db 10011010b
+		db 10001111b
+		db 0x0
+
+	GDTdataRM :
+		dw 0xffff	; low lim
+		dw 0x0		; low base
+		db 0x0		; mid base
+		db 10010010b	; access byte
+		db 00001111b	; flags & high limit
+		db 0x0		; high base
+	rmGDTend :
+
+GDTdescriptorRM :
+dw rmGDTend-rmGDT
+dd rmGDT
+
+RMsegOFFcode equ 0x8
+RMsegOFFdata equ 0x10
