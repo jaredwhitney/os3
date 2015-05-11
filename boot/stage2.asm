@@ -5,10 +5,12 @@ db 0x4a
 stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
-	call VESA.getMode
 	call boot.useVGAmode
+								;jmp stage2.novesa	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
+	call VESA.getMode
 	mov bx, 0x11b
 	call VESA.mode
+	stage2.novesa :
 	;	Shift into Protected Mode	;
 	jmp boot.Protected_Mode
 

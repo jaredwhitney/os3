@@ -97,9 +97,45 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	call goRealMode
+	mov ah, 0x0C	; EHCI controller info
+	mov al, 0x03
+	mov bl, 0x20
+	;console.test.rag :
+		;mov al, 0x0
+		;mov ah, [tdev]
+		;mov bl, 0x0
+		;mov bh, 0x08	; reg
+		;call PCI.read
+		;mov ebx, eax
+;		
+		;mov ah, [tdev]
+		;add ah, 1
+		;cmp ah, 0b11111
+			;jle ctestkcont
+		;mov ah, 0x0
+		;ctestkcont :
+		;mov [tdev], ah
+;		
+		;cmp ebx, 0xFFFFFFFF
+			;je console.test.rag
+;		
+		;mov ah, 0xFF
+		;push ebx
+		;xor ebx, ebx
+		;mov bl, [tdev]
+		;call console.numOut
+		;mov ebx, tdiv
+		;call console.print
+		;pop ebx
+		;call console.numOut
+		;call console.newline
+	call PCI.getDeviceByDescription
 popa
 ret
+;tdiv :
+;db ": ", 0x0
+;tdev :
+;db 0x0
 
 console.memstat :
 	mov ah, 0xFF

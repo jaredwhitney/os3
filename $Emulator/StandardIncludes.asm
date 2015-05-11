@@ -10,6 +10,7 @@
 %include "..\Drivers\PS2\Generic_Mouse.asm"
 %include "..\Drivers\PS2\Generic_Keyboard.asm"
 %include "..\Drivers\GFX\Generic_Display.asm"
+%include "..\Drivers\PCI\Generic_ComponentInterface.asm"
 
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\View.asm"

@@ -124,6 +124,7 @@ Graphics.init :
 	call debug.newl
 	cmp bx, 0xff
 	jne ccacont
+							;jmp ccacont	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
 	mov ebx, 0x500*0x4
 	mov [Graphics.SCREEN_WIDTH], ebx
 	mov ebx, 0x400;*0x4

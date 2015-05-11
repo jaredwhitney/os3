@@ -1,0 +1,11 @@
+errrrrrrbbbbbbbbdddddfff######00
+
+struct		offs	name
+------------------------
+        e	31	enable
+ rrr rrrr	24	reserved
+bbbb bbbb	16	bus num
+   d dddd	11	dev num
+      fff	8	func num
+  ## ####	2	reg num
+       00	0	reserved (0)

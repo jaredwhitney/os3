@@ -43,11 +43,11 @@ enterRM :
 ;cli				; make sure there are no queue'd interrupts
 sti				; enable interrupts
 	
-	mov al, 0x3		; change the screen mode back into text
-	mov ah, 0x0
-	int 0x10
-	mov bx, REALMODEMSG
-	call boot.print
+	;mov al, 0x3		; change the screen mode back into text
+	;mov ah, 0x0
+	;int 0x10
+	;mov bx, REALMODEMSG
+	;call boot.print
 	; ************************************** CODE GOES HERE ********************************* ;
 	mov dl, 0x80	; NEEDS TO STAY
 	mov ch, 0		; CAN CHANGE?
@@ -60,10 +60,10 @@ sti				; enable interrupts
 jmp goProtectedMode
 
 goProtectedMode :
-	call VESA.getMode
-	call boot.useVGAmode
-	mov bx, 0x11b
-	call VESA.mode
+	;call VESA.getMode
+	;call boot.useVGAmode
+	;mov bx, 0x11b
+	;call VESA.mode
 	jmp goIntoPMODE
 goIntoPMODE :
 	lgdt [GDTdescriptor]
@@ -84,14 +84,14 @@ goIntoPMODE_final :
 	mov ebp, [ebpstor]
 	mov esp, [espstor]
 	
-	mov al, [0x7e00]
-	mov [0xb8000], al
-	cmp al, 0x4a
-	jne stop
+	;mov al, [0x7e00]
+	;mov [0xb8000], al
+	;cmp al, 0x4a
+	;jne stop
 	
 	call loadIDT
 	
-	call Graphics.init
+	;call Graphics.init
 	
 	ret
 [bits 16]
@@ -126,7 +126,7 @@ goIntoPMODE_final :
 		
 	rRM.lret:
 		mov bx, rRM.ERRORrt
-		call boot.print
+		;call boot.print
 		mov ax, 0xF
 		mov [0x1000], ax
 		popa
@@ -135,7 +135,7 @@ goIntoPMODE_final :
 		
 	rRM.sload_error:
 		mov bx, rRM.ERRORs
-		call boot.print
+		;call boot.print
 		popa
 		ret
 		

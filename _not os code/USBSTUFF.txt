@@ -1,0 +1,9 @@
+PCI to find USB
+
+On PCI EHCI is
+	Class: 0x0C 
+	Subclass: 0x03 
+	Prog IF: 0x20
+
+0xCF8: CONFIG_ADDRESS
+0xCFC: CONFIG_DATA

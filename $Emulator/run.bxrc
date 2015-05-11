@@ -1,3 +1,5 @@
 floppya: 1_44=os.img, status=inserted
 boot: a
 vga: extension=none
+pci: enabled=1, chipset=i440fx
+clock: sync=none, time0=local, rtc_sync=0
