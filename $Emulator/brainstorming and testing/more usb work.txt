@@ -1,0 +1,65 @@
+enpoint_0 = control pipe
+
+__________________________________________________________________________________________________________
+
+PID CODES:
+	abcdABCD where capital are inverse of lowecase
+	Token:
+		OUT	0001
+		IN	1001
+		SOF	0101
+		SETUP	1101	(use data0)
+	Data:
+		DATA0	0011	(even)
+		DATA1	1011	(odd)
+		DATA2	0111
+		MDATA	1111
+	Handshake:
+		ACK	0010
+		NAK	1010
+		STALL	1110
+		NYET	0110
+	Special:
+		PRE	1100
+		ERR	1100
+		SPLIT	1000
+		PING	0100
+		RESERVE	0000
+ADDRESS:
+	used in {IN, SETUP, OUT, PING, SPLIT}
+	7 bits long
+	0 is default (reserved)
+ENDPOINT:
+	used in {IN, SETUP, OUT, PING}
+	4 bits long
+	0 is the default control pipe
+DATA:
+	0-1024 bytes long
+
+crc (cycle redundancy checks) are present on everything but the PID field to protect from error
+___________________________________________________________________________________________________________
+
+Handshakes:
+	Successfully recieved data, accepted or denied command, controlling flow, halting the device
+	WILL be returned in handshake part of response
+	MAY also appear in place of DATA
+	
+	{
+		ACK: {host: IN, function: OUT SETUP PING}
+		NAK: {function: IN OUT PING}
+		STALL: {function: IN OUT PING}
+		NYET: {hub: SPLIT, function: OUT}
+		ERR: {hub: SPLIT}
+	}
+
+PING and wait for ACK or NAK to figure out if the device is able to take more writes (OUT)
+
+Transactions: TOKEN--DATA--HANDSHAKE
+
+Control transactions :
+	SETUP (OUTx?) IN1
+	SETUP (INx?) OUT1
+	SETUP (IN1) 
+Bulk Transactions :
+	data toggle bit set to 0 upong configuration
+

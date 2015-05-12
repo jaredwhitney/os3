@@ -1,0 +1,145 @@
+PCI Registers :
+	0x0-0xF		Default PCI Registers
+	0x10-0x13	USB IO Mapped memory
+	0x14-0x5f	other PCI data
+	0x60		Serial bus release number
+	0x61		frame length adjustment register
+	0x62-0x63	port wake capabilities
+	0x64-0xff	other PCI data
+
+USB IO Mapped memory :
+	31:8	Base Address
+	7:3	Reserved
+	2:1	Type (00=can only be mapped to 32bit adress space, 10=may be mapped to 64 "")
+	0	Reserved
+
+Serial bus release number :
+	0:7	0x20	(spec 2.0)
+
+frame length adjustment register :
+	adjusted by BIOS, corrects for offset between clocks
+
+port wake capabilities :
+	0	whether or not the register is in use
+	15:1	whether or not it is implemented in each of the ports (1-15)
+___________________________________________
+capability registers length (b+0x0):
+	8 bits
+	length is at the base address, use as offset to skip to actual regs
+hci version (+0x2):
+	2 bytes
+	BCD encoded revision number
+structural params (b+0x4):
+	31:24	reserved
+	23:20	debug port number (0 if nonexistant)
+	19:17	reserved
+	16	port indicator support
+	15:12	# of companion controllers
+	11:8	# of ports per companion controller
+	7	port routing rules (for companion controller)
+	6:5	reserved
+	4	port power control (1=ports have power switches)
+	3:0	number of ports (0x1-0xf, 0x0=undefined)
+capability params (b+0x8):
+	31:16	reserved
+	15:8	EHCI extended capabilities (reg offs in PCI of list, 0x40 or greater, 0x0 = defaults)
+	7:4	isochronus scheduling threshold
+	3	reserved
+	2	async sched park capability
+	1	programmable frame list flag
+	0	64-bit addressing capability
+companion port route description (b+0xC):
+	60 bits long (15 nibble element array)
+	only used with port routing rules = 1
+________________________________________________
+host controller operational registers :
+ALL ARE 32BIT (DOUBLE) IN LENGTH
+	0x0	USB Command
+	0x4	USB Status
+	0x8	USB Interrupt Enable
+	0xC	USB Frame Index
+	0x10	4G Segment Selector
+	0x14	Frame List Base Address
+	0x18	Next Asynchronus List Address
+	0x1C-0x3F	RESERVED
+	0x40	Configured Flag Register
+	0x44	Port Status/Control
+
+USB Command (o+0x0):
+	31:24	Reserved
+	23:16	Interrupt Threshold (0, 1, 2, 4, 8, 0x10, 0x20, 0x40), max interrupt rate
+	15:12	Reserved
+	11	Async Schedule Park Mode Enable
+	10	Reserved
+	9:8	Asunc Schedule Park Mode Count
+	7	Light Reset
+	6	Interrupt on Async Advance Doorbell
+	5	Async Schedule Enable
+	4	Periodic Schedule Enable
+	3:2	Frame List Size
+	1	Hard Reset
+	0	Run/Stop (1 continues running, issuing commands, etx; 0 stops) [NO WRITE IF NOT IN HALTED STATE]
+USB Status (o+0x4):
+	31:16	Reserved
+	15	Async Schedule Status
+	14	Periodic Schedule Status
+	13	Reclamation (is async schedule empty?)
+	12	Halted? (inverted Run/Stop, sets only once the controller has ACTUALLY stopped)
+	11:6	Reserved
+	5	Interrupt on Async Advance
+	4	Host System Error (also clears R/S bit)
+	3	Frame List Rollover (has the frame list index underflowed to 0?)
+	2	Port Change Detect
+	1	USB Error Interrupt (transaction error, USB Interrupt will be set as well if it still finishes)
+	0	USB Interrupt (transaction finished)
+USB Int Enable (o+0x8):
+	31:6	Reserved
+	5	Int on Async Advance Enable
+	4	Host System Error Enable
+	3	Frame Rollover Enable
+	2	Port Change Int Enable
+	1	USB Error Int Enable
+	0	USB Int Enable
+Frame Index (o+0xC):
+	31:14	Reserved
+	13:0	Frame Index
+Control Data Struct Seg Reg (o+0x10):
+	most significant bytes of all structures if 64-bit
+Periodic Frame List Base Address (o+0x14):
+	31:12	Base Address (low)
+	11:0	Reserved
+Current Async List Address (o+0x18):
+	31:5	Link Pointer Low (references a Queue Head)
+	4:0	Reserved
+Configure Flag (o+0x40):
+	31:1	Reserved
+	0	Configure Flag (last thing set after the controller is configured)
+Port Status & Control (o+0x44+(4*PORT_NUM-1)):
+	31:23	Reserved
+	22	Wake on Over-curent Enable
+	21	Wake on Disconnect Enable
+	20	Wake on Connect Enable
+	19:16	Port Test Control (0001=J_STATE,0010=K_STATE,0011=SE0_NAK,0100=Packet,0101=FORCE_ENABLE)
+	15:14	Port Indicator Control
+	13	Port Owner
+	12	Port Power
+	11:10	Line Status
+	9	Reserved
+	8	Port Reset
+	7	Port Suspend
+	6	Force Port Resume
+	5	Over-current Changed
+	4	Over-current Active
+	3	Port Enable/Disable Changed
+	2	Port Enabled/Disabled
+	1	Connect Status Changed
+	0	Current Connect Status
+
+
+
+
+To actually send packets, need to use PCI with endpoints that are non-zero.
+
+
+
+

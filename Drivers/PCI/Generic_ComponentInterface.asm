@@ -63,15 +63,16 @@ PCI.getAddr :	; only meant for use inside PCI driver!
 	
 	ret
 
-PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program IF; returns dl = device number, dh = device bus (0xFF if fail)
+PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program IF; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
 	push eax
 	push ecx
-	push edx
+	push ebx
 	
 	and ebx, 0xFF
 	shl ebx, 8
 	shl eax, 16
 	or eax, ebx
+	and eax, 0xFFFFFF00
 	
 	push eax
 	mov dl, 0x0	; begin with device 0
@@ -79,7 +80,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	PCI.getDeviceByDescription.loop :
 		mov ah, dl	; device
 		mov al, dh	; bus
-		mov bl, 0	; func
+		mov bl, [fnc]	; func
 		mov bh, 0x08	; reg 0x08 is class info
 		call PCI.read
 				;pusha
@@ -90,17 +91,31 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 		mov ecx, eax
 		pop eax
 		and ecx, 0xFFFFFF00	; don't care about last byte (revision ID)
+		
 		cmp eax, ecx
 			je PCI.getDeviceByDescription.done
 		push eax
 		add dl, 1
-		cmp dl, 0b11111
+		cmp dl, 0b100000
 			je PCI.getDeviceByDescription.done1
 		jmp PCI.getDeviceByDescription.loop
 	PCI.getDeviceByDescription.done1 :
 	add dh, 1
+	mov dl, 0x0
 	cmp dh, 0xFF
-		jl PCI.getDeviceByDescription.loop
+		jne PCI.getDeviceByDescription.loop
+	mov dh, 0x0
+	push ax
+	mov al, [fnc]
+	add al, 1
+	mov [fnc], al
+		;mov ebx, eax
+		;and ebx, 0xFF
+		;call console.numOut
+	cmp al, 0b1000
+	pop ax
+		jne PCI.getDeviceByDescription.loop
+	mov edx, 0xFFFFFFFF
 	pop eax
 	PCI.getDeviceByDescription.done :
 
@@ -125,7 +140,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 		
 		call console.newline
 	
-	pop edx
+	pop ebx
 	pop ecx
 	pop eax
 	ret
@@ -136,3 +151,5 @@ PCI.STRING_gdIDs :
 	db " (Bus: 0x", 0
 PCI.STRING_gdIDe :
 	db ")", 0
+fnc :
+	db 0x0
