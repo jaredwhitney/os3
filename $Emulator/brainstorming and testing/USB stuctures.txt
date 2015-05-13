@@ -1,0 +1,56 @@
+qTD:
+	used to transfer up to 5*4096 bytes
+	- double "transfer state" and 32 bytes of 5-element array of data buffer locations
+	definition is 8 doubles long (MUST be aligned on 32-byte boundry)
+
+	dd unmodifiable data (see specs section 3.5)
+	dd unmodifiable data (see specs section 3.5)
+	
+	31	data toggle
+	30:16	Total bytes to transfer
+	15	interrupt on complete
+	14:12	Current page
+	11:10	Error counter
+	9:8	PID Code	; 00=out, 01=in, 10=setup
+	7:0	Status
+	
+	dd page 0 buffer | Current Offset
+	dd page 1 buffer
+	dd page 2 buffer
+	dd page 3 buffer
+	dd page 4 buffer
+
+Queue Head:
+	dd unmodifiable data (see specs section 3.6)
+	dd unmodifiable data (see specs section 3.6)
+	dd unmodifiable data (see specs section 3.6)
+	dd current qTD Pointer
+	dd (next qTD Pointer | bit T)
+	dd alt qTD Pointer | ((nibble NakCount & 0b1110) | bit T)
+	
+	31	data toggle
+	30:16	Total bytes to transfer
+	15	interrupt on complete
+	14:12	Current page
+	11:10	Error counter
+	9:8	PID Code
+	7:0	Status
+
+	dd page 0 buffer | current Offset
+	dd page 1 buffer | byte C-prog-mask
+	dd page 2 buffer | byte S-bytes << 4 | FrameTag	; (S-bytes keeps track of the number of transferred bytes)
+	dd page 3 buffer
+	dd page 4 buffer
+	
+
+EHCI INITIALIZATION:
+	Program CTRLDSSEGMENT
+	Write a value to USBINTR
+	Write PERIODICLIST BASE address, set T-Bits of all elements to 1
+	Write USBCMD w/ int threshold, frame list size, run/stop bit
+	Write 1 to CONFIGFLAG to route all ports to EHCI
+Doing Stuff :
+	make control or bulk queue head
+	put location into ASYNCLISTADDR reg
+	write 1 to Async Schedule Enable Bit (USBCMD reg)
+	
