@@ -98,6 +98,7 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	call USB_PrintControllerInfo
+	call USB_PrintActivePorts
 popa
 ret
 
