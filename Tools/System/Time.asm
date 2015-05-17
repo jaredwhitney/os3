@@ -107,7 +107,7 @@ Time.printToConsole :
 	call console.newline
 	popa
 	ret
-
+	
 Time.year :
 	db 0
 Time.month :

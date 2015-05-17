@@ -1,0 +1,4 @@
+"One queue head is used to manage the data stream for one endpoint."
+"Each qTD represents one or more bus transactions, which is defined in the context of this specification as a transfer."
+For Queue Heads:
+"All other areas of the overlay are set by the incoming qTD."

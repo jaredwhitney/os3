@@ -23,6 +23,8 @@
 %include "..\Tools\String\EqualityTests.asm"
 %include "..\Tools\String\General.asm"
 
+%include "..\Tools\Utility\Clock.asm"
+
 %include "..\kernel\ProgramLoader.asm"
 %include "..\debug\print.asm"
 %include "..\boot\IDTmain.asm"

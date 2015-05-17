@@ -26,6 +26,7 @@ kernel.runModules :
 	call Catfish.loop
 	call console.loop
 	call View.loop
+	call Clock.loop
 		;	PUSH BUFFER TO SCREEN	;
 		call Dolphin.updateScreen
 	ret
@@ -36,6 +37,9 @@ kernel.initModules :
 	call Catfish.init
 	call console.init
 	call View.init
+	call Clock.init
+	call Clock.show	; should be bound to a command!
+	call USB_InitController
 	;call debug.init
 	ret
 	

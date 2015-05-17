@@ -118,7 +118,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	mov edx, 0xFFFFFFFF
 	pop eax
 	PCI.getDeviceByDescription.done :
-
+		jmp PCI.getDeviceByDescription.noPrint	; only comment to debug
 		;	printing stuff
 		mov ebx, edx
 		and ebx, 0xFF
@@ -139,6 +139,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 		call console.print
 		
 		call console.newline
+		PCI.getDeviceByDescription.noPrint :
 	
 	pop ebx
 	pop ecx

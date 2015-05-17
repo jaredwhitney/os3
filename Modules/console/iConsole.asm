@@ -99,6 +99,10 @@ console.test :	; command that can be used to test anything.
 pusha
 	call USB_PrintControllerInfo
 	call USB_PrintActivePorts
+	call USB_EnablePlugAndPlay
+	;mov ebx, USB_QUEUEHEADEX
+	;call USB_LoadQueueHead
+	;call USB_RunAsyncTasks
 popa
 ret
 

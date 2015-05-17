@@ -24,7 +24,14 @@ mov dx, 0x0
 TextHandler.drawCharloop :
 ; ah contains the current row of the char
 mov ah, [ebx]
+	push ecx
+	mov ecx, [TextHandler.textSizeMultiplier]
+	TextHandler.drawCharLoop.FinishHeight :
 call TextHandler.drawRow
+	sub ecx, 1
+	cmp ecx, 0x0
+	jg TextHandler.drawCharLoop.FinishHeight
+	pop ecx
 add ebx, 0x1
 add dx, 0x1
 cmp dx, 0x7
@@ -34,7 +41,13 @@ mov ecx, [TextHandler.charpos]
 	push eax
 	xor eax, eax
 	mov ax, [TextHandler.textWidth]
-	imul eax, 9
+	push ebx
+	mov ebx, 7
+	imul ebx, [TextHandler.textSizeMultiplier]
+	add ebx, 2
+	imul eax, ebx	; 1=9, 2=16, 3=23
+	pop ebx
+		;imul eax, [TextHandler.textSizeMultiplier]
 	sub ecx, eax
 	pop eax
 	push edx
@@ -42,6 +55,7 @@ mov ecx, [TextHandler.charpos]
 	push eax
 	mov edx, [Graphics.bytesPerPixel]
 	imul edx, 6
+		imul edx, [TextHandler.textSizeMultiplier]
 	pop eax
 	pop ecx
 	add ecx, edx
@@ -79,23 +93,45 @@ TextHandler.drawRow :	; ah contains row
 				cmp dl, 0x0
 					jne TextHandler.drawRowVESA
 				mov dl, [TextHandler.selectedColor]
+					push ecx
+					mov ecx, [TextHandler.textSizeMultiplier]
+				TextHandler.drawRowloop.FinishWidth :
 				mov [ebx], dl
+					add ebx, 1
+					sub ecx, 1
+					cmp ecx, 0x0
+						jg TextHandler.drawRowloop.FinishWidth
+					pop ecx
+				
 				jmp TextHandler.drawRownddone
 				TextHandler.drawRowVESA :
 				mov edx, [TextHandler.selectedColor]
+					push ecx
+					mov ecx, [TextHandler.textSizeMultiplier]
+					TextHandler.drawRowloop.FinishWidthVESA :
 				mov [ebx], edx
+					add ebx, 4
+					sub ecx, 1
+					cmp ecx, 0x0
+						jg TextHandler.drawRowloop.FinishWidthVESA
+					pop ecx
 		jmp TextHandler.drawRownddone
 	TextHandler.drawRownd :
 		push dx
 		mov dl, [TextHandler.solidChar]
 		cmp dl, 0x0
-			je TextHandler.drawRownd.nodr
+			je TextHandler.drawRownd.nodrawnodr
 		mov dl, 0x0
 		mov [ebx], dl
+		TextHandler.drawRownd.nodrawnodr :
+			push ecx	; advance to next char slot
+			mov ecx, [TextHandler.textSizeMultiplier]
+			imul ecx, [Graphics.bytesPerPixel]
+		add ebx, ecx
+			pop ecx
 	TextHandler.drawRownd.nodr :
 		pop dx
 	TextHandler.drawRownddone :
-		add ebx, [Graphics.bytesPerPixel]
 		cmp cl, 0x0
 			jg TextHandler.drawRowloop
 			
@@ -182,6 +218,6 @@ dd 0x0
 TextHandler.charposStor :
 dd 0x0
 
-tada_msg :
-db "Something matched!", 0x0
+TextHandler.textSizeMultiplier :
+dd 0x1
 

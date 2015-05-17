@@ -177,9 +177,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		xor edx, edx
 		div ebx	; eax now contains the line number
 		
-		mov ecx, 9
+		push ecx
+		mov ecx, 7
+		imul ecx, [TextHandler.textSizeMultiplier]
+		add ecx, 2
 		xor edx, edx
 		idiv ecx
+		pop ecx
 		
 		cmp edx, 0x0
 		je Dolphin.checkCharLine.kret
@@ -187,7 +191,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		mov ecx, edx	; ecx now contains the remainder, if non 0 the line is invalid
 		add eax, 1	; eax contains last valid line
 		xor edx, edx
-		imul eax, 9	; should be 8
+		
+		push ebx
+		mov ebx, 7
+		imul ebx, [TextHandler.textSizeMultiplier]
+		add ebx, 2
+		imul eax, ebx	; should be 8
+		pop ebx
 		
 		xor ecx, ecx
 		mov cx, [TextHandler.textWidth]
@@ -359,13 +369,13 @@ Dolphin.doneDrawingWindows :
 	call Manager.freezePanic
 Dolphin.doneDrawingWindows.cont :
 ;call debug.update	; ensuring that debug information stays updated and 'on top'
-		mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
-		mov ebx, [Dolphin.SCREEN_BUFFER]
-		mov ecx, [Graphics.SCREEN_SIZE]
-		mov edx, [Graphics.SCREEN_MEMPOS]
-		call Dolphin.xorImage
+		;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
+		;mov ebx, [Dolphin.SCREEN_BUFFER]
+		;mov ecx, [Graphics.SCREEN_SIZE]
+		;mov edx, [Graphics.SCREEN_MEMPOS]
+		;call Dolphin.xorImage
 mov eax, [Dolphin.SCREEN_BUFFER]
-mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
+mov ebx, [Graphics.SCREEN_MEMPOS];[Dolphin.SCREEN_FLIPBUFFER]
 mov ecx, [Graphics.SCREEN_WIDTH]
 mov edx, [Graphics.SCREEN_HEIGHT]
 call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
