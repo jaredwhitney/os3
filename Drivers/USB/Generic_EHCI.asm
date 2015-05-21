@@ -98,6 +98,9 @@ USB_GrabControllerInfo :	; so broken D:
 	mov bl, [eax]
 	add eax, ebx	; operational base -> eax
 	mov [USB_OPBASE], eax
+	call console.numOut
+	mov ebx, eax
+	call console.numOut
 
 	mov eax, [USB_BASE]	; structural params
 	add eax, 0x4
@@ -129,6 +132,16 @@ pusha
 	mov eax, [ebx]
 	or eax, (0b1 << 2)
 	mov [ebx], eax
+	
+	mov ax, [USB_PCIMAJOR]
+	mov bl, [USB_PCIMINOR]
+	mov bh, 0x4
+	push eax
+	call PCI.read
+	mov ecx, eax
+	pop eax
+	or ecx, 0b1 << 10
+	call PCI.write
 popa
 ret
 

@@ -40,6 +40,7 @@ kernel.initModules :
 	call Clock.init
 	call Clock.show	; should be bound to a command!
 	call USB_InitController
+		call USB_EnablePlugAndPlay
 	;call debug.init
 	ret
 	

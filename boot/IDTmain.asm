@@ -488,7 +488,9 @@ IDTEND :
 IDTHANDLER :
 	pusha
 		call USB_PrintActivePorts
-		call IRQ_FINISH
+		call Manager.customLock
+		call Manager.doLock
+		hlt
 	popa
 	iret
 	

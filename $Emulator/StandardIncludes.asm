@@ -19,11 +19,12 @@
 %include "..\Tools\System\Guppy.asm"
 %include "..\Tools\System\Minnow.asm"
 
-%include "..\Tools\Security\Manager.asm"
-%include "..\Tools\String\EqualityTests.asm"
-%include "..\Tools\String\General.asm"
-
 %include "..\Tools\Utility\Clock.asm"
+%include "..\Tools\Security\Manager.asm"
+
+%include "..\Tools\String\General.asm"
+%include "..\Tools\String\EqualityTests.asm"
+%include "..\Tools\Number\BCDconversions.asm"
 
 %include "..\kernel\ProgramLoader.asm"
 %include "..\debug\print.asm"
