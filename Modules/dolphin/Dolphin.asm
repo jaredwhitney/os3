@@ -369,13 +369,13 @@ Dolphin.doneDrawingWindows :
 	call Manager.freezePanic
 Dolphin.doneDrawingWindows.cont :
 ;call debug.update	; ensuring that debug information stays updated and 'on top'
-		;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
-		;mov ebx, [Dolphin.SCREEN_BUFFER]
-		;mov ecx, [Graphics.SCREEN_SIZE]
-		;mov edx, [Graphics.SCREEN_MEMPOS]
-		;call Dolphin.xorImage
+		mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
+		mov ebx, [Dolphin.SCREEN_BUFFER]
+		mov ecx, [Graphics.SCREEN_SIZE]
+		mov edx, [Graphics.SCREEN_MEMPOS]
+		call Dolphin.xorImage
 mov eax, [Dolphin.SCREEN_BUFFER]
-mov ebx, [Graphics.SCREEN_MEMPOS];[Dolphin.SCREEN_FLIPBUFFER]
+mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
 mov ecx, [Graphics.SCREEN_WIDTH]
 mov edx, [Graphics.SCREEN_HEIGHT]
 call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
@@ -397,8 +397,13 @@ Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffe
 	xor ecx, edx
 	cmp ecx, 0x0
 		je Dolphin.xorImage.noUpdate
+		;mov edx, 0x0CFF0CFF
 	mov [eax], edx
+	jmp DxoIcnt
 	Dolphin.xorImage.noUpdate :
+	;		mov edx, [ebx]
+	;mov [eax], edx
+	DxoIcnt :
 	add eax, 4
 	mov [Dolphin.xbuf3pos], eax
 	mov eax, [Dolphin.xbufsize]

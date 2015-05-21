@@ -8,8 +8,6 @@ Keyboard.poll :
 	cmp al, 0x0	; if a key has not been released
 	je Keyboard.poll.checkKey
 	xor bl, 0x80
-	cmp bl, 0x2a
-	je KeyManager.handleShift.off
 	KeyManager.handleShift.off.reentry :
 	mov cx, 0x1	; otherwise a key was released
 	mov [KeyManager.isReady], cx	; store 1 so we know we are ready to read next time
@@ -27,6 +25,9 @@ Keyboard.poll :
 		Keyboard.poll.checkKey.override :
 		push bx
 	call KeyManager.toChar
+	
+	call KeyManager.handleShift
+	
 	cmp bl, 0x1d
 		je Keyboard.poll.drawKeyFinalize	; should not print a modifier byte
 	;cmp bl, 0x2a
@@ -40,7 +41,7 @@ Keyboard.poll :
 	cmp al, 0x0
 	pop ax
 	je os.handlecont
-		
+	
 		cmp bl, 0x50	; down key
 		je KeyManager.handleSpecialKey
 		cmp bl, 0x4d	; right key
@@ -58,10 +59,12 @@ Keyboard.poll :
 		call Dolphin.activateNext
 		jmp Keyboard.poll.drawKeyFinalize
 		os.handlecont :
-		cmp bl, 0x3a
-		je Keyboard.poll.drawKeyFinalize
-	jmp KeyManager.handleShift
-	KeyManager.handleShift.reentry :
+		;cmp bl, 0x3a
+		;je Keyboard.poll.drawKeyFinalize
+		
+		;jmp KeyManager.handleShift
+		
+	;KeyManager.handleShift.reentry :
 	mov bl, al
 	call KeyManager.keyPress	; keypress will be sent to the currently registered program in al
 	Keyboard.poll.drawKeyFinalize :
@@ -74,6 +77,7 @@ Keyboard.poll :
 	ret
 
 KeyManager.handleShift :	; charcode in bl
+	pusha
 	cmp bl, 0x2a
 	je KeyManager.handleShift.on	; DONT JUMP, handle it
 	push ax
@@ -87,19 +91,25 @@ KeyManager.handleShift :	; charcode in bl
 	jg KeyManager.handleShift.ret
 	sub al, 0x20
 	KeyManager.handleShift.ret :
-	jmp KeyManager.handleShift.reentry
+	popa
+	ret
+	;jmp KeyManager.handleShift.reentry
 	KeyManager.handleShift.on :
 		push ax
 		mov al, 0xFF
 		mov [KeyManager.caps], al
 		pop ax
-		jmp Keyboard.poll.drawKeyFinalize
+		popa
+		ret
+		;jmp Keyboard.poll.drawKeyFinalize
 	KeyManager.handleShift.off :
 		push ax
 		mov al, 0x0
 		mov [KeyManager.caps], al
 		pop ax
-		jmp KeyManager.handleShift.off.reentry
+		popa
+		ret
+		;jmp KeyManager.handleShift.off.reentry
 
 KeyManager.keyPress :
 	pusha
