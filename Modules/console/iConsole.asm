@@ -50,19 +50,24 @@ je console.update.gone
 console.loop.noChange :
 mov bl, [console.winNum]
 mov [Dolphin.currentWindow], bl
-call Keyboard.getKey
-cmp bl, 0x0
-je console.loop.ret
-cmp bl, 0xff
-je console.doBackspace
-cmp bl, 0xfe
-jne console.loop.notEnter
-call JASM.console.handleEnter
-jmp console.loop.ret
-console.loop.notEnter :
-mov al, bl
-mov ah, 0xFF
-call console.cprint
+	console.loop.checkKeyBuffer :
+	mov ebx, [KeyManager.bufferpos]
+	cmp ebx, 0x0	; is there any data avaliable?
+		je console.loop.ret
+	call Keyboard.getKey
+	cmp bl, 0x0		; was the program allowed to get data?
+		je console.loop.ret
+	cmp bl, 0xff	; was the character a backspace?
+		je console.doBackspace
+	cmp bl, 0xfe	; was the character an enter?
+		jne console.loop.notEnter
+	call JASM.console.handleEnter
+	jmp console.loop.checkKeyBuffer
+	console.loop.notEnter :
+		mov al, bl
+		mov ah, 0xFF
+		call console.cprint
+		jmp console.loop.checkKeyBuffer
 console.loop.ret :
 popa
 ret
@@ -397,7 +402,7 @@ mov [eax], bx
 add eax, 2
 mov [eax], bx
 call console.update
-jmp console.loop.ret
+jmp console.loop.checkKeyBuffer
 
 console.cprint :
 pusha

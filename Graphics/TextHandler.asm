@@ -106,6 +106,7 @@ TextHandler.drawRow :	; ah contains row
 				jmp TextHandler.drawRownddone
 				TextHandler.drawRowVESA :
 				mov edx, [TextHandler.selectedColor]
+								or edx, CHANGE_MASK
 					push ecx
 					mov ecx, [TextHandler.textSizeMultiplier]
 					TextHandler.drawRowloop.FinishWidthVESA :

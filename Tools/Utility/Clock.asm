@@ -23,6 +23,22 @@ pusha
 	mov ebx, [Clock.buffer]
 	call Clock.createTimeString
 	call Clock.win_update
+	call Keyboard.getKey
+	cmp bl, 0x0
+		je Clock.loop.ret
+	cmp bl, '-'
+		jne Clock.loop.nossub
+	mov eax, [Clock.size]
+	sub eax, 1
+	mov [Clock.size], eax
+	jmp Clock.loop.ret
+	Clock.loop.nossub :
+	cmp bl, '='
+		jne Clock.loop.ret
+		mov eax, [Clock.size]
+		add eax, 1
+		mov [Clock.size], eax
+Clock.loop.ret :
 popa
 ret
 
@@ -87,7 +103,7 @@ ret
 
 Clock.win_update :
 pusha
-	mov ebx, 2
+	mov ebx, [Clock.size]
 	mov [TextHandler.textSizeMultiplier], ebx
 		mov ebx, [Clock.buffer]
 		call String.getLength
@@ -105,6 +121,11 @@ pusha
 		add eax, 1
 		imul eax, 4
 		mov [Clock.width], ax
+		
+		mov ecx, 0x12/2
+		imul ecx, [TextHandler.textSizeMultiplier]
+		mov [Clock.height], cx
+		
 	xor ebx, ebx
 	mov bl, [Clock.pnum]
 	mov [Dolphin.currentWindow], ebx
@@ -124,6 +145,8 @@ ret
 
 Clock.pnum :
 	db 0x0
+Clock.size :
+	dd 0x2
 Clock.windowStruct :
 	dd "iConsole VER_1.0"	; title
 	Clock.width :

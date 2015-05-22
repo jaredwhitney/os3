@@ -2,6 +2,9 @@
 ;Dolphin.SCREEN_BUFFER	equ 0xA20000
 ;Graphics.SCREEN_WIDTH	equ 0x140
 ;Graphics.SCREEN_HEIGHT	equ 0xc8
+
+CHANGE_MASK equ 0x80000000
+
 Dolphin.init :
 	; whatever needs to be done here
 pusha
@@ -57,12 +60,13 @@ ret
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize (chars)
 	pusha
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
 	call Syntax.reset
 	and ecx, 0xFFFF
 	mov [dstor], edx
 	mov [bposstor], ebx
 	mov [TextHandler.textWidth], cx
-		pusha
+		pusha		;NOTE: this being commented breaks stuff :)
 		mov eax, ebx
 		mov edx, [Graphics.SCREEN_SIZE]
 		mov ebx, 0x0
@@ -95,13 +99,13 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 		pop ecx
 		pop ebx
 			jg Dolphin.drawText_ret
-				pusha
-				mov eax, [TextHandler.charpos]	; where we are in destination buffer + destination buffer pos
-				mov ebx, [bposstor]
-				add ebx, [Graphics.SCREEN_SIZE]
-				cmp eax, ebx
-				popa
-					jge Dolphin.drawText_ret
+				;pusha
+				;mov eax, [TextHandler.charpos]	; where we are in destination buffer + destination buffer pos
+				;mov ebx, [bposstor]
+				;add ebx, [Graphics.SCREEN_SIZE]
+				;cmp eax, ebx
+				;popa
+				;	jge Dolphin.drawText_ret
 		add edx, 1
 		cmp al, 0x0
 			je Dolphin.drawText.nodraw
@@ -149,6 +153,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 	Dolphin.drawText_ret :
 	mov ecx, [TextHandler.charposStor]
 	mov [TextHandler.charpos], ecx
+	mov byte [Dolphin_WAIT_FLAG], 0x0
 	popa
 	ret
 	
@@ -304,11 +309,22 @@ ret
 
 Dolphin.updateScreen :
 pusha
+	cmp byte [Dolphin_WAIT_FLAG], 0xFF
+		je Dolphin.updateScreen.ret
+	push word [Dolphin.currentWindow]
 			; 	If an exception occurs, blame Dolphin.	;
 			mov bl, Manager.CONTROL_DOLPHIN
 			mov [os.mlloc], bl
 			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
-call Dolphin.redrawBG	; should only be updated if one of the windows has been moved!
+		mov al, [Dolphin.dcount]
+		cmp al, 0x10
+		add al, 0x1
+			jne Dolphin.updateScreen.nbgup
+		call Dolphin.redrawBG
+		mov al, 0x0
+		Dolphin.updateScreen.nbgup :
+		mov [Dolphin.dcount], al
+
 ;
 ;	Draw windows in here!
 		mov ebx, 0x0
@@ -327,15 +343,16 @@ call Dolphin.redrawBG	; should only be updated if one of the windows has been mo
 		mov [Dolphin.currentWindow], ebx
 		mov bl, [Dolphin.WIDTH]
 		call Dolphin.getAttribute
-		mov [atwstor], ax
+		mov [atwstorX], ax
 		
 		mov bl, [Dolphin.HEIGHT]
 		call Dolphin.getAttribute
-		mov [atwstor2], ax
+		mov [atwstor2X], ax
 		
 		call Dolphin.getWindowBuffer	; mov eax, windowBuffer
-		mov ecx, [atwstor]
-		mov edx, [atwstor2]
+		
+		mov ecx, [atwstorX]
+		mov edx, [atwstor2X]
 			pusha
 			mov ebx, eax
 			call Dolphin.drawBorder
@@ -357,7 +374,9 @@ call Dolphin.redrawBG	; should only be updated if one of the windows has been mo
 		add ebx, eax
 		pop eax
 		
+		;mov byte [Image_checkChange], 0xFF	; enabling causes a *slight* slowdown
 		call Image.copy
+		;mov byte [Image_checkChange], 0x0
 		
 		pop ebx
 		jmp Dolphin.updateScreen.checkWindow
@@ -369,17 +388,44 @@ Dolphin.doneDrawingWindows :
 	call Manager.freezePanic
 Dolphin.doneDrawingWindows.cont :
 ;call debug.update	; ensuring that debug information stays updated and 'on top'
-		mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
-		mov ebx, [Dolphin.SCREEN_BUFFER]
-		mov ecx, [Graphics.SCREEN_SIZE]
-		mov edx, [Graphics.SCREEN_MEMPOS]
-		call Dolphin.xorImage
-mov eax, [Dolphin.SCREEN_BUFFER]
-mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
-mov ecx, [Graphics.SCREEN_WIDTH]
-mov edx, [Graphics.SCREEN_HEIGHT]
-call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
+		;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
+		;mov ebx, [Dolphin.SCREEN_BUFFER]
+		;mov ecx, [Graphics.SCREEN_SIZE]
+		;mov edx, [Graphics.SCREEN_MEMPOS]
+		;call Dolphin.xorImage
+;mov eax, [Dolphin.SCREEN_BUFFER]
+;mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
+;mov ecx, [Graphics.SCREEN_WIDTH]
+;mov edx, [Graphics.SCREEN_HEIGHT]
+;call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
 
+mov eax, [Dolphin.SCREEN_BUFFER]
+mov ebx, [Graphics.SCREEN_MEMPOS]
+mov ecx, [Graphics.SCREEN_SIZE]
+call Dolphin.copyChanged
+
+	pop word [Dolphin.currentWindow]
+Dolphin.updateScreen.ret :
+popa
+ret
+
+Dolphin.copyChanged :	; eax = buffer1, ebx = buffer2, ecx = buffersize
+pusha
+	Dolphin.copyChanged.loop :
+		mov edx, [eax]
+		test edx, CHANGE_MASK
+			jz Dolphin.copyChanged.noChange
+			
+		; else it needs to be updated!
+		and edx, 0xFFFFFF
+		mov [ebx], edx
+		
+		Dolphin.copyChanged.noChange :
+		sub ecx, 4
+		add eax, 4
+		add ebx, 4
+		cmp ecx, 0
+			jg Dolphin.copyChanged.loop
 popa
 ret
 
@@ -728,6 +774,8 @@ Dolphin.TYPE :
 db 24
 DOLPHIN.DEPTH :
 db 25
+Dolphin_WAIT_FLAG :
+db 0x0
 
 Dolphin.currentWindow :
 dd 0x0
@@ -741,6 +789,10 @@ atwstor :
 dw 0x0
 atwstor2 :
 dw 0x0
+atwstorX :
+dw 0x0
+atwstor2X :
+dw 0x0
 Dolphin.xbufsize :
 dd 0x0
 Dolphin.xbuf1pos :
@@ -749,6 +801,8 @@ Dolphin.xbuf2pos :
 dd 0x0
 Dolphin.xbuf3pos :
 dd 0x0
+Dolphin.dcount :
+db 0x0
 
 Dolphin.colorOverride :
 db 0x0

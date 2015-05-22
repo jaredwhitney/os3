@@ -1,3 +1,12 @@
+KeyManager.init :
+pusha
+	mov al, 0x1
+	mov ebx, 0x10
+	call Guppy.malloc
+	mov [Keyboard_buffer], ebx
+popa
+ret
+
 ;	POLL THE PS2 KEYBOARD FOR DATA	;
 Keyboard.poll :
 	pusha
@@ -111,13 +120,37 @@ KeyManager.handleShift :	; charcode in bl
 		ret
 		;jmp KeyManager.handleShift.off.reentry
 
-KeyManager.keyPress :
-	pusha
-	mov [0x1030], bl
-	mov al, 0xFF
-	mov [0x1031], al
-	popa
-	ret
+KeyManager.keyPress :	; key in bl
+pusha
+	; old code kept for compatability
+	;mov [0x1030], bl
+	;mov al, 0xFF
+	;mov [0x1031], al
+	
+	; new code
+	cmp bl, 0x0
+		je KeyManager.keyPress.ret
+		pusha	; shift all elements up in the array
+			mov eax, [KeyManager.bufferpos]
+			mov ebx, [Keyboard_buffer]
+			mov cl, [ebx]
+			KeyManager.keyPress.arrLoop :
+			add ebx, 1
+			mov dl, [ebx]
+			mov [ebx], cl
+			mov cl, dl
+			sub eax, 1
+			cmp eax, 0x0
+				jg KeyManager.keyPress.arrLoop
+		popa
+	mov eax, [Keyboard_buffer]
+	mov [eax], bl
+	mov eax, [KeyManager.bufferpos]
+	add eax, 1
+	mov [KeyManager.bufferpos], eax
+	KeyManager.keyPress.ret :
+popa
+ret
 
 Keyboard.getKey :
 	push eax
@@ -130,15 +163,34 @@ Keyboard.getKey :
 	mov bl, 0x0
 	ret
 	Keyboard.getKey.kcont :
-	;
+	
+	; old code
+	;mov bl, 0x0
+	;mov al, [0x1031]
+	;cmp al, 0xFF
+	;jne Keyboard.getKey.ret
+	;mov bl, [0x1030]
+	;mov al, 0x0
+	;mov [0x1031], al
+	;Keyboard.getKey.ret :
+	
+	;jmp Keyboard.getKey.new_retk
+	
+	; new code
 	mov bl, 0x0
-	mov al, [0x1031]
-	cmp al, 0xFF
-	jne Keyboard.getKey.ret
-	mov bl, [0x1030]
-	mov al, 0x0
-	mov [0x1031], al
-	Keyboard.getKey.ret :
+	push ecx
+	mov ecx, [KeyManager.bufferpos]
+	cmp ecx, 0x0
+		je Keyboard.getKey.new_ret
+	mov eax, [Keyboard_buffer]
+	add eax, ecx
+	sub eax, 1
+	mov bl, [eax]
+	sub ecx, 1
+	mov [KeyManager.bufferpos], ecx
+	Keyboard.getKey.new_ret :
+	pop ecx
+	Keyboard.getKey.new_retk :
 	pop eax
 	ret
 
@@ -260,6 +312,12 @@ KeyManager.toChar :
 	cmp bl, 0x0B
 	mov al, '0'
 	je KeyManager.toChar.ret
+	cmp bl, 0x0C
+	mov al, '-'
+	je KeyManager.toChar.ret
+	cmp bl, 0x0D
+	mov al, '='
+	je KeyManager.toChar.ret
 	cmp bl, 0x0E	; backspace
 	mov al, 0xff
 	je KeyManager.toChar.ret
@@ -362,3 +420,8 @@ dd 0x0
 KeyManager.lastKey :
 dw 0x0
 
+Keyboard_buffer :
+dd 0x0
+
+KeyManager.bufferpos :
+dd 0x0

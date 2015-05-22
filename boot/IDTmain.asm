@@ -60,7 +60,7 @@ setupPIC :
 	out dx, al
 	
 	mov dx, 0x21
-	mov al, 0b11111101	; 01
+	mov al, 0b11111100	; 01
 	out dx, al
 	mov dx, 0xa1
 	mov al, 0b11111111
@@ -496,8 +496,12 @@ IDTHANDLER :
 	
 _IRQ0 :
 	pusha
+		call IRQ_FINISH
 		; timer code goes here!
-	call IRQ_FINISH
+		cmp byte [Manager.locked], 0x0
+			jne _IRQ0.ret
+		call Dolphin.updateScreen
+	_IRQ0.ret :
 	popa
 	iret
 	

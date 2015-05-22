@@ -36,6 +36,7 @@ kernel.initModules :
 	call Guppy.init
 	call Catfish.init
 	call console.init
+	call KeyManager.init
 	call View.init
 	call Clock.init
 	call Clock.show	; should be bound to a command!
@@ -48,7 +49,7 @@ kernel.halt :
 	cli
 	mov ebx, kernel.HALT_MESSAGE
 	call debug.println
-	call Dolphin.updateScreen
+	;call Dolphin.updateScreen
 	hlt
 
 kernel.HALT_MESSAGE :
