@@ -1,13 +1,46 @@
+; NOTE: If this documentation appears to be formatted oddly, make sure that you are viewing it
+; 	- In a fixed-width font
+;	- With a tab size of 4 (tab aligns text to the next chunk of 4 spaces)
 
+; boot.asm
+;	Created :		4-29-15
+;	Uploaded :		4-29-15 (https://github.com/jaredwhitney/os3/blob/03284be7c5ae5dc779755da976f47939a6dd181b/IDT/IDTmain.asm)
+;	Pulled :		5-21-15 [not up to date]
+;	Commented :		Not yet fully commented.
+;	Modified :		5-23-15
+;	Documented :	Not yet documented.
+
+;
+; Contains interrupt handling code.
+;
+
+
+; Constants
+
+; Loads the IDT and enables interrupts.
+;Params :
+;	none
+;Returns :
+;	none (return to caller)
+;Modifies :
+;	none
+;Preconditions :
+;	processor in protected mode
+;	interrupts disabled
 loadIDT :
+	
+	; Load the new IDT
 	lidt [IDT_INFO]
-	; need to init Programmable Interrupt Chip (PIC) before enabling interrupts
+	
+	; Enable interrupts
 	sti
+	
+	; Setup the PIC (Programmable Interrupt Controller) and PIT (Programmable Interrupt Timer)
 	call setupPIC
 	call setupPIT
-	;int 0x1
-	;hlt
-	ret
+	
+ret
+
 	
 setupPIT :
 	pusha
@@ -23,6 +56,7 @@ setupPIT :
 	sti
 	popa
 	ret
+
 	
 setupPIC :
 	pusha
@@ -67,15 +101,9 @@ setupPIC :
 	out dx, al
 	
 	popa
-	;pop eax	; if things are not working keep this uncommented, it will skip enabling interrupts
 	ret
 
-;IDTDescriptor :
-;	dw loweroffs
-;	dw codeSegSelector	(see GDT, should be same as kernel)
-;	db 0x0
-;	db (bit_present, 2bit_ringLevel, bit_storage_seg (usually 0), nibble_gate_type)
-;	dw higheroffs
+
 IDTSTART :
 
 	_IDT0 :

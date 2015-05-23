@@ -5,6 +5,7 @@
 ; boot.asm
 ;	Created :		12-19-14
 ;	Uploaded :		2-4-15 (https://github.com/jaredwhitney/os3/blob/f2e74ca82ff9382242103e0ef4cfe8b0c671e882/boot/boot.asm)
+;	Pulled :		5-21-15
 ;	Commented :		5-21-15
 ;	Modified :		5-23-15
 ;	Documented :	Not yet documented.
@@ -47,11 +48,13 @@
 	TRUE							equ 0xFF	; the value 'true'
 
 
+
 ; The proccessor is currently in 16-bit mode, make sure the assembler knows this.
 [bits 16]
 
 ; This code will be loaded in at 0x7c00 (the location that BIOS should always copy bootloader code to).
 [org 0x7c00]
+
 
 ; Where execution will begin (function tag only included for completeness).
 ;Params :
@@ -66,6 +69,7 @@
 ;	processor in 16-bit mode
 ;	processor in real or unreal mode
 ;	function must be loaded in memory at 0x7c00
+
 boot.entryPoint :
 
 	; Initialize stack and segment registers
@@ -156,6 +160,7 @@ pusha
 popa
 ret
 
+
 ; Retries a failed disk load with drive 0x0.
 ;Params :
 ;	INTERNAL_USE_ONLY <@boot.load>
@@ -167,13 +172,22 @@ ret
 ;	INHERIT_FROM_PARENT
 
 lret:
+
+	; Alert the user that there was an error
 	mov bx, ERRORrt
-	call boot.print		; alert the user that there was an error
+	call boot.print
+	
+	; Set the word at [NON_USB_BOOT] to TRUE in order keep a record that the system retried the read
 	mov ax, TRUE
-	mov [NON_USB_BOOT], ax	; set the word at [NON_USB_BOOT] to TRUE in order keep a record that the system retried the read
-	popa				; restore all of the values used to originally call the function
-	mov dl, REAL_DRIVE			; set drive to 0x0
-	jmp boot.load		; retry the load
+	mov [NON_USB_BOOT], ax
+	
+	; Restore the values of the registersused to call @boot.load
+	popa
+	
+	; Attempt to load from the harddrive
+	mov dl, REAL_DRIVE
+	jmp boot.load
+	
 
 ; Alerts the user that a disk load has failed to read the appropriate amount of sectors.
 ;Params :
@@ -186,8 +200,11 @@ lret:
 ;	INHERIT_FROM_PARENT
 
 sload_error:
+
+	; Alert the user that not all sectors could be read
 	mov bx, ERRORs
-	call boot.print		; alert the user that not all sectors could be read
+	call boot.print
+	
 popa
 ret
 
@@ -205,21 +222,32 @@ ret
 
 boot.print :
 pusha
+
+	; Set up values to be used in the loop
 	mov ah, FUNC_TELETYPE_PRINTCHAR
 	mov al, [bx]	; move the first character into $al
+	
+	; Loop over the String until it is fully printed
 	boot.print.loop :
 		push bx
+		
+		; Set $bx to the specified values, and print the character stored in $al
 		mov bh, TELETYPE_DEFAULT_PAGE	; write to page 0
 		mov bl, COLOR_GRAY	; use a gray color
 		int DISPLAY_COMMAND	; call the interrupt (display the character)
 		pop bx
-		add bx, 1	; read from the next character in the String
-		mov al, [bx]
-		cmp al, STRING_END	; if it does not equal 0, repeat (Strings are null-terminated)
+		
+		; Read the next character in the String
+		add bx, 1
+		mov al, [bx]	; move the next character into $al
+		
+		; If the next character is not the end of the String, repeat until it is
+		cmp al, STRING_END
 			jne boot.print.loop
 popa
 ret		
 	
+
 	
 ; Data
 	; Strings
