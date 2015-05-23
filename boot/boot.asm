@@ -6,11 +6,46 @@
 ;	Created :		12-19-14
 ;	Uploaded :		2-4-15 (https://github.com/jaredwhitney/os3/blob/f2e74ca82ff9382242103e0ef4cfe8b0c671e882/boot/boot.asm)
 ;	Commented :		5-21-15
+;	Modified :		5-23-15
 ;	Documented :	Not yet documented.
 
 ;
 ; Contains os3's stage 1 bootloader.
 ;
+
+
+; Constants
+
+	; Bootloader constants
+	BOOTLOADER_END					equ 0x7e00	; location of the end of the bootloader
+	BOOTLOADER_MAGIC_NUMBER			equ 0xaa55	; marks this sector as containing a bootloader
+	STAGE2_ENTRY					equ 0x7e01	; where the stage 2 bootloader code begins
+	
+	; Misc constants
+	NON_USB_BOOT					equ 0x1000	; where to store whether or not the system was booted from a thumbdrive or not
+	STACK_BASE						equ 0x2000	; where the stack should be positioned
+	
+	; Interrupt constants
+	DISK_COMMAND					equ 0x13	; BIOS interrupt to perform disk operations
+		FUNC_DISK_READ				equ 0x02	; BIOS function to read from a disk
+			REAL_DRIVE				equ 0x00	; drive that is used by the default harddrive
+			USB_DRIVE 				equ 0x80	; drive that is used by BIOS for USB emulation
+		FUNC_FLOPPY_RESET			equ 0x00	; BIOS function to reset the floppy controller
+		
+	DISPLAY_COMMAND					equ 0x10	; BIOS interrupt to 
+		FUNC_TELETYPE_PRINTCHAR		equ 0x0e	; BIOS interrupt to output a character in teletype mode
+			COLOR_GRAY				equ 0x07	; a gray color in the default palette
+			TELETYPE_DEFAULT_PAGE	equ 0x00	; default page for teletype operations
+			
+	; String constants
+	CARRIAGE_RETURN					equ 0x0D	; carriage return character
+	LINE_FEED						equ 0x0A	; line feed character
+	STRING_END						equ 0x00	; null-byte which signals termination of a String
+	
+	; Boolean constants
+	FALSE							equ 0x00	; the value 'false'
+	TRUE							equ 0xFF	; the value 'true'
+
 
 ; The proccessor is currently in 16-bit mode, make sure the assembler knows this.
 [bits 16]
@@ -35,7 +70,7 @@ boot.entryPoint :
 
 	; Initialize stack and segment registers
 	cli
-	mov bp, 0x2000
+	mov bp, STACK_BASE
 	mov sp, bp
 	xor ax, ax		; xor'ing any number with itself will equal 0, and is slightly faster than a "mov $reg, 0x0"
 	mov ds, ax
@@ -54,21 +89,21 @@ boot.entryPoint :
 	; Store the drive the computer booted from into [boot_drive]
 	mov [boot_drive], dl
 
-	; Store that we are booting in real hardware (it will be overridden later if not running on a real computer)
-	mov ax, 0x0
-	mov [0x1000], ax
+	; Store that we are booting from a thumbdrive (it will be overridden later if not)
+	mov ax, FALSE
+	mov [NON_USB_BOOT], ax
 	
 	; Load the kernel into RAM (NOTE: ax=0x0 from above)
-	mov dl, 0x80	; drive 0x80 is used by BIOS for USB emulation, try it first
+	mov dl, USB_DRIVE		; try the USB drive first
 	mov ch, 0
-	mov bx, 0x7e00
+	mov bx, BOOTLOADER_END
 	mov cl, 2
 	mov dh, 0x40
 	call boot.load
 
 	; Call the auxilary bootloader steps
 	mov bl, 0x0
-	jmp 0x7e01
+	jmp STAGE2_ENTRY
 
 	
 ; Loads data from a disk using BIOS int 0x13.
@@ -92,20 +127,20 @@ pusha
 
 	; Reset the floppy controller (in case it is being booted from a floppy disc)
 	push ax
-		mov ah, 0	; BIOS function to use (int 0x13 function 0) to reset the floppy controller
-		int 0x13
+		mov ah, FUNC_FLOPPY_RESET
+		int DISK_COMMAND
 	pop ax
 	
 	; Shuffle around registers (the function accepts its values in different registers than are expected by int 0x13)
 	mov dl, bl	
 	push es			; ensure that $es can be restored later
 	mov es, ax
-	mov ah, 0x02	; BIOS function to use (int 0x13 function 2) to read from a disk
+	mov ah, FUNC_DISK_READ
 	mov al, dh		; number of sectors to read
 	mov dh, 0x0		; head to read from
 
 	; Call the actual interrupt! (read the data)
-	int 0x13
+	int DISK_COMMAND
 	
 	; Restore the previous value of $es
 	pop es
@@ -134,10 +169,10 @@ ret
 lret:
 	mov bx, ERRORrt
 	call boot.print		; alert the user that there was an error
-	mov ax, 0xF
-	mov [0x1000], ax	; set the word at [0x1000] to 0xFF in order keep a record that the system retried the read
+	mov ax, TRUE
+	mov [NON_USB_BOOT], ax	; set the word at [NON_USB_BOOT] to TRUE in order keep a record that the system retried the read
 	popa				; restore all of the values used to originally call the function
-	mov dl, 0x0			; set drive to 0x0
+	mov dl, REAL_DRIVE			; set drive to 0x0
 	jmp boot.load		; retry the load
 
 ; Alerts the user that a disk load has failed to read the appropriate amount of sectors.
@@ -170,17 +205,17 @@ ret
 
 boot.print :
 pusha
-	mov ah, 0x0E	; BIOS function to use (int 0x10 function 0xE) to output a character in teletype mode
+	mov ah, FUNC_TELETYPE_PRINTCHAR
 	mov al, [bx]	; move the first character into $al
 	boot.print.loop :
 		push bx
-		mov bh, 0x0	; write to page 0
-		mov bl, 0x7	; use a gray color
-		int 0x10	; call the interrupt (display the character)
+		mov bh, TELETYPE_DEFAULT_PAGE	; write to page 0
+		mov bl, COLOR_GRAY	; use a gray color
+		int DISPLAY_COMMAND	; call the interrupt (display the character)
 		pop bx
 		add bx, 1	; read from the next character in the String
 		mov al, [bx]
-		cmp al, 0	; if it does not equal 0, repeat (Strings are null-terminated)
+		cmp al, STRING_END	; if it does not equal 0, repeat (Strings are null-terminated)
 			jne boot.print.loop
 popa
 ret		
@@ -189,16 +224,16 @@ ret
 ; Data
 	; Strings
 		Greeting :
-			db "Hello World!", 0xD, 0xA, 0	; 0xD = carriage return, 0xA = line feed
+			db "Hello World!", CARRIAGE_RETURN, LINE_FEED, STRING_END
 			
 		LoadGDT :
-			db "Loading GDT...", 0
+			db "Loading GDT...", STRING_END
 			
 		ERRORrt :
-			db "Error: Retrying...", 0xD, 0xA, 0
+			db "Error: Retrying...", CARRIAGE_RETURN, LINE_FEED, STRING_END
 			
 		ERRORs :
-			db "Warning: Unable to read all sectors.", 0xD, 0xA, 0
+			db "Warning: Unable to read all sectors.", CARRIAGE_RETURN, LINE_FEED, STRING_END
 	; Words
 		boot_drive :
 			dw 0x0
@@ -211,10 +246,10 @@ ret
 
 
 ; Padding
-	; Bootloaders must contain the magic number 0xaa55 at the end of the sector they are stored in so that BIOS can find them)
+	; Bootloaders must contain the magic number 0xaa55 at the end of the sector they are stored in so that BIOS can find them
 	
 	times 510-($-$$) db 0	; pad the remaining space with 0's (one sector = 512 bytes)
-	dw 0xaa55				; put the 'magic number' in the remaining two bytes of the sector
+	dw BOOTLOADER_MAGIC_NUMBER				; put the 'magic number' in the remaining two bytes of the sector
 
 	
 	
