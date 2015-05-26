@@ -33,7 +33,7 @@
 			USB_DRIVE 				equ 0x80	; drive that is used by BIOS for USB emulation
 		FUNC_FLOPPY_RESET			equ 0x00	; BIOS function to reset the floppy controller
 		
-	DISPLAY_COMMAND					equ 0x10	; BIOS interrupt to 
+	DISPLAY_COMMAND					equ 0x10	; BIOS interrupt to perform display operations
 		FUNC_TELETYPE_PRINTCHAR		equ 0x0e	; BIOS interrupt to output a character in teletype mode
 			COLOR_GRAY				equ 0x07	; a gray color in the default palette
 			TELETYPE_DEFAULT_PAGE	equ 0x00	; default page for teletype operations
