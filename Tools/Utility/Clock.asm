@@ -136,6 +136,7 @@ pusha
 		mov ebx, [Clock.buffer]
 		call String.getLength	; length of Time string -> edx
 		pop ebx
+		mov [Clock.bsize], edx
 	call Dolphin.drawText
 	mov ebx, 1
 	mov [TextHandler.textSizeMultiplier], ebx
@@ -148,7 +149,7 @@ Clock.pnum :
 Clock.size :
 	dd 0x2
 Clock.windowStruct :
-	dd "iConsole VER_1.0"	; title
+	dd "Clock VER_1.0", 0	; title
 	Clock.width :
 	dw 0x00	; width
 	Clock.height :
@@ -161,3 +162,5 @@ Clock.windowStruct :
 	dd 0x0	; buffer location for storing the updated window
 	Clock.buffer :
 	dd 0x0	; buffer location for storing data
+	Clock.bsize :
+	dd 0x0

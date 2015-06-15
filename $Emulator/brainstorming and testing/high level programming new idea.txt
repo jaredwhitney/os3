@@ -1,0 +1,19 @@
+program TestProgram ("Orca HLL Test")	; Define the program, give it a descriptive name
+
+	#pre-alloc [200, Guppy.SECTORS]	; In order to run the program should first allocate at least 200 sectors
+
+	#request [Permission.KEYBOARD_LOCAL_RECIEVE]	; The program requests the ability to recieve local keypresses
+	#request [Permission.DOLPHIN_CREATE_WINDOWS]	; The program requests the ability to create windows
+
+	#global [Window w]	; variable w will always refer to the same object, set aside its memory location now
+	
+	func _init (void : null)
+		w = new Window("Test", Window.TYPE_TEXT)
+		w.buffer = "This window is a test!\n:)"
+		w.setPosition(0, 0)
+		w.setSize(w.getPreferredWidth(), w.getPreferredHeight())
+		w.showWindow()
+		KeyManager.recieveKeyPresses("_handleKeys", KeyManager.MODE_DEBOUNCED)
+	
+	func _handleKeys (void : char c)
+		String.append(w.buffer, c)

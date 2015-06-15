@@ -1,0 +1,21 @@
+; This program can be successfully translated into assembly! :)
+
+program TestProgram ("Orca HLL Test")	; Define the program, give it a descriptive name
+
+	#pre-alloc [200, Guppy.SECTORS]	; In order to run the program should first allocate at least 200 sectors
+
+	#request [Permission.KEYBOARD_LOCAL_RECIEVE]	; The program requests the ability to recieve local keypresses
+	#request [Permission.DOLPHIN_CREATE_WINDOWS]	; The program requests the ability to create windows
+
+	#global [Window window]	; variable window will always refer to the same object
+	
+	func _init (void : null)
+		window = new Window("Test", Window.TYPE_TEXT)
+		window.buffer = "This window is a test!\n:)"
+		window.SetPosition(0, 0)
+		window.SetSize(window.GetPreferredWidth(), window.GetPreferredHeight())
+		window.ShowWindow()
+		KeyManager.RecieveKeyPresses(<handleKeys>, KeyManager.MODE_DEBOUNCED)
+	
+	func handleKeys (void : char c)
+		String.Append(window.buffer, c)

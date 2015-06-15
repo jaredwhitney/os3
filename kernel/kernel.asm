@@ -4,7 +4,8 @@ Kernel.init :
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
 		;	INITIALIZING MODULES	;
-	call kernel.initModules
+	;call kernel.initModules
+	
 		;	LOCK THE COMPUTER	;
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
@@ -13,7 +14,7 @@ Kernel.init :
 	;	MAIN LOOP	;
 	kernel.loop:
 			;	RUN INSTALLED MODULES	;
-		call kernel.runModules
+		;call kernel.runModules
 			;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 		call Manager.handleLock
 			;	REPEAT	;
@@ -23,25 +24,27 @@ Kernel.init :
 kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
-	call Catfish.loop
-	call console.loop
-	call View.loop
-	call Clock.loop
+	;call Catfish.loop
+	;call console.loop
+	;call View.loop
+	;call Clock.loop
 		;	PUSH BUFFER TO SCREEN	;
-		call Dolphin.updateScreen
+		;call Dolphin.updateScreen
 	ret
 	
 kernel.initModules :
-	call Dolphin.init
 	call Guppy.init
-	call Catfish.init
-	call console.init
-	call KeyManager.init
-	call View.init
-	call Clock.init
-	call Clock.show	; should be bound to a command!
 	call USB_InitController
 		call USB_EnablePlugAndPlay
+	call Dolphin.init
+	;call Catfish.init
+	;call console.init
+	call KeyManager.init
+	;call View.init
+	
+	;call Clock.init
+	;call Clock.show	; should be bound to a command!
+		
 	;call debug.init
 	ret
 	

@@ -165,11 +165,11 @@ je console.update.gone
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
-	call Dolphin.getWindowBuffer
-	mov ebx, eax
+	
+	mov ebx, [console.windowBuffer]
 	mov eax, [console.buffer]
 	mov cx, [console.width]
-	mov edx, [console.TextHandler.charpos]
+	mov edx, [console.bufferPos]
 		;cmp edx, 0xA00
 		;jl console.size.noworry
 		;pusha
@@ -177,6 +177,7 @@ je console.update.gone
 		;popa
 		;console.size.noworry :
 	call Dolphin.drawText
+	;call Dolphin.uUpdate
 popa
 ret
 
@@ -191,7 +192,7 @@ popa
 ret
 
 ;console.checkClear :
-;mov ebx, [console.TextHandler.charpos]
+;mov ebx, [console.bufferPos]
 ;cmp ebx, 0x1000
 ;jle cseret
 ;call console.clearScreen
@@ -202,7 +203,7 @@ console.print :
 pusha
 call console.checkColor
 mov edx, [console.buffer]
-mov ecx, [console.TextHandler.charpos]
+mov ecx, [console.bufferPos]
 add edx, ecx
 printitp :
 mov al, [ebx]
@@ -214,9 +215,9 @@ mov [edx], ax
 add ebx, 1
 add edx, 2
 push ebx
-mov ebx, [console.TextHandler.charpos]
+mov ebx, [console.bufferPos]
 add ebx, 0x2
-mov [console.TextHandler.charpos], ebx
+mov [console.bufferPos], ebx
 pop ebx
 jmp printitp
 printdonep :
@@ -228,7 +229,7 @@ console.printMem :
 pusha
 call console.checkColor
 mov edx, [console.buffer]
-mov ecx, [console.TextHandler.charpos]
+mov ecx, [console.bufferPos]
 add edx, ecx
 printitpMem :
 mov al, [ebx]
@@ -239,9 +240,9 @@ mov [edx], ax
 add ebx, 2
 add edx, 2
 push ebx
-mov ebx, [console.TextHandler.charpos]
+mov ebx, [console.bufferPos]
 add ebx, 0x2
-mov [console.TextHandler.charpos], ebx
+mov [console.bufferPos], ebx
 pop ebx
 jmp printitpMem
 printdonepMem :
@@ -251,7 +252,7 @@ ret
 console.drawCursor :
 pusha
 mov edx, [console.buffer]
-mov ecx, [console.TextHandler.charpos]
+mov ecx, [console.bufferPos]
 add edx, ecx
 mov cl, 0x5f
 mov ch, 0x0F
@@ -339,20 +340,20 @@ jmp console.numOut.dontcare
 console.newline :
 	pusha
 		mov edx, [console.buffer]
-		mov ecx, [console.TextHandler.charpos]
+		mov ecx, [console.bufferPos]
 		add edx, ecx
 		mov al, 0x0A
 		mov ah, 0xFF
 		mov [edx], ax
-		mov ebx, [console.TextHandler.charpos]
+		mov ebx, [console.bufferPos]
 		add ebx, 0x2
-		mov [console.TextHandler.charpos], ebx
+		mov [console.bufferPos], ebx
 	popa
 	ret
 
 console.doBackspace :
 
-mov eax, [console.TextHandler.charpos]
+mov eax, [console.bufferPos]
 mov edx, 0x0
 bsdloop :
 push edx
@@ -367,7 +368,7 @@ jg bsdloop
 cmp eax, 0x0
 mov ecx, 2
 jne bsfnoloop
-mov ebx, [console.TextHandler.charpos]
+mov ebx, [console.bufferPos]
 add ebx, [console.buffer]
 mov [ebx], edx
 mov eax, edx
@@ -390,11 +391,11 @@ cmp [eax], bx
 je bsfcloop
 sub ecx, 2
 bsfnoloop :
-mov eax, [console.TextHandler.charpos]
+mov eax, [console.bufferPos]
 sub eax, ecx
 cmp eax, 0
 jl console.doBackspace.stop
-mov [console.TextHandler.charpos], eax
+mov [console.bufferPos], eax
 console.doBackspace.stop :
 add eax, [console.buffer]
 mov bx, 0x0
@@ -406,13 +407,13 @@ jmp console.loop.checkKeyBuffer
 
 console.cprint :
 pusha
-mov ebx, [console.TextHandler.charpos]
+mov ebx, [console.bufferPos]
 add ebx, [console.buffer]
 mov [ebx], ax
 ;call TextHandler.drawChar
-mov ebx, [console.TextHandler.charpos]
+mov ebx, [console.bufferPos]
 add ebx, 0x2
-mov [console.TextHandler.charpos], ebx
+mov [console.bufferPos], ebx
 call console.update
 popa
 ret
@@ -431,7 +432,7 @@ cmp eax, ebx
 pop ebx
 jl console.clearScreen.loop
 mov ecx, 0x0
-mov [console.TextHandler.charpos], ecx
+mov [console.bufferPos], ecx
 popa
 ret
 
@@ -441,7 +442,7 @@ ret
 
 console.getLine :	; Fixed.
 pusha
-mov eax, [console.TextHandler.charpos]
+mov eax, [console.bufferPos]
 mov edx, [console.buffer]
 add eax, edx
 mov ecx, 0x0
@@ -501,9 +502,6 @@ ret
 console.pos :	; should be removed, use the window's position instead
 dd 0x0
 
-console.TextHandler.charpos :
-dd 0xA2
-
 console.cstor :
 db 0x0
 
@@ -525,15 +523,11 @@ db "The specified function is unsupported on your computer.", 0
 console.bufferstor :
 dd 0x0
 
-TESTMSG_1 :
-db "TEqt", 0
-TESTMSG_2 :
-db "TESt"
 counter1 :
 dd 0x0
 
 console.windowStruct :
-	dd "iConsole VER_1.0"	; title
+	dd "iConsole VER_1.0", 0	; title
 	console.width :
 	dw 0xa0	; width
 	console.height :
@@ -546,3 +540,5 @@ console.windowStruct :
 	dd 0x0	; buffer location for storing the updated window
 	console.buffer :
 	dd 0x0	; buffer location for storing data
+	console.bufferPos :
+	dd 0xa2	; length of buffer (chars)

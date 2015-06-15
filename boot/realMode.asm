@@ -43,18 +43,19 @@ enterRM :
 ;cli				; make sure there are no queue'd interrupts
 sti				; enable interrupts
 	
-	;mov al, 0x3		; change the screen mode back into text
-	;mov ah, 0x0
-	;int 0x10
-	;mov bx, REALMODEMSG
-	;call boot.print
+	mov al, 0x3		; change the screen mode back into text
+	mov ah, 0x0
+	int 0x10
+	mov bx, REALMODEMSG
+	call boot.print
+	hlt
 	; ************************************** CODE GOES HERE ********************************* ;
-	mov dl, 0x80	; NEEDS TO STAY
-	mov ch, 0		; CAN CHANGE?
-	mov bx, MINNOW_START	; where to load data to
-	mov cl, 2		; CAN CHANGE?
-	mov dh, 0x40	; CAN CHANGE?
-	call rRM.load
+	;mov dl, 0x80	; NEEDS TO STAY
+	;mov ch, 0		; CAN CHANGE?
+	;mov bx, MINNOW_START	; where to load data to
+	;mov cl, 2		; CAN CHANGE?
+	;mov dh, 0x40	; CAN CHANGE?
+	;call rRM.load
 	; ***************************************** END CODE ************************************ ;
 
 jmp goProtectedMode
@@ -120,7 +121,7 @@ goIntoPMODE_final :
 		
 		cmp dh, al
 			jne rRM.sload_error
-		
+		hlt
 		popa
 		ret
 		

@@ -1,0 +1,29 @@
+program Renderer3D ("Test Arena Rendering Engine")
+	
+	#pre-alloc [300, Guppy.SECTORS]
+	
+	#request [Permission.KEYBOARD_LOCAL_RECIEVE]
+	#request [Permission.DOLPHIN_CREATE_WINDOWS]
+	#request [Permission.DOLPHIN_FULLSCREEN_MODE]
+	
+	#global [array<int>(300) meshData]
+	#global [Window w]
+
+	func _init (void : array<String> args)
+		w = new Window("TARA View", Window.TYPE_IMAGE)
+		Dolphin.GoFullScreen(w)
+		KeyManager.RecieveKeyPresses(<KeyPressed>, KeyManager.MODE_DEBOUNCED)
+	
+	func KeyPressed (void : char c)
+		if (c == 'w')
+			MoveCam(0, 0, 1)
+		if (c == 'a')
+			MoveCam(-1, 0, 0)
+		if (c == 's')
+			MoveCam(0, 0, -1)
+		if (c == 'd')
+			MoveCam(1, 0, 0)
+		if (c == Meta.SHIFT)
+			MoveCam(0, -1, 0)
+		if (c == ' ')
+			MoveCam(0, 1, 0)
