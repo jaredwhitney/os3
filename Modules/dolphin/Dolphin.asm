@@ -423,14 +423,14 @@ Dolphin.uUpdate :	; currentWindow is the window
 pusha
 	mov bl, [Dolphin.TYPE]
 	call Dolphin.getAttribByte
-	cmp bl, 0x0
+	cmp al, 0x0
 		jne Dolphin.uUpdate.notText
 	mov bl, [Dolphin.WIDTH]
 	call Dolphin.getAttribWord
 	mov cx, ax
 	mov bl, [Dolphin.BUFFERSIZE]
 	call Dolphin.getAttribDouble
-	mov edx, ebx
+	mov edx, eax
 	mov bl, [Dolphin.WINDOWBUFFER]
 	call Dolphin.getAttribDouble
 	mov ebx, eax

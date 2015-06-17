@@ -168,18 +168,18 @@ je console.update.gone
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	
-	mov ebx, [console.windowBuffer]
-	mov eax, [console.buffer]
-	mov cx, [console.width]
-	mov edx, [console.bufferPos]
+	;mov ebx, [console.windowBuffer]
+	;mov eax, [console.buffer]
+	;mov cx, [console.width]
+	;mov edx, [console.bufferPos]
 		;cmp edx, 0xA00
 		;jl console.size.noworry
 		;pusha
 			;call console.clearScreen
 		;popa
 		;console.size.noworry :
-	call Dolphin.drawText
-	;call Dolphin.uUpdate
+	;call Dolphin.drawText
+	call Dolphin.uUpdate
 popa
 ret
 
