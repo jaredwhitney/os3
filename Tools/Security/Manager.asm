@@ -338,7 +338,7 @@ Manager.direct.num :		; num in ebx
 		ret
 
 Manager.locked :
-	db 0x0
+	db 0x1
 Manager.reason :
 	db 0x0
 Manager.astor :

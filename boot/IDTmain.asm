@@ -487,10 +487,11 @@ IDTEND :
 
 IDTHANDLER :
 	pusha
-		call USB_PrintActivePorts
-		call Manager.customLock
-		call Manager.doLock
-		hlt
+		;call USB_PrintActivePorts
+		;call Manager.customLock
+		;call Manager.doLock
+		;hlt
+		call IRQ_FINISH
 	popa
 	iret
 	
@@ -522,9 +523,11 @@ _PRINTSTRING :
 	iret
 	
 IRQ_FINISH :
+		pusha
 		mov dx, 0x20
 		mov al, 0x20
 		out dx, al
+		popa
 		ret
 		
 EXCEPTION8HANDLER :

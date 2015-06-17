@@ -5,7 +5,9 @@ pusha
 	call ProgramManager.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
 call Dolphin.create				; allocate memory for a window
+				;mov ebx, MEMORY_START + 1000	; debugging
 mov [console.buffer], ebx 
+				;mov ebx, MEMORY_START + 1000 + 70000	; debugging
 mov [console.windowBuffer], ecx
 	call console.createWindow
 mov ah, 0xF	; yellow
@@ -527,7 +529,7 @@ counter1 :
 dd 0x0
 
 console.windowStruct :
-	dd "iConsole VER_1.0", 0	; title
+	db "iConsole VER_1.0", 0	; title
 	console.width :
 	dw 0xa0	; width
 	console.height :

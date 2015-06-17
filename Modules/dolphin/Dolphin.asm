@@ -380,7 +380,7 @@ pusha
 		pusha
 		mov bl, [Dolphin.TYPE]
 		call Dolphin.getAttribByte
-		cmp bl, 0x0	; text window, dont bother rechecking
+		cmp al, 0x0	; text window, dont bother rechecking
 			je Dolphin.updateScreen.notText
 		mov byte [Image_checkChange], 0xFF	; enabling causes a *slight* slowdown
 		Dolphin.updateScreen.notText :
@@ -389,7 +389,7 @@ pusha
 		mov byte [Image_checkChange], 0x0
 		
 		pop ebx
-		jmp Dolphin.updateScreen.checkWindow
+		;jmp Dolphin.updateScreen.checkWindow			UNCOMMENT: KILLS >1 WINDOWS
 Dolphin.doneDrawingWindows :
 ;
 	call Dolphin.anyActiveWindows
@@ -584,16 +584,18 @@ pop ecx
 ret
 
 ;																	NEW ***
-Dolphin.getAttribDouble :	; returns eax
+Dolphin.getAttribDouble :	; returns eax. bl = offset
 push edx
 push ecx
 push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
+	push ebx
 	mov ebx, eax
 	call String.getLength
 	add eax, edx
+	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov eax, [eax]
@@ -609,15 +611,18 @@ push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
+	push ebx
 	mov ebx, eax
 	call String.getLength
 	add eax, edx
+	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov ax, [eax]
 pop ebx
 pop ecx
 pop edx
+and eax, 0xFFFF
 ret
 
 Dolphin.getAttribByte :	; returns eax
@@ -627,15 +632,18 @@ push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
+	push ebx
 	mov ebx, eax
 	call String.getLength
 	add eax, edx
+	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov al, [eax]
 pop ebx
 pop ecx
 pop edx
+and eax, 0xFF
 ret
 ;																*** NEW
 

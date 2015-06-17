@@ -3,18 +3,26 @@
 Kernel.init :
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
+		
+	call Guppy.init
+		
 		;	INITIALIZING MODULES	;
-	;call kernel.initModules
+	call kernel.initModules
 	
+		call USB_InitController
+		
+		call USB_EnablePlugAndPlay
+
 		;	LOCK THE COMPUTER	;
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
+	;call kernel.halt
 	
 	;	MAIN LOOP	;
 	kernel.loop:
 			;	RUN INSTALLED MODULES	;
-		;call kernel.runModules
+		call kernel.runModules
 			;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 		call Manager.handleLock
 			;	REPEAT	;
@@ -25,7 +33,7 @@ kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
 	;call Catfish.loop
-	;call console.loop
+	call console.loop
 	;call View.loop
 	;call Clock.loop
 		;	PUSH BUFFER TO SCREEN	;
@@ -33,12 +41,9 @@ kernel.runModules :
 	ret
 	
 kernel.initModules :
-	call Guppy.init
-	call USB_InitController
-		call USB_EnablePlugAndPlay
 	call Dolphin.init
 	;call Catfish.init
-	;call console.init
+	call console.init
 	call KeyManager.init
 	;call View.init
 	
@@ -52,7 +57,7 @@ kernel.halt :
 	cli
 	mov ebx, kernel.HALT_MESSAGE
 	call debug.println
-	;call Dolphin.updateScreen
+	call goRealMode
 	hlt
 
 kernel.HALT_MESSAGE :
