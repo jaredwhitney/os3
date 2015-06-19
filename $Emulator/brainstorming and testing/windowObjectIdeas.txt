@@ -1,0 +1,21 @@
+____________________________________________________________________________________________________________________
+
+WindowStruct :
+	dd title	String pointer
+	dw width	small int
+	dw height	small int
+	dw xpos		small int
+	dw ypos		small int
+	db type		byte
+	db depth	byte
+	dd wBuffer	Buffer pointer
+	dd buffer	Buffer pointer
+	dd bPos		int
+
+___________________________________________________________________________________________________________________
+
+dd console.$mempos	; buffer to store all generated objs
+dd console.$croffs	; object creation offset in mempos
+dd console.$alocdb	; number of bytes currently allocated (out of memory error thing if objs greater than this)
+
+___________________________________________________________________________________________________________________

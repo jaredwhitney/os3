@@ -15,11 +15,15 @@ Keyboard.poll :
 	mov bl, al	; storing code in bl
 	and al, 0x80	; 1 if release code, 0 if not
 	cmp al, 0x0	; if a key has not been released
-	je Keyboard.poll.checkKey
+		je Keyboard.poll.checkKey
+		
 	xor bl, 0x80
-	KeyManager.handleShift.off.reentry :
 	mov cx, 0x1	; otherwise a key was released
 	mov [KeyManager.isReady], cx	; store 1 so we know we are ready to read next time
+	cmp bl, 0x2a
+		jne Keyboard.poll.return
+	; shift key has been released !
+	mov byte [KeyManager.caps], 0x0
 	jmp Keyboard.poll.return
 
 	Keyboard.poll.checkKey :
@@ -39,8 +43,8 @@ Keyboard.poll :
 	
 	cmp bl, 0x1d
 		je Keyboard.poll.drawKeyFinalize	; should not print a modifier byte
-	;cmp bl, 0x2a
-	;	je Keyboard.poll.drawKeyFinalize	; should not print a modifier byte UMMM NEED TO LOOK INTO THIS!
+	cmp bl, 0x2a
+		je Keyboard.poll.drawKeyFinalize	; should not print a modifier byte UMMM NEED TO LOOK INTO THIS!
 	;cmp al, 0xFF
 	;je console.doBackspace;	SHOULD NOT BE COMMENTED OUT
 	;cmp al, 0x1
@@ -86,9 +90,9 @@ Keyboard.poll :
 	ret
 
 KeyManager.handleShift :	; charcode in bl
-	pusha
+	push ebx
 	cmp bl, 0x2a
-	je KeyManager.handleShift.on	; DONT JUMP, handle it
+		je KeyManager.handleShift.on	; DONT JUMP, handle it
 	push ax
 	mov al, [KeyManager.caps]
 	cmp al, 0x0
@@ -100,25 +104,15 @@ KeyManager.handleShift :	; charcode in bl
 	jg KeyManager.handleShift.ret
 	sub al, 0x20
 	KeyManager.handleShift.ret :
-	popa
+	pop ebx
 	ret
-	;jmp KeyManager.handleShift.reentry
 	KeyManager.handleShift.on :
 		push ax
 		mov al, 0xFF
 		mov [KeyManager.caps], al
 		pop ax
-		popa
+		pop ebx
 		ret
-		;jmp Keyboard.poll.drawKeyFinalize
-	KeyManager.handleShift.off :
-		push ax
-		mov al, 0x0
-		mov [KeyManager.caps], al
-		pop ax
-		popa
-		ret
-		;jmp KeyManager.handleShift.off.reentry
 
 KeyManager.keyPress :	; key in bl
 pusha
@@ -330,7 +324,7 @@ KeyManager.toChar :
 	cmp bl, 0x49	; pgup
 	mov al, 0xfc
 	je KeyManager.toChar.ret
-	mov al, 0x3f
+	mov al, 0x0
 	pusha
 	and ebx, 0xFF
 		push ebx

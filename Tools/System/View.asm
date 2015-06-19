@@ -82,10 +82,10 @@ View.winSize :
 		mov bl, [View.wnum]
 		mov [Dolphin.currentWindow], bl
 		mov eax, ecx
-		mov bl, [Dolphin.WIDTH]
+		mov bl, [Window.WIDTH]
 		call Dolphin.setAttribute
 		mov eax, edx
-		mov bl, [Dolphin.HEIGHT]
+		mov bl, [Window.HEIGHT]
 		call Dolphin.setAttribute
 	popa
 	ret

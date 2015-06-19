@@ -30,7 +30,6 @@ console.createWindow :
 	mov bl, [console.pnum]
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
-	call Dolphin.updateTitle
 	mov [console.winNum], bl
 	call console.clearScreen
 	call JASM.console.post_init
@@ -519,9 +518,11 @@ dd 0x0
 counter1 :
 dd 0x0
 
+console.title :
+db "iConsole VER_1.1", 0
+
 console.windowStruct :
-	db 0
-	db "iConsole VER_1.1", 0	; title
+	dd console.title
 	console.width :
 	dw 0xa0	; width
 	console.height :

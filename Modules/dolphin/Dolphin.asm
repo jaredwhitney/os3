@@ -281,11 +281,11 @@ ret
 
 Dolphin.drawTitle :	; [currentWindow] contains window data
 pusha
-	mov bl, [Dolphin.X_POS]
+	mov bl, [Window.X_POS]
 	call Dolphin.getAttribWord
 	mov cx, ax
 	
-	mov bl, [Dolphin.Y_POS]
+	mov bl, [Window.Y_POS]
 	call Dolphin.getAttribWord
 	sub ax, 8
 	mov dx, ax
@@ -293,7 +293,7 @@ pusha
 	mov ebx, [Dolphin.currentWindow]
 	add ebx, Dolphin.windowStructs
 	mov ebx, [ebx]
-	add ebx, 1
+	mov ebx, [ebx]
 	
 	mov eax, [Dolphin.SCREEN_BUFFER]
 	and ecx, 0xFFFF
@@ -402,16 +402,16 @@ pusha
 		sub ebx, 4
 		
 		mov [Dolphin.currentWindow], ebx
-		mov bl, [Dolphin.WIDTH]
+		mov bl, [Window.WIDTH]
 		call Dolphin.getAttribWord
 		mov [atwstorX], ax
 		
-		mov bl, [Dolphin.HEIGHT]
+		mov bl, [Window.HEIGHT]
 		call Dolphin.getAttribWord
 		mov [atwstor2X], ax
 		
 		push ebx
-		mov ebx, [Dolphin.WINDOWBUFFER]
+		mov ebx, [Window.WINDOWBUFFER]
 		call Dolphin.getAttribDouble	; mov eax, windowBuffer
 		pop ebx
 		
@@ -427,20 +427,20 @@ pusha
 		push eax
 		xor eax, eax
 		push bx
-		mov bl, [Dolphin.Y_POS]
+		mov bl, [Window.Y_POS]
 		call Dolphin.getAttribWord
 		pop bx
 		imul eax, [Graphics.SCREEN_WIDTH]
 		add ebx, eax	; add ypos
 		push bx
-		mov bl, [Dolphin.X_POS]
+		mov bl, [Window.X_POS]
 		call Dolphin.getAttribWord
 		pop bx
 		add ebx, eax
 		pop eax
 		
 		pusha
-		mov bl, [Dolphin.TYPE]
+		mov bl, [Window.TYPE]
 		call Dolphin.getAttribByte
 		cmp al, 0x0	; text window, dont bother rechecking
 			je Dolphin.updateScreen.notText
@@ -483,21 +483,21 @@ ret
 
 Dolphin.uUpdate :	; currentWindow is the window
 pusha
-	mov bl, [Dolphin.TYPE]
+	mov bl, [Window.TYPE]
 	call Dolphin.getAttribByte
 	cmp al, 0x0
 		jne Dolphin.uUpdate.notText
-	mov bl, [Dolphin.WIDTH]
+	mov bl, [Window.WIDTH]
 	call Dolphin.getAttribWord
 	mov cx, ax
-	mov bl, [Dolphin.BUFFERSIZE]
+	mov bl, [Window.BUFFERSIZE]
 	call Dolphin.getAttribDouble
 	mov edx, eax
-	mov bl, [Dolphin.WINDOWBUFFER]
+	mov bl, [Window.WINDOWBUFFER]
 	call Dolphin.getAttribDouble
 	mov ebx, eax
 	push ebx
-	mov bl, [Dolphin.BUFFER]
+	mov bl, [Window.BUFFER]
 	call Dolphin.getAttribDouble
 	pop ebx
 	call Dolphin.drawText
@@ -656,11 +656,6 @@ push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
-	push ebx
-	xor ebx, ebx
-	mov bl, [eax]
-	add eax, ebx
-	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov eax, [eax]
@@ -676,11 +671,6 @@ push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
-	push ebx
-	xor ebx, ebx
-	mov bl, [eax]
-	add eax, ebx
-	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov ax, [eax]
@@ -697,11 +687,6 @@ push ebx
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
-	push ebx
-	xor ebx, ebx
-	mov bl, [eax]
-	add eax, ebx
-	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov al, [eax]
@@ -720,11 +705,6 @@ push eax
 mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
-	push ebx
-	xor ebx, ebx
-	mov bl, [eax]
-	add eax, ebx
-	pop ebx
 and ebx, 0xFF
 add eax, ebx
 mov ecx, eax
@@ -737,23 +717,6 @@ pop ecx
 pop edx
 ret
 ;																*** NEW
-
-Dolphin.updateTitle :	; currentWindow thing
-pusha
-	mov eax, [Dolphin.currentWindow]
-	add eax, Dolphin.windowStructs
-	mov eax, [eax]
-	add eax, 1
-	push ebx
-		mov ebx, eax
-		call String.getLength
-	pop ebx
-	sub eax, 1
-	add dl, 1
-	mov [eax], dl
-popa
-ret
-
 
 
 Dolphin.setAttribute :	; attribute num in bl, attribute data in eax
@@ -811,12 +774,12 @@ pusha
 mov edx, eax
 mov ecx, ebx
 
-mov bl, [Dolphin.X_POS]
+mov bl, [Window.X_POS]
 call Dolphin.getAttribWord
 add eax, edx
 call Dolphin.setAttribWord
 
-mov bl, [Dolphin.Y_POS]
+mov bl, [Window.Y_POS]
 call Dolphin.getAttribWord
 add eax, ecx
 call Dolphin.setAttribWord
@@ -830,11 +793,11 @@ Dolphin.moveWindowAbsolute :	; x in eax, y in ebx
 pusha
 mov ecx, ebx
 
-mov bl, [Dolphin.X_POS]
+mov bl, [Window.X_POS]
 call Dolphin.setAttribWord
 
 mov eax, ecx
-mov bl, [Dolphin.Y_POS]
+mov bl, [Window.Y_POS]
 call Dolphin.setAttribWord
 
 call Dolphin.redrawBG
@@ -902,12 +865,12 @@ pusha
 mov edx, eax
 mov ecx, ebx
 pusha
-mov bl, [Dolphin.WIDTH]
+mov bl, [Window.WIDTH]
 call Dolphin.getAttribWord
 add eax, edx
 call Dolphin.setAttribWord
 popa
-mov bl, [Dolphin.HEIGHT]
+mov bl, [Window.HEIGHT]
 call Dolphin.getAttribWord
 add eax, ecx
 call Dolphin.setAttribWord
@@ -941,24 +904,28 @@ dd 0x0
 Dolphin.SCREEN_FLIPBUFFER :
 dd 0x0
 
-Dolphin.WIDTH :
+
+Window.TITLE :
 db 0
-Dolphin.HEIGHT :
-db 2
-Dolphin.X_POS :
+Window.WIDTH :
 db 4
-Dolphin.Y_POS :
+Window.HEIGHT :
 db 6
-Dolphin.TYPE :
+Window.X_POS :
 db 8
-Dolphin.DEPTH :
-db 9
-Dolphin.WINDOWBUFFER :
+Window.Y_POS :
 db 10
-Dolphin.BUFFER :
+Window.TYPE :
+db 12
+Window.DEPTH :
+db 13
+Window.WINDOWBUFFER :
 db 14
-Dolphin.BUFFERSIZE :
+Window.BUFFER :
 db 18
+Window.BUFFERSIZE :
+db 22
+
 Dolphin_WAIT_FLAG :
 db 0x0
 

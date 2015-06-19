@@ -98,9 +98,9 @@ USB_GrabControllerInfo :	; so broken D:
 	mov bl, [eax]
 	add eax, ebx	; operational base -> eax
 	mov [USB_OPBASE], eax
-	call console.numOut
+	;call console.numOut
 	mov ebx, eax
-	call console.numOut
+	;call console.numOut
 
 	mov eax, [USB_BASE]	; structural params
 	add eax, 0x4
