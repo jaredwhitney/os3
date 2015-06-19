@@ -170,5 +170,5 @@ Graphics.SCREEN_HEIGHT :
 dd 0xc0
 
 Graphics.SCREEN_SIZE :
-dd 0xf000
+dd 0xf800
 

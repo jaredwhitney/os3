@@ -359,9 +359,9 @@ KeyManager.handleSpecialKey :
 	mov bh, [Dolphin.activeWindow]
 	mov [Dolphin.currentWindow], bh
 	mov eax, 0
-	mov ebx, 0
+	mov ebx, 8
 	call Dolphin.moveWindowAbsolute
-	jmp KeyManager.handleSpecialKey.ret	; not a huge problem that it calls moveWindow
+	jmp KeyManager.handleSpecialKey.aret	; not a huge problem that it calls moveWindow
 	KeyManager.handleSpecialKey.up :
 	mov eax, 0
 	mov ebx, -4

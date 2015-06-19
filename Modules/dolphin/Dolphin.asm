@@ -18,6 +18,9 @@ mov [Dolphin.SCREEN_BUFFER], ebx
 mov ebx, 0x2800
 call Guppy.malloc
 mov [Dolphin.SCREEN_FLIPBUFFER], ebx
+
+call Dolphin.redrawBG
+
 popa
 ret
 
@@ -29,6 +32,9 @@ mov [Dolphin.SCREEN_BUFFER], ebx
 mov ebx, 0x7D
 call Guppy.malloc
 mov [Dolphin.SCREEN_FLIPBUFFER], ebx
+
+call Dolphin.redrawBG
+
 popa
 ret
 
@@ -273,6 +279,61 @@ mov [ebx], al
 popa
 ret
 
+Dolphin.drawTitle :	; [currentWindow] contains window data
+pusha
+	mov bl, [Dolphin.X_POS]
+	call Dolphin.getAttribWord
+	mov cx, ax
+	
+	mov bl, [Dolphin.Y_POS]
+	call Dolphin.getAttribWord
+	sub ax, 8
+	mov dx, ax
+	
+	mov ebx, [Dolphin.currentWindow]
+	add ebx, Dolphin.windowStructs
+	mov ebx, [ebx]
+	add ebx, 1
+	
+	mov eax, [Dolphin.SCREEN_BUFFER]
+	and ecx, 0xFFFF
+	add eax, ecx
+	and edx, 0xFFFF
+	imul edx, [Graphics.SCREEN_WIDTH]
+	add eax, edx
+	
+	push eax
+	mov eax, [Graphics.SCREEN_WIDTH]
+	mov [TextHandler.textWidth], eax
+	pop eax
+	mov [TextHandler.charpos], eax
+	mov eax, [Dolphin.SCREEN_BUFFER]
+	mov dword [TextHandler.textSizeMultiplier], 1
+	;mov dword [eax], 0xFFFFFFFF
+	;jmp Dolphin.drawTitle.ret
+	
+		Dolphin.drawTitle.loop :
+			mov al, [ebx]
+			cmp al, 0x0
+				je Dolphin.drawTitle.ret
+			mov ah, 0xFF
+			call TextHandler.drawChar
+					push ecx
+					mov ecx, [TextHandler.charpos]
+					push ebx
+					mov ebx, [Graphics.SCREEN_WIDTH]
+					add ebx, [Graphics.SCREEN_WIDTH]
+					add ecx, ebx
+					mov [TextHandler.charpos], ecx
+					pop ebx
+					pop ecx
+			add ebx, 1
+			jmp Dolphin.drawTitle.loop
+Dolphin.drawTitle.ret :
+	
+popa
+ret
+
 Dolphin.redrawBG :
 push ebx
 mov ebx, [bglocstor]
@@ -316,14 +377,14 @@ pusha
 			mov bl, Manager.CONTROL_DOLPHIN
 			mov [os.mlloc], bl
 			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
-		mov al, [Dolphin.dcount]
-		cmp al, 0x10
-		add al, 0x1
-			jne Dolphin.updateScreen.nbgup
-		call Dolphin.redrawBG
-		mov al, 0x0
-		Dolphin.updateScreen.nbgup :
-		mov [Dolphin.dcount], al
+		;mov al, [Dolphin.dcount]
+		;cmp al, 0x10
+		;add al, 0x1
+		;	jne Dolphin.updateScreen.nbgup
+		
+		;mov al, 0x0
+		;Dolphin.updateScreen.nbgup :
+		;mov [Dolphin.dcount], al
 
 ;
 ;	Draw windows in here!
@@ -359,6 +420,7 @@ pusha
 			pusha
 			mov ebx, eax
 			call Dolphin.drawBorder
+			call Dolphin.drawTitle
 			popa
 		mov ebx, [Dolphin.SCREEN_BUFFER]
 		
@@ -451,7 +513,10 @@ pusha
 			jz Dolphin.copyChanged.noChange
 			
 		; else it needs to be updated!
+		cmp byte [Graphics.VESA_MODE], 0x0
+		je nobother
 		and edx, 0xFFFFFF
+		nobother :
 		mov [ebx], edx
 		
 		Dolphin.copyChanged.noChange :
@@ -592,9 +657,9 @@ mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
 	push ebx
-	mov ebx, eax
-	call String.getLength
-	add eax, edx
+	xor ebx, ebx
+	mov bl, [eax]
+	add eax, ebx
 	pop ebx
 and ebx, 0xFF
 add eax, ebx
@@ -612,9 +677,9 @@ mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
 	push ebx
-	mov ebx, eax
-	call String.getLength
-	add eax, edx
+	xor ebx, ebx
+	mov bl, [eax]
+	add eax, ebx
 	pop ebx
 and ebx, 0xFF
 add eax, ebx
@@ -633,9 +698,9 @@ mov eax, [Dolphin.currentWindow]
 add eax, Dolphin.windowStructs
 mov eax, [eax]
 	push ebx
-	mov ebx, eax
-	call String.getLength
-	add eax, edx
+	xor ebx, ebx
+	mov bl, [eax]
+	add eax, ebx
 	pop ebx
 and ebx, 0xFF
 add eax, ebx
@@ -645,7 +710,49 @@ pop ecx
 pop edx
 and eax, 0xFF
 ret
+
+
+Dolphin.setAttribWord :	; attrib val in eax
+push edx
+push ecx
+push ebx
+push eax
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+	push ebx
+	xor ebx, ebx
+	mov bl, [eax]
+	add eax, ebx
+	pop ebx
+and ebx, 0xFF
+add eax, ebx
+mov ecx, eax
+pop eax
+
+mov [ecx], ax
+
+pop ebx
+pop ecx
+pop edx
+ret
 ;																*** NEW
+
+Dolphin.updateTitle :	; currentWindow thing
+pusha
+	mov eax, [Dolphin.currentWindow]
+	add eax, Dolphin.windowStructs
+	mov eax, [eax]
+	add eax, 1
+	push ebx
+		mov ebx, eax
+		call String.getLength
+	pop ebx
+	sub eax, 1
+	add dl, 1
+	mov [eax], dl
+popa
+ret
 
 
 
@@ -693,6 +800,9 @@ Dolphin.registerWindow.noActiveChange :
 	call debug.num
 	mov ebx, Dolphin.UNDolphin.REG_MSG
 	call debug.log.system
+	
+call Dolphin.redrawBG
+	
 popa
 ret
 
@@ -704,12 +814,15 @@ mov ecx, ebx
 mov bl, [Dolphin.X_POS]
 call Dolphin.getAttribWord
 add eax, edx
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
 
 mov bl, [Dolphin.Y_POS]
 call Dolphin.getAttribWord
 add eax, ecx
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
+
+call Dolphin.redrawBG
+
 popa
 ret
 
@@ -718,11 +831,13 @@ pusha
 mov ecx, ebx
 
 mov bl, [Dolphin.X_POS]
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
 
 mov eax, ecx
 mov bl, [Dolphin.Y_POS]
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
+
+call Dolphin.redrawBG
 
 popa
 ret
@@ -790,12 +905,15 @@ pusha
 mov bl, [Dolphin.WIDTH]
 call Dolphin.getAttribWord
 add eax, edx
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
 popa
 mov bl, [Dolphin.HEIGHT]
 call Dolphin.getAttribWord
 add eax, ecx
-call Dolphin.setAttribute
+call Dolphin.setAttribWord
+
+call Dolphin.redrawBG
+
 popa
 ret
 

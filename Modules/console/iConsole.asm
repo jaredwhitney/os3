@@ -30,6 +30,7 @@ console.createWindow :
 	mov bl, [console.pnum]
 	mov eax, console.windowStruct
 	call Dolphin.registerWindow
+	call Dolphin.updateTitle
 	mov [console.winNum], bl
 	call console.clearScreen
 	call JASM.console.post_init
@@ -168,18 +169,8 @@ je console.update.gone
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	
-	;mov ebx, [console.windowBuffer]
-	;mov eax, [console.buffer]
-	;mov cx, [console.width]
-	;mov edx, [console.bufferPos]
-		;cmp edx, 0xA00
-		;jl console.size.noworry
-		;pusha
-			;call console.clearScreen
-		;popa
-		;console.size.noworry :
-	;call Dolphin.drawText
 	call Dolphin.uUpdate
+	
 popa
 ret
 
@@ -529,13 +520,14 @@ counter1 :
 dd 0x0
 
 console.windowStruct :
-	db "iConsole VER_1.0", 0	; title
+	db 0
+	db "iConsole VER_1.1", 0	; title
 	console.width :
 	dw 0xa0	; width
 	console.height :
 	dw 0xc8	; height
 	dw 0x0	; xpos
-	dw 0	; ypos
+	dw 20	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin
 	console.windowBuffer :
