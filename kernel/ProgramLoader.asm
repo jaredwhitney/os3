@@ -87,9 +87,71 @@ ProgramManager.getProgramNumber :	; returns pnum in bl
 	call debug.newl
 	ret
 	
+ProgramManager.setActive :	; bl = pNum, SHOULD NOT BE CALLED BY ANYTHING OTHER THAN THE KERNEL!!~!
+pusha
+	mov [ProgramManager.pNum], bl
+	and ebx, 0xFF
+	imul ebx, 4
+	mov eax, ProgramManager.pMemStor
+	add eax, ebx
+	mov eax, [eax]
+	mov [ProgramManager.memoryStart], eax
+	mov eax, ProgramManager.pOffsStor
+	add eax, ebx
+	mov eax, [eax]
+	mov [ProgramManager.memoryStart], eax
+popa
+ret
+
+ProgramManager.finalize :
+pusha
+	mov bl, [ProgramManager.pNum]
+	and ebx, 0xFF
+	mov eax, ProgramManager.pMemStor
+	add eax, ebx
+	mov eax, [eax]
+	mov [ProgramManager.memoryStart], eax
+	mov eax, ProgramManager.pOffsStor
+	add eax, ebx
+	mov eax, [eax]
+	mov [ProgramManager.memoryStart], eax
+popa
+ret
+	
+ProgramManager.requestMemory :
+pusha
+	mov al, [ProgramManager.pNum]
+	call Guppy.malloc
+	mov [ProgramManager.memoryStart], ebx
+popa
+ret
+
+ProgramManager.reserveMemory :	; ebx contains bytes to reserve, returns ebx = location
+push eax
+	push dword [ProgramManager.creationOffset]
+	mov eax, [ProgramManager.creationOffset]
+	add eax, ebx
+	mov [ProgramManager.creationOffset], eax
+	pop ebx
+	add ebx, [ProgramManager.memoryStart]
+pop eax
+ret
+
 	
 ProgramManager.PROGRAM_REGISTERED :
 db "A program has been registered: PNUM=", 0
 
 ProgramManager.PnumCounter :
+db 0x0
+
+ProgramManager.memoryStart :
+dd 0x0
+ProgramManager.creationOffset :
+dd 0x0
+
+ProgramManager.pMemStor :
+times 0xFF dd 0x0
+ProgramManager.pOffsStor :
+times 0xFF dd 0x0
+ProgramManager.pNum :
 db 0x0

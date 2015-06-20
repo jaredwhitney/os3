@@ -83,10 +83,10 @@ View.winSize :
 		mov [Dolphin.currentWindow], bl
 		mov eax, ecx
 		mov bl, [Window.WIDTH]
-		call Dolphin.setAttribute
+		call Dolphin.setAttribWord
 		mov eax, edx
 		mov bl, [Window.HEIGHT]
-		call Dolphin.setAttribute
+		call Dolphin.setAttribWord
 	popa
 	ret
 View.file.image :

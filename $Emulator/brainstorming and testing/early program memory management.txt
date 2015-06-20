@@ -1,0 +1,9 @@
+program requests x sectors
+	PM stores the mem location of them, performs a malloc(x)
+
+obj creation requests x bytes
+	PM advances the creation offs and returns the bytes (no freeing memory atm)
+
+program requests an object
+	PM uses the offs provided to return the value
+		to get subVars use value returned by PM as the new offs

@@ -2,13 +2,37 @@
 
 console.init :
 pusha
+	
 	call ProgramManager.getProgramNumber	; register program with the OS
 	mov [console.pnum], bl
+	call ProgramManager.setActive	; Make removable Later
+	
+	mov ebx, 0x10fa	; sectors
+	cmp byte [Graphics.VESA_MODE], 0x0
+		je console.init.novesa
+	mov ebx, 0x6000	; sectors
+	console.init.novesa :
+	call ProgramManager.requestMemory
+
+	pusha
+	mov bl, [console.pnum]
+	mov eax, console.windowStruct
+	call Dolphin.registerWindow
+	mov [console.winNum], bl
+	and ebx, 0xFF
+	mov [Dolphin.currentWindow], ebx
+	popa
+	
 call Dolphin.create				; allocate memory for a window
 				;mov ebx, MEMORY_START + 1000	; debugging
-mov [console.buffer], ebx 
+mov eax, ebx
+mov bl, [Window.BUFFER]
+call Dolphin.setAttribDouble
 				;mov ebx, MEMORY_START + 1000 + 70000	; debugging
-mov [console.windowBuffer], ecx
+mov eax, ecx
+mov bl, [Window.WINDOWBUFFER]
+call Dolphin.setAttribDouble
+
 	call console.createWindow
 mov ah, 0xF	; yellow
 call JASM.console.init	; initiallize the console
@@ -20,19 +44,19 @@ call JASM.console.post_init
 call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 call console.update
 
+call ProgramManager.finalize	; Make removable Later
+
 popa
 ret
 
 console.createWindow :
 	pusha
+		
 	mov ebx, 0x1
 	mov [JASM.console.draw], ebx
-	mov bl, [console.pnum]
-	mov eax, console.windowStruct
-	call Dolphin.registerWindow
-	mov [console.winNum], bl
+
 	call console.clearScreen
-	call JASM.console.post_init
+	call JASM.console.post_init		; FIX THIS!!!
 	call console.update
 	popa
 	ret
@@ -40,11 +64,23 @@ console.createWindow :
 
 console.loop :
 pusha
+
+	mov bl, [console.pnum]
+	call ProgramManager.setActive	; Make removable Later
+	
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.update.gone
 	mov eax, [console.dat]
-	mov ebx, [console.width]
+		push eax
+		mov bl, [Window.WIDTH]
+		call Dolphin.getAttribWord
+		mov ebx, eax
+		pop eax
 	cmp eax, ebx
 	je console.loop.noChange
 	mov [console.dat], ebx
@@ -71,6 +107,9 @@ mov [Dolphin.currentWindow], bl
 		call console.cprint
 		jmp console.loop.checkKeyBuffer
 console.loop.ret :
+
+	call ProgramManager.finalize	; Make removable Later
+
 popa
 ret
 
@@ -79,13 +118,16 @@ pusha
 and ebx, 0xFFFF
 mov eax, [Graphics.bytesPerPixel]
 imul ebx, eax
-mov [console.width], bx
+mov eax, ebx
+mov bl, [Window.WIDTH]
+call Dolphin.setAttribWord
 popa
 ret
 
 console.setHeight :
-mov [console.height], bx
-;call console.clearScreen
+	mov ax, bx
+	mov bl, [Window.HEIGHT]	; -> ecx
+	call Dolphin.setAttribWord
 ret
 
 console.setPos :
@@ -97,7 +139,9 @@ ret
 
 JASM.console.safeFullscreen :
 mov ebx, [Graphics.SCREEN_WIDTH]
-mov [console.width], bx
+	mov eax, ebx
+	mov bl, [Window.WIDTH]
+	call Dolphin.setAttribWord
 mov ebx, [Graphics.SCREEN_HEIGHT]
 call console.setHeight
 ret
@@ -193,9 +237,23 @@ ret
 
 console.print :
 pusha
+	push ebx
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+	pop ebx
 call console.checkColor
-mov edx, [console.buffer]
-mov ecx, [console.bufferPos]
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> edx
+		call Dolphin.getAttribDouble
+		mov edx, eax
+		
+		mov bl, [Window.BUFFERSIZE]	; -> ecx
+		call Dolphin.getAttribDouble
+		mov ecx, eax
+		pop bx
+		pop eax
 add edx, ecx
 printitp :
 mov al, [ebx]
@@ -207,9 +265,17 @@ mov [edx], ax
 add ebx, 1
 add edx, 2
 push ebx
-mov ebx, [console.bufferPos]
+		push eax
+		mov bl, [Window.BUFFERSIZE]	; -> ebx
+		call Dolphin.getAttribDouble
+		mov ebx, eax
+		pop eax
 add ebx, 0x2
-mov [console.bufferPos], ebx
+	push eax
+	mov eax, ebx
+	mov bl, [Window.BUFFERSIZE]	; <- ebx
+	call Dolphin.setAttribDouble
+	pop eax
 pop ebx
 jmp printitp
 printdonep :
@@ -217,40 +283,16 @@ call console.update
 popa
 ret
 
-console.printMem :
-pusha
-call console.checkColor
-mov edx, [console.buffer]
-mov ecx, [console.bufferPos]
-add edx, ecx
-printitpMem :
-mov al, [ebx]
-;mov ah, 0x0c ; or 0x0f... you get the point
-cmp al, 0
-je printdonepMem
-mov [edx], ax
-add ebx, 2
-add edx, 2
-push ebx
-mov ebx, [console.bufferPos]
-add ebx, 0x2
-mov [console.bufferPos], ebx
-pop ebx
-jmp printitpMem
-printdonepMem :
-popa
-ret
-
-console.drawCursor :
-pusha
-mov edx, [console.buffer]
-mov ecx, [console.bufferPos]
-add edx, ecx
-mov cl, 0x5f
-mov ch, 0x0F
-mov [edx], cx
-popa
-ret
+;console.drawCursor :
+;pusha
+;mov edx, [console.buffer]
+;mov ecx, [console.bufferPos]
+;add edx, ecx
+;mov cl, 0x5f
+;mov ch, 0x0F
+;mov [edx], cx
+;popa
+;ret
 
 console.println :
 call console.print
@@ -331,26 +373,51 @@ jmp console.numOut.dontcare
 ; newline
 console.newline :
 	pusha
-		mov edx, [console.buffer]
-		mov ecx, [console.bufferPos]
+		push ebx
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+	pop ebx
+			push eax
+			push bx
+			mov bl, [Window.BUFFER]	; -> edx
+			call Dolphin.getAttribDouble
+			mov edx, eax
+			mov bl, [Window.BUFFERSIZE]	; -> ecx
+			call Dolphin.getAttribDouble
+			mov ecx, eax
+			pop bx
+			pop eax
 		add edx, ecx
 		mov al, 0x0A
 		mov ah, 0xFF
 		mov [edx], ax
-		mov ebx, [console.bufferPos]
+			push eax
+			mov bl, [Window.BUFFERSIZE]	; -> ebx
+			call Dolphin.getAttribDouble
+			mov ebx, eax
+			pop eax
 		add ebx, 0x2
-		mov [console.bufferPos], ebx
+			mov bl, [Window.BUFFERSIZE]	; <- ebx
+			mov eax, ebx
+			call Dolphin.setAttribDouble
 	popa
 	ret
 
 console.doBackspace :
-
-mov eax, [console.bufferPos]
+		mov bl, [Window.BUFFERSIZE]	; -> eax
+		call Dolphin.getAttribDouble
 mov edx, 0x0
 bsdloop :
 push edx
 xor edx, edx
-mov dx, [console.width]
+		push eax
+		push bx
+		mov bl, [Window.WIDTH]	; -> dx
+		call Dolphin.getAttribWord
+		mov dx, ax
+		pop bx
+		pop eax
 ;add dx, dx
 sub eax, edx
 pop edx
@@ -360,21 +427,49 @@ jg bsdloop
 cmp eax, 0x0
 mov ecx, 2
 jne bsfnoloop
-mov ebx, [console.bufferPos]
-add ebx, [console.buffer]
+		push eax
+		mov bl, [Window.BUFFERSIZE]	; -> ebx
+		call Dolphin.getAttribDouble
+		mov ebx, eax
+		pop eax
+push ecx
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> ecx
+		call Dolphin.getAttribDouble
+		mov ecx, eax
+		pop bx
+		pop eax
+add ebx, ecx
+pop ecx
 mov [ebx], edx
 mov eax, edx
 push bx
 push edx
 xor edx, edx
-mov dx, [console.width]
+		push eax
+		push bx
+		mov bl, [Window.WIDTH]	; -> dx
+		call Dolphin.getAttribWord
+		mov dx, ax
+		pop bx
+		pop eax
 ;add dx, dx
 mov bx, dx
 pop edx
 mul bx
 pop bx
 sub eax, 2
-add eax, [console.buffer]
+push ecx
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> ecx
+		call Dolphin.getAttribDouble
+		mov ecx, eax
+		pop bx
+		pop eax
+add eax, ecx
+pop ecx
 mov bx, 0x0
 bsfcloop :
 add ecx, 2
@@ -383,13 +478,28 @@ cmp [eax], bx
 je bsfcloop
 sub ecx, 2
 bsfnoloop :
-mov eax, [console.bufferPos]
+		push bx
+		mov bl, [Window.BUFFERSIZE]	; -> eax
+		call Dolphin.getAttribDouble
+		pop bx
 sub eax, ecx
 cmp eax, 0
 jl console.doBackspace.stop
-mov [console.bufferPos], eax
+		push bx
+		mov bl, [Window.BUFFERSIZE]	; <- eax
+		call Dolphin.setAttribDouble
+		pop bx
 console.doBackspace.stop :
-add eax, [console.buffer]
+push ecx
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> ecx
+		call Dolphin.getAttribDouble
+		mov ecx, eax
+		pop bx
+		pop eax
+add eax, ecx
+pop ecx
 mov bx, 0x0
 mov [eax], bx
 add eax, 2
@@ -399,32 +509,64 @@ jmp console.loop.checkKeyBuffer
 
 console.cprint :
 pusha
-mov ebx, [console.bufferPos]
-add ebx, [console.buffer]
+		push eax
+		mov bl, [Window.BUFFERSIZE]	; -> ebx
+		call Dolphin.getAttribDouble
+		mov ebx, eax
+		pop eax
+push ecx
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> ecx
+		call Dolphin.getAttribDouble
+		mov ecx, eax
+		pop bx
+		pop eax
+add ebx, ecx
+pop ecx
 mov [ebx], ax
 ;call TextHandler.drawChar
-mov ebx, [console.bufferPos]
+		push eax
+		mov bl, [Window.BUFFERSIZE]	; -> ebx
+		call Dolphin.getAttribDouble
+		mov ebx, eax
+		pop eax
 add ebx, 0x2
-mov [console.bufferPos], ebx
+		push eax
+		mov eax, ebx
+		mov bl, [Window.BUFFERSIZE]	; <- ebx
+		call Dolphin.setAttribDouble
+		pop eax
 call console.update
 popa
 ret
 
 console.clearScreen :
 pusha
-mov eax, [console.buffer]
+								popa	; FIX THIS!!!
+								ret
+		push bx
+		mov bl, [Window.BUFFER]	; -> eax
+		call Dolphin.getAttribDouble
+		pop bx
 mov cx, 0x0
 console.clearScreen.loop :
 mov [eax], cx
 add eax, 2
 push ebx
-mov ebx, [console.buffer]
+		push eax
+		mov bl, [Window.BUFFER]	; -> ebx
+		call Dolphin.getAttribDouble
+		mov ebx, eax
+		pop eax
 add ebx, 0xfa00
 cmp eax, ebx
 pop ebx
 jl console.clearScreen.loop
 mov ecx, 0x0
-mov [console.bufferPos], ecx
+		mov eax, ecx
+		mov bl, [Window.BUFFER]	; <- ecx
+		call Dolphin.setAttribDouble
 popa
 ret
 
@@ -434,8 +576,15 @@ ret
 
 console.getLine :	; Fixed.
 pusha
-mov eax, [console.bufferPos]
-mov edx, [console.buffer]
+		push bx
+		mov bl, [Window.BUFFERSIZE]	; -> eax
+		call Dolphin.getAttribDouble
+		push eax
+		mov bl, [Window.BUFFER]	; -> edx
+		call Dolphin.getAttribDouble
+		mov edx, eax
+		pop eax
+		pop bx
 add eax, edx
 mov ecx, 0x0
 add eax, 0x2
@@ -450,7 +599,13 @@ cmp eax, edx
 jg gldloop
 mov eax, ecx	; eax now contains the line number!
 
-	mov edx, [console.buffer]
+		push eax
+		push bx
+		mov bl, [Window.BUFFER]	; -> edx
+		call Dolphin.getAttribDouble
+		mov edx, eax
+		pop bx
+		pop eax
 	mov ecx, 0x0
 	gldloop2 :
 	mov bx, [edx]
@@ -523,17 +678,12 @@ db "iConsole VER_1.1", 0
 
 console.windowStruct :
 	dd console.title
-	console.width :
 	dw 0xa0	; width
-	console.height :
 	dw 0xc8	; height
 	dw 0x0	; xpos
 	dw 20	; ypos
 	db 0	; type: 0=text, 1=image
 	db 0	; depth, set by Dolphin
-	console.windowBuffer :
 	dd 0x0	; buffer location for storing the updated window
-	console.buffer :
 	dd 0x0	; buffer location for storing data
-	console.bufferPos :
 	dd 0xa2	; length of buffer (chars)

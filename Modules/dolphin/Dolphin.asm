@@ -46,21 +46,24 @@ cmp dl, 0x0
 pop dx
 	je Dolphin.NONVESAcreate
 mov al, bl
-mov ebx, 0x2800	; Window buffer
-call Guppy.malloc
+
+mov ebx, 0x2800*0x200
+call ProgramManager.reserveMemory
 mov ecx, ebx
-mov ebx, 0x2800	; text/image buffer
-call Guppy.malloc
+
+mov ebx, 0x2800*0x200
+call ProgramManager.reserveMemory
+
 pop eax
 ret	; returns buffer locations in ebx, ecx
 
 Dolphin.NONVESAcreate :
 mov al, bl
-mov ebx, 0x7D	; Window buffer
-call Guppy.malloc
+mov ebx, 0x7D*0x200
+call ProgramManager.reserveMemory
 mov ecx, ebx
-mov ebx, 0x7D	; text/image buffer
-call Guppy.malloc
+mov ebx, 0x7D*0x200
+call ProgramManager.reserveMemory
 pop eax
 ret
 
@@ -697,7 +700,28 @@ and eax, 0xFF
 ret
 
 
-Dolphin.setAttribWord :	; attrib val in eax
+Dolphin.setAttribDouble :	; attrib val in eax
+push edx
+push ecx
+push ebx
+push eax
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+and ebx, 0xFF
+add eax, ebx
+mov ecx, eax
+pop eax
+
+mov [ecx], eax
+
+pop ebx
+pop ecx
+pop edx
+ret
+
+
+Dolphin.setAttribWord :	; attrib val in ax
 push edx
 push ecx
 push ebx
@@ -716,37 +740,30 @@ pop ebx
 pop ecx
 pop edx
 ret
+
+
+Dolphin.setAttribByte :	; attrib val in al
+push edx
+push ecx
+push ebx
+push eax
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+and ebx, 0xFF
+add eax, ebx
+mov ecx, eax
+pop eax
+
+mov [ecx], al
+
+pop ebx
+pop ecx
+pop edx
+ret
 ;																*** NEW
 
 
-Dolphin.setAttribute :	; attribute num in bl, attribute data in eax
-	pusha
-						popa
-						ret
-	mov ecx, [Dolphin.currentWindow]
-	add ecx, Dolphin.windowStructs
-	mov ecx, [ecx]
-	and ebx, 0xFF
-	add ecx, ebx
-	cmp bl, 16
-	jl Dolphin.setAttribute.read2xDouble
-	cmp bl, 24
-	jl Dolphin.setAttribute.readWord
-	cmp bl, 26
-	jge Dolphin.setAttribute.readDouble
-	mov [ecx], al
-	jmp Dolphin.setAttribute.done
-	Dolphin.setAttribute.readWord :
-	mov [ecx], ax
-	jmp Dolphin.setAttribute.done
-	Dolphin.setAttribute.readDouble :
-	mov [ecx], eax
-	jmp Dolphin.setAttribute.done
-	Dolphin.setAttribute.read2xDouble :
-	;mov eax, ecx	; currently unimplemented.
-	Dolphin.setAttribute.done :
-	popa
-	ret
 
 Dolphin.unregisterWindow :	; winNum in bl
 pusha
