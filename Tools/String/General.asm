@@ -77,6 +77,22 @@ pusha
 popa
 ret
 
+String.copy :	; eax = String to copy, ebx = new location to copy it to
+pusha
+	String.copy.loop :
+		mov cl, [eax]
+		cmp cl, 0x0
+			je String.copy.ret
+		mov [ebx], cl
+		add eax, 1
+		add ebx, 1
+		jmp String.copy.loop
+String.copy.ret :
+mov byte [ebx], 0x0
+popa
+ret
+
+
 String._buffer :
 dd 0x0
 

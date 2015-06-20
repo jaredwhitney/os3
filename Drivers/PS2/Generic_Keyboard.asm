@@ -324,6 +324,9 @@ KeyManager.toChar :
 	cmp bl, 0x49	; pgup
 	mov al, 0xfc
 	je KeyManager.toChar.ret
+	cmp bl, 0x48	; UP ARROW
+	mov al, 0xfb
+	je KeyManager.toChar.ret
 	mov al, 0x0
 	pusha
 	and ebx, 0xFF

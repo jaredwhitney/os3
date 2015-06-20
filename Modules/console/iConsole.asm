@@ -89,22 +89,28 @@ console.loop.noChange :
 mov bl, [console.winNum]
 mov [Dolphin.currentWindow], bl
 	console.loop.checkKeyBuffer :
-	mov ebx, [KeyManager.bufferpos]
-	cmp ebx, 0x0	; is there any data avaliable?
-		je console.loop.ret
-	call Keyboard.getKey
-	cmp bl, 0x0		; was the program allowed to get data?
-		je console.loop.ret
-	cmp bl, 0xff	; was the character a backspace?
-		je console.doBackspace
-	cmp bl, 0xfe	; was the character an enter?
-		jne console.loop.notEnter
-	call JASM.console.handleEnter
-	jmp console.loop.checkKeyBuffer
-	console.loop.notEnter :
-		mov al, bl
-		mov ah, 0xFF
-		call console.cprint
+		mov ebx, [KeyManager.bufferpos]
+		cmp ebx, 0x0	; is there any data avaliable?
+			je console.loop.ret
+		call Keyboard.getKey
+		cmp bl, 0x0		; was the program allowed to get data?
+			je console.loop.ret
+		cmp bl, 0xff	; was the character a backspace?
+			je console.doBackspace
+		cmp bl, 0xfe	; was the character an enter?
+			jne console.loop.notEnter
+		call JASM.console.handleEnter
+		jmp console.loop.checkKeyBuffer
+		console.loop.notEnter :
+			cmp bl, 0xfb
+				jne console.loop.notUp
+			mov ebx, console.lastLine
+			call console.print
+			jmp console.loop.checkKeyBuffer
+		console.loop.notUp :
+			mov al, bl
+			mov ah, 0xFF
+			call console.cprint
 		jmp console.loop.checkKeyBuffer
 console.loop.ret :
 
@@ -125,25 +131,37 @@ popa
 ret
 
 console.setHeight :
+pusha
 	mov ax, bx
 	mov bl, [Window.HEIGHT]	; -> ecx
 	call Dolphin.setAttribWord
+popa
 ret
 
 console.setPos :
+pusha
 mov al, [console.winNum]
 mov [Dolphin.currentWindow], al
 mov eax, ebx
 call Dolphin.moveWindowAbsolute
+popa
 ret
 
 JASM.console.safeFullscreen :
-mov ebx, [Graphics.SCREEN_WIDTH]
-	mov eax, ebx
+pusha
+	mov eax, 0
+	mov bl, [Window.X_POS]
+	call Dolphin.setAttribWord
+	mov eax, 8
+	mov bl, [Window.Y_POS]
+	call Dolphin.setAttribWord
+	mov eax, [Graphics.SCREEN_WIDTH]
 	mov bl, [Window.WIDTH]
 	call Dolphin.setAttribWord
-mov ebx, [Graphics.SCREEN_HEIGHT]
-call console.setHeight
+	mov eax, [Graphics.SCREEN_HEIGHT]
+	mov bl, [Window.HEIGHT]
+	call Dolphin.setAttribWord
+popa
 ret
 
 console.test :	; command that can be used to test anything.
@@ -237,7 +255,12 @@ ret
 
 console.print :
 pusha
-	push ebx
+
+push ebx
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+	
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
@@ -398,8 +421,8 @@ console.newline :
 			mov ebx, eax
 			pop eax
 		add ebx, 0x2
-			mov bl, [Window.BUFFERSIZE]	; <- ebx
 			mov eax, ebx
+			mov bl, [Window.BUFFERSIZE]	; <- ebx
 			call Dolphin.setAttribDouble
 	popa
 	ret
@@ -543,8 +566,11 @@ ret
 
 console.clearScreen :
 pusha
-								popa	; FIX THIS!!!
-								ret
+	push ebx
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+	pop ebx
 		push bx
 		mov bl, [Window.BUFFER]	; -> eax
 		call Dolphin.getAttribDouble
@@ -565,7 +591,7 @@ pop ebx
 jl console.clearScreen.loop
 mov ecx, 0x0
 		mov eax, ecx
-		mov bl, [Window.BUFFER]	; <- ecx
+		mov bl, [Window.BUFFERSIZE]	; <- ecx
 		call Dolphin.setAttribDouble
 popa
 ret
@@ -640,6 +666,9 @@ mov al, 0x0
 mov [edx], al
 mov eax, console.line
 mov [retval], eax
+	add eax, 9
+	mov ebx, console.lastLine
+	call String.copy
 popa
 ret
 
@@ -653,7 +682,10 @@ console.cstor :
 db 0x0
 
 console.line :
-dd 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0
+times 14 dd 0x0
+
+console.lastLine :
+times 14 dd 0x0
 
 console.winNum :
 db 0x0

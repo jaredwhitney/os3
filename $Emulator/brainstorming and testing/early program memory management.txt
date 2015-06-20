@@ -7,3 +7,6 @@ obj creation requests x bytes
 program requests an object
 	PM uses the offs provided to return the value
 		to get subVars use value returned by PM as the new offs
+
+TO TRANSFER CONTROL OS MUST CALL ProgramManager.setActive(bl)
+BEFORE REPEALING CONTROL OS MUST CALL ProgramManager.finalize()

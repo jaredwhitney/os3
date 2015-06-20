@@ -38,14 +38,22 @@ call Dolphin.redrawBG
 popa
 ret
 
-Dolphin.create :	; bl contains PNUM
+;Window.create :
+;pusha
+;	call Dolphin.create
+;	mov [dstor], ebx
+;	mov [dstor2], ecx
+;	
+;popa
+;ret
+
+Dolphin.create :
 push eax
 push dx
 mov dl, [Graphics.VESA_MODE]
 cmp dl, 0x0
 pop dx
 	je Dolphin.NONVESAcreate
-mov al, bl
 
 mov ebx, 0x2800*0x200
 call ProgramManager.reserveMemory
@@ -953,6 +961,8 @@ dd 0x0
 bposstor :
 dd 0x0
 dstor :
+dd 0x0
+dstor2 :
 dd 0x0
 atwstor :
 dw 0x0
