@@ -14,37 +14,22 @@ pusha
 	console.init.novesa :
 	call ProgramManager.requestMemory
 
-	pusha
-	mov bl, [console.pnum]
 	mov eax, console.windowStruct
-	call Dolphin.registerWindow
+	call Window.create
 	mov [console.winNum], bl
-	and ebx, 0xFF
-	mov [Dolphin.currentWindow], ebx
-	popa
 	
-call Dolphin.create				; allocate memory for a window
-				;mov ebx, MEMORY_START + 1000	; debugging
-mov eax, ebx
-mov bl, [Window.BUFFER]
-call Dolphin.setAttribDouble
-				;mov ebx, MEMORY_START + 1000 + 70000	; debugging
-mov eax, ecx
-mov bl, [Window.WINDOWBUFFER]
-call Dolphin.setAttribDouble
-
-	call console.createWindow
-mov ah, 0xF	; yellow
-call JASM.console.init	; initiallize the console
-;call JASM.test.main	; testing some JASM code that interfaces with the console
-call console.clearScreen
-	mov ah, 0xFF
-	call Time.printToConsole
-call JASM.console.post_init
-call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
-call console.update
-
-call ProgramManager.finalize	; Make removable Later
+		call console.createWindow
+	mov ah, 0xF	; yellow
+	call JASM.console.init	; initiallize the console
+	;call JASM.test.main	; testing some JASM code that interfaces with the console
+	call console.clearScreen
+		mov ah, 0xFF
+		call Time.printToConsole
+	call JASM.console.post_init
+	call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+	call console.update
+	
+	call ProgramManager.finalize	; Make removable Later
 
 popa
 ret
@@ -104,6 +89,7 @@ mov [Dolphin.currentWindow], bl
 		console.loop.notEnter :
 			cmp bl, 0xfb
 				jne console.loop.notUp
+			mov ah, 0xFF
 			mov ebx, console.lastLine
 			call console.print
 			jmp console.loop.checkKeyBuffer
@@ -166,9 +152,18 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	call USB_PrintControllerInfo
-	call USB_PrintActivePorts
-	call USB_EnablePlugAndPlay
+mov ebx, 8
+console.test.loop :
+add ebx, 4
+call Dolphin.windowExists
+cmp eax, 0x0
+	je console.test.loop
+mov ah, 0xFF
+call console.numOut
+call console.newline
+;	call USB_PrintControllerInfo
+;	call USB_PrintActivePorts
+;	call USB_EnablePlugAndPlay
 	;mov ebx, USB_QUEUEHEADEX
 	;call USB_LoadQueueHead
 	;call USB_RunAsyncTasks

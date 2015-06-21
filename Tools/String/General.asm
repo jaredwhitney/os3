@@ -92,6 +92,22 @@ mov byte [ebx], 0x0
 popa
 ret
 
+String.copyRawToWhite :	; eax = String to copy, ebx = new location to copy it to
+pusha
+	mov ch, 0xFF
+	String.copyRawToWhite.loop :
+		mov cl, [eax]
+		cmp cl, 0x0
+			je String.copyRawToWhite.ret
+		mov [ebx], cx
+		add eax, 1
+		add ebx, 2
+		jmp String.copyRawToWhite.loop
+String.copyRawToWhite.ret :
+mov byte [ebx], 0x0
+popa
+ret
+
 
 String._buffer :
 dd 0x0

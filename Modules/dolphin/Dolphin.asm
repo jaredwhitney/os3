@@ -48,31 +48,45 @@ ret
 ;ret
 
 Dolphin.create :
-push eax
-push dx
-mov dl, [Graphics.VESA_MODE]
-cmp dl, 0x0
-pop dx
-	je Dolphin.NONVESAcreate
+pusha
 
-mov ebx, 0x2800*0x200
-call ProgramManager.reserveMemory
-mov ecx, ebx
-
-mov ebx, 0x2800*0x200
-call ProgramManager.reserveMemory
-
-pop eax
+	mov dl, [Graphics.VESA_MODE]
+	cmp dl, 0x0
+		je Dolphin.NONVESAcreate
+	
+	mov ebx, 0x2800*0x200
+	call ProgramManager.reserveMemory
+		mov eax, ebx
+		mov bl, [Window.BUFFER]
+		call Dolphin.setAttribDouble
+	
+	mov ebx, 0x2800*0x200
+	call ProgramManager.reserveMemory
+		mov eax, ebx
+		mov bl, [Window.WINDOWBUFFER]
+		call Dolphin.setAttribDouble
+popa
 ret	; returns buffer locations in ebx, ecx
 
+Window.create :	; eax = windowStruct, returns ebx (bl) = winNum
+	call Dolphin.registerWindow
+	and ebx, 0xFF
+	mov [Dolphin.currentWindow], ebx
+	call Dolphin.create
+ret
+
 Dolphin.NONVESAcreate :
-mov al, bl
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
-mov ecx, ebx
+		mov eax, ebx
+		mov bl, [Window.BUFFER]
+		call Dolphin.setAttribDouble
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
-pop eax
+		mov eax, ebx
+		mov bl, [Window.WINDOWBUFFER]
+		call Dolphin.setAttribDouble
+popa
 ret
 
 Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize (chars)
@@ -403,11 +417,13 @@ pusha
 		mov ecx, 0x0
 		Dolphin.updateScreen.checkWindow :
 						; loop through each window, find the one with the highest depth, then highest depth lower than that depth, etc. (run through all of the windows in order of decreasing depth)
+			cmp ebx, 0x3C;0xF*4	; num of windows * 4 bytes per windowStruct location
+				jge Dolphin.doneDrawingWindows
+					;cmp ebx, 8										; REMOVE THIS LINE
+					;	jg Dolphin.doneDrawingWindows;kernel.halt	; REMOVE THIS LINE
 			call Dolphin.windowExists
-			cmp ebx, 0xF*4	; num of windows * 4 bytes per windowStruct location
-			je Dolphin.doneDrawingWindows
-			cmp eax, 0x0
 			add ebx, 4
+			cmp eax, 0x0
 				je Dolphin.updateScreen.checkWindow
 		push ebx
 		sub ebx, 4
@@ -462,7 +478,8 @@ pusha
 		mov byte [Image_checkChange], 0x0
 		
 		pop ebx
-		;jmp Dolphin.updateScreen.checkWindow			UNCOMMENT: KILLS >1 WINDOWS
+		jmp Dolphin.updateScreen.checkWindow			;COMMENTED: KILLS >1 WINDOWS
+		
 Dolphin.doneDrawingWindows :
 ;
 	call Dolphin.anyActiveWindows
@@ -635,7 +652,7 @@ Dolphin.toggleColored.ret :
 popa
 ret
 
-Dolphin.registerWindow :	; bl = pnum, eax = pointer to windowStruct; returns bl contains windowNum
+Dolphin.registerWindow :	; eax = pointer to windowStruct; returns bl contains windowNum
 push ecx
 push edx
 mov edx, Dolphin.windowStructs
@@ -996,7 +1013,7 @@ db 0x0
 bglocstor :
 dd 0x0
 Dolphin.windowStructs :
-dd 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+times 20 dd 0
 
 Dolphin.UNDolphin.REG_MSG :
 db "A window has been unregistered!", 0
