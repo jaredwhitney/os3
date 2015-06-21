@@ -14,19 +14,26 @@ pusha
 	console.init.novesa :
 	call ProgramManager.requestMemory
 
-	mov eax, console.windowStruct
-	call Window.create
-	mov [console.winNum], bl
+	push dword console.title
+	push word Window.TYPE_TEXT
+	call Window.create	; essentially: Window windowStructLoc = new Window(title, Window.TYPE_TEXT)
+	mov [console.windowStructLoc], ecx
+	mov [console.winNum], bl	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
 	
-		call console.createWindow
+	call console.createWindow
+	
 	mov ah, 0xF	; yellow
 	call JASM.console.init	; initiallize the console
-	;call JASM.test.main	; testing some JASM code that interfaces with the console
+	
 	call console.clearScreen
-		mov ah, 0xFF
-		call Time.printToConsole
+	
+	mov ah, 0xFF
+	call Time.printToConsole
+	
 	call JASM.console.post_init
+	
 	call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+	
 	call console.update
 	
 	call ProgramManager.finalize	; Make removable Later
@@ -152,15 +159,19 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov ebx, 8
-console.test.loop :
-add ebx, 4
-call Dolphin.windowExists
-cmp eax, 0x0
-	je console.test.loop
-mov ah, 0xFF
+mov ebx, [console.windowStructLoc]
 call console.numOut
 call console.newline
+mov ebx, [ebx]
+call console.numOut
+call console.newline
+call console.newline
+;mov ebx, console.windowStruct
+;call console.numOut
+;call console.newline
+;mov ebx, [ebx]
+;call console.numOut
+;call console.newline
 ;	call USB_PrintControllerInfo
 ;	call USB_PrintActivePorts
 ;	call USB_EnablePlugAndPlay
@@ -703,14 +714,5 @@ dd 0x0
 console.title :
 db "iConsole VER_1.1", 0
 
-console.windowStruct :
-	dd console.title
-	dw 0xa0	; width
-	dw 0xc8	; height
-	dw 0x0	; xpos
-	dw 20	; ypos
-	db 0	; type: 0=text, 1=image
-	db 0	; depth, set by Dolphin
-	dd 0x0	; buffer location for storing the updated window
-	dd 0x0	; buffer location for storing data
-	dd 0xa2	; length of buffer (chars)
+console.windowStructLoc :
+	dd 0

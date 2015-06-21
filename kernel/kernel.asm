@@ -34,7 +34,7 @@ kernel.runModules :
 	mov [os.mlloc], bl
 	;call Catfish.loop
 	call console.loop
-		call card.loop
+	;	call card.loop
 	;call View.loop
 	call Clock.loop
 		;	PUSH BUFFER TO SCREEN	;
@@ -45,7 +45,7 @@ kernel.initModules :
 	call Dolphin.init
 	;call Catfish.init
 	call console.init
-		call card.init
+	;	call card.init
 	call KeyManager.init
 	;call View.init
 	

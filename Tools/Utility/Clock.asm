@@ -17,8 +17,10 @@ pusha
 	mov bl, [Clock.pnum]
 	call ProgramManager.setActive
 	
-	mov eax, Clock.windowStruct
+	push dword Clock.title
+	push word Window.TYPE_TEXT
 	call Window.create
+	mov [Clock.window], ecx
 	mov [Clock.wnum], bl
 	
 	mov bl, [Window.BUFFER]
@@ -185,7 +187,8 @@ pusha
 popa
 ret
 
-
+Clock.window :
+	dd 0x0
 Clock.pnum :
 	db 0x0
 Clock.wnum :

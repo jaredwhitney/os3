@@ -68,11 +68,46 @@ pusha
 popa
 ret	; returns buffer locations in ebx, ecx
 
-Window.create :	; eax = windowStruct, returns ebx (bl) = winNum
+Window.create :	; String title, byte type : returns ebx (bl) = winNum, ecx = object pointer
+pop dword [retstor]
+	pop dx
+	pop ecx
+	call Dolphin.allocNewWindow
+	
+	mov eax, ebx
 	call Dolphin.registerWindow
 	and ebx, 0xFF
 	mov [Dolphin.currentWindow], ebx
 	call Dolphin.create
+push dword [retstor]
+ret
+retstor :
+	dd 0x0
+Dolphin.allocNewWindow :
+
+	mov ebx, 26	; window size
+	call ProgramManager.reserveMemory
+	push ebx
+	mov [ebx], ecx			; title
+	add ebx, 4
+	mov word [ebx], 4		; width
+	add ebx, 2
+	mov word [ebx], 4		; height
+	add ebx, 2
+	mov word [ebx], 0		; xpos
+	add ebx, 2
+	mov word [ebx], 8		; ypos
+	add ebx, 2
+	mov [ebx], dl			; type
+	add ebx, 1
+	mov byte [ebx], 0		; depth
+	add ebx, 1
+	mov dword [ebx], 0		; buffer
+	add ebx, 4
+	mov dword [ebx], 0		; windowbuffer
+	add ebx, 4
+	mov dword [ebx], 0		; buffersize
+	pop ebx
 ret
 
 Dolphin.NONVESAcreate :
@@ -86,6 +121,19 @@ call ProgramManager.reserveMemory
 		mov eax, ebx
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
+popa
+ret
+
+Window.fitTextBufferSize :
+pusha
+	mov bl, [Window.BUFFER]
+	call Dolphin.getAttribDouble
+	mov ebx, eax
+	call String.getLength
+	
+	mov eax, edx
+	mov bl, [Window.BUFFERSIZE]
+	call Dolphin.setAttribDouble
 popa
 ret
 
@@ -946,6 +994,8 @@ dd 0x0
 Dolphin.SCREEN_FLIPBUFFER :
 dd 0x0
 
+Window.TYPE_TEXT equ 0x0
+Window.TYPE_IMAGE equ 0x1
 
 Window.TITLE :
 db 0
