@@ -115,7 +115,7 @@ Catfish.getLength :	; String in eax, return length in edx
 Catfish.init :
 	call ProgramManager.getProgramNumber
 	mov [Catfish.pnum], bl
-	call Dolphin.create
+	call Window.create	; will not work
 	mov [Catfish.buffer], ecx
 	mov [Catfish.windowBuffer], ebx
 	ret

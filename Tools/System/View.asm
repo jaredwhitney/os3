@@ -5,12 +5,12 @@ GREEN equ 0xC
 PINK equ 0x17
 BLUE equ 0x30
 ORANGE equ 0xF
-
+					; NEEDS REWORK!
 View.init :
 pusha
 	call ProgramManager.getProgramNumber
 	mov [View.pnum], bl
-	call Dolphin.create
+	call Window.create	; WILL NOT WORK
 	mov [View.buffer], ecx
 	mov [View.windowBuffer], ebx
 popa

@@ -32,28 +32,21 @@ Kernel.init :
 kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
-	;call Catfish.loop
 	call console.loop
 	;	call card.loop
-	;call View.loop
 	call Clock.loop
-		;	PUSH BUFFER TO SCREEN	;
-		;call Dolphin.updateScreen
-	ret
+ret
 	
 kernel.initModules :
 	call Dolphin.init
-	;call Catfish.init
 	call console.init
 	;	call card.init
+	
 	call KeyManager.init
-	;call View.init
 	
 	call Clock.init
-	call Clock.show	; should be bound to a command!
-		
-	;call debug.init
-	ret
+	call Clock.show	; should be bound to a command!	
+ret
 	
 kernel.halt :
 	cli

@@ -30,3 +30,5 @@
 %include "..\debug\print.asm"
 %include "..\boot\IDTmain.asm"
 %include "..\boot\realMode.asm"
+
+%include "..\Meta\Graphics\Window.asm"
