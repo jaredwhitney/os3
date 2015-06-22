@@ -18,7 +18,7 @@ pusha
 	push word Window.TYPE_TEXT
 	call Window.create	; essentially: Window windowStructLoc = new Window(title, Window.TYPE_TEXT)
 	mov [console.windowStructLoc], ecx
-	mov [console.winNum], bl	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
+	mov [console.winNum], ebx	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
 	
 	call console.createWindow
 	
@@ -61,7 +61,7 @@ pusha
 	call ProgramManager.setActive	; Make removable Later
 	
 	xor ebx, ebx
-	mov bl, [console.winNum]
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 
 mov ebx, [JASM.console.draw]
@@ -78,8 +78,8 @@ je console.update.gone
 	mov [console.dat], ebx
 	call console.update
 console.loop.noChange :
-mov bl, [console.winNum]
-mov [Dolphin.currentWindow], bl
+mov ebx, [console.winNum]
+mov [Dolphin.currentWindow], ebx
 	console.loop.checkKeyBuffer :
 		mov ebx, [KeyManager.bufferpos]
 		cmp ebx, 0x0	; is there any data avaliable?
@@ -133,8 +133,8 @@ ret
 
 console.setPos :
 pusha
-mov al, [console.winNum]
-mov [Dolphin.currentWindow], al
+mov eax, [console.winNum]
+mov [Dolphin.currentWindow], eax
 mov eax, ebx
 call Dolphin.moveWindowAbsolute
 popa
@@ -233,7 +233,7 @@ mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.update.gone
 	xor ebx, ebx
-	mov bl, [console.winNum]
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	
 	call Dolphin.uUpdate
@@ -263,12 +263,10 @@ console.print :
 pusha
 
 push ebx
-	xor ebx, ebx
-	mov bl, [console.winNum]
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	
-	xor ebx, ebx
-	mov bl, [console.winNum]
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	pop ebx
 call console.checkColor
@@ -402,9 +400,8 @@ jmp console.numOut.dontcare
 ; newline
 console.newline :
 	pusha
-		push ebx
-	xor ebx, ebx
-	mov bl, [console.winNum]
+	push ebx
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	pop ebx
 			push eax
@@ -573,8 +570,7 @@ ret
 console.clearScreen :
 pusha
 	push ebx
-	xor ebx, ebx
-	mov bl, [console.winNum]
+	mov ebx, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 	pop ebx
 		push bx

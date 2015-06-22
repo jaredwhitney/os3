@@ -497,12 +497,12 @@ IDTHANDLER :
 	
 _IRQ0 :
 	pusha
-		call IRQ_FINISH
 		; timer code goes here!
 		cmp byte [Manager.locked], 0x0
 			jne _IRQ0.ret
-		call Dolphin.updateScreen
+		call Dolphin.updateScreen	;			BLARGH
 	_IRQ0.ret :
+	call IRQ_FINISH
 	popa
 	iret
 	
