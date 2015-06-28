@@ -28,11 +28,9 @@ pop ecx
 	
 	mov eax, ebx
 	call Dolphin.registerWindow
-	
+	and ebx, 0xFF
 	mov [Dolphin.currentWindow], ebx
 	call Window.create.createBuffers
-	
-	mov ebx, ecx	; where is ecx being set again?! :|
 	
 push dword [retstor]
 ret

@@ -39,7 +39,8 @@ pusha
 	mov bl, [Clock.pnum]
 	call ProgramManager.setActive
 	
-	mov ebx, [Clock.wnum]
+	xor ebx, ebx
+	mov bl, [Clock.wnum]
 	mov [Dolphin.currentWindow], ebx
 
 			mov bl, [Window.BUFFER]
@@ -167,7 +168,8 @@ pusha
 			pop ax
 			pop ebx
 			
-	mov ebx, [Clock.wnum]
+	xor ebx, ebx
+	mov bl, [Clock.wnum]
 	mov [Dolphin.currentWindow], ebx
 	
 		mov bl, [Window.BUFFER]
@@ -190,7 +192,7 @@ Clock.window :
 Clock.pnum :
 	db 0x0
 Clock.wnum :
-	dd 0x0
+	db 0x0
 Clock.size :
 	dd 0x2
 Clock.title :

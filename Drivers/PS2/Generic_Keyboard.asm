@@ -149,17 +149,28 @@ ret
 Keyboard.getKey :
 	push eax
 	;	 check the program is allowed to get keypresses here
-	push edx
-	mov eax, [Dolphin.currentWindow]
-	mov edx, [Dolphin.activeWindow]
-	cmp eax, edx
+	mov al, [Dolphin.currentWindow]
+	mov ah, [Dolphin.activeWindow]
+	cmp al, ah
 		je Keyboard.getKey.kcont
-	pop edx
 	pop eax
 	mov bl, 0x0
 	ret
 	Keyboard.getKey.kcont :
-	pop edx
+	
+	; old code
+	;mov bl, 0x0
+	;mov al, [0x1031]
+	;cmp al, 0xFF
+	;jne Keyboard.getKey.ret
+	;mov bl, [0x1030]
+	;mov al, 0x0
+	;mov [0x1031], al
+	;Keyboard.getKey.ret :
+	
+	;jmp Keyboard.getKey.new_retk
+	
+	; new code
 	mov bl, 0x0
 	push ecx
 	mov ecx, [KeyManager.bufferpos]
@@ -342,10 +353,8 @@ KeyManager.handleSpecialKey :
 	cmp bl, 0x3a
 	je KeyManager.handleSpecialKey.swapMode
 	;	else it is a tab, reset the window's position
-	push ebx
-	mov ebx, [Dolphin.activeWindow]
-	mov [Dolphin.currentWindow], ebx
-	pop ebx
+	mov bh, [Dolphin.activeWindow]
+	mov [Dolphin.currentWindow], bh
 	mov eax, 0
 	mov ebx, 8
 	call Dolphin.moveWindowAbsolute
@@ -375,10 +384,10 @@ KeyManager.handleSpecialKey :
 		popa
 		jmp Keyboard.poll.drawKeyFinalize
 	KeyManager.handleSpecialKey.ret :
-		push ebx
-			mov ebx, [Dolphin.activeWindow]
-			mov [Dolphin.currentWindow], ebx
-		pop ebx
+		push bx
+			mov bh, [Dolphin.activeWindow]
+			mov [Dolphin.currentWindow], bh
+		pop bx
 		push bx
 		mov bl, [KeyManager.hsmode]
 		cmp bl, 0x0

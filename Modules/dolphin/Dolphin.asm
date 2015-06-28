@@ -226,14 +226,12 @@ and ecx, 0xFFFF
 push ecx
 mov al, 0x03	; red
 	push ebx
-	push ecx
-	mov ecx, [Dolphin.activeWindow]
-	mov ebx, [Dolphin.currentWindow]
-	cmp ecx, ebx
-		jne Dolphin.drawBorder.nonactive
+	mov bl, [Dolphin.activeWindow]
+	mov bh, [Dolphin.currentWindow]
+	cmp bl, bh
+	jne Dolphin.drawBorder.nonactive
 	mov al, 0x3d	; light blue
 	Dolphin.drawBorder.nonactive :
-	pop ecx
 	pop ebx
 push ebx
 Dolphin.drawBorder.loop1 :
@@ -349,7 +347,7 @@ Dolphin.updateScreen :
 pusha
 	cmp byte [Dolphin_WAIT_FLAG], 0xFF
 		je Dolphin.updateScreen.ret
-	push dword [Dolphin.currentWindow]
+	push word [Dolphin.currentWindow]
 			; 	If an exception occurs, blame Dolphin.	;
 			mov bl, Manager.CONTROL_DOLPHIN
 			mov [os.mlloc], bl
@@ -380,7 +378,6 @@ pusha
 		push ebx
 		sub ebx, 4
 		
-		mov ebx, [ebx]
 		mov [Dolphin.currentWindow], ebx
 		mov bl, [Window.WIDTH]
 		call Dolphin.getAttribWord
@@ -394,8 +391,7 @@ pusha
 		mov ebx, [Window.WINDOWBUFFER]
 		call Dolphin.getAttribDouble	; mov eax, windowBuffer
 		pop ebx
-
-						hlt ; working up to here?
+		
 		mov ecx, [atwstorX]
 		mov edx, [atwstor2X]
 			pusha
@@ -458,7 +454,7 @@ mov ebx, [Graphics.SCREEN_MEMPOS]
 mov ecx, [Graphics.SCREEN_SIZE]
 call Dolphin.copyChanged
 
-	pop dword [Dolphin.currentWindow]
+	pop word [Dolphin.currentWindow]
 Dolphin.updateScreen.ret :
 popa
 ret
@@ -562,31 +558,30 @@ ret
 
 Dolphin.activateNext :	; activates the next window in the list
 pusha
+xor ebx, ebx
+mov bl, [Dolphin.activeWindow]
+mov cl, bl
+mov ch, 0x0
+	Dolphin.activeNext.loop :
+	cmp ch, 0x0
+	je Dolphin.activeNext.loop.ncjo
+	cmp bl, cl
+		je Dolphin.activeNext.ret
+	Dolphin.activeNext.loop.ncjo :
+	add ch, 1
+	add bl, 4
+	cmp bl, 0x40
+		jl Dolphin.activateNext.cont_1
+	mov bl, 0x0
+	Dolphin.activateNext.cont_1 :
+	call Dolphin.windowExists
+	cmp eax, 0x0
+	je Dolphin.activeNext.loop
+	Dolphin.activeNext.ret :
+	mov [Dolphin.activeWindow], bl
+	call debug.num
 popa
 ret
-;mov ebx, [Dolphin.activeWindow]		; Does not work with new window numbering system	
-;mov edx, ebx
-;mov ch, 0x0
-	;Dolphin.activeNext.loop :
-	;cmp ch, 0x0
-	;je Dolphin.activeNext.loop.ncjo
-	;cmp edx, ebx
-		;je Dolphin.activeNext.ret
-	;Dolphin.activeNext.loop.ncjo :
-	;add ch, 1
-	;add ebx, 4
-	;cmp ebx, 0x40
-		;jl Dolphin.activateNext.cont_1
-	;mov ebx, 0x0
-	;Dolphin.activateNext.cont_1 :
-	;call Dolphin.windowExists
-	;cmp eax, 0x0
-	;je Dolphin.activeNext.loop
-	;Dolphin.activeNext.ret :
-	;mov [Dolphin.activeWindow], ebx
-	;call debug.num
-;popa
-;ret
 
 Dolphin.toggleColored :
 pusha
@@ -618,47 +613,65 @@ cmp ecx, 0x0
 jne Dolphin.registerWindow.loop1
 sub edx, 4
 mov [edx], eax
-;sub edx, Dolphin.windowStructs		; does not work with new window numbering system
-;mov ebx, edx
-;and ebx, 0xFF
-;mov [Dolphin.activeWindow], ebx
-;	pusha
-;	call debug.num
-;	mov ebx, Dolphin.REG_MSG
-;	call debug.log.system
-;	popa
+sub edx, Dolphin.windowStructs
+mov ebx, edx
+and ebx, 0xFF
+mov [Dolphin.activeWindow], bl
+	pusha
+	call debug.num
+	mov ebx, Dolphin.REG_MSG
+	call debug.log.system
+	popa
 pop edx
 pop ecx
 ret
 
 ;																	NEW ***
 Dolphin.getAttribDouble :	; returns eax. bl = offset
+push edx
+push ecx
 push ebx
-	mov eax, [Dolphin.currentWindow]
-	and ebx, 0xFF
-	add eax, ebx
-	mov eax, [eax]
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+and ebx, 0xFF
+add eax, ebx
+mov eax, [eax]
 pop ebx
+pop ecx
+pop edx
 ret
 
 Dolphin.getAttribWord :	; returns eax
-push ebx		; not that it matters in this case, but push/popping other regs here causes it to retf and fault???	EDIT: stack was getting too large?
-	mov eax, [Dolphin.currentWindow]
-	and ebx, 0xFF
-	add eax, ebx
-	mov ax, [eax]
-	and eax, 0xFFFF
+push edx
+push ecx
+push ebx
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+and ebx, 0xFF
+add eax, ebx
+mov ax, [eax]
 pop ebx
+pop ecx
+pop edx
+and eax, 0xFFFF
 ret
 
 Dolphin.getAttribByte :	; returns eax
+push edx
+push ecx
 push ebx
-	mov eax, [Dolphin.currentWindow]
-	and ebx, 0xFF
-	add eax, ebx
-	mov al, [eax]
-	and eax, 0xFF
+mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
+and ebx, 0xFF
+add eax, ebx
+mov al, [eax]
 pop ebx
+pop ecx
+pop edx
+and eax, 0xFF
 ret
 
 
@@ -668,6 +681,8 @@ push ecx
 push ebx
 push eax
 mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
 and ebx, 0xFF
 add eax, ebx
 mov ecx, eax
@@ -687,6 +702,8 @@ push ecx
 push ebx
 push eax
 mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
 and ebx, 0xFF
 add eax, ebx
 mov ecx, eax
@@ -706,6 +723,8 @@ push ecx
 push ebx
 push eax
 mov eax, [Dolphin.currentWindow]
+add eax, Dolphin.windowStructs
+mov eax, [eax]
 and ebx, 0xFF
 add eax, ebx
 mov ecx, eax
@@ -942,7 +961,7 @@ dw 0x0
 Dolphin.bsizstor :
 dd 0x0
 Dolphin.activeWindow :	; winNum for the window that currently has focus (must be switched by Dolphin!)
-dd 0x0
+db 0x0
 bglocstor :
 dd 0x0
 Dolphin.windowStructs :

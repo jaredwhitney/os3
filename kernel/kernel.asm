@@ -32,20 +32,20 @@ Kernel.init :
 kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
-	;call console.loop
-		call card.loop
-	;call Clock.loop
+	call console.loop
+	;	call card.loop
+	call Clock.loop
 ret
 	
 kernel.initModules :
 	call Dolphin.init
-	;call console.init
-		call card.init
+	call console.init
+	;	call card.init
 	
 	call KeyManager.init
 	
-	;call Clock.init
-	;call Clock.show	; should be bound to a command!	
+	call Clock.init
+	call Clock.show	; should be bound to a command!	
 ret
 	
 kernel.halt :

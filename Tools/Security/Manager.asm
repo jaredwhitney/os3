@@ -216,8 +216,8 @@ call drawStringDirect
 			mov cl, 0xD0
 			call Manager.direct.num
 ; ***************************************************************
-	mov eax, [Dolphin.activeWindow]
-	mov [Dolphin.currentWindow], eax
+	mov ah, [Dolphin.activeWindow]
+	mov [Dolphin.currentWindow], ah
 	LockLoop :
 		call Keyboard.poll
 		call Keyboard.getKey
