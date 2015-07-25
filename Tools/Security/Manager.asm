@@ -4,11 +4,11 @@ Manager.CONTROL_MODULES	equ 0x1
 Manager.CONTROL_DOLPHIN	equ 0x2
 
 Manager.handleLock :
-push ebx
+push bx
 mov bl, [Manager.locked]
 cmp bl, 0x0
+pop bx
 jne Manager.doLock
-pop ebx
 ret
 
 Manager.lock :
@@ -241,7 +241,6 @@ call drawStringDirect
 	call Image.clear
 	
 popa
-pop ebx
 ret
 
 drawStringDirect :

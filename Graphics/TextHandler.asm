@@ -91,7 +91,7 @@ TextHandler.drawRow :	; ah contains row
 			je TextHandler.drawRownd
 				mov dl, [Graphics.VESA_MODE]
 				cmp dl, 0x0
-					jne TextHandler.drawRowVESA
+					jne TextHandler.drawRowVESA					; should be jne
 				mov dl, [TextHandler.selectedColor]
 					push ecx
 					mov ecx, [TextHandler.textSizeMultiplier]

@@ -6,14 +6,14 @@ Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 		Image.wupdate.loop1 :
 			push eax
 			mov eax, [eax]
-					cmp byte [Image_checkChange], 0xFF
-						jne Image.wupdate.nobother
-					test eax, CHANGE_MASK
-						jne Image.wupdate.nobother
-					jmp Image.wupdate.notnew
-					Image.wupdate.nobother :
-									or eax, CHANGE_MASK
-				Image.wupdate.notnew :
+					;cmp byte [Image_checkChange], 0xFF
+					;	jne Image.wupdate.nobother
+					;test eax, CHANGE_MASK
+					;	jne Image.wupdate.nobother
+					;jmp Image.wupdate.notnew
+					;Image.wupdate.nobother :
+									;or eax, CHANGE_MASK
+				;Image.wupdate.notnew :
 			mov [ebx], eax
 			pop eax
 			add ebx, 4

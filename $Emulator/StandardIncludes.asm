@@ -32,3 +32,5 @@
 %include "..\boot\realMode.asm"
 
 %include "..\Meta\Graphics\Window.asm"
+
+%include "..\Debug\InfoPanel.asm"

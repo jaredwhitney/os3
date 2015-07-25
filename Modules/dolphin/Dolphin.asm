@@ -101,7 +101,7 @@ Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize
 			mov ah, bl
 			Dolphin.drawText_noOverride1 :
 			pop bx
-			call Syntax.highlight
+			;call Syntax.highlight
 			call TextHandler.drawChar
 		mov ecx, [TextHandler.charpos]
 			push ebx
@@ -379,80 +379,79 @@ pusha
 		sub ebx, 4
 		
 		mov [Dolphin.currentWindow], ebx
-		mov bl, [Window.WIDTH]
-		call Dolphin.getAttribWord
+		add ebx, Dolphin.windowStructs
+		mov edx, [ebx]
+		push edx
+		
 		mov [atwstorX], ax
 		
-		mov bl, [Window.HEIGHT]
-		call Dolphin.getAttribWord
+		
 		mov [atwstor2X], ax
 		
-		push ebx
-		mov ebx, [Window.WINDOWBUFFER]
-		call Dolphin.getAttribDouble	; mov eax, windowBuffer
-		pop ebx
+		mov eax, [edx+14]	; windowbuffer
 		
-		mov ecx, [atwstorX]
-		mov edx, [atwstor2X]
-			pusha
+		xor ecx, ecx
+		mov cx, [edx+4]	; width
+		mov dx, [edx+6]	; height
+		and edx, 0xFFFF
+
 			mov ebx, eax
 			call Dolphin.drawBorder
 			call Dolphin.drawTitle
-			popa
+
 		mov ebx, [Dolphin.SCREEN_BUFFER]
 		
-		push eax
-		xor eax, eax
-		push bx
-		mov bl, [Window.Y_POS]
-		call Dolphin.getAttribWord
-		pop bx
-		imul eax, [Graphics.SCREEN_WIDTH]
+			pop edx
+			push eax
+			xor eax, eax
+			mov ax, [edx+10]	; ypos
+			imul eax, [Graphics.SCREEN_WIDTH]
+			
 		add ebx, eax	; add ypos
-		push bx
-		mov bl, [Window.X_POS]
-		call Dolphin.getAttribWord
-		pop bx
-		add ebx, eax
+		xor eax, eax
+		mov ax, [edx+8]
+		add ebx, eax	; add xpos
 		pop eax
+		mov dx, [edx+6]	; height back
+
 		
-		pusha
-		mov bl, [Window.TYPE]
-		call Dolphin.getAttribByte
-		cmp al, 0x0	; text window, dont bother rechecking
-			je Dolphin.updateScreen.notText
-		mov byte [Image_checkChange], 0xFF	; enabling causes a *slight* slowdown
-		Dolphin.updateScreen.notText :
-		popa
+		;pusha
+		;mov bl, [Window.TYPE]
+		;call Dolphin.getAttribByte
+		;cmp al, 0x0	; text window, dont bother rechecking
+		;	je Dolphin.updateScreen.notText
+		;mov byte [Image_checkChange], 0xFF	; enabling causes a *slight* slowdown
+		;Dolphin.updateScreen.notText :
+		;popa
 		call Image.copy
-		mov byte [Image_checkChange], 0x0
+		;mov byte [Image_checkChange], 0x0
 		
 		pop ebx
 		jmp Dolphin.updateScreen.checkWindow			;COMMENTED: KILLS >1 WINDOWS
 		
 Dolphin.doneDrawingWindows :
 ;
-	call Dolphin.anyActiveWindows
-	cmp eax, 0x0	; no windows to draw :(
-		jne Dolphin.doneDrawingWindows.cont
-	call Manager.freezePanic
-Dolphin.doneDrawingWindows.cont :
+	;call Dolphin.anyActiveWindows	; DO NOT CHECK EVERY FRAME !!!
+	;cmp eax, 0x0	; no windows to draw :(
+	;	jne Dolphin.doneDrawingWindows.cont
+	;call Manager.freezePanic
+;Dolphin.doneDrawingWindows.cont :
 ;call debug.update	; ensuring that debug information stays updated and 'on top'
-		;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
-		;mov ebx, [Dolphin.SCREEN_BUFFER]
-		;mov ecx, [Graphics.SCREEN_SIZE]
-		;mov edx, [Graphics.SCREEN_MEMPOS]
-		;call Dolphin.xorImage
-;mov eax, [Dolphin.SCREEN_BUFFER]
-;mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
-;mov ecx, [Graphics.SCREEN_WIDTH]
-;mov edx, [Graphics.SCREEN_HEIGHT]
-;call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
-
+		mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; THIS MAKES IT GO WAAAY FASTER!
+		mov ebx, [Dolphin.SCREEN_BUFFER]
+		mov ecx, [Graphics.SCREEN_SIZE]
+		mov edx, [Graphics.SCREEN_MEMPOS]
+		call Dolphin.xorImage
 mov eax, [Dolphin.SCREEN_BUFFER]
-mov ebx, [Graphics.SCREEN_MEMPOS]
-mov ecx, [Graphics.SCREEN_SIZE]
-call Dolphin.copyChanged
+mov ebx, [Dolphin.SCREEN_FLIPBUFFER]
+mov ecx, [Graphics.SCREEN_WIDTH]
+mov edx, [Graphics.SCREEN_HEIGHT]
+call Image.copyLinear	; need to be checking each frame and only updating memory that has changed
+
+;mov eax, [Dolphin.SCREEN_BUFFER]
+;mov ebx, [Graphics.SCREEN_MEMPOS]
+;mov ecx, [Graphics.SCREEN_SIZE]
+;call Dolphin.copyChanged
 
 	pop word [Dolphin.currentWindow]
 Dolphin.updateScreen.ret :
@@ -484,18 +483,20 @@ popa
 ret
 
 Dolphin.copyChanged :	; eax = buffer1, ebx = buffer2, ecx = buffersize
-pusha
+	xor edx, edx
+	mov [cval], edx
 	Dolphin.copyChanged.loop :
 		mov edx, [eax]
+		;cmp byte [Graphics.VESA_MODE], 0x0
+			;je nobother
 		test edx, CHANGE_MASK
 			jz Dolphin.copyChanged.noChange
-			
-		; else it needs to be updated!
-		cmp byte [Graphics.VESA_MODE], 0x0
-		je nobother
 		and edx, 0xFFFFFF
 		nobother :
 		mov [ebx], edx
+					mov edx, [cval]
+					add edx, 1
+					mov [cval], edx
 		
 		Dolphin.copyChanged.noChange :
 		sub ecx, 4
@@ -503,8 +504,9 @@ pusha
 		add ebx, 4
 		cmp ecx, 0
 			jg Dolphin.copyChanged.loop
-popa
 ret
+cval :
+dd 0x0
 
 Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffer3
 	pusha

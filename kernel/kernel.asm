@@ -17,7 +17,6 @@ Kernel.init :
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
-	;call kernel.halt
 	
 	;	MAIN LOOP	;
 	kernel.loop:
@@ -32,20 +31,21 @@ Kernel.init :
 kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
+	
+	call InfoPanel.loop
 	call console.loop
-	;	call card.loop
-	call Clock.loop
+	;call Clock.loop
 ret
 	
 kernel.initModules :
 	call Dolphin.init
 	call console.init
-	;	call card.init
 	
 	call KeyManager.init
 	
-	call Clock.init
-	call Clock.show	; should be bound to a command!	
+	;call Clock.init
+	;call Clock.show	; should be bound to a command!	
+	call InfoPanel.init
 ret
 	
 kernel.halt :
@@ -62,6 +62,5 @@ os.mlloc :
 db 0x0
 	
 %include "../$Emulator/StandardIncludes.asm"
-%include "../_not os code/~DO NOT SYNC/DadCard.asm"
 
 MINNOW_START :
