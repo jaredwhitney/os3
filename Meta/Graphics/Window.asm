@@ -14,6 +14,12 @@ pusha
 	mov ebx, 0x2800*0x200
 	call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov bl, [Window.OLDBUFFER]
+		call Dolphin.setAttribDouble
+	
+	mov ebx, 0x2800*0x200
+	call ProgramManager.reserveMemory
+		mov eax, ebx
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
 popa
@@ -44,6 +50,11 @@ call ProgramManager.reserveMemory
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov bl, [Window.OLDBUFFER]
+		call Dolphin.setAttribDouble
+mov ebx, 0x7D*0x200
+call ProgramManager.reserveMemory
+		mov eax, ebx
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
 popa
@@ -53,7 +64,7 @@ retstor :
 	dd 0x0
 Window.create.allocNewWindow :
 
-	mov ebx, 26	; window size
+	mov ebx, 30	; window size
 	call ProgramManager.reserveMemory
 	push ebx
 	mov [ebx], ecx			; title

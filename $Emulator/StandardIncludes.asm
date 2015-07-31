@@ -1,5 +1,4 @@
 %include "..\modules\dolphin\Dolphin.asm"
-%include "..\modules\dolphin\Catfish.asm"
 %include "..\modules\console\iConsole.asm"
 %include "..\modules\xlib\int30.asm"
 
@@ -15,7 +14,6 @@
 %include "..\Drivers\USB\Generic_EHCI.asm"
 
 %include "..\Tools\System\Time.asm"
-%include "..\Tools\System\View.asm"
 %include "..\Tools\System\Guppy.asm"
 %include "..\Tools\System\Minnow.asm"
 
@@ -34,3 +32,8 @@
 %include "..\Meta\Graphics\Window.asm"
 
 %include "..\Debug\InfoPanel.asm"
+Catfish.notify:
+ret
+View.file:
+ret
+WHITE equ 0xFF

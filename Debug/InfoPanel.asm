@@ -27,7 +27,7 @@ InfoPanel.initWindow :
 	mov ebx, eax
 		mov eax, InfoPanel.EMPTY_MESSAGE
 	call String.copyRawToWhite	; move String into [ebx]
-	call Window.fitTextBufferSize
+	;call Window.fitTextBufferSize
 	mov ax, 0x100
 	mov bx, 0x10
 	call Dolphin.sizeWindow
@@ -54,11 +54,6 @@ pusha
 	xor ebx, ebx
 	mov bl, [InfoPanel.wnum]
 	mov [Dolphin.currentWindow], ebx
-		mov bl, [Window.BUFFER]
-		call Dolphin.getAttribDouble
-		mov ebx, [cval]
-		call String.fromHex
-		call Window.fitTextBufferSize
 	call Dolphin.uUpdate
 popa
 ret
@@ -70,6 +65,6 @@ InfoPanel.wnum :
 InfoPanel.window :
 	dd 0x0
 InfoPanel.EMPTY_MESSAGE :
-	db "            ", 0
+	db "[No data available]", 0x0a, "Sorry about that :(", 0
 InfoPanel.title :
 	db "Diagnostics", 0

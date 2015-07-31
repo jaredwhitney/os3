@@ -33,13 +33,13 @@ kernel.runModules :
 	mov [os.mlloc], bl
 	
 	call InfoPanel.loop
-	call console.loop
+	;call console.loop
 	;call Clock.loop
 ret
 	
 kernel.initModules :
 	call Dolphin.init
-	call console.init
+	;call console.init
 	
 	call KeyManager.init
 	
