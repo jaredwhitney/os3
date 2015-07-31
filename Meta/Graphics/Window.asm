@@ -101,3 +101,30 @@ pusha
 	call Dolphin.setAttribDouble
 popa
 ret
+
+
+Window.TYPE_TEXT equ 0x0
+Window.TYPE_IMAGE equ 0x1
+
+Window.TITLE :
+db 0
+Window.WIDTH :
+db 4
+Window.HEIGHT :
+db 6
+Window.X_POS :
+db 8
+Window.Y_POS :
+db 10
+Window.TYPE :
+db 12
+Window.DEPTH :
+db 13
+Window.WINDOWBUFFER :
+db 14
+Window.BUFFER :
+db 18
+Window.BUFFERSIZE :
+db 22
+Window.OLDBUFFER :
+db 26

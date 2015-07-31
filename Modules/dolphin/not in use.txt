@@ -1,0 +1,62 @@
+Dolphin.copyChanged :	; eax = buffer1, ebx = buffer2, ecx = buffersize
+	xor edx, edx
+	mov [cval], edx
+	Dolphin.copyChanged.loop :
+		mov edx, [eax]
+		;cmp byte [Graphics.VESA_MODE], 0x0
+			;je nobother
+		test edx, CHANGE_MASK
+			jz Dolphin.copyChanged.noChange
+		and edx, 0xFFFFFF
+		nobother :
+		mov [ebx], edx
+					mov edx, [cval]
+					add edx, 1
+					mov [cval], edx
+		
+		Dolphin.copyChanged.noChange :
+		sub ecx, 4
+		add eax, 4
+		add ebx, 4
+		cmp ecx, 0
+			jg Dolphin.copyChanged.loop
+ret
+cval :
+dd 0x0
+
+Dolphin.xorImage :	; eax = buffer1, ebx = buffer2, ecx = buffersize, edx = buffer3
+	pusha
+	mov [Dolphin.xbufsize], ecx
+	mov [Dolphin.xbuf1pos], eax
+	mov [Dolphin.xbuf2pos], ebx
+	mov [Dolphin.xbuf3pos], edx
+	Dolphin.xorImage.loop :
+	mov ecx, [eax]
+	mov edx, [ebx]
+	push eax
+	mov eax, [Dolphin.xbuf3pos]
+	xor ecx, edx
+	cmp ecx, 0x0
+		je Dolphin.xorImage.noUpdate
+		;mov edx, 0x0CFF0CFF
+	mov [eax], edx
+	jmp DxoIcnt
+	Dolphin.xorImage.noUpdate :
+	;		mov edx, [ebx]
+	;mov [eax], edx
+	DxoIcnt :
+	add eax, 4
+	mov [Dolphin.xbuf3pos], eax
+	mov eax, [Dolphin.xbufsize]
+	sub eax, 4
+	mov [Dolphin.xbufsize], eax
+	cmp eax, 0x4
+		jle Dolphin.xorImage.ret
+	pop eax
+	add eax, 4
+	add ebx, 4
+	jmp Dolphin.xorImage.loop
+	Dolphin.xorImage.ret :
+	pop eax
+	popa
+	ret

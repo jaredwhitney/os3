@@ -1,4 +1,7 @@
 %include "..\modules\dolphin\Dolphin.asm"
+%include "..\modules\dolphin\WindowTools.asm"
+%include "..\modules\dolphin\Update_Text.asm"
+
 %include "..\modules\console\iConsole.asm"
 %include "..\modules\xlib\int30.asm"
 
