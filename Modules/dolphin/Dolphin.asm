@@ -42,18 +42,68 @@ Dolphin.drawTextNew :	; eax = text buffer, ebx = dest, cx = width, edx = old tex
 pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
+		push eax
+		mov eax, 0
+		mov [Dolphin.dcount], eax
+		pop eax
+	
 	mov [bstor], ebx
+	call Dolphin.dTN.checkUnsmartClear
 	call Dolphin.dTN.alignTo_start	; text buffer (eax) -> ecx
 	
 	call Dolphin.dTN.calc_newlineCutoff
 	
 	Dolphin.drawTextNew.loop :
-		call Dolphin.dTN.cchar_ecx
+		call Dolphin.dTN.ccharcheck_ecxedx
 		mov bl, [ecx]
 		cmp bl, 0x0
 			jne Dolphin.drawTextNew.loop
+		mov bl, [edx]
+		cmp bl, 0x0
+			jne Dolphin.drawTextNew.loop
+	
+	call Dolphin.dTN.updateTempBuffer
 	
 mov byte [Dolphin_WAIT_FLAG], 0x0
+popa
+ret
+
+Dolphin.dTN.checkUnsmartClear :
+pusha
+	push edx
+	push edx
+		mov ebx, eax
+		call String.getLength
+		mov ecx, edx
+	pop edx
+		mov ebx, edx
+		call String.getLength
+		sub edx, 4
+	cmp ecx, edx
+	pop edx
+		jge Dolphin.dTN.checkUnsmartClear.noShrink
+			mov eax, edx
+			mov edx, [Graphics.SCREEN_SIZE]
+			mov ebx, 0x0
+			call Image.clear
+		mov eax, [bstor]
+		mov edx, [Graphics.SCREEN_SIZE]
+		mov ebx, 0x0
+		call Image.clear
+Dolphin.dTN.checkUnsmartClear.noShrink :
+popa
+ret
+
+Dolphin.dTN.updateTempBuffer :
+pusha
+	mov bl, [Window.OLDBUFFER]
+	call Dolphin.getAttribDouble
+	mov ebx, eax
+	push ebx
+	mov bl, [Window.BUFFER]
+	call Dolphin.getAttribDouble
+	pop ebx
+	call String.copy
 popa
 ret
 
@@ -114,6 +164,45 @@ push ax
 pop ax
 ret
 
+Dolphin.dTN.ccharcheck_ecxedx :
+push ax
+push bx
+		mov ax, [ecx]
+		mov bx, [edx]
+		cmp ax, bx
+			jne Dolphin.dTN.ccharcheck_ecxedx.updateIt
+			cmp al, 0x0a
+				jne Dolphin.dTN.ccharcheck_ecxedx.noup.notnewl
+			call Dolphin.dTN.newline
+			jmp Dolphin.dTN.ccharcheck_ecxedx.cont
+			Dolphin.dTN.ccharcheck_ecxedx.noup.notnewl :
+			push ecx
+			mov ecx, [TextHandler.charpos]
+			add ecx, 7
+			mov [TextHandler.charpos], ecx
+			pop ecx
+			call Dolphin.dTN.check_newlineCutoff
+			jmp Dolphin.dTN.ccharcheck_ecxedx.cont
+	Dolphin.dTN.ccharcheck_ecxedx.updateIt :	; if something has changed
+					push eax
+					mov eax, [Dolphin.dcount]
+					add eax, 1
+					mov [Dolphin.dcount], eax
+					pop eax
+	mov ax, [ecx]
+	cmp al, 0x0a
+		jne Dolphin.dTN.ccharcheck_ecxedx.notnewl
+	call Dolphin.dTN.newline
+	jmp Dolphin.dTN.ccharcheck_ecxedx.cont
+	Dolphin.dTN.ccharcheck_ecxedx.notnewl :
+	call Dolphin.dTN.printCharPlain
+	Dolphin.dTN.ccharcheck_ecxedx.cont :
+	add ecx, 2
+	add edx, 2
+pop bx
+pop ax
+ret
+
 Dolphin.dTN.printCharPlain :	; char in ax
 	push ecx
 		call TextHandler.drawChar
@@ -144,177 +233,6 @@ Dolphin.dTN.s_calc :
 		mov [dstor2], ebx
 		pop ebx
 		ret
-
-
-; Dolphin.drawText :	; eax = text buffer, ebx = dest, cx = width, edx = bufferSize (chars)
-	; pusha
-	; mov byte [Dolphin_WAIT_FLAG], 0xFF
-	; call Syntax.reset
-	; and ecx, 0xFFFF
-	; mov [dstor], edx
-	; mov [bposstor], ebx
-	; mov [TextHandler.textWidth], cx
-		; pusha		;NOTE: this being commented breaks stuff :)
-		; mov eax, ebx
-		; mov edx, [Graphics.SCREEN_SIZE]
-		; mov ebx, 0x0
-		; call Image.clear
-		; popa
-	; mov ecx, [TextHandler.charpos]
-		; push ecx
-		; xor ecx, ecx
-		; mov cx, [TextHandler.textWidth]
-		; add ebx, ecx	; so the border isn't overlapping the text
-		; add ebx, ecx
-		; pop ecx
-	; mov [bstor], ebx
-	; mov [TextHandler.charposStor], ecx
-	; mov ecx, ebx	; dest buffer
-	; call Dolphin.checkCharLine
-	; mov [TextHandler.charpos], ecx
-	; mov ebx, eax	; src buffer
-	; mov ah, 255
-	; mov [Dolphin.bsizstor], edx
-	; mov edx, 0x0
-	; Dolphin.drawText_loop :
-		; mov ax, [ebx]
-		; push ebx
-		; mov ebx, [Dolphin.bsizstor]
-		; ;call debug.num
-		; push ecx
-		; mov ecx, [dstor]
-		; cmp edx, ecx	; size of buffer
-		; pop ecx
-		; pop ebx
-			; jg Dolphin.drawText_ret
-				; ;pusha
-				; ;mov eax, [TextHandler.charpos]	; where we are in destination buffer + destination buffer pos
-				; ;mov ebx, [bposstor]
-				; ;add ebx, [Graphics.SCREEN_SIZE]
-				; ;cmp eax, ebx
-				; ;popa
-				; ;	jge Dolphin.drawText_ret
-		; add edx, 1
-		; cmp al, 0x0
-			; je Dolphin.drawText.nodraw
-		; cmp al, 0xD
-			; je Dolphin.drawText.nodraw
-		; cmp al, 0x0A
-			; je Dolphin.drawText.newl
-			; push bx
-			; mov bl, [Dolphin.colorOverride]
-			; cmp bl, 0
-			; je Dolphin.drawText_noOverride1
-			; mov ah, bl
-			; Dolphin.drawText_noOverride1 :
-			; pop bx
-			; ;call Syntax.highlight
-			; call TextHandler.drawChar
-		; mov ecx, [TextHandler.charpos]
-			; push ebx
-			; xor ebx, ebx
-			; mov bx, [TextHandler.textWidth]
-			; imul ebx, 2
-			; add ecx, ebx
-			; ;add ecx, 0xa0*2
-			; pop ebx
-		; Dolphin.drawText.doCheck :
-		; call Dolphin.checkCharLine	; EXPERIMENTAL!!!
-		; mov [TextHandler.charpos], ecx
-		; jmp Dolphin.drawText.cont1
-		; Dolphin.drawText.nodraw :
-			; push ecx
-			; mov ecx, [TextHandler.charpos]
-			; add ecx, 6
-			; mov [TextHandler.charpos], ecx
-			; pop ecx
-		; Dolphin.drawText.cont1 :
-			; add ebx, 0x1
-				; push ax
-				; mov al, [Dolphin.colorOverride]
-				; cmp al, 0
-				; jne Dolphin.drawText_noOverride2
-				; add ebx, 0x1
-				; Dolphin.drawText_noOverride2 :
-				; pop ax
-			; jmp Dolphin.drawText_loop
-	; Dolphin.drawText_ret :
-	; mov ecx, [TextHandler.charposStor]
-	; mov [TextHandler.charpos], ecx
-	; mov byte [Dolphin_WAIT_FLAG], 0x0
-	; popa
-	; ret
-	
-	; Dolphin.drawText.newl :	; move one space down, checkCharLine will move to the next line
-	; push edx
-	; mov ecx, [TextHandler.charpos]
-	; mov edx, [Graphics.SCREEN_WIDTH]
-	; add ecx, edx
-	; mov [TextHandler.charpos], ecx
-	; pop edx
-	; ret
-	
-	; Dolphin.checkCharLine :	; TextHandler.charpos in ecx, width in TextHandler.textWidth, buffer loc in bstor
-	; push eax
-	; push ebx
-	; push edx
-		; mov eax, [bstor]
-		; sub ecx, eax
-		; push eax
-		; push ecx
-		; add ecx, 6
-		; mov eax, ecx
-		; xor ebx, ebx
-		; mov bx, [TextHandler.textWidth]
-		; xor edx, edx
-		; div ebx	; eax now contains the line number
-		
-		; push ecx
-		; mov ecx, 7
-		; imul ecx, [TextHandler.textSizeMultiplier]
-		; add ecx, 2
-		; xor edx, edx
-		; idiv ecx
-		; pop ecx
-		
-		; cmp edx, 0x0
-		; je Dolphin.checkCharLine.kret
-		;;if the line is invalid :
-		; mov ecx, edx	; ecx now contains the remainder, if non 0 the line is invalid
-		; add eax, 1	; eax contains last valid line
-		; xor edx, edx
-		
-		; push ebx
-		; mov ebx, 7
-		; imul ebx, [TextHandler.textSizeMultiplier]
-		; add ebx, 2
-		; imul eax, ebx	; should be 8
-		; pop ebx
-		
-		; xor ecx, ecx
-		; mov cx, [TextHandler.textWidth]
-		; xor edx, edx
-		; imul eax, ecx
-			; mov ebx, eax
-		; pop ecx
-		; pop eax
-			; mov ecx, ebx
-			; add ecx, eax
-		; add ecx, 1
-		; noreadd :
-		; jmp Dolphin.checkCharLine.ret
-		
-		; Dolphin.checkCharLine.kret :
-		; pop ecx
-		; pop eax
-		; add ecx, eax
-	; Dolphin.checkCharLine.ret :
-	; pop edx
-	; pop ebx
-	; pop eax
-	; ret
-	
-	
 
 Dolphin.drawBorder :	; ebx = image buffer, cx = width, dx = height
 pusha
@@ -574,14 +492,6 @@ pusha
 	call Dolphin.getAttribDouble
 	pop ebx
 	call Dolphin.drawTextNew
-			;mov bl, [Window.OLDBUFFER]
-			;call Dolphin.getAttribDouble
-			;mov ebx, eax
-			;push ebx
-			;mov bl, [Window.BUFFER]
-			;call Dolphin.getAttribDouble
-			;pop ebx
-			;call String.copy
 	Dolphin.uUpdate.notText :
 popa
 ret
@@ -1058,7 +968,7 @@ dd 0x0
 Dolphin.xbuf3pos :
 dd 0x0
 Dolphin.dcount :
-db 0x0
+dd 0x0
 
 Dolphin.colorOverride :
 db 0x0

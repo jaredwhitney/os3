@@ -108,6 +108,18 @@ mov byte [ebx], 0x0
 popa
 ret
 
+String.append :	; eax = main String, ebx = text to append
+pusha
+	push ebx
+	mov ebx, eax
+	call String.getLength
+	sub edx, 1
+	add eax, edx
+	pop ebx
+	xchg eax, ebx
+	call String.copy
+popa
+ret
 
 String._buffer :
 dd 0x0

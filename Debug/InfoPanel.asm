@@ -24,11 +24,11 @@ InfoPanel.initWindow :
 	mov bl, [Window.BUFFER]
 	call Dolphin.getAttribDouble
 	
-	mov ebx, eax
-		mov eax, InfoPanel.EMPTY_MESSAGE
-	call String.copyRawToWhite	; move String into [ebx]
+	;mov ebx, eax
+	;	mov eax, InfoPanel.EMPTY_MESSAGE
+	;call String.copyRawToWhite	; move String into [ebx]
 	;call Window.fitTextBufferSize
-	mov ax, 0x100
+	mov ax, 0x80
 	mov bx, 0x10
 	call Dolphin.sizeWindow
 	call InfoPanel.win_update
@@ -54,6 +54,22 @@ pusha
 	xor ebx, ebx
 	mov bl, [InfoPanel.wnum]
 	mov [Dolphin.currentWindow], ebx
+	
+	mov eax, InfoPanel.FIELD_0
+	mov ebx, [Dolphin.dcount]
+	call String.fromHex
+	
+	mov bl, [Window.BUFFER]
+	call Dolphin.getAttribDouble
+	mov ebx, eax
+	
+	mov eax, InfoPanel.LABEL_0
+	call String.copyRawToWhite
+	
+	mov eax, ebx
+	mov ebx, InfoPanel.FIELD_0
+	call String.append
+	
 	call Dolphin.uUpdate
 popa
 ret
@@ -66,5 +82,9 @@ InfoPanel.window :
 	dd 0x0
 InfoPanel.EMPTY_MESSAGE :
 	db "[No data available]", 0x0a, "Sorry about that :(", 0
+InfoPanel.LABEL_0 :
+	db "Updates last frame: ", 0
+InfoPanel.FIELD_0 :
+	dd 0x0, 0x0, 0x0, 0x0, 0x0
 InfoPanel.title :
 	db "Diagnostics", 0

@@ -72,6 +72,12 @@ je TextHandler.drawSolidBacking.ret
 mov ah, 0x0
 call TextHandler.drawRow
 call TextHandler.drawRow
+	push ecx
+	mov ecx, [TextHandler.charpos]
+	sub ecx, [TextHandler.textWidth]
+	sub ecx, [TextHandler.textWidth]
+	mov [TextHandler.charpos], ecx
+	pop ecx
 TextHandler.drawSolidBacking.ret :
 popa
 ret
@@ -211,7 +217,7 @@ TextHandler.selectedColor :
 dd 0xFFFFFF
 
 TextHandler.solidChar :
-db 0x0
+db 0xFF
 
 TextHandler.textWidth :
 dd 0x0

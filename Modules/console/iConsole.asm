@@ -159,25 +159,9 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov ebx, [console.windowStructLoc]
-call console.numOut
-call console.newline
-mov ebx, [ebx]
-call console.numOut
-call console.newline
-call console.newline
-;mov ebx, console.windowStruct
-;call console.numOut
-;call console.newline
-;mov ebx, [ebx]
-;call console.numOut
-;call console.newline
-;	call USB_PrintControllerInfo
-;	call USB_PrintActivePorts
-;	call USB_EnablePlugAndPlay
-	;mov ebx, USB_QUEUEHEADEX
-	;call USB_LoadQueueHead
-	;call USB_RunAsyncTasks
+	mov ebx, [Dolphin.dcount]
+	call console.numOut
+	call console.newline
 popa
 ret
 
