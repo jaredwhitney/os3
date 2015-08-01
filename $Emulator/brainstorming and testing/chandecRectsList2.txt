@@ -5,8 +5,8 @@ list.add([TextHandler.charpos])
 on = 0
 while (on < list.length)
 {
-	eax <- list.get(on) + cwin.getPos()
-	ebx <- [Graphics.SCREEN_MEMPOS]
+	eax <- list.get(on)
+	ebx <- [Graphics.SCREEN_MEMPOS] + cwin.getPos()
 	cx <- 5
 	dx <- 7
 	Image.copy()
