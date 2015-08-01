@@ -1,0 +1,11 @@
+Image.copy(cStart, vmem, 5, 7)
+-->
+Image.copy([TextHandler.charpos], [Graphics.SCREEN_MEMPOS], 5, 7)
+-->
+mov dword [TextHandler.charposStor], [TextHandler.charpos]
+...
+mov eax, [TextHandler.charposStor]
+mov ebx, [Graphics.SCREEN_MEMPOS]
+mov cx, 5
+mov dx, 7
+call Image.copy

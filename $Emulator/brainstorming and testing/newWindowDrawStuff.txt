@@ -1,0 +1,17 @@
+all changes within windows go
+change -> rect -> winimage -> screen
+
+when windows are moved/resized
+all: winimage -> screen
+
+drawText: change -> rect -> winimage
+
+update: rect -> screen OR winimage -> screen
+
+
+window changed?
+	update redraws all winimages
+
+window content changed?
+	drawText makes changes into rects, pushes rects to winimage
+	update pushes rects to screen

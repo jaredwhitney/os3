@@ -1,0 +1,23 @@
+list.add([TextHandler.charpos])
+
+....
+
+on = 0
+while (on < list.length)
+{
+	eax <- list.get(on) + cwin.getPos()
+	ebx <- [Graphics.SCREEN_MEMPOS]
+	cx <- 5
+	dx <- 7
+	Image.copy()
+}
+
+4 bytes per entry
+0x10 = 4 entries
+0x100 = 64 entries
+0x1000 = 1024 entries
+0x10000 = 16384 entries
+0x20000 = 32768 entries
+
+so a list size of 0x20000 should be more than large enough
+aka a 100 sector list
