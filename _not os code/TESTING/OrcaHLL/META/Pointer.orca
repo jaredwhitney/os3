@@ -1,0 +1,16 @@
+classdef Pointer
+	
+	linked func Get (byte : int pos)
+		byte ret = 255
+		asm("mov edx, [ebx]")
+		asm("add edx, [Pointer.Get.$local.pos]")
+		asm("mov byte [Pointer.Get.$local.ret], [edx]")
+		return ret
+	
+	linked func GetInt (int : int pos)
+		int ret = 255
+		asm("mov edx, [ebx]")
+		asm("add edx, [Pointer.GetInt.$local.pos]")
+		asm("mov dword [Pointer.GetInt.$local.ret], [edx]")
+		return ret
+

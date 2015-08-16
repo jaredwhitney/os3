@@ -1,0 +1,13 @@
+0 0 0 0 0 0 0 0 0
+0 0 0 0 S x x 0 0	0 0 0 0 0 0 0
+0 0 0 0 x x x 0 0	0 0 0 D x x 0
+0 0 0 0 0 0 0 0 0	0 0 0 x x x 0
+
+width=9
+height=4
+r_width=3
+r_height=2
+
+rep r_height
+	copy rep r_width
+	add width-r_width

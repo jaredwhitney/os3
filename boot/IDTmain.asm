@@ -498,10 +498,13 @@ IDTHANDLER :
 _IRQ0 :
 	pusha
 		call IRQ_FINISH
+		mov eax, [Clock.tics]
+		add eax, 1
+		mov [Clock.tics], eax
 		; timer code goes here!
 		cmp byte [Manager.locked], 0x0
 			jne _IRQ0.ret
-		call Dolphin.updateScreen
+		call Dolphin.updateScreenNew
 	_IRQ0.ret :
 	popa
 	iret

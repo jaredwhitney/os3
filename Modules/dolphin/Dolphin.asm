@@ -144,6 +144,12 @@ ret
 
 Dolphin.updateScreenNew :
 pusha
+cmp byte [Dolphin_WAIT_FLAG], 0x0
+	je Dolphin.uSN.cont
+popa
+ret
+Dolphin.uSN.cont :
+mov byte [Dolphin_WAIT_FLAG], 0xFF
 ;
 ; for each window
 ; 	does it need rects drawn?
@@ -160,8 +166,57 @@ pusha
 ;	for each window
 ;		redraw winBuffer to screen
 ;
+	
+	mov ebx, Dolphin.windowStructs
+	mov [Dolphin.uSN.endval], ebx
+	add dword [Dolphin.uSN.endval], 0xF*0x4
+	Dolphin.updateScreenNew.loop1_start :
+		cmp ebx, [Dolphin.uSN.endval]
+			jg Dolphin.updateScreenNew.loop1_end	
+			
+			push ebx
+			mov eax, [ebx]
+			cmp eax, 0x0
+				je Dolphin.updateScreenNew.loop1_innerdone
+				mov eax, ebx
+				sub eax, Dolphin.windowStructs
+			mov [Dolphin.currentWindow], eax
+			
+			mov bl, [Window.DEPTH]
+			call Dolphin.getAttribByte
+			cmp al, 0x0
+				jne Dolphin.uSN.loop1.notOnTop
+					mov bl, [Window.NEEDS_RECT_UPDATE]
+					call Dolphin.getAttribByte
+						cmp al, 0x0
+							je Dolphin.updateScreenNew.loop1_innerdone
+						mov bl, [Window.RECTL_BASE]
+						call Dolphin.getAttribDouble
+						sub eax, 4
+						mov [uRectsBase], eax
+						mov bl, [Window.RECTL_TOP]
+						call Dolphin.getAttribDouble
+						mov [uRectsEnd], eax
+						mov bl, [Window.WINDOWBUFFER]
+						call Dolphin.getAttribDouble
+						mov [cWinBuf], eax
+						call Dolphin.updateScreenNew.updateRects
+			Dolphin.uSN.loop1.notOnTop :
+;				figure out occlusion somehow...
+		Dolphin.updateScreenNew.loop1_innerdone :
+		pop ebx
+		add ebx, 4
+		jmp Dolphin.updateScreenNew.loop1_start
+	Dolphin.updateScreenNew.loop1_end :
+	mov byte [Dolphin_WAIT_FLAG], 0x00
 popa
 ret
+Dolphin.uSN.endval :
+	dd 0x0
+cWinPos :
+	dd 0x0
+cWinBuf :
+	dd 0x0
 
 Dolphin.updateScreenNew.updateRects :
 pusha
@@ -173,8 +228,7 @@ pusha			; store window's position
 	mov bl, [Window.Y_POS]
 	call Dolphin.getAttribWord
 	mov ecx, eax
-	mov bl, [Window.WIDTH]
-	call Dolphin.getAttribWord
+	mov eax, [Graphics.SCREEN_WIDTH]
 	imul ecx, eax
 	mov bl, [Window.X_POS]
 	call Dolphin.getAttribWord
@@ -182,24 +236,42 @@ pusha			; store window's position
 	mov [cWinPos], ecx
 popa
 
-mov ebp, [uRectsBase]	; load rects stack
-mov esp, [uRectsEnd]
 
 Dolphin.updateNew.cRectsLoop :	; update rects
-pop eax	; eg 0= ul of win in winB
+;pop eax	; eg 0= ul of win in winB
+mov eax, [uRectsEnd]
+push eax
+mov eax, [eax]
+
+add dword [uRectsEnd], 4
 mov ebx, [Graphics.SCREEN_MEMPOS]	; ul of screen
 add ebx, [cWinPos]	; ul of win
 add ebx, eax	; where to be in win
-mov cx, 5
-mov dx, 7
-call Image.copy
-cmp ebp, esp
-	jne Dolphin.updateNew.cRectsLoop
+add eax, [cWinBuf]
+mov cx, 7	; SHOULD BE 5 BY 7
+mov dx, 9
 
-mov ebp, [ebpStor]	; load old stack
-mov esp, [espStor]
+call Image.copyFromWinSource
+
+pop eax
+cmp eax, [uRectsBase]
+	jl Dolphin.updateNew.cRectsLoop
+
+	mov al, 0x0
+	mov bl, [Window.NEEDS_RECT_UPDATE]
+	call Dolphin.setAttribByte
+	
 popa
 ret
+
+uRectsBase :
+	dd 0x0
+uRectsEnd :
+	dd 0x0
+ebpStor :
+	dd 0x0
+espStor :
+	dd 0x0
 
 ; *** END NEW SCREEN UPDATE CODE ***
 

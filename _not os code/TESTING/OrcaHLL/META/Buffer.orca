@@ -1,0 +1,30 @@
+classdef Buffer #childOf Pointer	; Note: children of Pointer must declare all of their fields as capped
+	
+	; Fields
+	final capped linked int size
+	
+	func Create (Buffer : int size)
+		Buffer buf = System.Memory.Allocate($LinkedClassSize + size) as Buffer
+		buf.size = size
+		return buf
+	
+	linked func GetObjectSize (int : null)
+		return size + $LinkedClassSize
+	
+	linked func Set (void : int pos, byte val)
+		asm("mov byte [ebx+Buffer.Set.$local.pos+$LinkedClassSize], [Buffer.Set.$local.val]")	; this is wrong
+	
+	linked func Get (byte : int pos)
+		byte ret = 255
+		asm("xor ecx, ecx")
+		asm("mov byte [Buffer.Get.$local.ret], [ebx+Buffer.Get.$local.pos+$LinkedClassSize]")	; this is wrong
+		return ret
+
+	linked func SetInt (void : int pos, int val)
+		asm("mov dword [ebx+Buffer.Set.$local.pos+$LinkedClassSize], [Buffer.Set.$local.val]")	; this is wrong
+	
+	linked func GetInt (int : int pos)
+		int ret = 255
+		asm("mov dword [Buffer.GetInt.$local.ret], [ebx+Buffer.Get.$local.pos+$LinkedClassSize]")	; this is wrong
+		return ret
+

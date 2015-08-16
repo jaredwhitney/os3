@@ -22,6 +22,14 @@ pusha
 		mov eax, ebx
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
+		
+	mov ebx, 100*0x200
+	call ProgramManager.reserveMemory
+		mov eax, ebx
+		
+		add eax, 100*0x200
+		mov bl, [Window.RECTL_BASE]
+		call Dolphin.setAttribDouble
 popa
 ret	; returns buffer locations in ebx, ecx
 
@@ -57,6 +65,15 @@ call ProgramManager.reserveMemory
 		mov eax, ebx
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
+		
+mov ebx, 100*0x200
+call ProgramManager.reserveMemory
+		mov eax, ebx
+		add eax, 100*0x200
+
+		mov bl, [Window.RECTL_BASE]
+		call Dolphin.setAttribDouble
+		
 popa
 ret
 
@@ -64,19 +81,19 @@ retstor :
 	dd 0x0
 Window.create.allocNewWindow :
 
-	mov ebx, 30	; window size
+	mov ebx, 47	; window size
 	call ProgramManager.reserveMemory
 	push ebx
 	mov [ebx], ecx			; title
 	add ebx, 4
 	mov word [ebx], 4		; width
-	add ebx, 2
+	add ebx, 4
 	mov word [ebx], 4		; height
-	add ebx, 2
+	add ebx, 4
 	mov word [ebx], 0		; xpos
-	add ebx, 2
+	add ebx, 4
 	mov word [ebx], 8		; ypos
-	add ebx, 2
+	add ebx, 4
 	mov [ebx], dl			; type
 	add ebx, 1
 	mov byte [ebx], 0		; depth
@@ -86,20 +103,9 @@ Window.create.allocNewWindow :
 	mov dword [ebx], 0		; windowbuffer
 	add ebx, 4
 	mov dword [ebx], 0		; buffersize
+	add ebx, 8
+	mov byte [ebx], 0	; needsRectUpdate
 	pop ebx
-ret
-
-Window.fitTextBufferSize :
-pusha
-	mov bl, [Window.BUFFER]
-	call Dolphin.getAttribDouble
-	mov ebx, eax
-	call String.getLength
-	
-	mov eax, edx
-	mov bl, [Window.BUFFERSIZE]
-	call Dolphin.setAttribDouble
-popa
 ret
 
 
@@ -110,21 +116,35 @@ Window.TITLE :
 db 0
 Window.WIDTH :
 db 4
-Window.HEIGHT :
+Window.LASTWIDTH :
 db 6
-Window.X_POS :
+Window.HEIGHT :
 db 8
-Window.Y_POS :
+Window.LASTHEIGHT :
 db 10
-Window.TYPE :
+Window.X_POS :
 db 12
-Window.DEPTH :
-db 13
-Window.WINDOWBUFFER :
+Window.LASTX_POS :
 db 14
-Window.BUFFER :
+Window.Y_POS :
+db 16
+Window.LASTY_POS :
 db 18
-Window.BUFFERSIZE :
+Window.TYPE :
+db 20
+Window.DEPTH :
+db 21
+Window.WINDOWBUFFER :
 db 22
-Window.OLDBUFFER :
+Window.BUFFER :
 db 26
+Window.BUFFERSIZE :
+db 30
+Window.OLDBUFFER :
+db 34
+Window.NEEDS_RECT_UPDATE :
+db 38
+Window.RECTL_BASE :
+db 39
+Window.RECTL_TOP :
+db 43

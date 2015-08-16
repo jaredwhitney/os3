@@ -67,17 +67,8 @@ pusha
 mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.update.gone
-	mov eax, [console.dat]
-		push eax
-		mov bl, [Window.WIDTH]
-		call Dolphin.getAttribWord
-		mov ebx, eax
-		pop eax
-	cmp eax, ebx
-	je console.loop.noChange
 	mov [console.dat], ebx
 	call console.update
-console.loop.noChange :
 mov bl, [console.winNum]
 mov [Dolphin.currentWindow], bl
 	console.loop.checkKeyBuffer :
@@ -159,7 +150,11 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov ebx, [Dolphin.dcount]
+	mov bl, [Window.BUFFER]
+	call Dolphin.getAttribDouble
+	mov ebx, eax
+	call String.getLength
+	mov ebx, edx
 	call console.numOut
 	call console.newline
 popa
@@ -556,35 +551,28 @@ ret
 
 console.clearScreen :
 pusha
-	push ebx
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
-	pop ebx
-		push bx
 		mov bl, [Window.BUFFER]	; -> eax
 		call Dolphin.getAttribDouble
-		pop bx
-mov cx, 0x0
-console.clearScreen.loop :
-mov [eax], cx
-add eax, 2
-push ebx
-		push eax
-		mov bl, [Window.BUFFER]	; -> ebx
-		call Dolphin.getAttribDouble
-		mov ebx, eax
-		pop eax
-add ebx, 0xfa00
-cmp eax, ebx
-pop ebx
-jl console.clearScreen.loop
+	mov ebx, eax
+	call String.getLength
+	add ebx, edx
+	mov [console.clearScreen.end], ebx
 mov ecx, 0x0
-		mov eax, ecx
+console.clearScreen.loop :
+mov [eax], ecx
+add eax, 4
+cmp eax, [console.clearScreen.end]
+	jl console.clearScreen.loop
+		mov eax, 0
 		mov bl, [Window.BUFFERSIZE]	; <- ecx
 		call Dolphin.setAttribDouble
 popa
 ret
+console.clearScreen.end :
+	dd 0x0
 
 console.setColor :
 mov ah, bl

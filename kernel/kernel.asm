@@ -1,6 +1,7 @@
 [bits 32]
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
+mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
 		
@@ -17,7 +18,7 @@ Kernel.init :
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
-	
+	mov byte [Dolphin_WAIT_FLAG], 0x0
 	;	MAIN LOOP	;
 	kernel.loop:
 			;	RUN INSTALLED MODULES	;
@@ -33,13 +34,13 @@ kernel.runModules :
 	mov [os.mlloc], bl
 	
 	call InfoPanel.loop
-	call console.loop
+	;call console.loop
 	;call Clock.loop
 ret
 	
 kernel.initModules :
 	call Dolphin.init
-	call console.init
+	;call console.init
 	
 	call KeyManager.init
 	

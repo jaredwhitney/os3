@@ -14,4 +14,4 @@ window changed?
 
 window content changed?
 	drawText makes changes into rects, pushes rects to winimage
-	update pushes rects to screen
+	update and pushes rects to screen

@@ -1,0 +1,33 @@
+mov [espStor], esp	; store current stack
+mov [ebpStor], ebp
+
+pusha			; store window's position
+	xor eax, eax
+	mov bl, [Window.Y_POS]
+	call Dolphin.getAttribWord
+	mov ecx, eax
+	mov bl, [Window.WIDTH]
+	call Dolphin.getAttribWord
+	imul ecx, eax
+	mov bl, [Window.X_POS]
+	call Dolphin.getAttribWord
+	add ecx, eax
+	mov [cWinPos], ecx
+popa
+
+mov ebp, [uRectsBase]	; load rects stack
+mov esp, [uRectsEmd]
+
+Dolphin.updateNew.cRectsLoop :	; update rects
+pop eax	; eg 0= ul of win in winB
+mov ebx, [Graphics.SCREEN_MEMPOS]	; ul of screen
+add ebx, [cWinPos]	; ul of win
+add ebx, eax	; where to be in win
+mov cx, 5
+mov dx, 7
+call Image.copy
+cmp ebp, esp
+	jne Dolphin.updateNew.cRectsLoop
+
+mov ebp, [ebpStor]	; load old stack
+mov esp, [espStor]

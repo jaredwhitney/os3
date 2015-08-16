@@ -1,0 +1,48 @@
+classdef Image #childOf Buffer
+	
+	; Fields
+	invis linked int width
+	invis linked int height
+	invis linked Buffer data
+	
+	func Create (Image : int width, int height)
+		int size = width * height
+		Image img = new Buffer($LinkedClassSize) as Image
+		img.width = width
+		img.height = height
+		img.data = new Buffer(size)
+		return img
+	
+	func Copy (Image : Image source, Image dest)
+		int width = source.GetWidth()
+		int height = source.GetHeight()
+		dest.SetSize(width, height)
+		for (int z = 0 : z < width*height : z++)
+			dest.data.Set(z, source.data.Get(z))
+		return source
+	
+	linked func SetPixel (void : int x, int y, int color)
+		int pos = x + y * this.width
+		this.data.SetInt(pos, color.RGB)
+	
+	linked func GetPixel (Color : int x, int y)
+		int pos = x + y * this.width
+		return this.data.GetInt(pos) as Color
+		
+	linked func Clear (void : int RGB)
+		for (int z = 0 : z < this.width*this.height : z += 4)
+			this.data.SetInt(z, RGB)
+			
+	linked func SetSize (void : int width, int height)
+		int newSize = width*height
+		if (newSize > this.data.size)
+			this.buffer = new Buffer(newSize)
+		this.width = width
+		this.height = height
+	
+	linked func GetWidth (int : null)
+		return this.width
+	
+	linked func GetHeight (int : null)
+		return this.height
+

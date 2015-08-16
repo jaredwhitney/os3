@@ -1,0 +1,87 @@
+classdef Window #childOf Buffer
+
+	; Fields
+	invis linked String title
+	invis linked int_s width
+	invis linked int_s lastWidth
+	invis linked int_s height
+	invis linked int_s lastHeight
+	invis linked int_s xPos
+	invis linked int_s lastxPos
+	invis linked int_s yPos
+	invis linked int_s lastyPos
+	invis linked byte type
+	invis linked byte depth
+	invis linked Buffer windowBuffer
+	invis linked Buffer buffer
+	invis linked Buffer oldBuffer
+	invis linked byte needsRectUpdate
+	invis linked int rectlBase
+	invis linked int rectlTop
+	invis linked int_s winNum
+	
+	func Create (Window : String title, byte type)
+		Window ret = new Buffer($LinkedClassSize) as Window
+		ret.title = title
+		ret.width = 4
+		ret.height = 4
+		ret.xPos = 0
+		ret.yPos = 8
+		ret.type = type
+		ret.depth = 0
+		
+		size = 0x7D*0x200
+		if (Graphics.VESA)
+			size = 0x2800*0x200
+		
+		ret.bufferSize = size
+		ret.windowBuffer = new Buffer(size)
+		ret.buffer = new Buffer(size)
+		ret.oldBuffer = new Buffer(size)
+		
+		winNum = Dolphin.registerWindow(ret)
+		
+		return ret
+
+	linked func GetPreferredHeight (int_s : null)
+		if (this.type == Window.TYPE_TEXT)
+			return 12
+		return (buffer as Image).GetHeight() as int_s
+
+	linked func GetPreferredWidth (int_s : null)
+		if (this.type == Window.TYPE_TEXT)
+			return (buffer as String).GetLength() as int_s
+		return (buffer as Image).GetWidth() as int_s
+
+	linked func SetSize (void : int_s width, int_s height)
+		this.width = width
+		this.height = height
+	
+	linked func SetPosition (void : int_s x, int_s y)
+		this.xPos = x
+		this.yPos = y
+		
+	linked func GetWidth (int_s : null)
+		return this.width
+		
+	linked func GetHeight (int_s : null)
+		return this.height
+		
+	linked func GetX (int_s : null)
+		return this.xPos
+		
+	linked func GetY (int_s : null)
+		return this.yPos
+	
+	linked func SetBuffer (void : Buffer buffer)
+		this.buffer = buffer
+	
+	linked func GetBuffer (Buffer : null)
+		return this.buffer
+	
+	linked func SetTitle (void : String title)
+		this.title = title
+	
+	linked func GetTitle (String : null)
+		return this.title
+

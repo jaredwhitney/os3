@@ -1,17 +1,17 @@
 Dolphin.drawTextNew :	; eax = text buffer, ebx = dest, cx = width, edx = old text buffer
 pusha
-mov byte [Dolphin_WAIT_FLAG], 0xFF
-	
 		push eax
 		mov eax, 0
 		mov [Dolphin.dcount], eax
 		pop eax
 	
 	mov [bstor], ebx
-	call Dolphin.dTN.checkUnsmartClear
+	;call Dolphin.dTN.checkUnsmartClear
 	call Dolphin.dTN.alignTo_start	; text buffer (eax) -> ecx
 	
 	call Dolphin.dTN.calc_newlineCutoff
+	
+	call Dolphin.dTN.s_Rcalcs
 	
 	Dolphin.drawTextNew.loop :
 		call Dolphin.dTN.ccharcheck_ecxedx
@@ -24,10 +24,78 @@ mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
 	call Dolphin.dTN.updateTempBuffer
 	
+	;call Dolphin.dTN.upTest
+	
+	call Dolphin.dTN.e_Rcalcs
+	
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 
+Dolphin.dTN.upTest :
+pusha
+	; mov [u_espStor], esp
+	; mov [u_ebpStor], ebp
+	; mov bl, [Window.RECTL_BASE]
+	; call Dolphin.getAttribDouble
+	; mov ebp, eax
+	; mov esp, eax
+	; push dword 0x0
+	; push dword 0x6
+	; mov eax, esp
+	; mov ebp, [u_ebpStor]
+	; mov esp, [u_espStor]
+	; mov bl, [Window.RECTL_TOP]
+	; call Dolphin.setAttribDouble
+	; mov al, 0xFF
+	; mov bl, [Window.NEEDS_RECT_UPDATE]
+	; call Dolphin.setAttribByte
+	mov eax, 0x0
+	call Dolphin.dTN.addR
+	mov eax, 0x6
+	call Dolphin.dTN.addR
+popa
+ret
+
+Dolphin.dTN.s_Rcalcs :
+pusha
+	mov bl, [Window.RECTL_BASE]
+	call Dolphin.getAttribDouble
+	mov [uRectsBase], eax
+	mov [uRectsEnd], eax
+popa
+ret
+
+Dolphin.dTN.addR :	; pos in eax
+pusha
+	mov eax, [TextHandler.charpos]
+	sub eax, [bstor]
+	mov ebx, [uRectsEnd]
+	mov [ebx], eax
+	sub ebx, 4
+	
+	mov [uRectsEnd], ebx
+	
+	mov al, 0xFF
+	mov bl, [Window.NEEDS_RECT_UPDATE]
+	call Dolphin.setAttribByte
+	
+popa
+ret
+
+Dolphin.dTN.e_Rcalcs :
+pusha
+	mov eax, [uRectsEnd]
+	mov bl, [Window.RECTL_TOP]
+	call Dolphin.setAttribDouble
+popa
+ret
+
+;uRectsBase :
+	;dd 0x0
+;uRectsEnd :
+	;dd 0x0
+	
 Dolphin.dTN.checkUnsmartClear :
 pusha
 	push edx
@@ -63,7 +131,7 @@ pusha
 	mov bl, [Window.BUFFER]
 	call Dolphin.getAttribDouble
 	pop ebx
-	call String.copy
+	call String.copyUntilBothZeroed
 popa
 ret
 
@@ -118,7 +186,7 @@ push bx
 		mov ax, [ecx]
 		mov bx, [edx]
 		cmp ax, bx
-			jne Dolphin.dTN.ccharcheck_ecxedx.updateIt
+			jne Dolphin.dTN.ccharcheck_ecxedx.updateIt	; SHOULD BE JNE
 			cmp al, 0x0a
 				jne Dolphin.dTN.ccharcheck_ecxedx.noup.notnewl
 			call Dolphin.dTN.newline
@@ -132,18 +200,21 @@ push bx
 			call Dolphin.dTN.check_newlineCutoff
 			jmp Dolphin.dTN.ccharcheck_ecxedx.cont
 	Dolphin.dTN.ccharcheck_ecxedx.updateIt :	; if something has changed
-					push eax
-					mov eax, [Dolphin.dcount]
-					add eax, 1
-					mov [Dolphin.dcount], eax
-					pop eax
-	mov ax, [ecx]
+	;				push eax
+	;				mov eax, [Dolphin.dcount]
+	;				add eax, 1
+	;				mov [Dolphin.dcount], eax
+	;				pop eax
+	;mov ax, [ecx]
+				;mov ax, bx
 	cmp al, 0x0a
 		jne Dolphin.dTN.ccharcheck_ecxedx.notnewl
 	call Dolphin.dTN.newline
 	jmp Dolphin.dTN.ccharcheck_ecxedx.cont
 	Dolphin.dTN.ccharcheck_ecxedx.notnewl :
 	call Dolphin.dTN.printCharPlain
+	;					mov ax, bx
+	;					call Dolphin.dTN.printCharPlain
 	Dolphin.dTN.ccharcheck_ecxedx.cont :
 	add ecx, 2
 	add edx, 2
@@ -153,6 +224,9 @@ ret
 
 Dolphin.dTN.printCharPlain :	; char in ax
 	push ecx
+		call Dolphin.dTN.addR
+		mov ah, 0xFF
+		;mov al, '&'
 		call TextHandler.drawChar
 		call Dolphin.dTN.fixV_align
 		call Dolphin.dTN.check_newlineCutoff

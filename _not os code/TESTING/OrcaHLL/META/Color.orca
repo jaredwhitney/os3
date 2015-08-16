@@ -1,0 +1,26 @@
+classdef Color #childOf Buffer
+	
+	; Fields
+	invis linked int RGB
+	
+	func Create (Color : byte r, byte g, byte b)
+		Color ret = new Buffer($LinkedClassSize) as Color
+		int ri = r as int
+		int gi = g as int
+		int bi = b as int
+		ret.RGB = ri*0x10000 + gi*0x100 + bi
+	
+	func AsColor (Color : int RGB)
+		Color ret = new Color()
+		ret.RGB = RGB
+		return ret
+
+	linked func GetRed (byte : null)
+		return (RGB / 0x10000) as byte
+		
+	linked func GetGreen (byte : null)
+		return (RGB / 0x100) as byte
+	
+	linked func GetBlue (byte : null)
+		return RGB as byte
+

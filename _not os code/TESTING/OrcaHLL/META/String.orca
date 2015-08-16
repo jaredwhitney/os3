@@ -1,0 +1,37 @@
+classdef String #childOf Buffer
+	
+	; Fields
+	invis linked Buffer data
+	
+	func Create (String : Pointer stringData)
+		int size = GetSizeFromPointer(stringData)
+		String ret = new Buffer($LinkedClassSize) as String
+		ret.data = new Buffer(size)
+		CopyDataFromPointer(stringData, ret.data)
+		return ret
+	
+	func GetSizeFromPointer (int : Pointer p)
+		byte b = 255
+		int counter = 0
+		while (b != 0)
+			b = p.Get(counter)
+			counter++
+		return counter
+		
+	func CopyDataFromPointer (void : Pointer data, Buffer buffer)
+		byte num = 255
+		for (int size = buffer.size : size > 0 : size--)
+			num = data.Get(size-1)
+			buffer.Set(size, num)
+	
+	linked func Append (String : String s)
+		int size = this.GetSize()
+	
+	linked func GetSize (int : null)
+		byte b = 255
+		int counter = 0
+		while (b != 0)
+			b = this.data.Get(counter)
+			counter++
+		return counter
+		

@@ -197,6 +197,8 @@ Clock.size :
 	dd 0x2
 Clock.title :
 	db "Clock VER_1.0", 0
+Clock.tics :
+	dd 0x0
 Clock.windowStruct :
 	dd Clock.title	; title
 	dw 0x00	; width

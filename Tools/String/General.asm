@@ -108,6 +108,26 @@ mov byte [ebx], 0x0
 popa
 ret
 
+String.copyUntilBothZeroed :	; eax = String to copy, ebx = new location to copy it to
+pusha
+	mov edx, [Graphics.SCREEN_MEMPOS]
+	add dword [edx], 0x01010101
+	String.copyUntilBothZeroed.loop :
+		mov cx, [eax]
+		cmp cx, 0x0
+			jne String.copyUntilBothZeroed.cont
+		cmp word [ebx], 0x0
+			je String.copyUntilBothZeroed.ret
+		String.copyUntilBothZeroed.cont :
+		mov [ebx], cx
+		add eax, 2
+		add ebx, 2
+		jmp String.copyUntilBothZeroed.loop
+String.copyUntilBothZeroed.ret :
+mov byte [ebx], 0x0
+popa
+ret
+
 String.append :	; eax = main String, ebx = text to append
 pusha
 	push ebx
