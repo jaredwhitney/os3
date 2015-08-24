@@ -1,15 +1,19 @@
 [bits 16]
 [org 0x7c00]
 
+
+	jmp short bootstart
+	nop
+	bootstart :
 	; Initialize stack and segment registers
+	mov ax, 0x0
 	cli
-	mov bp, 0x2000
-	mov sp, bp
+	mov ss, ax
+	mov sp, 0x7c00
+	sti
+	
 	mov ax, 0x0
 	mov ds, ax
-	mov es, ax
-	mov ss, ax
-	sti
 
 	; Zero out the remaining registers
 	mov cx, 0x0
