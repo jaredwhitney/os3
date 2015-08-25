@@ -558,14 +558,26 @@ pusha
 		call Dolphin.getAttribDouble
 	mov ebx, eax
 	call String.getLength
-	add ebx, edx
-	mov [console.clearScreen.end], ebx
-mov ecx, 0x0
-console.clearScreen.loop :
-mov [eax], ecx
-add eax, 4
-cmp eax, [console.clearScreen.end]
-	jl console.clearScreen.loop
+	mov ebx, edx
+	call Buffer.clear
+				mov bl, [Window.WIDTH]
+				call Dolphin.getAttribWord
+				mov ecx, eax
+				and ecx, 0xFF
+				mov bl, [Window.HEIGHT]
+				call Dolphin.getAttribWord
+				and eax, 0xFF
+				imul ecx, eax
+				mov bl, [Window.WINDOWBUFFER]
+				call Dolphin.getAttribDouble
+				mov ebx, ecx
+				call Buffer.clear
+			mov bl, [Window.OLDBUFFER]
+			call Dolphin.getAttribDouble
+			mov ebx, eax
+			call String.getLength
+			mov ebx, edx
+			call Buffer.clear
 		mov eax, 0
 		mov bl, [Window.BUFFERSIZE]	; <- ecx
 		call Dolphin.setAttribDouble

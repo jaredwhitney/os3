@@ -340,8 +340,9 @@ ret
 
 Dolphin.drawTitle :	; [currentWindow] contains window data
 pusha
-popa
-ret
+push dword [TextHandler.charpos]
+push dword [TextHandler.textWidth]
+push word [TextHandler.solidChar]
 	mov bl, [Window.X_POS]
 	call Dolphin.getAttribWord
 	mov cx, ax
@@ -370,8 +371,7 @@ ret
 	mov [TextHandler.charpos], eax
 	mov eax, [Graphics.SCREEN_MEMPOS]
 	mov dword [TextHandler.textSizeMultiplier], 1
-	;mov dword [eax], 0xFFFFFFFF
-	;jmp Dolphin.drawTitle.ret
+	mov byte [TextHandler.solidChar], 0x0
 	
 		Dolphin.drawTitle.loop :
 			mov al, [ebx]
@@ -382,7 +382,9 @@ ret
 			add ebx, 1
 			jmp Dolphin.drawTitle.loop
 Dolphin.drawTitle.ret :
-	
+pop word [TextHandler.solidChar]
+pop dword [TextHandler.textWidth]
+pop dword [TextHandler.charpos]
 popa
 ret
 

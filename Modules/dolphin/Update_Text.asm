@@ -280,6 +280,9 @@ dbgcnt :
 	
 Dolphin.drawTextNew2 :
 pusha
+push dword [TextHandler.charpos]
+push dword [TextHandler.textWidth]
+push word [TextHandler.solidChar]
 	mov bl, [Window.BUFFER]
 	call Dolphin.getAttribDouble
 	mov [D.dTN2.buf], eax	; buffer -> buf
@@ -355,6 +358,9 @@ pusha
 	;}
 	jmp D.dTN2.loop
 D.dTN2.ret :
+pop word [TextHandler.solidChar]
+pop dword [TextHandler.textWidth]
+pop dword [TextHandler.charpos]
 popa
 ret
 

@@ -220,7 +220,7 @@ TextHandler.selectedColor :
 dd 0xFFFFFF
 
 TextHandler.solidChar :
-db 0xFF
+db 0xFF, 0x0 ; (pad)
 
 TextHandler.textWidth :
 dd 0x0
