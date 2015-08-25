@@ -52,7 +52,14 @@ console.createWindow :
 	call console.update
 	popa
 	ret
-	
+
+console.rereg :
+pusha
+	;mov eax, [console.windowStructLoc]
+	;call Dolphin.registerWindow
+	;mov [console.winNum], bl
+popa
+ret
 
 console.loop :
 pusha

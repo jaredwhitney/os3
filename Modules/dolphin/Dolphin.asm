@@ -76,6 +76,12 @@ pusha
 	mov bl, Manager.CONTROL_DOLPHIN
 	mov [os.mlloc], bl
 			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
+			
+	call Dolphin.anyActiveWindows
+	cmp eax, 0x0
+		jne Dolphin.updateScreen.cont
+	call Manager.freezePanic
+	Dolphin.updateScreen.cont :
 
 ;	Draw windows in here!
 	mov ebx, 0x0

@@ -67,6 +67,8 @@ Keyboard.poll :
 		je KeyManager.handleSpecialKey
 		cmp bl, 0x3a	; caps lock
 		je KeyManager.handleSpecialKey
+		cmp bl, 0x1		; escape
+		je KeyManager.handleSpecialKey
 		cmp bl, 0x29
 		jne os.handlecont
 		call Dolphin.activateNext
@@ -352,6 +354,8 @@ KeyManager.handleSpecialKey :
 	je KeyManager.handleSpecialKey.left
 	cmp bl, 0x3a
 	je KeyManager.handleSpecialKey.swapMode
+	cmp bl, 0x1
+	je KeyManager.handleSpecialKey.closeWindow
 	;	else it is a tab, reset the window's position
 	mov bh, [Dolphin.activeWindow]
 	mov [Dolphin.currentWindow], bh
@@ -401,6 +405,10 @@ KeyManager.handleSpecialKey :
 	popa
 	jmp Keyboard.poll.drawKeyFinalize
 
+	KeyManager.handleSpecialKey.closeWindow :
+	mov bl, [Dolphin.activeWindow]
+	call Dolphin.unregisterWindow
+	jmp KeyManager.handleSpecialKey.aret
 	
 KeyManager.hsmode :
 db 0x0

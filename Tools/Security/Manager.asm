@@ -228,7 +228,7 @@ call drawStringDirect
 		mov bl, [Manager.reason]
 		cmp bl, 0x01
 			jne Manager.doLock.post.notFP
-		call console.createWindow
+		call console.rereg
 	Manager.doLock.post.notFP :
 	
 	mov eax, [Graphics.SCREEN_MEMPOS]	; clear out residual data from the lock screen
