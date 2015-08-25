@@ -8,28 +8,27 @@ pusha
 	mov ebx, 0x2800*0x200
 	call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x2800*0x200
+		call Buffer.clear
 		mov bl, [Window.BUFFER]
 		call Dolphin.setAttribDouble
 	
 	mov ebx, 0x2800*0x200
 	call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x2800*0x200
+		call Buffer.clear
 		mov bl, [Window.OLDBUFFER]
 		call Dolphin.setAttribDouble
 	
 	mov ebx, 0x2800*0x200
 	call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x2800*0x200
+		call Buffer.clear
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
-		
-	mov ebx, 100*0x200
-	call ProgramManager.reserveMemory
-		mov eax, ebx
-		
-		add eax, 100*0x200
-		mov bl, [Window.RECTL_BASE]
-		call Dolphin.setAttribDouble
+
 popa
 ret	; returns buffer locations in ebx, ecx
 
@@ -53,25 +52,23 @@ Window.create.NONVESA :
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x7D*0x200
+		call Buffer.clear
 		mov bl, [Window.BUFFER]
 		call Dolphin.setAttribDouble
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x7D*0x200
+		call Buffer.clear
 		mov bl, [Window.OLDBUFFER]
 		call Dolphin.setAttribDouble
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
+		mov ebx, 0x7D*0x200
+		call Buffer.clear
 		mov bl, [Window.WINDOWBUFFER]
-		call Dolphin.setAttribDouble
-		
-mov ebx, 100*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		add eax, 100*0x200
-
-		mov bl, [Window.RECTL_BASE]
 		call Dolphin.setAttribDouble
 		
 popa

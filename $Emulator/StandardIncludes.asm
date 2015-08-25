@@ -33,6 +33,7 @@
 %include "..\boot\realMode.asm"
 
 %include "..\Meta\Graphics\Window.asm"
+%include "..\Meta\Buffer.asm"
 
 %include "..\Debug\InfoPanel.asm"
 Catfish.notify:

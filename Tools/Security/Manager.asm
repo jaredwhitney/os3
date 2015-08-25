@@ -256,15 +256,6 @@ cmp al, 0x0
 je drawStringDirect.ret
 mov ah, cl
 call TextHandler.drawChar
-			push ecx
-			mov ecx, [TextHandler.charpos]
-			push ebx
-			mov ebx, [Graphics.SCREEN_WIDTH]
-			add ebx, [Graphics.SCREEN_WIDTH]
-			add ecx, ebx
-			mov [TextHandler.charpos], ecx
-			pop ebx
-			pop ecx
 add ebx, 1
 jmp drawStringDirect.loop
 drawStringDirect.ret :
@@ -283,15 +274,6 @@ Manager.direct.num :		; num in ebx
 			mov ah, [TextHandler.selectedColor]
 			mov al, '0'
 			call TextHandler.drawChar
-					push ecx
-					mov ecx, [TextHandler.charpos]
-					push ebx
-					mov ebx, [Graphics.SCREEN_WIDTH]
-					add ebx, [Graphics.SCREEN_WIDTH]
-					add ecx, ebx
-					mov [TextHandler.charpos], ecx
-					pop ebx
-					pop ecx
 			popa
 			ret
 			Manager.direct.num.cont :
@@ -313,15 +295,6 @@ Manager.direct.num :		; num in ebx
 		Manager.direct.num.goPrint :
 		mov ah, [TextHandler.selectedColor]
 		call TextHandler.drawChar
-			push ecx
-			mov ecx, [TextHandler.charpos]
-			push ebx
-			mov ebx, [Graphics.SCREEN_WIDTH]
-			add ebx, [Graphics.SCREEN_WIDTH]
-			add ecx, ebx
-			mov [TextHandler.charpos], ecx
-			pop ebx
-			pop ecx
 		pop ebx
 		Manager.direct.num.goCont :
 		cmp cl, 0
