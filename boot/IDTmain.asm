@@ -504,7 +504,7 @@ _IRQ0 :
 		; timer code goes here!
 		cmp byte [Manager.locked], 0x0
 			jne _IRQ0.ret
-		call Dolphin.updateScreenNew
+		call Dolphin.updateScreen
 	_IRQ0.ret :
 	popa
 	iret

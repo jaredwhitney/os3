@@ -60,6 +60,9 @@ mov ecx, [TextHandler.charpos]
 	pop ecx
 	add ecx, edx
 	pop edx
+		mov eax, [TextHandler.textWidth]
+		imul eax, 2
+		add ecx, eax
 mov [TextHandler.charpos], ecx
 popa
 ret

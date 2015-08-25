@@ -27,7 +27,7 @@ pusha
 	;call Dolphin.dTN.upTest
 	
 	call Dolphin.dTN.e_Rcalcs
-	
+
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
@@ -70,6 +70,7 @@ Dolphin.dTN.addR :	; pos in eax
 pusha
 	mov eax, [TextHandler.charpos]
 	sub eax, [bstor]
+			;	call DebugLogEAX
 	mov ebx, [uRectsEnd]
 	mov [ebx], eax
 	sub ebx, 4
@@ -131,6 +132,18 @@ pusha
 	mov bl, [Window.BUFFER]
 	call Dolphin.getAttribDouble
 	pop ebx
+			pusha
+			push eax
+			call os.seq
+			cmp al, 0x0
+			pop eax
+				jne Thioasdf
+			call TextMode.println
+			mov ebx, eax
+			call TextMode.println
+			Thioasdf :
+			popa
+			
 	call String.copyUntilBothZeroed
 popa
 ret
@@ -216,8 +229,8 @@ push bx
 	;					mov ax, bx
 	;					call Dolphin.dTN.printCharPlain
 	Dolphin.dTN.ccharcheck_ecxedx.cont :
-	add ecx, 2
-	add edx, 2
+	add ecx, 2	; 1-2 in these lines doesnt skip things but makes every other char invalid
+	add edx, 2	; 2-1 in these lines doesnt skip things but makes a lot of invalid chars at the end
 pop bx
 pop ax
 ret
@@ -255,3 +268,143 @@ Dolphin.dTN.s_calc :
 		mov [dstor2], ebx
 		pop ebx
 		ret
+
+dbgcnt :
+	dd 0
+	
+	
+	
+	; NEW THINGS
+	
+	
+	
+Dolphin.drawTextNew2 :
+pusha
+	mov bl, [Window.BUFFER]
+	call Dolphin.getAttribDouble
+	mov [D.dTN2.buf], eax	; buffer -> buf
+	mov ecx, eax
+	mov bl, [Window.OLDBUFFER]
+	call Dolphin.getAttribDouble
+	mov [D.dTN2.obuf], eax	; old buffer -> obuf
+	mov edx, eax
+	mov bl, [Window.WIDTH]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [D.dTN2.width], eax
+	mov [TextHandler.textWidth], ax
+	mov bl, [Window.WINDOWBUFFER]
+	call Dolphin.getAttribDouble
+	mov ebx, [D.dTN2.width]
+	imul ebx, 2
+	add eax, ebx	; padding!
+	mov [D.dTN2.imgbase], eax
+	mov [TextHandler.charpos], eax
+	
+	; mov al, 'H'
+	; mov ah, 0xFF
+	; call TextHandler.drawChar
+	; popa
+	; ret
+	; while they are not both 0
+	D.dTN2.loop :
+	mov bx, [ecx]
+	or bx, word [edx]
+	cmp bx, 0
+		je D.dTN2.ret
+	;{
+		; if they are not equal
+		mov bx, [ecx]
+		xor bx, word [edx]
+		cmp bx, 0x0
+			je D.dTN2.noupadd
+		;{
+			mov ax, [ecx]
+			; if it is a newline
+			cmp al, 0x0A
+				jne D.dTN2.notAnewl
+			;{
+				mov byte [D.dTN2.forceNewl], 0xFF
+			;}
+			jmp D.dTN2.noup
+			D.dTN2.notAnewl :
+			
+			; else draw it
+			call TextHandler.drawChar
+			mov [edx], ax
+		;}
+		jmp D.dTN2.noup
+		D.dTN2.noupadd :
+		add dword [TextHandler.charpos], 7
+		D.dTN2.noup :
+		mov eax, [TextHandler.charpos]
+		sub eax, [D.dTN2.imgbase]
+		
+		; if it should wrap to a newline
+		call D.dTN2.checkNeedsNewl
+		cmp ebx, 0x0
+			je D.dTN2.nonewl
+		;{
+			call D.dTN2.handleNewl
+		;}
+		D.dTN2.nonewl :
+		add eax, [D.dTN2.imgbase]
+		mov [TextHandler.charpos], eax
+		add ecx, 2
+		add edx, 2
+	;}
+	jmp D.dTN2.loop
+D.dTN2.ret :
+popa
+ret
+
+D.dTN2.checkNeedsNewl :
+push eax
+push ecx
+push edx
+	cmp byte [D.dTN2.forceNewl], 0xFF
+		jne D.dTN2.cNN.noforce
+			mov byte [D.dTN2.forceNewl], 0x0
+			mov ebx, 0x1
+			jmp D.dTN2.cNN.ret
+	D.dTN2.cNN.noforce :
+	add eax, 5
+	xor edx, edx
+	mov ecx, [TextHandler.textWidth]
+	idiv ecx
+	cmp edx, 7
+		jge D.dTN2.cNN.noNeed
+	mov ebx, 0x1
+	jmp D.dTN2.cNN.ret
+	D.dTN2.cNN.noNeed :
+	mov ebx, 0x0
+D.dTN2.cNN.ret :
+pop edx
+pop ecx
+pop eax
+ret
+
+D.dTN2.handleNewl :
+push ebx
+push ecx
+push edx
+	xor edx, edx
+	mov ecx, [TextHandler.textWidth]
+	idiv ecx
+	add eax, 9
+	imul eax, ecx
+pop edx
+pop ecx
+pop ebx
+ret
+
+D.dTN2.imgbase :
+	dd 0x0
+D.dTN2.buf :
+	dd 0x0
+D.dTN2.obuf :
+	dd 0x0
+D.dTN2.width :
+	dd 0x0
+D.dTN2.forceNewl :
+	db 0x0

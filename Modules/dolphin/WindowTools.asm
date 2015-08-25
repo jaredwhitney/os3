@@ -340,6 +340,8 @@ ret
 
 Dolphin.drawTitle :	; [currentWindow] contains window data
 pusha
+popa
+ret
 	mov bl, [Window.X_POS]
 	call Dolphin.getAttribWord
 	mov cx, ax
@@ -377,15 +379,6 @@ pusha
 				je Dolphin.drawTitle.ret
 			mov ah, 0xFF
 			call TextHandler.drawChar
-					push ecx
-					mov ecx, [TextHandler.charpos]
-					push ebx
-					mov ebx, [Graphics.SCREEN_WIDTH]
-					add ebx, [Graphics.SCREEN_WIDTH]
-					add ecx, ebx
-					mov [TextHandler.charpos], ecx
-					pop ebx
-					pop ecx
 			add ebx, 1
 			jmp Dolphin.drawTitle.loop
 Dolphin.drawTitle.ret :

@@ -92,7 +92,7 @@ mov byte [ebx], 0x0
 popa
 ret
 
-String.copyRawToWhite :	; eax = String to copy, ebx = new location to copy it to
+String.copyRawToWhite :	; eax = String to copy, ebx = location to copy it to
 pusha
 	mov ch, 0xFF
 	String.copyRawToWhite.loop :
@@ -104,6 +104,21 @@ pusha
 		add ebx, 2
 		jmp String.copyRawToWhite.loop
 String.copyRawToWhite.ret :
+mov word [ebx], 0x0	; i think word is right...
+popa
+ret
+
+String.copyColorToRaw : ; eax = String to copy, ebx = location to copy it to
+pusha
+	String.copyColorToRaw.loop :
+		mov cx, [eax]
+		cmp cl, 0x0
+			je String.copyColorToRaw.ret
+		mov [ebx], cl
+		add eax, 2
+		add ebx, 1
+		jmp String.copyColorToRaw.loop
+String.copyColorToRaw.ret :
 mov byte [ebx], 0x0
 popa
 ret
@@ -111,7 +126,10 @@ ret
 String.copyUntilBothZeroed :	; eax = String to copy, ebx = new location to copy it to
 pusha
 	mov edx, [Graphics.SCREEN_MEMPOS]
-	add dword [edx], 0x01010101
+	mov ecx, [Clock.tics]
+	and ecx, 0xFF
+	add edx, ecx
+	mov dword [edx], 0xFF
 	String.copyUntilBothZeroed.loop :
 		mov cx, [eax]
 		cmp cx, 0x0

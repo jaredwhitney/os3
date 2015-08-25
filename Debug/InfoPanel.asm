@@ -83,7 +83,7 @@ InfoPanel.window :
 InfoPanel.EMPTY_MESSAGE :
 	db "[No data available]", 0x0a, "Sorry about that :(", 0
 InfoPanel.LABEL_0 :
-	db "#", 0
+	db "Tics: ", 0
 InfoPanel.FIELD_0 :
 	dd 0x0, 0x0, 0x0, 0x0, 0x0
 InfoPanel.title :

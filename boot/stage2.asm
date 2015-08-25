@@ -2,14 +2,19 @@
 [org 0x7e00]
 db 0x4a
 
+MODE_TEXT equ 0x0
+MODE_GRAPHICS equ 0x1
+
 stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
+	
+	mov dword [DisplayMode], MODE_TEXT
 	call boot.useVGAmode
 								;jmp stage2.novesa	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
-	call VESA.getMode
-	mov bx, 0x11b
-	call VESA.mode
+	;call VESA.getMode
+	;mov bx, 0x11b
+	;call VESA.mode
 	stage2.novesa :
 	;	Shift into Protected Mode	;
 	jmp boot.Protected_Mode
@@ -233,6 +238,9 @@ SUCCESS :
 
 RMGDTSAVE :
 	dd 0x0
+	dd 0x0
+	
+DisplayMode :
 	dd 0x0
 	
 %include "..\kernel\kernel.asm"

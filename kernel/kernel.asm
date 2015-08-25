@@ -1,7 +1,12 @@
 [bits 32]
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
-mov byte [Dolphin_WAIT_FLAG], 0xFF
+
+	cmp dword [DisplayMode], MODE_TEXT
+		je Kernel.textInit
+	kernel.cont :
+
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
 		
@@ -34,13 +39,13 @@ kernel.runModules :
 	mov [os.mlloc], bl
 	
 	call InfoPanel.loop
-	;call console.loop
+	call console.loop
 	;call Clock.loop
 ret
 	
 kernel.initModules :
 	call Dolphin.init
-	;call console.init
+	call console.init
 	
 	call KeyManager.init
 	
@@ -63,5 +68,93 @@ os.mlloc :
 db 0x0
 	
 %include "../$Emulator/StandardIncludes.asm"
+
+Kernel.textInit :
+	call TextMode.clearScreen
+	mov ebx, TEXTMODE_INIT
+	call TextMode.println
+	jmp kernel.cont
+jmp $
+
+TextMode.println :	; ebx is String
+pusha
+	mov ah, 0x0F
+	mov ecx, [TextMode.charpos]
+	TextMode.println.loop :
+	mov al, [ebx]
+	cmp al, 0x0
+		je TextMode.println.ret
+	mov [ecx], ax
+	add ecx, 2
+	add ebx, 1
+	jmp TextMode.println.loop
+	TextMode.println.ret :
+	mov [TextMode.charpos], ecx
+	call TextMode.newline
+	call TextMode.scroll
+popa
+ret
+
+TextMode.newline :
+pusha
+	mov eax, [TextMode.charpos]
+	sub eax, 0xb8000
+	xor ebx, ebx
+	xor edx, edx
+	mov ecx, 160
+	idiv ecx
+	add eax, 1
+	imul eax, 160
+	add eax, 0xb8000
+	mov [TextMode.charpos], eax
+popa
+ret
+
+TextMode.clearScreen :
+pusha
+	mov eax, 0xb8000
+	mov [TextMode.charpos], eax
+	TextMode.clearScreen.loop :
+	cmp eax, 0xb9000
+		je TextMode.clearScreen.ret
+	mov dword [eax], 0x0
+	add eax, 4
+	jmp TextMode.clearScreen.loop
+TextMode.clearScreen.ret :
+popa
+ret
+
+DebugLogEAX :
+pusha
+	mov ebx, eax
+	mov eax, DebugStringStor
+	call String.fromHex
+	mov ebx, eax
+	call String.copyColorToRaw
+	;call TextMode.clearScreen
+	call TextMode.println
+popa
+ret
+
+TextMode.scroll :
+pusha
+	mov ecx, [TextMode.charpos]
+	cmp ecx, 0xb9000
+		jle TextMode.scroll.ret
+	call TextMode.clearScreen
+	;mov esi, 0xb9000
+	;mov edx, 0xb8000
+	;mov ecx, 0x1000
+	;rep movsb
+TextMode.scroll.ret :
+popa
+ret
+
+TEXTMODE_INIT :
+	db "Booted into debug (text) mode.", 0
+TextMode.charpos :
+	dd 0xb8000
+DebugStringStor :
+	dd 0x0, 0x0, 0x0, 0x0, 0x0
 
 MINNOW_START :
