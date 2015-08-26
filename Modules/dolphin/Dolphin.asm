@@ -76,13 +76,28 @@ pusha
 	mov bl, Manager.CONTROL_DOLPHIN
 	mov [os.mlloc], bl
 			; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
+		
+		mov eax, [Clock.tics]
+		sub eax, [Dolphin.lastTic]
+		;imul eax, 10
+		mov [Dolphin.frameTime], eax
+		mov eax, [Clock.tics]
+		mov [Dolphin.lastTic], eax
+		
+		mov eax, [tnums]
+		and eax, 0xFF
+		add eax, 0xa0000
+		mov dword [eax], 0xFF
+		mov eax, [tnums]
+		add eax, 1
+		mov [tnums], eax
 			
 	call Dolphin.anyActiveWindows
 	cmp eax, 0x0
 		jne Dolphin.updateScreen.cont
 	call Manager.freezePanic
 	Dolphin.updateScreen.cont :
-
+	
 ;	Draw windows in here!
 	mov ebx, 0x0
 	mov ecx, 0x0
@@ -358,6 +373,13 @@ bglocstor :
 dd 0x0
 Dolphin.windowStructs :
 times 20 dd 0
+
+Dolphin.lastTic :
+dd 0x0
+Dolphin.frameTime :
+dd 0x0
+tnums :
+dd 0x0
 
 Dolphin.UNDolphin.REG_MSG :
 db "A window has been unregistered!", 0

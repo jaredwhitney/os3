@@ -157,11 +157,8 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov bl, [Window.BUFFER]
-	call Dolphin.getAttribDouble
-	mov ebx, eax
-	call String.getLength
-	mov ebx, edx
+	mov ah, 0xFF
+	mov ebx, [Dolphin.frameTime]
 	call console.numOut
 	call console.newline
 popa

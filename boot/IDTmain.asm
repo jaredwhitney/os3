@@ -15,7 +15,7 @@ setupPIT :
 		mov al, 0b00110110
 		mov dx, 0x43
 		out dx, al
-		mov ax, 0x0	; lowest possible tick rate (dont need to spam the interrupt too quickly)
+		mov ax, 1193180/5000	; 5000 tics per second
 		mov dx, 0x40
 		out dx, al
 		mov al, ah
