@@ -9,12 +9,22 @@ stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
 	
-	;mov dword [DisplayMode], MODE_TEXT
-	call boot.useVGAmode
+	mov dword [DisplayMode], MODE_TEXT
+	;call boot.useVGAmode
 								;jmp stage2.novesa	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
+	
+	mov ax, 0x0
+	mov es, ax
+	mov ax, 0x2000
+	mov di, ax
+	mov ax, 0x4f00
+	int 0x10	; get controller info
+	mov [VESACNTERRCODE], ax
+	
+	
 	;call VESA.getMode
-	mov bx, 0x11b
-	call VESA.mode
+	;mov bx, 0x11b
+	;call VESA.mode
 	stage2.novesa :
 	;	Shift into Protected Mode	;
 	jmp boot.Protected_Mode
@@ -235,6 +245,24 @@ STOPm :
 
 SUCCESS :
 	db "Success!", 0xD, 0xA, 0
+	
+VESA_OEMMSG :
+	db "OEM String: ", 0x0
+	
+VESA_VER :
+	db "VESA Version: ", 0x0
+
+VESA_TAGMSG :
+	db "VESA Signature: ", 0x0
+
+VESA_TAG :
+	dd 0x0, 0x0
+
+VESA_VMODENUMMSG :
+	db "Modes Available: 0x", 0x0
+	
+VESACNTERRCODE :
+	dw 0x0
 
 RMGDTSAVE :
 	dd 0x0

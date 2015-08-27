@@ -73,10 +73,74 @@ Kernel.textInit :
 	call TextMode.clearScreen
 	mov ebx, TEXTMODE_INIT
 	call TextMode.println
+	
+	call TextMode.newline
+	;mov ax, [VESACNTERRCODE]
+	;and eax, 0xFF
+	;call DebugLogEAX
+	;call TextMode.newline
+	
+	mov eax, [0x2000]
+	mov [VESA_TAG], eax
+	mov ebx, VESA_TAGMSG
+	call TextMode.print
+	mov ebx, VESA_TAG
+	call TextMode.println
+	
+	mov ax, [0x2004]
+	and eax, 0xFFFF
+	mov ebx, VESA_VER
+	call TextMode.print
+	call DebugLogEAX
+	call TextMode.newline
+	
+	;mov eax, [0x2006]
+	;call DebugLogEAX
+	;call TextMode.newline
+	;mov eax, [0x200E]
+	;call DebugLogEAX
+	;call TextMode.newline
+	
+	mov ebx, VESA_OEMMSG
+	call TextMode.print
+	mov ax, [0x2006]
+	mov bx, [0x2008]
+	and ebx, 0xFFFF
+	and eax, 0xFFFF
+	imul ebx, 0x10
+	add eax, ebx
+	mov ebx, eax
+	call TextMode.println
+	
+	mov ax, [0x200E]
+	mov bx, [0x2010]
+	and ebx, 0xFFFF
+	and eax, 0xFFFF
+	imul ebx, 0x1000
+	add eax, ebx
+	Txmlp_0.qo :
+	mov bx, [eax]
+	add eax, 2
+	add ecx, 1
+	cmp bx, 0xFFFF
+		jne Txmlp_0.qo
+	
+	mov eax, ecx
+	mov ebx, VESA_VMODENUMMSG
+	call TextMode.print
+	call DebugLogEAX
+	call TextMode.newline
+	
 	jmp kernel.cont
 jmp $
 
 TextMode.println :	; ebx is String
+pusha
+call TextMode.print
+call TextMode.newline
+popa
+ret
+TextMode.print :	; ebx is String
 pusha
 	mov ah, 0x0F
 	mov ecx, [TextMode.charpos]
@@ -90,7 +154,6 @@ pusha
 	jmp TextMode.println.loop
 	TextMode.println.ret :
 	mov [TextMode.charpos], ecx
-	call TextMode.newline
 	call TextMode.scroll
 popa
 ret
@@ -132,7 +195,7 @@ pusha
 	mov ebx, eax
 	call String.copyColorToRaw
 	;call TextMode.clearScreen
-	call TextMode.println
+	call TextMode.print
 popa
 ret
 
