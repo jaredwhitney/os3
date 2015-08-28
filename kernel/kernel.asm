@@ -1,15 +1,26 @@
 [bits 32]
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
-
 	cmp dword [DisplayMode], MODE_TEXT
 		je Kernel.textInit
 	kernel.cont :
 
+
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
-		
+	;mov eax, [Graphics.SCREEN_MEMPOS]
+	;mov dword [eax], 0xFF0000
+	;add eax, 4
+	;mov dword [eax], 0x00FF00
+	;add eax, 4
+	;mov dword [eax], 0x0000FF
+	;add eax, 4
+	;mov dword [eax], 0x000000
+	;add eax, 4
+	;mov dword [eax], 0xFFFFFF
+	;call Graphics.doVESAtest
+	;	jmp $
 	call Guppy.init
 		
 		;	INITIALIZING MODULES	;
@@ -131,6 +142,24 @@ Kernel.textInit :
 	call DebugLogEAX
 	call TextMode.newline
 	
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_XRES]
+	call DebugLogEAX
+	call TextMode.newline
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_YRES]
+	call DebugLogEAX
+	call TextMode.newline
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_MATCH]
+	call DebugLogEAX
+	call TextMode.newline
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_BPP]
+	call DebugLogEAX
+	call TextMode.newline
+	
+	
 	jmp kernel.cont
 jmp $
 
@@ -189,6 +218,10 @@ ret
 
 DebugLogEAX :
 pusha
+	mov ecx, DebugStringStor
+	mov dword [ecx], 0x0
+	add ecx, 4
+	mov dword [ecx], 0x0
 	mov ebx, eax
 	mov eax, DebugStringStor
 	call String.fromHex

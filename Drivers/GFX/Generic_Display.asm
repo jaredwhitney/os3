@@ -125,23 +125,28 @@ Graphics.init :
 	cmp bx, 0xff
 	jne ccacont
 							;jmp ccacont	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
-	mov ebx, 0x500*0x4
+	xor ebx, ebx
+	mov bx, [VESA_CLOSEST_XRES]
+	imul ebx, 4	; should not be hardcoded
 	mov [Graphics.SCREEN_WIDTH], ebx
-	mov ebx, 0x400;*0x4
+	xor ebx, ebx
+	mov bx, [VESA_CLOSEST_YRES]
 	mov [Graphics.SCREEN_HEIGHT], ebx
-	mov ebx, 0x140000*0x4
+	mov ecx, [Graphics.SCREEN_WIDTH]
+	imul ebx, ecx
+	imul ebx, 4	;bpp, should not be hardcoded >8|
 	mov [Graphics.SCREEN_SIZE], ebx
-	mov ebx, [0x80000+40]
+	mov ebx, [VESA_CLOSEST_BUFFERLOC]
 	mov [Graphics.SCREEN_MEMPOS], ebx
-	mov bl, 1
+	mov bl, 1	; this needs to be a word...
 	mov [Graphics.VESA_MODE], bl
-	mov ebx, 0x4
+	mov ebx, 0x4	; and this also should NOT be hardcoded
 	mov [Graphics.bytesPerPixel], ebx
 	popa
 	ret
 	ccacont :
-		call Graphics.setGrayscalePalette
-		call Graphics.setVGApalette
+		;call Graphics.setGrayscalePalette
+		;call Graphics.setVGApalette
 	popa
 	ret
 

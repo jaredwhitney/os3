@@ -5,6 +5,9 @@ db 0x4a
 MODE_TEXT equ 0x0
 MODE_GRAPHICS equ 0x1
 
+DESIRED_XRES equ	1366
+DESIRED_YRES equ	768
+
 stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
@@ -21,10 +24,74 @@ stage2:
 	int 0x10	; get controller info
 	mov [VESACNTERRCODE], ax
 	
+	cmp ax, 0x4F
+		jne stage2.novesa
+		
+	mov ax, [0x2010]
+	mov es, ax
+	mov ax, [0x200E]
+	mov di, ax
+	VESA_loopStart :
+	mov cx, [es:di]
+	cmp cx, 0xFFFF
+		je VESA_loopOver
+	push es
+	push di
+		mov ax, 0x0	; load mode info
+		mov es, ax
+		mov ax, 0x3000
+		mov di, ax
+		mov ax, 0x4f01
+		int 0x10
+		mov dx, [0x3012]	; check width
+		mov ax, DESIRED_XRES
+		sub ax, [VESA_CLOSEST_XRES]
+		mov bx, DESIRED_XRES
+		sub bx, dx
+		cmp bx, ax
+			jge Vesa.checkNotBetter
+		mov dx, [0x3014]	; check height
+		mov ax, DESIRED_YRES
+		sub ax, [VESA_CLOSEST_YRES]
+		mov bx, DESIRED_YRES
+		sub bx, dx
+		cmp bx, ax
+			jge Vesa.checkNotBetter
+		mov dx, [0x3000]	; check to make sure it is linear
+		and dx, 0b10010000
+			cmp dx, 0b10010000
+				jne Vesa.checkNotBetter
+		mov edx, [0x3028]
+			mov [VESA_CLOSEST_BUFFERLOC], edx
+		mov dl, [0x3019]
+			cmp dl, 32
+				jne Vesa.checkNotBetter
+			mov [VESA_CLOSEST_BPP], dl; THIS VALUE IS WRONG
+		mov ax, [0x3012]	; save it as the closest found
+		mov bx, [0x3014]
+		mov [VESA_CLOSEST_XRES], ax
+		mov [VESA_CLOSEST_YRES], bx
+		mov [VESA_CLOSEST_MATCH], cx
+		Vesa.checkNotBetter :
+		pop di
+		pop es
+		mov ax, di
+		add ax, 2
+		mov di, ax
+		jmp VESA_loopStart
+	VESA_loopOver :
 	
-	;call VESA.getMode
-	;mov bx, 0x11b
-	;call VESA.mode
+	mov ax, 0x4f02
+	xor bx, bx
+	mov es, bx
+	mov bx, 0x3000
+	mov di, bx
+	mov bx, [VESA_CLOSEST_MATCH]
+	or bx, 0x4000	; get the linear version
+	int 0x10
+	
+	mov byte [Graphics.VESA_SUPPORTED], 0xFF
+	
 	stage2.novesa :
 	;	Shift into Protected Mode	;
 	jmp boot.Protected_Mode
@@ -264,6 +331,17 @@ VESA_VMODENUMMSG :
 VESACNTERRCODE :
 	dw 0x0
 
+VESA_CLOSEST_MATCH :
+	dw 0x0
+VESA_CLOSEST_XRES :
+	dw 0x0
+VESA_CLOSEST_YRES :
+	dw 0x0
+VESA_CLOSEST_BPP :
+	db 0x0
+VESA_CLOSEST_BUFFERLOC :
+	dd 0x0
+	
 RMGDTSAVE :
 	dd 0x0
 	dd 0x0
