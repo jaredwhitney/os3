@@ -26,10 +26,30 @@ Kernel.init :
 		;	INITIALIZING MODULES	;
 	call kernel.initModules
 	
-		call USB_InitController
+;		call USB_InitController
 		
-		call USB_EnablePlugAndPlay
-
+;		call USB_EnablePlugAndPlay
+	
+			mov ebx, MEMORY_BUFFMAXMSG
+			call TextMode.print
+			mov ebx, [Guppy.usedRAM]
+			imul ebx, 0x200
+			add ebx, MEMORY_START
+			mov eax, ebx
+			call DebugLogEAX
+			call TextMode.newline
+			
+			mov eax, [Guppy.usedRAM]
+			mov ecx, [Guppy.totalRAM]
+			imul eax, 100
+			xor edx, edx
+			idiv ecx
+			call DebugLogEAX
+			mov ebx, Guppy.div3
+			call TextMode.println
+			
+			
+	;jmp $
 		;	LOCK THE COMPUTER	;
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
@@ -49,7 +69,7 @@ kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
 	
-	call InfoPanel.loop
+	;call InfoPanel.loop
 	call console.loop
 	;call Clock.loop
 ret
@@ -62,7 +82,7 @@ kernel.initModules :
 	
 	;call Clock.init
 	;call Clock.show	; should be bound to a command!	
-	call InfoPanel.init
+	;call InfoPanel.init
 ret
 	
 kernel.halt :
@@ -142,23 +162,40 @@ Kernel.textInit :
 	call DebugLogEAX
 	call TextMode.newline
 	
-	xor eax, eax
-	mov ax, [VESA_CLOSEST_XRES]
-	call DebugLogEAX
-	call TextMode.newline
-	xor eax, eax
-	mov ax, [VESA_CLOSEST_YRES]
-	call DebugLogEAX
-	call TextMode.newline
+	mov ebx, VESA_CLOSEST_MATCHMSG
+	call TextMode.print
 	xor eax, eax
 	mov ax, [VESA_CLOSEST_MATCH]
 	call DebugLogEAX
 	call TextMode.newline
+	
+	mov ebx, VESA_CLOSEST_RESMSG
+	call TextMode.print
+	
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_XRES]
+	call DebugLogEAX
+	
+	mov ebx, VESA_CLOSEST_RESDIV
+	call TextMode.print
+	
+	xor eax, eax
+	mov ax, [VESA_CLOSEST_YRES]
+	call DebugLogEAX
+	
+	mov ebx, VESA_CLOSEST_BPPMSG
+	call TextMode.print
+	
 	xor eax, eax
 	mov ax, [VESA_CLOSEST_BPP]
 	call DebugLogEAX
 	call TextMode.newline
 	
+	mov ebx, VESA_CLOSEST_BUFFERLOCMSG
+	call TextMode.print
+	mov eax, [VESA_CLOSEST_BUFFERLOC]
+	call DebugLogEAX
+	call TextMode.newline
 	
 	jmp kernel.cont
 jmp $

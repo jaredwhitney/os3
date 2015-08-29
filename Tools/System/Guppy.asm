@@ -6,9 +6,9 @@ MEMORY_START equ 0x1000000
 ; 0x7c00 - 0xc000 is reserved for the OS (34 sectors)
 Guppy.init :
 pusha
-mov al, 0x1
-mov ebx, 34
-call Guppy.malloc
+;mov al, 0x1
+;mov ebx, 34
+;call Guppy.malloc
 ;call console.numOut
 ;call console.newline
 

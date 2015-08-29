@@ -7,13 +7,20 @@ pusha
 	mov [console.pnum], bl
 	call ProgramManager.setActive	; Make removable Later
 	
-	mov ebx, 0x10fa	; sectors
-	cmp byte [Graphics.VESA_MODE], 0x0
-		je console.init.novesa
-	mov ebx, 0x6000	; sectors
+	;mov ebx, 0x10fa	; sectors
+	;cmp byte [Graphics.VESA_MODE], 0x0
+	;	je console.init.novesa
+	mov eax, [Graphics.SCREEN_SIZE]	; sectors
+	xor edx, edx
+	mov ecx, 0x200
+	idiv ecx
+	imul eax, 3
+	add eax, 0x4
+	mov ebx, eax
 	console.init.novesa :
 	call ProgramManager.requestMemory
-
+			;mov eax, [ProgramManager.memoryStart]
+			;call DebugLogEAX
 	push dword console.title
 	push word Window.TYPE_TEXT
 	call Window.create	; essentially: Window windowStructLoc = new Window(title, Window.TYPE_TEXT)
@@ -558,8 +565,14 @@ pusha
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
-		mov bl, [Window.BUFFER]	; -> eax
-		call Dolphin.getAttribDouble
+			mov bl, [Window.OLDBUFFER]
+			call Dolphin.getAttribDouble
+			mov ebx, eax
+			call String.getLength
+			mov ebx, edx
+			call Buffer.clear
+	mov bl, [Window.BUFFER]	; -> eax
+	call Dolphin.getAttribDouble
 	mov ebx, eax
 	call String.getLength
 	mov ebx, edx
@@ -567,21 +580,15 @@ pusha
 				mov bl, [Window.WIDTH]
 				call Dolphin.getAttribWord
 				mov ecx, eax
-				and ecx, 0xFF
+				and ecx, 0xFFFF
 				mov bl, [Window.HEIGHT]
 				call Dolphin.getAttribWord
-				and eax, 0xFF
+				and eax, 0xFFFF
 				imul ecx, eax
 				mov bl, [Window.WINDOWBUFFER]
 				call Dolphin.getAttribDouble
 				mov ebx, ecx
 				call Buffer.clear
-			mov bl, [Window.OLDBUFFER]
-			call Dolphin.getAttribDouble
-			mov ebx, eax
-			call String.getLength
-			mov ebx, edx
-			call Buffer.clear
 		mov eax, 0
 		mov bl, [Window.BUFFERSIZE]	; <- ecx
 		call Dolphin.setAttribDouble

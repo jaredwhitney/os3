@@ -13,7 +13,7 @@ stage2:
 	sgdt [RMGDTSAVE]
 	
 	mov dword [DisplayMode], MODE_TEXT
-	;call boot.useVGAmode
+	call boot.useVGAmode
 								;jmp stage2.novesa	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
 	
 	mov ax, 0x0
@@ -48,6 +48,8 @@ stage2:
 		sub ax, [VESA_CLOSEST_XRES]
 		mov bx, DESIRED_XRES
 		sub bx, dx
+			cmp dx, DESIRED_XRES
+				jg Vesa.checkNotBetter
 		cmp bx, ax
 			jge Vesa.checkNotBetter
 		mov dx, [0x3014]	; check height
@@ -55,6 +57,8 @@ stage2:
 		sub ax, [VESA_CLOSEST_YRES]
 		mov bx, DESIRED_YRES
 		sub bx, dx
+			cmp dx, DESIRED_YRES
+				jg Vesa.checkNotBetter
 		cmp bx, ax
 			jge Vesa.checkNotBetter
 		mov dx, [0x3000]	; check to make sure it is linear
@@ -66,7 +70,7 @@ stage2:
 		mov dl, [0x3019]
 			cmp dl, 32
 				jne Vesa.checkNotBetter
-			mov [VESA_CLOSEST_BPP], dl; THIS VALUE IS WRONG
+			mov [VESA_CLOSEST_BPP], dl
 		mov ax, [0x3012]	; save it as the closest found
 		mov bx, [0x3014]
 		mov [VESA_CLOSEST_XRES], ax
@@ -327,6 +331,16 @@ VESA_TAG :
 
 VESA_VMODENUMMSG :
 	db "Modes Available: 0x", 0x0
+VESA_CLOSEST_RESMSG :
+	db "    Resolution: ", 0x0
+VESA_CLOSEST_RESDIV :
+	db "x", 0x0
+VESA_CLOSEST_MATCHMSG :
+	db "Found mode: ", 0x0
+VESA_CLOSEST_BPPMSG :
+	db ", bpp = ", 0x0
+VESA_CLOSEST_BUFFERLOCMSG :
+	db "    Buffer position: ", 0x0
 	
 VESACNTERRCODE :
 	dw 0x0
@@ -341,7 +355,10 @@ VESA_CLOSEST_BPP :
 	db 0x0
 VESA_CLOSEST_BUFFERLOC :
 	dd 0x0
-	
+
+MEMORY_BUFFMAXMSG :
+	db "Memory allocated up to: 0x", 0x0
+
 RMGDTSAVE :
 	dd 0x0
 	dd 0x0

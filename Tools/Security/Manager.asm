@@ -235,10 +235,10 @@ call drawStringDirect
 	mov edx, [Graphics.SCREEN_SIZE]
 	mov ebx, 0x0
 	call Image.clear
-	mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
-	mov edx, [Graphics.SCREEN_SIZE]
-	mov ebx, 0x0
-	call Image.clear
+	;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
+	;mov edx, [Graphics.SCREEN_SIZE]
+	;mov ebx, 0x0
+	;call Image.clear
 	
 popa
 ret

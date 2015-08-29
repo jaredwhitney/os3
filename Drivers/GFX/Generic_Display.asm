@@ -142,11 +142,11 @@ Graphics.init :
 	mov [Graphics.VESA_MODE], bl
 	mov ebx, 0x4	; and this also should NOT be hardcoded
 	mov [Graphics.bytesPerPixel], ebx
-	popa
-	ret
+	;popa
+	;ret
 	ccacont :
-		;call Graphics.setGrayscalePalette
-		;call Graphics.setVGApalette
+		call Graphics.setGrayscalePalette
+		call Graphics.setVGApalette
 	popa
 	ret
 

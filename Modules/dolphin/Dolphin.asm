@@ -3,35 +3,39 @@ CHANGE_MASK equ 0x80000000
 
 Dolphin.init :
 pusha
-	mov bl, [Graphics.VESA_MODE]
-	cmp bl, 0x0
-		je Dolphin.NONVESAinit
+	;mov bl, [Graphics.VESA_MODE]
+	;cmp bl, 0x0
+	;	je Dolphin.NONVESAinit
 	mov al, 0x1
-	mov ebx, 0x2800
+		mov eax, [Graphics.SCREEN_SIZE]
+		mov ecx, 0x200
+		xor edx, edx
+		idiv ecx
+	mov ebx, eax
 	call Guppy.malloc
 	mov [Dolphin.SCREEN_BUFFER], ebx
-	mov ebx, 0x2800
-	call Guppy.malloc
-	mov [Dolphin.SCREEN_FLIPBUFFER], ebx
+	;mov ebx, 0x2800
+	;call Guppy.malloc
+	;mov [Dolphin.SCREEN_FLIPBUFFER], ebx
 
 	call Dolphin.redrawBG
 
 popa
 ret
 
-	Dolphin.NONVESAinit :
-		mov al, 0x1
-		mov ebx, 0x7D
-		call Guppy.malloc
-		mov [Dolphin.SCREEN_BUFFER], ebx
-		mov ebx, 0x7D
-		call Guppy.malloc
-		mov [Dolphin.SCREEN_FLIPBUFFER], ebx
+	; Dolphin.NONVESAinit :
+		; mov al, 0x1
+		; mov ebx, 0x7D
+		; call Guppy.malloc
+		; mov [Dolphin.SCREEN_BUFFER], ebx
+		; mov ebx, 0x7D
+		; call Guppy.malloc
+		; mov [Dolphin.SCREEN_FLIPBUFFER], ebx
 		
-		call Dolphin.redrawBG
+		; call Dolphin.redrawBG
 		
-	popa
-	ret
+	; popa
+	; ret
 
 Dolphin.redrawBG :
 push ebx
@@ -322,8 +326,8 @@ ret
 
 Dolphin.SCREEN_BUFFER :
 dd 0x0
-Dolphin.SCREEN_FLIPBUFFER :
-dd 0x0
+;Dolphin.SCREEN_FLIPBUFFER :
+;dd 0x0
 
 
 

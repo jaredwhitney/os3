@@ -1,30 +1,30 @@
 Window.create.createBuffers :
 pusha
 
-	mov dl, [Graphics.VESA_MODE]
-	cmp dl, 0x0
-		je Window.create.NONVESA
+	;mov dl, [Graphics.VESA_MODE]
+	;cmp dl, 0x0
+	;	je Window.create.NONVESA
 	
-	mov ebx, 0x2800*0x200
+	mov ebx, [Graphics.SCREEN_SIZE]
 	call ProgramManager.reserveMemory
 		mov eax, ebx
-		mov ebx, 0x2800*0x200
+		mov ebx, [Graphics.SCREEN_SIZE]
 		call Buffer.clear
 		mov bl, [Window.BUFFER]
 		call Dolphin.setAttribDouble
 	
-	mov ebx, 0x2800*0x200
+	mov ebx, [Graphics.SCREEN_SIZE]
 	call ProgramManager.reserveMemory
 		mov eax, ebx
-		mov ebx, 0x2800*0x200
+		mov ebx, [Graphics.SCREEN_SIZE]
 		call Buffer.clear
 		mov bl, [Window.OLDBUFFER]
 		call Dolphin.setAttribDouble
 	
-	mov ebx, 0x2800*0x200
+	mov ebx, [Graphics.SCREEN_SIZE]
 	call ProgramManager.reserveMemory
 		mov eax, ebx
-		mov ebx, 0x2800*0x200
+		mov ebx, [Graphics.SCREEN_SIZE]
 		call Buffer.clear
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
@@ -48,26 +48,26 @@ pop ecx
 push dword [retstor]
 ret
 
-Window.create.NONVESA :
+;Window.create.NONVESA :
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
 		mov ebx, 0x7D*0x200
-		call Buffer.clear
+;		call Buffer.clear
 		mov bl, [Window.BUFFER]
 		call Dolphin.setAttribDouble
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
 		mov ebx, 0x7D*0x200
-		call Buffer.clear
+;		call Buffer.clear
 		mov bl, [Window.OLDBUFFER]
 		call Dolphin.setAttribDouble
 mov ebx, 0x7D*0x200
 call ProgramManager.reserveMemory
 		mov eax, ebx
 		mov ebx, 0x7D*0x200
-		call Buffer.clear
+;		call Buffer.clear
 		mov bl, [Window.WINDOWBUFFER]
 		call Dolphin.setAttribDouble
 		
