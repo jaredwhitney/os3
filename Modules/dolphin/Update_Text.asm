@@ -338,7 +338,11 @@ push word [TextHandler.solidChar]
 		;}
 		jmp D.dTN2.noup
 		D.dTN2.noupadd :
-		add dword [TextHandler.charpos], 7
+		push eax
+		mov eax, 7
+		imul eax, [Graphics.bytesPerPixel]
+		add dword [TextHandler.charpos], eax
+		pop eax
 		D.dTN2.noup :
 		mov eax, [TextHandler.charpos]
 		sub eax, [D.dTN2.imgbase]
@@ -374,11 +378,19 @@ push edx
 			mov ebx, 0x1
 			jmp D.dTN2.cNN.ret
 	D.dTN2.cNN.noforce :
-	add eax, 5
+	push ecx
+	mov ecx, 5
+	imul ecx, [Graphics.bytesPerPixel]
+	add eax, ecx
+	pop ecx
 	xor edx, edx
 	mov ecx, [TextHandler.textWidth]
 	idiv ecx
-	cmp edx, 7
+	push ecx
+	mov ecx, 7
+	imul ecx, [Graphics.bytesPerPixel]
+	cmp edx, ecx
+	pop ecx
 		jge D.dTN2.cNN.noNeed
 	mov ebx, 0x1
 	jmp D.dTN2.cNN.ret

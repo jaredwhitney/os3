@@ -245,6 +245,7 @@ ret
 
 drawStringDirect :
 pusha
+push dword [TextHandler.charpos]
 push eax
 mov eax, [Graphics.SCREEN_WIDTH]
 mov [TextHandler.textWidth], eax
@@ -259,6 +260,7 @@ call TextHandler.drawChar
 add ebx, 1
 jmp drawStringDirect.loop
 drawStringDirect.ret :
+pop dword [TextHandler.charpos]
 popa
 ret
 

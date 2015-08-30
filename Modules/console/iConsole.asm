@@ -83,8 +83,8 @@ cmp ebx, 0x0
 je console.update.gone
 	mov [console.dat], ebx
 	call console.update
-mov bl, [console.winNum]
-mov [Dolphin.currentWindow], bl
+;mov bl, [console.winNum]
+;mov [Dolphin.currentWindow], bl
 	console.loop.checkKeyBuffer :
 		mov ebx, [KeyManager.bufferpos]
 		cmp ebx, 0x0	; is there any data avaliable?
@@ -256,11 +256,7 @@ push ebx
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
-	
-	xor ebx, ebx
-	mov bl, [console.winNum]
-	mov [Dolphin.currentWindow], ebx
-	pop ebx
+pop ebx
 call console.checkColor
 		push eax
 		push bx
@@ -528,22 +524,30 @@ jmp console.loop.checkKeyBuffer
 
 console.cprint :
 pusha
+
+	push ebx
+	xor ebx, ebx
+	mov bl, [console.winNum]
+	mov [Dolphin.currentWindow], ebx
+	pop ebx
+
 		push eax
 		mov bl, [Window.BUFFERSIZE]	; -> ebx
 		call Dolphin.getAttribDouble
-		mov ebx, eax
-		pop eax
-push ecx
-		push eax
+		mov edx, eax
+
 		push bx
 		mov bl, [Window.BUFFER]	; -> ecx
 		call Dolphin.getAttribDouble
-		mov ecx, eax
 		pop bx
-		pop eax
-add ebx, ecx
-pop ecx
-mov [ebx], ax
+
+add edx, eax
+
+pop eax
+
+mov [edx], ax
+add edx, 2
+mov word [edx], 0x0
 ;call TextHandler.drawChar
 		push eax
 		mov bl, [Window.BUFFERSIZE]	; -> ebx
