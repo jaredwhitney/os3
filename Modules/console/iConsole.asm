@@ -10,11 +10,7 @@ pusha
 	;mov ebx, 0x10fa	; sectors
 	;cmp byte [Graphics.VESA_MODE], 0x0
 	;	je console.init.novesa
-	mov eax, [Graphics.SCREEN_SIZE]	; sectors
-	xor edx, edx
-	mov ecx, 0x200
-	idiv ecx
-	imul eax, 3
+	call Window.getSectorSize	; <- eax
 	add eax, 0x4
 	mov ebx, eax
 	console.init.novesa :
@@ -41,7 +37,7 @@ pusha
 	
 	call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 	
-	call console.update
+	;call console.update
 	
 	call ProgramManager.finalize	; Make removable Later
 
@@ -56,7 +52,7 @@ console.createWindow :
 
 	call console.clearScreen
 	call JASM.console.post_init		; FIX THIS!!!
-	call console.update
+	;call console.update
 	popa
 	ret
 
@@ -82,7 +78,7 @@ mov ebx, [JASM.console.draw]
 cmp ebx, 0x0
 je console.update.gone
 	mov [console.dat], ebx
-	call console.update
+	;call console.update
 ;mov bl, [console.winNum]
 ;mov [Dolphin.currentWindow], bl
 	console.loop.checkKeyBuffer :
@@ -217,19 +213,19 @@ screen.wipe :
 ;popa
 ret
 
-console.update :
-pusha
-mov ebx, [JASM.console.draw]
-cmp ebx, 0x0
-je console.update.gone
-	xor ebx, ebx
-	mov bl, [console.winNum]
-	mov [Dolphin.currentWindow], ebx
+; console.update :
+; pusha
+; mov ebx, [JASM.console.draw]
+; cmp ebx, 0x0
+; je console.update.gone
+	; xor ebx, ebx
+	; mov bl, [console.winNum]
+	; mov [Dolphin.currentWindow], ebx
 	
-	call Dolphin.uUpdate
+	; call Dolphin.uUpdate
 	
-popa
-ret
+; popa
+; ret
 
 console.update.gone :
 mov bl, [console.winNum]
@@ -257,7 +253,7 @@ push ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 pop ebx
-call console.checkColor
+		mov ah, [console.vgacolor]
 		push eax
 		push bx
 		mov bl, [Window.BUFFER]	; -> edx
@@ -294,7 +290,8 @@ add ebx, 0x2
 pop ebx
 jmp printitp
 printdonep :
-call console.update
+mov word [edx], 0x0
+;call console.update
 popa
 ret
 
@@ -519,11 +516,13 @@ mov bx, 0x0
 mov [eax], bx
 add eax, 2
 mov [eax], bx
-call console.update
+;call console.update
 jmp console.loop.checkKeyBuffer
 
 console.cprint :
 pusha
+
+	mov ah, [console.vgacolor]
 
 	push ebx
 	xor ebx, ebx
@@ -560,7 +559,7 @@ add ebx, 0x2
 		mov bl, [Window.BUFFERSIZE]	; <- ebx
 		call Dolphin.setAttribDouble
 		pop eax
-call console.update
+;call console.update
 popa
 ret
 
@@ -569,30 +568,16 @@ pusha
 	xor ebx, ebx
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
-			mov bl, [Window.OLDBUFFER]
-			call Dolphin.getAttribDouble
-			mov ebx, eax
-			call String.getLength
-			mov ebx, edx
-			call Buffer.clear
+
+	call Window.forceFlush
+	
 	mov bl, [Window.BUFFER]	; -> eax
 	call Dolphin.getAttribDouble
-	mov ebx, eax
-	call String.getLength
-	mov ebx, edx
+	;mov ebx, eax
+	;call String.getLength
+	mov ebx, [Graphics.SCREEN_SIZE];edx
 	call Buffer.clear
-				mov bl, [Window.WIDTH]
-				call Dolphin.getAttribWord
-				mov ecx, eax
-				and ecx, 0xFFFF
-				mov bl, [Window.HEIGHT]
-				call Dolphin.getAttribWord
-				and eax, 0xFFFF
-				imul ecx, eax
-				mov bl, [Window.WINDOWBUFFER]
-				call Dolphin.getAttribDouble
-				mov ebx, ecx
-				call Buffer.clear
+
 		mov eax, 0
 		mov bl, [Window.BUFFERSIZE]	; <- ecx
 		call Dolphin.setAttribDouble
@@ -602,7 +587,7 @@ console.clearScreen.end :
 	dd 0x0
 
 console.setColor :
-mov ah, bl
+mov [console.vgacolor], bl
 ret
 
 console.getLine :	; Fixed.
@@ -679,6 +664,10 @@ ret
 
 %include "../Modules/console/build.asm"
 
+console.vgacolor :
+	db 0xC
+console.color :
+	dd 0xFF0000
 
 console.pos :	; should be removed, use the window's position instead
 dd 0x0

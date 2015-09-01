@@ -59,6 +59,8 @@ RTC.getSecond :
 
 Time.printToConsole :
 	pusha
+	mov byte [console.vgacolor], 0xFF
+	mov dword [console.color], 0xFFFFFF
 	mov ebx, Time.preface
 	call console.print
 	xor ebx, ebx

@@ -106,7 +106,7 @@ Minnow.ctree :
 	add ebx, edx	; at header for next file
 	jmp Minnow.ctree.scr1done
 	Minnow.ctree.ret :
-	call console.update
+	;call console.update
 	pop edx
 	popa
 	ret

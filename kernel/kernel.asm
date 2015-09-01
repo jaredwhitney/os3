@@ -59,6 +59,8 @@ Kernel.init :
 	kernel.loop:
 			;	RUN INSTALLED MODULES	;
 		call kernel.runModules
+			;	UPDATE WINDOWS	;
+		call Dolphin.updateWindows
 			;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 		call Manager.handleLock
 			;	REPEAT	;
@@ -80,6 +82,7 @@ kernel.initModules :
 	
 	call KeyManager.init
 	
+	;call HelloWorld.init
 	;call Clock.init
 	;call Clock.show	; should be bound to a command!	
 	;call InfoPanel.init

@@ -81,6 +81,7 @@ Image.clear :	; eax = source, edx = size, ebx = color
 	popa
 	ret
 
+
 Image.copyFromWinSource :	; eax = source, ebx = dest, cx = regionWidth, dx = regionHeight, currentWindow = window
 pusha
 	and ecx, 0xFFFF

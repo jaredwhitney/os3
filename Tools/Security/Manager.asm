@@ -231,14 +231,7 @@ call drawStringDirect
 		call console.rereg
 	Manager.doLock.post.notFP :
 	
-	mov eax, [Graphics.SCREEN_MEMPOS]	; clear out residual data from the lock screen
-	mov edx, [Graphics.SCREEN_SIZE]
-	mov ebx, 0x0
-	call Image.clear
-	;mov eax, [Dolphin.SCREEN_FLIPBUFFER]	; force entire screen to redraw itself on next update
-	;mov edx, [Graphics.SCREEN_SIZE]
-	;mov ebx, 0x0
-	;call Image.clear
+	call Dolphin.redrawBG
 	
 popa
 ret

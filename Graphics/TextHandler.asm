@@ -1,5 +1,8 @@
 [bits 32]
 
+newline equ 0x0A
+endstring equ 0x0
+
 ;clearScreenG :
 ;pusha
 ;mov dx, 0x0

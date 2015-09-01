@@ -39,8 +39,10 @@ ret
 
 Dolphin.redrawBG :
 push ebx
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
 	mov ebx, [bglocstor]
 	call Dolphin.makeBG
+	mov byte [Dolphin_WAIT_FLAG], 0x0
 pop ebx
 ret
 
@@ -61,16 +63,22 @@ ret
 	Dolphin.solidBG :
 		mov eax, [Graphics.SCREEN_MEMPOS]
 		mov edx, [Graphics.SCREEN_SIZE]
-		mov ebx, 0x10101010
-		mov cl, [Graphics.VESA_MODE]
-		cmp cl, 0x0
-			je Dolphin.solidBGNOVESA
-		mov ebx, 0x0000C7
-		Dolphin.solidBGNOVESA :
+		call Dolphin.getSolidBGColor
 		call Image.clear
 	popa
 	ret
 
+Dolphin.getSolidBGColor :
+push cx
+	mov ebx, 0x10101010
+	mov cl, [Graphics.VESA_MODE]
+	cmp cl, 0x0
+		je Dolphin.solidBGNOVESA
+	mov ebx, 0x0000C7
+	Dolphin.solidBGNOVESA :
+pop cx
+ret
+	
 Dolphin.updateScreen :
 pusha
 	cmp byte [Dolphin_WAIT_FLAG], 0xFF
@@ -320,6 +328,30 @@ pusha
 	pop ebx
 	call Dolphin.drawTextNew2
 	Dolphin.uUpdate.notText :
+popa
+ret
+
+Dolphin.updateWindows :
+pusha
+Dolphin.updateWindows.wait :
+cmp byte [Dolphin_WAIT_FLAG], 0xFF
+	je Dolphin.updateWindows.wait
+mov byte [Dolphin_WAIT_FLAG], 0xFF
+	xor ecx, ecx
+	mov ebx, Dolphin.windowStructs
+	
+	Dolphin.updateWindows.loop :
+	mov edx, [ebx]
+	cmp edx, 0x0
+		je Dolphin.updateWindows.nope
+	mov [Dolphin.currentWindow], ecx
+	call Dolphin.uUpdate
+	Dolphin.updateWindows.nope :
+	add ebx, 4
+	add ecx, 4
+	;cmp ecx, 20*4
+	;	jle Dolphin.updateWindows.loop
+	mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 

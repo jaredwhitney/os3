@@ -2,6 +2,9 @@ String.getLength :	; String in ebx, length out in edx
 xor edx, edx
 push ebx
 push ax
+	mov al, [ebx]
+	cmp al, 0x0
+		je String.getLength.kret
 String.getLength.loop :
 add ebx, 1
 add edx, 1
@@ -11,6 +14,11 @@ jne String.getLength.loop
 pop ax
 pop ebx
 add edx, 1
+ret
+String.getLength.kret :
+pop ax
+pop ebx
+mov edx, 1
 ret
 
 String.fromHex :	; eax = buffer to store string in, ebx = hex number
@@ -106,6 +114,36 @@ pusha
 String.copyRawToWhite.ret :
 mov word [ebx], 0x0	; i think word is right...
 popa
+ret
+
+String.copyRawToWhite_auto :	; ebx = String to copy, returns ecx = new String
+push eax
+push ebx
+push edx
+		mov eax, ebx
+		call String.getLength
+		imul edx, 2
+		mov ebx, edx
+		call ProgramManager.reserveMemory
+				;mov ebx, 0x4000	; TESTING
+		mov ecx, ebx
+		push ecx
+	mov ch, 0xFF
+				;mov eax, HelloWorld.welcomeMessage
+	String.copyRawToWhite_auto.loop :
+		mov cl, [eax]
+		cmp cl, 0x0
+			je String.copyRawToWhite_auto.ret
+		mov [ebx], cx
+		add eax, 1
+		add ebx, 2
+		jmp String.copyRawToWhite_auto.loop
+String.copyRawToWhite_auto.ret :
+mov word [ebx], 0x0	; i think word is right...
+pop ecx
+pop edx
+pop ebx
+pop eax
 ret
 
 String.copyColorToRaw : ; eax = String to copy, ebx = location to copy it to

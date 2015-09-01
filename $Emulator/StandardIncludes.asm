@@ -35,7 +35,8 @@
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"
 
-%include "..\Debug\InfoPanel.asm"
+%include "..\Debug\InfoPanel.asm"	; show numerical value in realtime in window
+%include "..\Debug\HelloWorld.asm"	; text window test
 Catfish.notify:
 ret
 View.file:

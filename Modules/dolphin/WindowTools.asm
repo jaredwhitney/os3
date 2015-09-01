@@ -174,8 +174,12 @@ ret
 
 Dolphin.unregisterWindow :	; winNum in bl
 pusha
+mov byte [Dolphin_WAIT_FLAG], 0xFF
+
 mov ecx, 0x0
 and ebx, 0xFF
+	mov [Dolphin.currentWindow], ebx
+	call Window.makeGlass
 mov eax, Dolphin.windowStructs
 add eax, ebx
 mov [eax], ecx
@@ -187,35 +191,40 @@ Dolphin.registerWindow.noActiveChange :
 	call debug.num
 	mov ebx, Dolphin.UNDolphin.REG_MSG
 	call debug.log.system
-	
-call Dolphin.redrawBG
-	
+
+mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 
 Dolphin.moveWindow :	; xchange in eax, y change in ebx
 pusha
-mov edx, eax
-mov ecx, ebx
+mov byte [Dolphin_WAIT_FLAG], 0xFF
 
-mov bl, [Window.X_POS]
-call Dolphin.getAttribWord
-add eax, edx
-call Dolphin.setAttribWord
+	call Window.makeGlass
 
-mov bl, [Window.Y_POS]
-call Dolphin.getAttribWord
-add eax, ecx
-call Dolphin.setAttribWord
-
-call Dolphin.redrawBG
-
+	mov edx, eax
+	mov ecx, ebx
+	
+	mov bl, [Window.X_POS]
+	call Dolphin.getAttribWord
+	add eax, edx
+	call Dolphin.setAttribWord
+	
+	mov bl, [Window.Y_POS]
+	call Dolphin.getAttribWord
+	add eax, ecx
+	call Dolphin.setAttribWord
+	
+mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 
 Dolphin.moveWindowAbsolute :	; x in eax, y in ebx
 pusha
+mov byte [Dolphin_WAIT_FLAG], 0xFF
 mov ecx, ebx
+
+call Window.makeGlass
 
 mov bl, [Window.X_POS]
 call Dolphin.setAttribWord
@@ -223,9 +232,7 @@ call Dolphin.setAttribWord
 mov eax, ecx
 mov bl, [Window.Y_POS]
 call Dolphin.setAttribWord
-
-call Dolphin.redrawBG
-
+mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 
@@ -286,21 +293,28 @@ Dolphin.activeWinNum :
 
 Dolphin.sizeWindow :	; xchange in eax, y change in ebx
 pusha
-mov edx, eax
-mov ecx, ebx
-pusha
-mov bl, [Window.WIDTH]
-call Dolphin.getAttribWord
-add eax, edx
-call Dolphin.setAttribWord
-popa
-mov bl, [Window.HEIGHT]
-call Dolphin.getAttribWord
-add eax, ecx
-call Dolphin.setAttribWord
+mov byte [Dolphin_WAIT_FLAG], 0xFF
 
-call Dolphin.redrawBG
+	call Window.makeGlass
+	
+	mov edx, eax
+	mov ecx, ebx
+	
+	pusha
+	mov bl, [Window.WIDTH]
+	call Dolphin.getAttribWord
+	add eax, edx
+	call Dolphin.setAttribWord
+	popa
+	
+	mov bl, [Window.HEIGHT]
+	call Dolphin.getAttribWord
+	add eax, ecx
+	call Dolphin.setAttribWord
+	
+	;call Window.forceFlush
 
+mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 
