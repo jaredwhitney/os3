@@ -26,6 +26,8 @@ Kernel.init :
 		;	INITIALIZING MODULES	;
 	call kernel.initModules
 	
+	call TestProgram._init
+	
 ;		call USB_InitController
 		
 ;		call USB_EnablePlugAndPlay
@@ -58,13 +60,13 @@ Kernel.init :
 	;	MAIN LOOP	;
 	kernel.loop:
 			;	RUN INSTALLED MODULES	;
-		call kernel.runModules
+		;call kernel.runModules
 			;	UPDATE WINDOWS	;
 		call Dolphin.updateWindows
 			;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 		call Manager.handleLock
 			;	REPEAT	;
-		jmp kernel.loop
+		;jmp kernel.loop
 		
 	
 kernel.runModules :

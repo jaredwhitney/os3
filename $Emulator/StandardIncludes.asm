@@ -35,6 +35,8 @@
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"
 
+%include "..\OrcaHLL\TestProgram.asm"
+
 %include "..\Debug\InfoPanel.asm"	; show numerical value in realtime in window
 %include "..\Debug\HelloWorld.asm"	; text window test
 Catfish.notify:
