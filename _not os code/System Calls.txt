@@ -1,0 +1,39 @@
+System calls:
+	mov ax, CALL_CODE
+	int 0x30
+
+System :			0x00
+	System.getValue			0x01
+Console :			0x01
+	Console.Print			0x00
+	Console.PrintLine		0x01
+	Console.PrintHex		0x02
+	Console.Newline			0x03
+	Console.Clear			0x04
+Dolphin :			0x02
+	Dolphin.RegisterWindow		0x00
+	Dolphin.UnregisterWindow	0x01
+Debug :				0x03
+	Debug.log			0x01
+	Debug.logHex			0x02
+Keyboard :			0x04
+	Keyboard.AddKeypressHandler	0x01
+	Keyboard.RemoveKeypressHandler	0x02
+	Keyboard.IsKeyPressed		0x03
+Program : 			0x05
+	Program.Exit			0x00
+	Program.RequestRAM		0x01
+Mouse :				0x06
+	Mouse.GetX			0x00
+	Mouse.GetY			0x01
+	Mouse.IsButtonPressed		0x02
+	Mouse.AddButtonpressListener	0x03
+	Mouse.RemoveButtonpressListener	0x04
+Time : 				0x07
+	Time.GetSecond			
+	Time.GetMinute			
+	Time.GetHour			
+	Time.GetYear			
+Minnow :			0x08
+	Minnow.Open			0x01	
+
