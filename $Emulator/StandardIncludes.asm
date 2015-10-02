@@ -28,6 +28,8 @@
 %include "..\Tools\Number\BCDconversions.asm"
 
 %include "..\kernel\ProgramLoader.asm"
+%include "..\kernel\Paging.asm"
+
 %include "..\debug\print.asm"
 %include "..\boot\IDTmain.asm"
 %include "..\boot\realMode.asm"

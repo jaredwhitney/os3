@@ -16,7 +16,7 @@ pusha
 	mov bx, [0x10c0]
 	imul ebx, 8000	; number of bytes of RAM
 	mov eax, ebx
-	mov ecx, 0x200	; number of bytes in a sector
+	mov ecx, 0x1000	; number of bytes in a sector
 		xor edx, edx
 	idiv ecx
 	mov ebx, eax
@@ -82,13 +82,13 @@ mov eax, ebx			; move # start sector to eax
 	;and eax, 0xFF	; getting ah -> eax
 	add ebx, eax
 	mov eax, ebx
-	mov ebx, 0x200
+	mov ebx, 0x1000
 	mul ebx
 	mov ebx, eax
 	add ebx, MEMORY_START
 	call debug.num
 	popa
-	mov ebx, 0x200
+	mov ebx, 0x1000
 	push eax
 	mov eax, ecx
 mul ebx

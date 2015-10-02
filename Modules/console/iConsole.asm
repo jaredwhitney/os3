@@ -11,7 +11,7 @@ pusha
 	;cmp byte [Graphics.VESA_MODE], 0x0
 	;	je console.init.novesa
 	call Window.getSectorSize	; <- eax
-	add eax, 0x4
+	add eax, 0x1
 	mov ebx, eax
 	console.init.novesa :
 	call ProgramManager.requestMemory
@@ -161,7 +161,19 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	mov ah, 0xFF
-	mov ebx, [Dolphin.frameTime]
+	mov ebx, [P.ledat]
+	call console.numOut
+	call console.newline
+	mov ebx, [P.lepos]
+	call console.numOut
+	call console.newline
+	mov ebx, [P.dedat]
+	call console.numOut
+	call console.newline
+	mov ebx, [P.depos]
+	call console.numOut
+	call console.newline
+	mov ebx, MINNOW_START
 	call console.numOut
 	call console.newline
 popa

@@ -23,6 +23,10 @@ Kernel.init :
 	;	jmp $
 	call Guppy.init
 		
+	call Paging.init
+	;Paging.ret :
+	;call Stubfunc
+	;jmp $
 		;	INITIALIZING MODULES	;
 	call kernel.initModules
 	
@@ -78,6 +82,9 @@ kernel.runModules :
 	;call Clock.loop
 ret
 	
+	Stubfunc :
+		ret
+	
 kernel.initModules :
 	call Dolphin.init
 	call console.init
@@ -92,8 +99,8 @@ ret
 	
 kernel.halt :
 	cli
-	mov ebx, kernel.HALT_MESSAGE
-	call debug.println
+	;mov ebx, kernel.HALT_MESSAGE
+	;call debug.println
 	call goRealMode
 	hlt
 

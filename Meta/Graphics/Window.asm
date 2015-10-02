@@ -51,32 +51,6 @@ pop ecx
 push dword [retstor]
 ret
 
-;Window.create.NONVESA :
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.BUFFER]
-		call Dolphin.setAttribDouble
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.OLDBUFFER]
-		call Dolphin.setAttribDouble
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.WINDOWBUFFER]
-		call Dolphin.setAttribDouble
-		
-popa
-ret
-
 retstor :
 	dd 0x0
 Window.create.allocNewWindow :
@@ -165,7 +139,7 @@ push ecx
 	mov eax, [Graphics.SCREEN_SIZE]
 	add eax, WINDOW_CLASS_SIZE
 	xor edx, edx
-	mov ecx, 0x200
+	mov ecx, 0x1000
 	idiv ecx
 	imul eax, 3
 pop ecx
