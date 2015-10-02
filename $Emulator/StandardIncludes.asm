@@ -19,6 +19,7 @@
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\Guppy.asm"
 %include "..\Tools\System\Minnow.asm"
+%include "..\Tools\System\GetValue.asm"
 
 %include "..\Tools\Utility\Clock.asm"
 %include "..\Tools\Security\Manager.asm"
@@ -34,8 +35,6 @@
 
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"
-
-%include "..\OrcaHLL\TestProgram.asm"
 
 %include "..\Debug\InfoPanel.asm"	; show numerical value in realtime in window
 %include "..\Debug\HelloWorld.asm"	; text window test

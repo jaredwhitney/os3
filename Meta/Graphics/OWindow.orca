@@ -1,0 +1,87 @@
+classdef Window #childOf Buffer
+	
+	; Fields
+	invis linked String title
+	invis linked int_s width
+	invis linked int_s lastWidth
+	invis linked int_s height
+	invis linked int_s lastHeight
+	invis linked int_s xPos
+	invis linked int_s lastxPos
+	invis linked int_s yPos
+	invis linked int_s lastyPos
+	invis linked byte type
+	invis linked byte depth
+	invis linked Buffer windowBuffer
+	invis linked Buffer buffer
+	invis linked int bufferSize
+	invis linked Buffer oldBuffer
+	invis linked byte needsRectUpdate
+	invis linked int rectlBase
+	invis linked int rectlTop
+	invis linked int_s winNum
+	
+	func Create (Window : String title, byte type)
+		Window ret = sys Program.Alloc($LinkedClassSize)
+		ret.title = title
+		ret.width = 0x90
+		ret.height = 0x40
+		ret.xPos = 0
+		ret.yPos = 8
+		ret.type = type
+		ret.depth = 0
+		ret.bufferSize = 0
+		
+		int size = sys System.GetValue(SCREEN_BYTEWIDTH) * sys System.GetValue(SCREEN_WIDTH)
+		
+		ret.windowBuffer = sys Program.Ealloc(size)
+		ret.buffer = sys Program.Ealloc(size)
+		ret.oldBuffer = sys Program.Ealloc(size)
+		
+		ret.winNum = sys Dolphin.RegisterWindow(ret)
+		
+		return ret
+
+	linked func GetPreferredHeight (int_s : null)
+		if this.type == Window.TYPE_TEXT
+			return 12
+		Image temp = this.buffer
+		return temp.GetHeight()
+
+	; linked func GetPreferredWidth (int_s : null)
+		; if (this.type == Window.TYPE_TEXT)
+			; return (buffer as String).GetLength() as int_s
+		; return (buffer as Image).GetWidth() as int_s
+
+	; linked func SetSize (void : int_s width, int_s height)
+		; this.width = width
+		; this.height = height
+	
+	; linked func SetPosition (void : int_s x, int_s y)
+		; this.xPos = x
+		; this.yPos = y
+		
+	; linked func GetWidth (int_s : null)
+		; return this.width
+		
+	; linked func GetHeight (int_s : null)
+		; return this.height
+		
+	; linked func GetX (int_s : null)
+		; return this.xPos
+		
+	; linked func GetY (int_s : null)
+		; return this.yPos
+	
+	; linked func SetBuffer (void : Buffer buffer)
+		; this.buffer = buffer
+	
+	; linked func GetBuffer (Buffer : null)
+		; return this.buffer
+	
+	; linked func SetTitle (void : String title)
+		; this.title = title
+	
+	; linked func GetTitle (String : null)
+		; return this.title
+

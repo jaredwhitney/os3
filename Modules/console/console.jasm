@@ -92,7 +92,7 @@ func int handleEnter(null)
 		return 0
 func int fullscrn(null)
 	if (full = 0)
-			setWidth(0xa0)
+			setWidth(0xf0)
 			setHeight(0xc8)
 			full = 2
 	endif

@@ -142,7 +142,7 @@ ProgramManager.PROGRAM_REGISTERED :
 db "A program has been registered: PNUM=", 0
 
 ProgramManager.PnumCounter :
-db 0x0
+dd 0x0
 
 ProgramManager.memoryStart :
 dd 0x0

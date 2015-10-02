@@ -1,0 +1,10 @@
+classdef VideoInfo
+	func _init (void : null)
+		sys Console.Clear()
+		String gcName = sys System.GetValue(GRAPHICSCARD_NAME)
+		sys Console.Print("Graphics card name: ")
+		sys Console.PrintLine(gcName)
+		int pCount = sys System.GetValue(PROCESSCOUNT)
+		sys Console.Print("Active processes: ")
+		sys Console.PrintHex(pCount)
+		sys Console.Newline()

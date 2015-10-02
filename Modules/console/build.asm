@@ -707,9 +707,9 @@ cmp eax, ebx
 pop ebx
 pop eax
 jne JASM.console.loop_17.end
-		; setWidth(0xa0)
+		; setWidth(0xf0)
 push ebx
-mov ebx, 0xa0
+mov ebx, 0xf0
 call console.setWidth
 pop ebx
 		; setHeight(0xc8)
