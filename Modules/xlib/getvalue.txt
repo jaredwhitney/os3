@@ -1,0 +1,11 @@
+
+
+System.getValue :	; val in ebx, returns in ecx
+pusha
+	add ebx, System.valueLocations
+	mov ecx, [ebx]
+popa
+ret
+
+System.valueLocations :
+	dd 0x0

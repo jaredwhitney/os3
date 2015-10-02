@@ -160,7 +160,10 @@ Graphics.VESA_SUPPORTED :
 dw 0x4d
 
 Graphics.VESA_MODE :
-db 0x0
+dd 0x0
+
+Graphics.CARDNAME :
+dd 0x0
 
 Graphics.tColor :
 dd 0x0, 0x0, 0x0, 0x0

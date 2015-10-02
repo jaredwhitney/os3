@@ -37,3 +37,6 @@ Time : 				0x07
 Minnow :			0x08
 	Minnow.Open			0x01	
 
+Guppy :				0x09
+	Guppy.GetTotalRAM		0x01
+	Guppy.GetUsedRAM		0x02

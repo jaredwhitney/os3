@@ -9,5 +9,3 @@
 @cd %x%
 @pause
 @cat boot.bin kernel.bin fstest.bin "../_not os code/image/iConsole.file" "fspadding.bin" > os.img
-@pause
-@start run.bxrc

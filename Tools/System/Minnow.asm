@@ -151,7 +151,9 @@ Minnow.byName :	; pointer to name in ebx, returns file location in ebx
 		pop ecx
 		je Minnow.byName.fileNotFound
 	add ebx, 4	; at filetype
-	add ebx, 4	; at filename
+		call String.getLength
+		add ebx, edx
+	;add ebx, 4	; at filename
 	mov edx, [ebx]
 	mov [Minnow.cstor], edx
 	add ebx, 4

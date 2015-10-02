@@ -4,8 +4,7 @@ Kernel.init :
 	cmp dword [DisplayMode], MODE_TEXT
 		je Kernel.textInit
 	kernel.cont :
-
-
+	
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
@@ -30,7 +29,15 @@ Kernel.init :
 		;	INITIALIZING MODULES	;
 	call kernel.initModules
 	
-	call TestProgram._init
+	;mov ebx, kernel.BOOT_PROGRAM_NAME
+	;call Minnow.byName
+	;call console.numOut
+	;mov ebx, [ebx]
+	;call console.numOut
+	;call ebx
+	;mov ebx, MathTest._init
+	;call console.numOut
+	call VideoInfo._init
 	
 ;		call USB_InitController
 		
@@ -107,6 +114,9 @@ kernel.halt :
 kernel.HALT_MESSAGE :
 db "The operating system is now halted.", 0
 
+kernel.BOOT_PROGRAM_NAME :
+db "MathTest", 0
+
 os.mlloc :
 db 0x0
 	
@@ -153,6 +163,7 @@ Kernel.textInit :
 	imul ebx, 0x10
 	add eax, ebx
 	mov ebx, eax
+	mov [Graphics.CARDNAME], ebx
 	call TextMode.println
 	
 	mov ax, [0x200E]
@@ -303,3 +314,5 @@ DebugStringStor :
 	dd 0x0, 0x0, 0x0, 0x0, 0x0
 
 MINNOW_START :
+
+%include "..\OrcaHLL\VideoInfo.asm"	; so it will also show up as a file
