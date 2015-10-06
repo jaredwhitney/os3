@@ -33,7 +33,7 @@ Kernel.init :
 	;call ebx
 	;mov ebx, MathTest._init
 	;call console.numOut
-	call VideoInfo._init
+	call HelloWorldWindowProgram._init
 	
 ;		call USB_InitController
 		
@@ -308,4 +308,4 @@ DebugStringStor :
 
 MINNOW_START :
 
-%include "..\OrcaHLL\VideoInfo.asm"	; so it will also show up as a file
+%include "..\OrcaHLL\hwin.asm"	; so it will also show up as a file

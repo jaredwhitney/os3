@@ -125,7 +125,20 @@ pusha
 			
 		push ebx
 		sub ebx, 4
+
+		call Dolphin.compositeWindow
 		
+		pop ebx
+		jmp Dolphin.updateScreen.checkWindow
+		
+	Dolphin.doneDrawingWindows :
+	pop word [Dolphin.currentWindow]
+	
+Dolphin.updateScreen.ret :
+popa
+ret
+
+Dolphin.compositeWindow :
 		mov [Dolphin.currentWindow], ebx
 		add ebx, Dolphin.windowStructs
 		mov edx, [ebx]
@@ -162,30 +175,22 @@ pusha
 		mov dx, [edx+8]	; height back
 
 		call Image.copy
-		
-		pop ebx
-		jmp Dolphin.updateScreen.checkWindow
-		
-	Dolphin.doneDrawingWindows :
-	pop word [Dolphin.currentWindow]
-	
-Dolphin.updateScreen.ret :
-popa
+
 ret
 
 ; *** NEW SCREEN UPDATE CODE ***
 
-Dolphin.updateScreenNew :
-pusha
-cmp byte [Dolphin_WAIT_FLAG], 0x0
-	je Dolphin.uSN.cont
-popa
-ret
-Dolphin.uSN.cont :
-mov byte [Dolphin_WAIT_FLAG], 0xFF
-;
-; for each window
-; 	does it need rects drawn?
+; Dolphin.updateScreenNew :
+; pusha
+; cmp byte [Dolphin_WAIT_FLAG], 0x0
+	; je Dolphin.uSN.cont
+; popa
+; ret
+; Dolphin.uSN.cont :
+; mov byte [Dolphin_WAIT_FLAG], 0xFF
+
+;for each window
+;	does it need rects drawn?
 ;		yes:
 ;			window is on top:
 ;				updateRects
@@ -193,117 +198,117 @@ mov byte [Dolphin_WAIT_FLAG], 0xFF
 ;				figure out occlusion somehow...
 ;	window has been moved/resized:
 ;		updateAll = true
-;
-; if updateAll
+
+;if updateAll
 ;	redraw background
 ;	for each window
 ;		redraw winBuffer to screen
-;
+
 	
-	mov ebx, Dolphin.windowStructs
-	mov [Dolphin.uSN.endval], ebx
-	add dword [Dolphin.uSN.endval], 0xF*0x4
-	Dolphin.updateScreenNew.loop1_start :
-		cmp ebx, [Dolphin.uSN.endval]
-			jg Dolphin.updateScreenNew.loop1_end	
+	; mov ebx, Dolphin.windowStructs
+	; mov [Dolphin.uSN.endval], ebx
+	; add dword [Dolphin.uSN.endval], 0xF*0x4
+	; Dolphin.updateScreenNew.loop1_start :
+		; cmp ebx, [Dolphin.uSN.endval]
+			; jg Dolphin.updateScreenNew.loop1_end	
 			
-			push ebx
-			mov eax, [ebx]
-			cmp eax, 0x0
-				je Dolphin.updateScreenNew.loop1_innerdone
-				mov eax, ebx
-				sub eax, Dolphin.windowStructs
-			mov [Dolphin.currentWindow], eax
+			; push ebx
+			; mov eax, [ebx]
+			; cmp eax, 0x0
+				; je Dolphin.updateScreenNew.loop1_innerdone
+				; mov eax, ebx
+				; sub eax, Dolphin.windowStructs
+			; mov [Dolphin.currentWindow], eax
 			
-			mov bl, [Window.DEPTH]
-			call Dolphin.getAttribByte
-			cmp al, 0x0
-				jne Dolphin.uSN.loop1.notOnTop
-					mov bl, [Window.NEEDS_RECT_UPDATE]
-					call Dolphin.getAttribByte
-						cmp al, 0x0
-							je Dolphin.updateScreenNew.loop1_innerdone
-						mov bl, [Window.RECTL_BASE]
-						call Dolphin.getAttribDouble
-						sub eax, 4
-						mov [uRectsBase], eax
-						mov bl, [Window.RECTL_TOP]
-						call Dolphin.getAttribDouble
-						mov [uRectsEnd], eax
-						mov bl, [Window.WINDOWBUFFER]
-						call Dolphin.getAttribDouble
-						mov [cWinBuf], eax
-						call Dolphin.updateScreenNew.updateRects
-			Dolphin.uSN.loop1.notOnTop :
+			; mov bl, [Window.DEPTH]
+			; call Dolphin.getAttribByte
+			; cmp al, 0x0
+				; jne Dolphin.uSN.loop1.notOnTop
+					; mov bl, [Window.NEEDS_RECT_UPDATE]
+					; call Dolphin.getAttribByte
+						; cmp al, 0x0
+							; je Dolphin.updateScreenNew.loop1_innerdone
+						; mov bl, [Window.RECTL_BASE]
+						; call Dolphin.getAttribDouble
+						; sub eax, 4
+						; mov [uRectsBase], eax
+						; mov bl, [Window.RECTL_TOP]
+						; call Dolphin.getAttribDouble
+						; mov [uRectsEnd], eax
+						; mov bl, [Window.WINDOWBUFFER]
+						; call Dolphin.getAttribDouble
+						; mov [cWinBuf], eax
+						; call Dolphin.updateScreenNew.updateRects
+			; Dolphin.uSN.loop1.notOnTop :
 ;				figure out occlusion somehow...
-		Dolphin.updateScreenNew.loop1_innerdone :
-		pop ebx
-		add ebx, 4
-		jmp Dolphin.updateScreenNew.loop1_start
-	Dolphin.updateScreenNew.loop1_end :
-	mov byte [Dolphin_WAIT_FLAG], 0x00
-popa
-ret
-Dolphin.uSN.endval :
-	dd 0x0
-cWinPos :
-	dd 0x0
-cWinBuf :
-	dd 0x0
+		; Dolphin.updateScreenNew.loop1_innerdone :
+		; pop ebx
+		; add ebx, 4
+		; jmp Dolphin.updateScreenNew.loop1_start
+	; Dolphin.updateScreenNew.loop1_end :
+	; mov byte [Dolphin_WAIT_FLAG], 0x00
+; popa
+; ret
+; Dolphin.uSN.endval :
+	; dd 0x0
+; cWinPos :
+	; dd 0x0
+; cWinBuf :
+	; dd 0x0
 
-Dolphin.updateScreenNew.updateRects :
-pusha
-
-
-pusha			; store window's position
-	xor eax, eax
-	mov bl, [Window.Y_POS]
-	call Dolphin.getAttribWord
-	mov ecx, eax
-	mov eax, [Graphics.SCREEN_WIDTH]
-	imul ecx, eax
-	mov bl, [Window.X_POS]
-	call Dolphin.getAttribWord
-	add ecx, eax
-	mov [cWinPos], ecx
-popa
+; Dolphin.updateScreenNew.updateRects :
+; pusha
 
 
-Dolphin.updateNew.cRectsLoop :	; update rects
+; pusha			; store window's position
+	; xor eax, eax
+	; mov bl, [Window.Y_POS]
+	; call Dolphin.getAttribWord
+	; mov ecx, eax
+	; mov eax, [Graphics.SCREEN_WIDTH]
+	; imul ecx, eax
+	; mov bl, [Window.X_POS]
+	; call Dolphin.getAttribWord
+	; add ecx, eax
+	; mov [cWinPos], ecx
+; popa
+
+
+; Dolphin.updateNew.cRectsLoop :	; update rects
 ;pop eax	; eg 0= ul of win in winB
-mov eax, [uRectsEnd]
-push eax
-mov eax, [eax]
+; mov eax, [uRectsEnd]
+; push eax
+; mov eax, [eax]
 
-add dword [uRectsEnd], 4
-mov ebx, [Graphics.SCREEN_MEMPOS]	; ul of screen
-add ebx, [cWinPos]	; ul of win
-add ebx, eax	; where to be in win
-add eax, [cWinBuf]
-mov cx, 7	; SHOULD BE 5 BY 7
-mov dx, 9
+; add dword [uRectsEnd], 4
+; mov ebx, [Graphics.SCREEN_MEMPOS]	; ul of screen
+; add ebx, [cWinPos]	; ul of win
+; add ebx, eax	; where to be in win
+; add eax, [cWinBuf]
+; mov cx, 7	; SHOULD BE 5 BY 7
+; mov dx, 9
 
-call Image.copyFromWinSource
+; call Image.copyFromWinSource
 
-pop eax
-cmp eax, [uRectsBase]
-	jle Dolphin.updateNew.cRectsLoop
+; pop eax
+; cmp eax, [uRectsBase]
+	; jle Dolphin.updateNew.cRectsLoop
 
-	mov al, 0x0
-	mov bl, [Window.NEEDS_RECT_UPDATE]
-	call Dolphin.setAttribByte
+	; mov al, 0x0
+	; mov bl, [Window.NEEDS_RECT_UPDATE]
+	; call Dolphin.setAttribByte
 	
-popa
-ret
+; popa
+; ret
 
-uRectsBase :
-	dd 0x0
-uRectsEnd :
-	dd 0x0
-ebpStor :
-	dd 0x0
-espStor :
-	dd 0x0
+; uRectsBase :
+	; dd 0x0
+; uRectsEnd :
+	; dd 0x0
+; ebpStor :
+	; dd 0x0
+; espStor :
+	; dd 0x0
 
 ; *** END NEW SCREEN UPDATE CODE ***
 

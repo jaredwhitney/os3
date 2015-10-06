@@ -59,6 +59,22 @@ cmp ax, 0x0104
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next4 :
 	
+cmp ax, 0x0202
+	jne _HANDLEFUNC1.nextd1
+		pop dword [_arg1]
+		pop dword [_arg0]
+		push eax
+		push ebx
+		push edx
+		push dword [_arg0]
+		push word [_arg1]
+		call Window.create
+		pop edx
+		pop ebx
+		pop eax
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextd1 :
+	
 cmp ax, 0x0501
 	jne _HANDLEFUNC1.next5
 		pop dword [_arg0]
@@ -93,9 +109,10 @@ push dword [_HF1_s1]
 push dword [_HF1_s0]
 iret
 
-;_funcList :
-;dd 0, Dolphin.moveWindow, Dolphin.sizeWindow, Dolphin.unregisterWindow, Image.copy, 0, os.seq, 0, Image.clear, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Minnow.byName, 0, Manager.lock, console.print, console.println, console.clearScreen, console.newline, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, Catfish.notify, Keyboard.getKey, 0, 0, RTC.getSecond, RTC.getMinute, RTC.getHour, 0, RTC.getDay, RTC.getMonth, RTC.getYear, Guppy.malloc, 0, 0, 0
+
 _arg0 :
+dd 0
+_arg1 :
 dd 0
 _HF1_s0 :
 dd 0

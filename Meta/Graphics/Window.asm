@@ -48,34 +48,40 @@ pop ecx
 	mov [Dolphin.currentWindow], ebx
 	call Window.create.createBuffers
 	pop ecx
+	; store winNum
+	push ecx
+	add cl, [Window.WIN_NUM]
+	mov [ecx], bl
+	pop ecx
+; return
 push dword [retstor]
 ret
 
 ;Window.create.NONVESA :
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.BUFFER]
-		call Dolphin.setAttribDouble
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.OLDBUFFER]
-		call Dolphin.setAttribDouble
-mov ebx, 0x7D*0x200
-call ProgramManager.reserveMemory
-		mov eax, ebx
-		mov ebx, 0x7D*0x200
-;		call Buffer.clear
-		mov bl, [Window.WINDOWBUFFER]
-		call Dolphin.setAttribDouble
+;mov ebx, 0x7D*0x200
+;call ProgramManager.reserveMemory
+		;mov eax, ebx
+		;mov ebx, 0x7D*0x200
+;;		call Buffer.clear
+		;mov bl, [Window.BUFFER]
+		;call Dolphin.setAttribDouble
+;mov ebx, 0x7D*0x200
+;call ProgramManager.reserveMemory
+;		mov eax, ebx
+		;mov ebx, 0x7D*0x200
+;;		call Buffer.clear
+		;mov bl, [Window.OLDBUFFER]
+		;call Dolphin.setAttribDouble
+;mov ebx, 0x7D*0x200
+;call ProgramManager.reserveMemory
+		;mov eax, ebx
+		;mov ebx, 0x7D*0x200
+;;		call Buffer.clear
+		;mov bl, [Window.WINDOWBUFFER]
+		;call Dolphin.setAttribDouble
 		
-popa
-ret
+;popa
+;ret
 
 retstor :
 	dd 0x0
@@ -231,9 +237,5 @@ Window.BUFFERSIZE :
 db 30
 Window.OLDBUFFER :
 db 34
-Window.NEEDS_RECT_UPDATE :
+Window.WIN_NUM :
 db 38
-Window.RECTL_BASE :
-db 39
-Window.RECTL_TOP :
-db 43
