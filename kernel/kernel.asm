@@ -22,6 +22,10 @@ Kernel.init :
 	;	jmp $
 	call Guppy.init
 		
+	;call Paging.init
+	;Paging.ret :
+	;call Stubfunc
+	;jmp $
 		;	INITIALIZING MODULES	;
 	call kernel.initModules
 	
@@ -33,7 +37,7 @@ Kernel.init :
 	;call ebx
 	;mov ebx, MathTest._init
 	;call console.numOut
-	call HelloWorldWindowProgram._init
+	call Library._init
 	
 ;		call USB_InitController
 		
@@ -84,6 +88,9 @@ kernel.runModules :
 	call console.loop
 	;call Clock.loop
 ret
+	
+	Stubfunc :
+		ret
 	
 kernel.initModules :
 	call Dolphin.init
@@ -308,4 +315,4 @@ DebugStringStor :
 
 MINNOW_START :
 
-%include "..\OrcaHLL\hwin.asm"	; so it will also show up as a file
+%include "..\OrcaHLL\Library.asm"	; so it will also show up as a file
