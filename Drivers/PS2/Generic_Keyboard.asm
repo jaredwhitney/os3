@@ -318,7 +318,7 @@ KeyManager.toChar :
 	mov al, 0xff
 	je KeyManager.toChar.ret
 	cmp bl, 0x1C
-	mov al, 0xfe
+	mov al, 0xfe	; enter
 	je KeyManager.toChar.ret
 	cmp bl, 0x51	; pgdown
 	mov al, 0xfd
