@@ -171,7 +171,7 @@ push ecx
 	mov eax, [Graphics.SCREEN_SIZE]
 	add eax, WINDOW_CLASS_SIZE
 	xor edx, edx
-	mov ecx, 0x200
+	mov ecx, 0x1000
 	idiv ecx
 	imul eax, 3
 pop ecx

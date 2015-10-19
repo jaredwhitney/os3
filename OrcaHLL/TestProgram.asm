@@ -12,7 +12,7 @@ push ebx
 push edx
 mov ecx, [TestProgram._init.string_0]
 push ecx
-mov ax, 0x0002
+mov ax, 0x0101
 int 0x30
 pop edx
 pop ebx

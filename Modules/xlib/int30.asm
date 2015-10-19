@@ -78,8 +78,11 @@ cmp ax, 0x0202
 cmp ax, 0x0501
 	jne _HANDLEFUNC1.next5
 		pop dword [_arg0]
+		push ebx
 		mov ebx, [_arg0]
 		call ProgramManager.reserveMemory
+		mov ecx, ebx
+		pop ebx
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next5 :
 	
@@ -101,6 +104,24 @@ cmp ax, 0x0502
 		pop eax
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next6 :
+	
+cmp ax, 0x0404
+	jne _HANDLEFUNC1.next7
+		call KeyManager.hasEvent
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.next7 :
+
+cmp ax, 0x0405
+	jne _HANDLEFUNC1.next8
+		pop dword [_arg0]
+		push ebx
+		mov ebx, [_arg0]
+		mov [Dolphin.currentWindow], ebx
+		call Keyboard.getKey
+		mov cl, bl
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.next8 :
 	
 call kernel.halt
 _HANDLEFUNC1.ret :

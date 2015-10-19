@@ -163,11 +163,11 @@ IDTSTART :
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT E
+		dw (0x7e00+_PAGEFAULT-$$) & 0xFFFF	; INT E
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (0x7e00+_PAGEFAULT-$$) >> 16
 		
 		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT F
 		dw 0x8

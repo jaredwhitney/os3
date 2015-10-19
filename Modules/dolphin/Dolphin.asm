@@ -8,7 +8,7 @@ pusha
 	;	je Dolphin.NONVESAinit
 	mov al, 0x1
 		mov eax, [Graphics.SCREEN_SIZE]
-		mov ecx, 0x200
+		mov ecx, 0x1000
 		xor edx, edx
 		idiv ecx
 	mov ebx, eax

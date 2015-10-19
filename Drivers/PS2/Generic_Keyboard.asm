@@ -410,6 +410,22 @@ KeyManager.handleSpecialKey :
 	call Dolphin.unregisterWindow
 	jmp KeyManager.handleSpecialKey.aret
 	
+KeyManager.hasEvent :
+push bx
+	mov bl, 0x0
+	push ecx
+	mov ecx, [KeyManager.bufferpos]
+	cmp ecx, 0x0
+		je KeyManager.hasEvent.false
+	mov cl, 0xFF
+	jmp KeyManager.hasEvent.ret
+	KeyManager.hasEvent.false :
+	mov cl, 0x00
+	KeyManager.hasEvent.ret :
+pop bx
+ret
+
+	
 KeyManager.hsmode :
 db 0x0
 

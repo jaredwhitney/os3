@@ -11,7 +11,7 @@ pusha
 	;cmp byte [Graphics.VESA_MODE], 0x0
 	;	je console.init.novesa
 	call Window.getSectorSize	; <- eax
-	add eax, 0x4
+	add eax, 0x1
 	mov ebx, eax
 	console.init.novesa :
 	call ProgramManager.requestMemory
@@ -160,12 +160,36 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov ah, 0xFF
-	mov ebx, [Dolphin.frameTime]
-	call console.numOut
-	call console.newline
+	; ;mov ah, 0xFF
+	; mov eax, [HelloWorldWindowProgram.DisplayWindow.$local.w]
+	; mov ecx, eax
+	; add al, [Window.WIN_NUM]
+	; mov bl, [eax]
+	; and ebx, 0xFF
+	; ;call console.numOut
+	; ;call console.newline	;; Works with gen'd win
+	; ;push dword 0x0
+	; ;push word 0x0
+	; ;call Window.create
+	; mov [C.test.w], ecx
+	; mov [Dolphin.currentWindow], bl
+	; mov bl, [Window.X_POS]
+	; call Dolphin.getAttribWord
+	; mov ebx, eax
+	; and ebx, 0xFFFF
+	; mov ah, 0xFF
+	; call console.numOut
+	; call console.newline
+	; mov ebx, [C.test.w]
+	; add bl, [Window.X_POS]
+	; mov word [ebx], 0x40
+	; mov ebx, [ebx]
+	; call console.numOut
+	; call console.newline
 popa
 ret
+C.test.w :
+	dd 0x0
 
 console.memstat :
 	mov ah, 0xFF
