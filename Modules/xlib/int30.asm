@@ -58,6 +58,17 @@ cmp ax, 0x0104
 		call console.clearScreen
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next4 :
+
+cmp ax, 0x0105
+	jne _HANDLEFUNC1.nextc5
+		pop dword [_arg0]
+		push ax
+		mov ah, 0xFF
+		mov al, [_arg0]
+		call console.cprint
+		pop ax
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextc5 :
 	
 cmp ax, 0x0202
 	jne _HANDLEFUNC1.nextd1

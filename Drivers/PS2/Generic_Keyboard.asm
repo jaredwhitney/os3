@@ -412,8 +412,6 @@ KeyManager.handleSpecialKey :
 	
 KeyManager.hasEvent :
 push bx
-	mov bl, 0x0
-	push ecx
 	mov ecx, [KeyManager.bufferpos]
 	cmp ecx, 0x0
 		je KeyManager.hasEvent.false

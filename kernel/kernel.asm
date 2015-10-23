@@ -37,7 +37,7 @@ Kernel.init :
 	;call ebx
 	;mov ebx, MathTest._init
 	;call console.numOut
-	call Library._init
+	call EchoTest._init
 	
 ;		call USB_InitController
 		
@@ -85,8 +85,11 @@ kernel.runModules :
 	mov [os.mlloc], bl
 	
 	;call InfoPanel.loop
-	call console.loop
+	;call console.loop
 	;call Clock.loop
+	
+	call EchoTest._loop
+	
 ret
 	
 	Stubfunc :
@@ -315,4 +318,4 @@ DebugStringStor :
 
 MINNOW_START :
 
-%include "..\OrcaHLL\Library.asm"	; so it will also show up as a file
+%include "..\OrcaHLL\EchoTest.asm"	; so it will also show up as a file
