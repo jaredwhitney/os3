@@ -412,6 +412,10 @@ KeyManager.handleSpecialKey :
 	
 KeyManager.hasEvent :
 push bx
+	mov bl, [Dolphin.currentWindow]
+	mov bh, [Dolphin.activeWindow]
+	cmp bl, bh
+		jne KeyManager.hasEvent.false
 	mov ecx, [KeyManager.bufferpos]
 	cmp ecx, 0x0
 		je KeyManager.hasEvent.false

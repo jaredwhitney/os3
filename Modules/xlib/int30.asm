@@ -69,6 +69,12 @@ cmp ax, 0x0105
 		pop ax
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.nextc5 :
+
+cmp ax, 0x0106
+	jne _HANDLEFUNC1.nextc6
+		mov ecx, [console.windowStructLoc]
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextc6 :
 	
 cmp ax, 0x0202
 	jne _HANDLEFUNC1.nextd1
@@ -118,7 +124,12 @@ cmp ax, 0x0502
 	
 cmp ax, 0x0404
 	jne _HANDLEFUNC1.next7
+		pop dword [_arg0]
+		push ebx
+		mov ebx, [_arg0]
+		mov [Dolphin.currentWindow], ebx
 		call KeyManager.hasEvent
+		pop ebx
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next7 :
 

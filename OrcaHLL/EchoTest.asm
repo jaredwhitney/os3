@@ -5,6 +5,8 @@ db "OrcaHLL Class", 0
 db "EchoTest", 0
 EchoTest.$FILE_START :
 
+EchoTest.$global.console :
+	dd 0x0
 EchoTest.$global.nul :
 	db 0x0
 EchoTest.$global.text :
@@ -23,6 +25,9 @@ mov ecx, [EchoTest._init.string_0]
 push ecx
 mov ax, 0x0101
 int 0x30
+mov ax, 0x0106
+int 0x30
+mov [EchoTest.$global.console], ecx
 pop edx
 pop ebx
 pop eax
@@ -42,11 +47,13 @@ pop dword [EchoTest._loop.returnVal]
 push eax
 push ebx
 push edx
+mov ecx, [EchoTest.$global.console]
+push ecx
 mov ax, 0x0404
 int 0x30
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.0_close
-mov ecx, [console.windowStructLoc]
+mov ecx, [EchoTest.$global.console]
 push ecx
 mov ax, 0x0405
 int 0x30
@@ -58,12 +65,12 @@ mov edx, ecx
 mov ecx, 0xFE
 cmp edx, ecx
 pop edx
-je EchoTest.$comp_10.true
+je EchoTest.$comp_11.true
 mov cl, 0x0
-jmp EchoTest.$comp_10.done
-EchoTest.$comp_10.true :
+jmp EchoTest.$comp_11.done
+EchoTest.$comp_11.true :
 mov cl, 0xFF
-EchoTest.$comp_10.done :
+EchoTest.$comp_11.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.1_close
@@ -91,12 +98,12 @@ mov edx, ecx
 mov ecx, 0xFE
 cmp edx, ecx
 pop edx
-jne EchoTest.$comp_14.true
+jne EchoTest.$comp_15.true
 mov cl, 0x0
-jmp EchoTest.$comp_14.done
-EchoTest.$comp_14.true :
+jmp EchoTest.$comp_15.done
+EchoTest.$comp_15.true :
 mov cl, 0xFF
-EchoTest.$comp_14.done :
+EchoTest.$comp_15.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.2_close
