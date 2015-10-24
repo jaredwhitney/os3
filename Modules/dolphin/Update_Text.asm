@@ -339,7 +339,7 @@ push word [TextHandler.solidChar]
 		jmp D.dTN2.noup
 		D.dTN2.noupadd :
 		push eax
-		mov eax, 7
+		mov eax, 6
 		imul eax, [Graphics.bytesPerPixel]
 		add dword [TextHandler.charpos], eax
 		pop eax
