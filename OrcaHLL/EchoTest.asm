@@ -21,7 +21,7 @@ int 0x30
 mov [EchoTest.$global.text], ecx
 mov ecx, [EchoTest._init.string_0]
 push ecx
-mov ax, 0x0100
+mov ax, 0x0101
 int 0x30
 pop edx
 pop ebx
@@ -29,10 +29,10 @@ pop eax
 push dword [EchoTest._init.returnVal]
 ret
 	;Vars:
-EchoTest._init.string_0_data :
-	db ":: ", 0
 EchoTest._init.string_0 :
 	dd EchoTest._init.string_0_data
+EchoTest._init.string_0_data :
+	db "Any text you type will be echoed back to you!", 0
 EchoTest._init.returnVal:
 	dd 0x0
 
@@ -46,7 +46,7 @@ mov ax, 0x0404
 int 0x30
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.0_close
-mov ecx, [console.windowStructLoc]	; INLINE ASSEMBLY
+mov ecx, [console.windowStructLoc]
 push ecx
 mov ax, 0x0405
 int 0x30
@@ -58,12 +58,12 @@ mov edx, ecx
 mov ecx, 0xFE
 cmp edx, ecx
 pop edx
-je EchoTest.$comp_8.true
+je EchoTest.$comp_10.true
 mov cl, 0x0
-jmp EchoTest.$comp_8.done
-EchoTest.$comp_8.true :
+jmp EchoTest.$comp_10.done
+EchoTest.$comp_10.true :
 mov cl, 0xFF
-EchoTest.$comp_8.done :
+EchoTest.$comp_10.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.1_close
@@ -71,9 +71,7 @@ mov ax, 0x0103
 int 0x30
 mov ecx, [EchoTest.$global.text]
 push ecx
-mov ax, 0x0100
-int 0x30
-mov ax, 0x0103
+mov ax, 0x0101
 int 0x30
 push ebx
 mov ebx, EchoTest.$global.text
@@ -93,12 +91,12 @@ mov edx, ecx
 mov ecx, 0xFE
 cmp edx, ecx
 pop edx
-jne EchoTest.$comp_13.true
+jne EchoTest.$comp_14.true
 mov cl, 0x0
-jmp EchoTest.$comp_13.done
-EchoTest.$comp_13.true :
+jmp EchoTest.$comp_14.done
+EchoTest.$comp_14.true :
 mov cl, 0xFF
-EchoTest.$comp_13.done :
+EchoTest.$comp_14.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.2_close
@@ -348,24 +346,14 @@ mov [String.$loop_for.0.$local.offs], ecx
 ;			k.	; INLINE ASSEMBLY
 push ebx
 mov ebx, ebx
-push edx	; Math start
-mov ecx, 2
-mov edx, ecx
 mov ecx, [String.$loop_for.0.$local.z]
-imul ecx, edx
-pop edx	; Math end
 push ecx
 call String.GetChar
 pop ebx
 mov [String.$loop_for.0.$local.ch], cl
 push ebx
 mov ebx, String.RawToWhite.$local.ret
-push edx	; Math start
-mov ecx, 2
-mov edx, ecx
-mov ecx, [String.$loop_for.0.$local.z]
-imul ecx, edx
-pop edx	; Math end
+mov ecx, [String.$loop_for.0.$local.offs]
 push ecx
 xor ecx, ecx
 mov cl, [String.$loop_for.0.$local.ch]
@@ -375,14 +363,9 @@ pop ebx
 push ebx
 mov ebx, String.RawToWhite.$local.ret
 push edx	; Math start
-push edx	; Math start
 mov ecx, 1
 mov edx, ecx
-mov ecx, 2
-add ecx, edx
-pop edx	; Math end
-mov edx, ecx
-mov ecx, [String.$loop_for.0.$local.z]
+mov ecx, [String.$loop_for.0.$local.offs]
 add ecx, edx
 pop edx	; Math end
 push ecx
@@ -404,16 +387,17 @@ mov edx, ecx
 mov ecx, [String.RawToWhite.$local.length]
 cmp edx, ecx
 pop edx
-jl String.$comp_46.true
+jl String.$comp_45.true
 mov cl, 0x0
-jmp String.$comp_46.done
-String.$comp_46.true :
+jmp String.$comp_45.done
+String.$comp_45.true :
 mov cl, 0xFF
-String.$comp_46.done :
+String.$comp_45.done :
 
 cmp cl, 0xFF
 	je String.$loop_for.0_open
 
+mov ecx, [String.RawToWhite.$local.ret]
 pop edx
 pop ebx
 pop eax
@@ -458,12 +442,12 @@ mov edx, ecx
 mov ecx, 0
 cmp edx, ecx
 pop edx
-jne String.$comp_49.true
+jne String.$comp_50.true
 mov cl, 0x0
-jmp String.$comp_49.done
-String.$comp_49.true :
+jmp String.$comp_50.done
+String.$comp_50.true :
 mov cl, 0xFF
-String.$comp_49.done :
+String.$comp_50.done :
 
 cmp cl, 0xFF
 	jne String.$loop_while.1_end
