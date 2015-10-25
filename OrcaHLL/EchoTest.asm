@@ -7,8 +7,6 @@ EchoTest.$FILE_START :
 
 EchoTest.$global.console :
 	dd 0x0
-EchoTest.$global.nul :
-	db 0x0
 EchoTest.$global.text :
 	dd 0x0
 EchoTest._init: 
@@ -62,15 +60,16 @@ push edx
 xor ecx, ecx
 mov cl, [EchoTest.$loop_if.0.$local.ch]
 mov edx, ecx
-mov ecx, 0xFE
+xor ecx, ecx
+mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-je EchoTest.$comp_11.true
+je EchoTest.$comp_13.true
 mov cl, 0x0
-jmp EchoTest.$comp_11.done
-EchoTest.$comp_11.true :
+jmp EchoTest.$comp_13.done
+EchoTest.$comp_13.true :
 mov cl, 0xFF
-EchoTest.$comp_11.done :
+EchoTest.$comp_13.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.1_close
@@ -85,7 +84,7 @@ mov ebx, EchoTest.$global.text
 mov ecx, 0
 push ecx
 xor ecx, ecx
-mov cl, [EchoTest.$global.nul]
+mov cl, [Char.$global.NUL]
 push ecx
 call String.SetChar
 pop ebx
@@ -95,15 +94,16 @@ push edx
 xor ecx, ecx
 mov cl, [EchoTest.$loop_if.0.$local.ch]
 mov edx, ecx
-mov ecx, 0xFE
+xor ecx, ecx
+mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-jne EchoTest.$comp_15.true
+jne EchoTest.$comp_17.true
 mov cl, 0x0
-jmp EchoTest.$comp_15.done
-EchoTest.$comp_15.true :
+jmp EchoTest.$comp_17.done
+EchoTest.$comp_17.true :
 mov cl, 0xFF
-EchoTest.$comp_15.done :
+EchoTest.$comp_17.done :
 
 cmp cl, 0xFF
 	jne EchoTest.$loop_if.2_close
@@ -490,6 +490,46 @@ String.GetLength.returnVal:
 
 
 String.$FILE_END :
+
+
+; *** LIB IMPORT 'CharCodes' ***
+[bits 32]
+dd Char.$FILE_END - Char.$FILE_START
+db "OrcaHLL Class", 0
+db "Char", 0
+Char.$FILE_START :
+
+Char.$global.NUL :
+	db 0x00
+Char.$global.NEWLINE :
+	db 0x0A
+Char.$FILE_END :
+
+
+; *** LIB IMPORT 'KeyCodes' ***
+[bits 32]
+dd Key.$FILE_END - Key.$FILE_START
+db "OrcaHLL Class", 0
+db "Key", 0
+Key.$FILE_START :
+
+Key.$global.KEY_DOWN :
+	db 0x50
+Key.$global.KEY_LEFT :
+	db 0x4B
+Key.$global.TAB :
+	db 0x3A
+Key.$global.ESC :
+	db 0x01
+Key.$global.KEY_RIGHT :
+	db 0x4D
+Key.$global.ENTER :
+	db 0xFE
+Key.$global.KEY_UP :
+	db 0x48
+Key.$global.BACKSPACE :
+	db 0xFF
+Key.$FILE_END :
 
 
 
