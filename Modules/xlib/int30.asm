@@ -76,6 +76,20 @@ cmp ax, 0x0106
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.nextc6 :
 	
+cmp ax, 0x0107
+	jne _HANDLEFUNC1.nextc7
+		pop dword ecx
+		mov dword [console.color], ecx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextc7 :
+	
+cmp ax, 0x0108
+	jne _HANDLEFUNC1.nextc8
+		pop dword ecx
+		mov byte [console.vgacolor], cl
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextc8 :
+	
 cmp ax, 0x0202
 	jne _HANDLEFUNC1.nextd1
 		pop dword [_arg1]
@@ -144,6 +158,60 @@ cmp ax, 0x0405
 		pop ebx
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next8 :
+	
+cmp ax, 0x0701
+	jne _HANDLEFUNC1.nextt1
+		push ebx
+		call RTC.getSecond
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt1 :
+
+cmp ax, 0x0702
+	jne _HANDLEFUNC1.nextt2
+		push ebx
+		call RTC.getMinute
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt2 :
+
+cmp ax, 0x0703
+	jne _HANDLEFUNC1.nextt3
+		push ebx
+		call RTC.getHour
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt3 :
+	
+cmp ax, 0x0704
+	jne _HANDLEFUNC1.nextt4
+		push ebx
+		call RTC.getYear
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt4 :
+	
+cmp ax, 0x0705
+	jne _HANDLEFUNC1.nextt5
+		push ebx
+		call RTC.getMonth
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt5 :
+	
+cmp ax, 0x0706
+	jne _HANDLEFUNC1.nextt6
+		push ebx
+		call RTC.getDay
+		mov ecx, ebx
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextt6 :
 	
 call kernel.halt
 _HANDLEFUNC1.ret :

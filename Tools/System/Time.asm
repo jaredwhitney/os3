@@ -30,30 +30,38 @@ RTC.recalc :
 	
 RTC.getYear :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.year]
+	add ebx, 0x2000
 	ret
 
 RTC.getMonth :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.month]
+	ret
 	
 RTC.getDay :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.day]
 	ret
 
 RTC.getHour :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.hour]
 	ret
 
 RTC.getMinute :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.minute]
 	ret
 
 RTC.getSecond :
 	call RTC.recalc
+	xor ebx, ebx
 	mov bl, [Time.second]
 	ret
 
