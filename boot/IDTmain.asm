@@ -15,7 +15,7 @@ setupPIT :
 		mov al, 0b00110110
 		mov dx, 0x43
 		out dx, al
-		mov ax, 1193180/5000	; 5000 tics per second
+		mov ax, 1193180/5000	; 5000 tics per second ... CHANGING THIS CAUSES PROBLEMS!
 		mov dx, 0x40
 		out dx, al
 		mov al, ah

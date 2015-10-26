@@ -37,7 +37,7 @@ Kernel.init :
 	;call ebx
 	;mov ebx, MathTest._init
 	;call console.numOut
-	call EchoTest._init
+	call iConsole._init
 	
 ;		call USB_InitController
 		
@@ -88,7 +88,7 @@ kernel.runModules :
 	;call console.loop
 	;call Clock.loop
 	
-	call EchoTest._loop
+	call iConsole._loop
 	
 ret
 	
@@ -318,4 +318,4 @@ DebugStringStor :
 
 MINNOW_START :
 
-%include "..\OrcaHLL\EchoTest.asm"	; so it will also show up as a file
+%include "..\OrcaHLL\iConsole.asm"	; so it will also show up as a file
