@@ -30,10 +30,10 @@ pusha
 	
 	call console.clearScreen
 	
-	mov ah, 0xFF
-	call Time.printToConsole
+	;mov ah, 0xFF
+	;call Time.printToConsole
 	
-	call JASM.console.post_init
+	;call JASM.console.post_init
 	
 	call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 	

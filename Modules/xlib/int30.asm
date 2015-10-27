@@ -90,8 +90,39 @@ cmp ax, 0x0108
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.nextc8 :
 	
-cmp ax, 0x0202
+cmp ax, 0x0200
+	jne _HANDLEFUNC1.nextd0
+		pop dword [_arg0]
+		push ebx
+		push eax
+		mov eax, [_arg0]
+		call Dolphin.registerWindow
+		xor ecx, ecx
+		mov cl, bl
+		pop eax
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextd0 :
+	
+cmp ax, 0x0201
 	jne _HANDLEFUNC1.nextd1
+		pop dword [_arg0]
+		push ebx
+		push eax
+		mov eax, [_arg0]
+		mov [Dolphin.currentWindow], eax
+		mov bl, [Window.WIN_NUM]
+		call Dolphin.getAttribByte
+		xor ebx, ebx
+		mov bl, al
+		call Dolphin.unregisterWindow
+		pop eax
+		pop ebx
+		jmp _HANDLEFUNC1.ret
+	_HANDLEFUNC1.nextd1 :
+
+cmp ax, 0x0202
+	jne _HANDLEFUNC1.nextd2
 		pop dword [_arg1]
 		pop dword [_arg0]
 		push eax
@@ -104,7 +135,7 @@ cmp ax, 0x0202
 		pop ebx
 		pop eax
 		jmp _HANDLEFUNC1.ret
-	_HANDLEFUNC1.nextd1 :
+	_HANDLEFUNC1.nextd2 :
 	
 cmp ax, 0x0501
 	jne _HANDLEFUNC1.next5

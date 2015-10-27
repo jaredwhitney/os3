@@ -7,6 +7,8 @@ iConsole.$FILE_START :
 
 iConsole.$global.window :
 	dd 0x0
+iConsole.$global.win :
+	dd 0x0
 iConsole.$global.command :
 	dd 0x0
 iConsole._init: 
@@ -167,7 +169,9 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.5_close
-mov ax, 0x0500
+mov ecx, [iConsole.$global.window]
+push ecx
+mov ax, 0x0201
 int 0x30
 iConsole.$loop_if.5_close :
 
@@ -212,62 +216,24 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.9_close
-mov ecx, 0x0B
-push ecx
-mov ax, 0x0108
-int 0x30
-mov ax, 0x0703
-int 0x30
-push ecx
-mov ax, 0x0102
-int 0x30
 mov ecx, [iConsole.$loop_if.9.string_1]
 push ecx
-mov ax, 0x0100
-int 0x30
-mov ax, 0x0702
-int 0x30
+xor ecx, ecx
+mov cl, [Window.$global.TYPE_TEXT]
 push ecx
-mov ax, 0x0102
-int 0x30
-mov ecx, [iConsole.$loop_if.9.string_2]
+call Window.Create
+mov [iConsole.$global.win], ecx
+mov ecx, [iConsole.$global.win]
 push ecx
-mov ax, 0x0100
+mov ax, 0x0200
 int 0x30
-mov ax, 0x0701
-int 0x30
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ecx, [iConsole.$loop_if.9.string_3]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ax, 0x0705
-int 0x30
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ecx, [iConsole.$loop_if.9.string_4]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ax, 0x0706
-int 0x30
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ecx, [iConsole.$loop_if.9.string_5]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ax, 0x0704
-int 0x30
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ax, 0x0103
-int 0x30
+push edx	; Begin getting subvar
+mov edx, [iConsole.$global.win]
+add dl, Window.winNum
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
 iConsole.$loop_if.9_close :
 
 push ebx
@@ -278,8 +244,88 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.10_close
-call Minnow.ctree	; INLINE ASSEMBLY
+mov ecx, [iConsole.$global.win]
+push ecx
+mov ax, 0x0201
+int 0x30
 iConsole.$loop_if.10_close :
+
+push ebx
+mov ebx, iConsole.$global.command
+mov ecx, [iConsole.$loop_if.11.string_0]
+push ecx
+call String.Equals
+pop ebx
+cmp cl, 0xFF
+	jne iConsole.$loop_if.11_close
+mov ecx, 0x0B
+push ecx
+mov ax, 0x0108
+int 0x30
+mov ax, 0x0703
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ecx, [iConsole.$loop_if.11.string_1]
+push ecx
+mov ax, 0x0100
+int 0x30
+mov ax, 0x0702
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ecx, [iConsole.$loop_if.11.string_2]
+push ecx
+mov ax, 0x0100
+int 0x30
+mov ax, 0x0701
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ecx, [iConsole.$loop_if.11.string_3]
+push ecx
+mov ax, 0x0100
+int 0x30
+mov ax, 0x0705
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ecx, [iConsole.$loop_if.11.string_4]
+push ecx
+mov ax, 0x0100
+int 0x30
+mov ax, 0x0706
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ecx, [iConsole.$loop_if.11.string_5]
+push ecx
+mov ax, 0x0100
+int 0x30
+mov ax, 0x0704
+int 0x30
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ax, 0x0103
+int 0x30
+iConsole.$loop_if.11_close :
+
+push ebx
+mov ebx, iConsole.$global.command
+mov ecx, [iConsole.$loop_if.12.string_0]
+push ecx
+call String.Equals
+pop ebx
+cmp cl, 0xFF
+	jne iConsole.$loop_if.12_close
+call Minnow.ctree	; INLINE ASSEMBLY
+iConsole.$loop_if.12_close :
 
 mov ecx, [iConsole.$loop_if.2.string_0]
 push ecx
@@ -304,96 +350,108 @@ pop eax
 push dword [iConsole._loop.returnVal]
 ret
 	;Vars:
-iConsole.$loop_if.3.string_1 :
-	dd iConsole.$loop_if.3.string_1_data
 iConsole.$loop_if.7.string_0_data :
 	db "lock", 0
-iConsole.$loop_if.10.string_0 :
-	dd iConsole.$loop_if.10.string_0_data
 iConsole.$loop_if.7.string_0 :
 	dd iConsole.$loop_if.7.string_0_data
 iConsole.$loop_if.3.string_2 :
 	dd iConsole.$loop_if.3.string_2_data
-iConsole.$loop_if.4.string_0 :
-	dd iConsole.$loop_if.4.string_0_data
-iConsole.$loop_if.6.string_0 :
-	dd iConsole.$loop_if.6.string_0_data
-iConsole.$loop_if.9.string_3_data :
+iConsole.$loop_if.11.string_2 :
+	dd iConsole.$loop_if.11.string_2_data
+iConsole.$loop_if.11.string_3_data :
 	db " ", 0
-iConsole.$loop_if.9.string_1_data :
-	db ":", 0
 iConsole.$loop_if.3.string_3 :
 	dd iConsole.$loop_if.3.string_3_data
-iConsole.$loop_if.3.string_1_data :
-	db "clear: Clears the screen.", 0
-iConsole.$loop_if.3.string_2_data :
-	db "exit: Exits the console.", 0
-iConsole.$loop_if.9.string_4 :
-	dd iConsole.$loop_if.9.string_4_data
-iConsole.$loop_if.3.string_6_data :
-	db "memstat: Prints out the percentage of RAM in use.", 0
-iConsole.$loop_if.3.string_6 :
-	dd iConsole.$loop_if.3.string_6_data
-iConsole.$loop_if.9.string_4_data :
-	db "-", 0
-iConsole.$loop_if.3.string_7 :
-	dd iConsole.$loop_if.3.string_7_data
-iConsole.$loop_if.8.string_0_data :
-	db "memstat", 0
 iConsole.$loop_if.9.string_1 :
 	dd iConsole.$loop_if.9.string_1_data
-iConsole.$loop_if.9.string_3 :
-	dd iConsole.$loop_if.9.string_3_data
-iConsole.$loop_if.2.string_0_data :
-	db "Console: ", 0
+iConsole.$loop_if.12.string_0_data :
+	db "tree", 0
 iConsole.$loop_if.3.string_4_data :
 	db "help: Displays this prompt.", 0
-iConsole.$loop_if.5.string_0_data :
-	db "exit", 0
+iConsole.$loop_if.10.string_0 :
+	dd iConsole.$loop_if.10.string_0_data
+iConsole.$loop_if.11.string_1 :
+	dd iConsole.$loop_if.11.string_1_data
+iConsole.$loop_if.11.string_2_data :
+	db ":", 0
 iConsole.$loop_if.3.string_0_data :
 	db "help", 0
-iConsole.$loop_if.9.string_2 :
-	dd iConsole.$loop_if.9.string_2_data
-iConsole.$loop_if.0.$local.ch :
-	db 0x0
 iConsole.$loop_if.6.string_0_data :
 	db "fullscreen", 0
-iConsole.$loop_if.3.string_8_data :
-	db "tree: Displays all mounted files.", 0
-iConsole.$loop_if.3.string_4 :
-	dd iConsole.$loop_if.3.string_4_data
-iConsole.$loop_if.10.string_0_data :
-	db "tree", 0
-iConsole.$loop_if.3.string_8 :
-	dd iConsole.$loop_if.3.string_8_data
-iConsole.$loop_if.5.string_0 :
-	dd iConsole.$loop_if.5.string_0_data
-iConsole.$loop_if.8.string_0 :
-	dd iConsole.$loop_if.8.string_0_data
-iConsole.$loop_if.9.string_2_data :
-	db ":", 0
 iConsole.$loop_if.2.string_0 :
 	dd iConsole.$loop_if.2.string_0_data
-iConsole.$loop_if.9.string_0 :
-	dd iConsole.$loop_if.9.string_0_data
+iConsole.$loop_if.10.string_0_data :
+	db "endtest", 0
+iConsole.$loop_if.3.string_8 :
+	dd iConsole.$loop_if.3.string_8_data
+iConsole.$loop_if.8.string_0 :
+	dd iConsole.$loop_if.8.string_0_data
 iConsole.$loop_if.3.string_7_data :
 	db "time: Prints out the current time.", 0
 iConsole.$loop_if.3.string_0 :
 	dd iConsole.$loop_if.3.string_0_data
-iConsole.$loop_if.4.string_0_data :
-	db "clear", 0
+iConsole.$loop_if.11.string_5_data :
+	db "-", 0
+iConsole.$loop_if.11.string_5 :
+	dd iConsole.$loop_if.11.string_5_data
 iConsole.$loop_if.9.string_0_data :
-	db "time", 0
+	db "test", 0
 iConsole.$loop_if.3.string_3_data :
 	db "fullscreen: Toggles fullscreen mode.", 0
+iConsole.$loop_if.3.string_1 :
+	dd iConsole.$loop_if.3.string_1_data
+iConsole.$loop_if.4.string_0 :
+	dd iConsole.$loop_if.4.string_0_data
+iConsole.$loop_if.6.string_0 :
+	dd iConsole.$loop_if.6.string_0_data
+iConsole.$loop_if.9.string_1_data :
+	db "Test Window", 0
+iConsole.$loop_if.3.string_1_data :
+	db "clear: Clears the screen.", 0
+iConsole.$loop_if.9.string_0 :
+	dd iConsole.$loop_if.9.string_0_data
+iConsole.$loop_if.3.string_2_data :
+	db "exit: Exits the console.", 0
+iConsole.$loop_if.3.string_6_data :
+	db "memstat: Prints out the percentage of RAM in use.", 0
+iConsole.$loop_if.3.string_6 :
+	dd iConsole.$loop_if.3.string_6_data
+iConsole.$loop_if.3.string_7 :
+	dd iConsole.$loop_if.3.string_7_data
+iConsole.$loop_if.11.string_1_data :
+	db ":", 0
+iConsole.$loop_if.11.string_3 :
+	dd iConsole.$loop_if.11.string_3_data
+iConsole.$loop_if.8.string_0_data :
+	db "memstat", 0
+iConsole.$loop_if.2.string_0_data :
+	db "Console: ", 0
+iConsole.$loop_if.5.string_0_data :
+	db "exit", 0
+iConsole.$loop_if.0.$local.ch :
+	db 0x0
+iConsole.$loop_if.11.string_4 :
+	dd iConsole.$loop_if.11.string_4_data
+iConsole.$loop_if.3.string_8_data :
+	db "tree: Displays all mounted files.", 0
+iConsole.$loop_if.3.string_4 :
+	dd iConsole.$loop_if.3.string_4_data
+iConsole.$loop_if.5.string_0 :
+	dd iConsole.$loop_if.5.string_0_data
+iConsole.$loop_if.11.string_4_data :
+	db "-", 0
+iConsole.$loop_if.11.string_0_data :
+	db "time", 0
+iConsole.$loop_if.4.string_0_data :
+	db "clear", 0
 iConsole.$loop_if.3.string_5_data :
 	db "lock: Locks the computer.", 0
+iConsole.$loop_if.11.string_0 :
+	dd iConsole.$loop_if.11.string_0_data
+iConsole.$loop_if.12.string_0 :
+	dd iConsole.$loop_if.12.string_0_data
 iConsole.$loop_if.3.string_5 :
 	dd iConsole.$loop_if.3.string_5_data
-iConsole.$loop_if.9.string_5 :
-	dd iConsole.$loop_if.9.string_5_data
-iConsole.$loop_if.9.string_5_data :
-	db "-", 0
 iConsole._loop.returnVal:
 	dd 0x0
 
@@ -423,24 +481,127 @@ Window.oldBuffer equ 34
 Window.height equ 8
 Window.bufferSize equ 30
 
+Window.$global.TYPE_IMAGE :
+	db 0x0
 Window.$global.TYPE_TEXT :
-	dd 0x0
-Window._dummyFunc: 
-pop dword [Window._dummyFunc.returnVal]
+	db 0x0
+Window.Create: 
+pop dword [Window.Create.returnVal]
+pop ecx
+mov [Window.Create.$local.type], cl
+pop ecx
+mov [Window.Create.$local.title], ecx
 push eax
 push ebx
 push edx
-mov ecx, 0
-mov [Window._dummyFunc.$local.y], ecx
+mov ecx, 39
+push ecx
+mov ax, 0x0502
+int 0x30
+mov [Window.Create.$local.ret], ecx
+mov ecx, [Window.Create.$local.title]
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.title
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+xor ecx, ecx
+mov cl, [Window.Create.$local.type]
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.type
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+mov ecx, 40
+mov [Window.Create.$local.wk], cx
+xor ecx, ecx
+mov cx, [Window.Create.$local.wk]
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.width
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+xor ecx, ecx
+mov cx, [Window.Create.$local.wk]
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.height
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+mov ecx, 0x1	; System Constant
+push ecx
+mov ax, 0x0001
+int 0x30
+mov [Window.Create.$local.size], ecx
+push edx	; Math start
+mov ecx, 0x2	; System Constant
+push ecx
+mov ax, 0x0001
+int 0x30
+mov edx, ecx
+mov ecx, [Window.Create.$local.size]
+imul ecx, edx
+pop edx	; Math end
+mov [Window.Create.$local.size], ecx
+mov ecx, [Window.Create.$local.size]
+push ecx
+mov ax, 0x0501
+int 0x30
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.windowBuffer
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+mov ecx, [Window.Create.$local.size]
+push ecx
+mov ax, 0x0502
+int 0x30
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.buffer
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+mov ecx, [Window.Create.$local.size]
+push ecx
+mov ax, 0x0502
+int 0x30
+push edx	; Begin getting subvar
+mov edx, [Window.Create.$local.ret]
+add dl, Window.oldBuffer
+mov eax, edx
+mov edx, [edx]
+pop edx	; End getting subvar
+mov [eax], ecx
+mov ecx, [Window.Create.$local.ret]
 pop edx
 pop ebx
 pop eax
-push dword [Window._dummyFunc.returnVal]
+push dword [Window.Create.returnVal]
 ret
 	;Vars:
-Window._dummyFunc.$local.y :
+Window.Create.$local.ret :
 	dd 0x0
-Window._dummyFunc.returnVal:
+Window.Create.$local.wk :
+	dw 0x0
+Window.Create.$local.size :
+	dd 0x0
+Window.Create.$local.title :
+	dd 0x0
+Window.Create.$local.type :
+	db 0x0
+Window.Create.returnVal:
 	dd 0x0
 
 
