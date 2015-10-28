@@ -319,3 +319,6 @@ DebugStringStor :
 MINNOW_START :
 
 %include "..\OrcaHLL\iConsole.asm"	; so it will also show up as a file
+%include "..\OrcaHLL\Library.asm"
+%include "..\OrcaHLL\VideoInfo.asm"
+%include "..\OrcaHLL\TestProgram.asm"
