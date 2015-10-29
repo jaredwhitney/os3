@@ -18,8 +18,6 @@ mov ecx, [Library._init.string_1]
 push ecx
 call Book.Create
 mov [Library._init.$local.two], ecx
-mov ax, 0x0103
-int 0x30
 mov ecx, [Library._init.string_2]
 push ecx
 mov ax, 0x0100
@@ -70,7 +68,7 @@ mov ecx, [eax]
 push ecx
 mov ax, 0x0102
 int 0x30
-mov ax, 0x0101
+mov ax, 0x0103
 int 0x30
 mov ecx, 0x57
 push edx	; Begin getting subvar
@@ -94,7 +92,7 @@ mov ecx, [eax]
 push ecx
 mov ax, 0x0102
 int 0x30
-mov ax, 0x0101
+mov ax, 0x0103
 int 0x30
 pop edx
 pop ebx
@@ -102,38 +100,38 @@ pop eax
 push dword [Library._init.returnVal]
 ret
 	;Vars:
-Library._init.string_5 :
-	dd Library._init.string_5_data
+Library._init.string_6 :
+	dd Library._init.string_6_data
 Library._init.string_3_data :
 	db "Othello", 0
 Library._init.string_2_data :
 	db "Book one's title is: ", 0
+Library._init.string_4 :
+	dd Library._init.string_4_data
 Library._init.$local.one :
+	dd 0x0
+Library._init.string_0 :
+	dd Library._init.string_0_data
+Library._init.string_5 :
+	dd Library._init.string_5_data
+Library._init.string_3 :
+	dd Library._init.string_3_data
+Library._init.$local.two :
 	dd 0x0
 Library._init.string_1 :
 	dd Library._init.string_1_data
-Library._init.$local.two :
-	dd 0x0
+Library._init.string_2 :
+	dd Library._init.string_2_data
 Library._init.string_4_data :
 	db "Book one's new title is: ", 0
-Library._init.string_4 :
-	dd Library._init.string_4_data
 Library._init.string_5_data :
 	db "Pages in book one: ", 0
 Library._init.string_0_data :
 	db "A Midsummer Night's Dream", 0
-Library._init.string_6 :
-	dd Library._init.string_6_data
-Library._init.string_2 :
-	dd Library._init.string_2_data
-Library._init.string_3 :
-	dd Library._init.string_3_data
 Library._init.string_6_data :
 	db "Pages in book two: ", 0
 Library._init.string_1_data :
 	db "Beowulf", 0
-Library._init.string_0 :
-	dd Library._init.string_0_data
 Library._init.returnVal:
 	dd 0x0
 
