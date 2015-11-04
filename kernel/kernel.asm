@@ -21,7 +21,8 @@ Kernel.init :
 	;call Graphics.doVESAtest
 	;	jmp $
 	call Guppy.init
-		
+	call mouse.init
+	
 	;call Paging.init
 	;Paging.ret :
 	;call Stubfunc
@@ -89,6 +90,8 @@ kernel.runModules :
 	;call Clock.loop
 	
 	call iConsole._loop
+	
+	call Mouse.loop
 	
 ret
 	

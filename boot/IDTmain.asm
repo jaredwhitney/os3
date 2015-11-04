@@ -512,7 +512,7 @@ _IRQ0 :
 _IRQ1 :
 	push ax
 	push dx
-	call Keyboard.poll
+	;call Keyboard.poll
 	call IRQ_FINISH
 	pop dx
 	pop ax

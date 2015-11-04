@@ -329,7 +329,7 @@ KeyManager.toChar :
 	cmp bl, 0x48	; UP ARROW
 	mov al, 0xfb
 	je KeyManager.toChar.ret
-	mov al, 0x0
+	mov al, bl
 	pusha
 	and ebx, 0xFF
 		push ebx
