@@ -3,4 +3,4 @@
 @nasm.exe -o fstest.bin -f bin "../_not os code/Hello World.asm"
 @nasm.exe -o fspadding.bin -f bin "fspadding.asm"
 @pause
-@cat boot.bin kernel.bin fstest.bin "../_not os code/image/iConsole.file" "fspadding.bin" > os.img
+@cat boot.bin kernel.bin fstest.bin "fspadding.bin" > os.img

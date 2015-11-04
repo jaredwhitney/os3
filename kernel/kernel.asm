@@ -8,18 +8,6 @@ Kernel.init :
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
-	;mov eax, [Graphics.SCREEN_MEMPOS]
-	;mov dword [eax], 0xFF0000
-	;add eax, 4
-	;mov dword [eax], 0x00FF00
-	;add eax, 4
-	;mov dword [eax], 0x0000FF
-	;add eax, 4
-	;mov dword [eax], 0x000000
-	;add eax, 4
-	;mov dword [eax], 0xFFFFFF
-	;call Graphics.doVESAtest
-	;	jmp $
 	call Guppy.init
 	call mouse.init
 	
@@ -27,18 +15,19 @@ Kernel.init :
 	;Paging.ret :
 	;call Stubfunc
 	;jmp $
-		;	INITIALIZING MODULES	;
+	
 	call kernel.initModules
 	
-	;mov ebx, kernel.BOOT_PROGRAM_NAME
-	;call Minnow.byName
-	;call console.numOut
-	;mov ebx, [ebx]
-	;call console.numOut
-	;call ebx
-	;mov ebx, MathTest._init
-	;call console.numOut
-	call iConsole._init
+	call ProgramManager.getProgramNumber	; ~!! OHLL SETUP !!~
+	mov [OHLLPROTO_PNUM], bl
+	call ProgramManager.setActive
+	call Window.getSectorSize	; <- eax
+	add eax, 0x1
+	mov ebx, eax
+	call ProgramManager.requestMemory
+			call iConsole._init
+	call ProgramManager.finalize			; ~!! END SETUP !!~
+	
 	
 ;		call USB_InitController
 		
@@ -80,16 +69,20 @@ Kernel.init :
 			;	REPEAT	;
 		jmp kernel.loop
 		
-	
+	OHLLPROTO_PNUM :
+		db 0x0
+		
 kernel.runModules :
 	mov bl, Manager.CONTROL_MODULES
 	mov [os.mlloc], bl
 	
-	;call InfoPanel.loop
-	;call console.loop
-	;call Clock.loop
-	
-	call iConsole._loop
+		;call InfoPanel.loop
+		;call console.loop
+		;call Clock.loop
+	mov bl, [OHLLPROTO_PNUM]
+	call ProgramManager.setActive
+		call iConsole._loop
+	call ProgramManager.finalize
 	
 	call Mouse.loop
 	
