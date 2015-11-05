@@ -491,6 +491,7 @@ IDTHANDLER :
 		;call Manager.customLock
 		;call Manager.doLock
 		;hlt
+		;jmp kernel.halt
 		call IRQ_FINISH
 	popa
 	iret
@@ -517,6 +518,14 @@ _IRQ1 :
 	pop dx
 	pop ax
 	iret
+
+_IRQC :
+	pusha
+	;mov ebx, INT0_CALL
+	;call console.println
+	call IRQ_FINISH
+	popa
+	iret
 	
 _PRINTSTRING :
 	pusha
@@ -535,9 +544,9 @@ IRQ_FINISH :
 		
 EXCEPTION8HANDLER :
 	pushad
-	mov bl, 0x3
-	call Manager.customLock
-	call Manager.handleLock
+	;mov bl, 0x3
+	;call Manager.customLock
+	;call Manager.handleLock
 	popad
 	iret
 	

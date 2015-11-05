@@ -9,7 +9,6 @@ Kernel.init :
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
 	call Guppy.init
-	call mouse.init
 	
 	;call Paging.init
 	;Paging.ret :
@@ -57,6 +56,9 @@ Kernel.init :
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
+	
+	call mouse.init
+	
 	mov byte [Dolphin_WAIT_FLAG], 0x0
 	;	MAIN LOOP	;
 	kernel.loop:

@@ -10,6 +10,12 @@ pusha
 	mov al, 0x55
 	call Mouse.waitForResponse
 	; set the compaq status byte
+;	call Mouse.setCompaqByte
+	call Mouse.waitForReady
+	mov al, 0xA8
+	out MOUSE_COMMANDPORT, al
+	mov al, 0xFA
+	call Mouse.waitForResponse
 	call kernel.halt
 popa
 ret
@@ -27,6 +33,24 @@ pusha
 	call console.println
 Mouse.loop.ret :
 popa
+ret
+
+Mouse.setCompaqByte :
+	call Mouse.waitForReady
+	mov al, 0x20
+	out MOUSE_COMMANDPORT, al
+	in al, MOUSE_DATAPORT
+	or al, 0b10
+	mov bl, 0b100000
+	not bl
+	or al, bl
+	call Mouse.waitForReady
+	push ax
+	mov al, 0x60
+	out MOUSE_COMMANDPORT, al
+	pop ax
+	call Mouse.waitForReady
+	out MOUSE_DATAPORT, al
 ret
 
 Mouse.waitForResponse :
