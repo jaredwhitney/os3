@@ -53,11 +53,13 @@ Kernel.init :
 			
 	;jmp $
 		;	LOCK THE COMPUTER	;
+		xor edx, edx
+		mov dl, [ps2firstrep]
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
 	
-	call mouse.init
+	;call mouse.init
 	
 	mov byte [Dolphin_WAIT_FLAG], 0x0
 	;	MAIN LOOP	;
@@ -86,7 +88,7 @@ kernel.runModules :
 		call iConsole._loop
 	call ProgramManager.finalize
 	
-	call Mouse.loop
+	;call Mouse.loop
 	
 ret
 	
