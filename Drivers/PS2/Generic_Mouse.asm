@@ -1,36 +1,41 @@
-;	INITIALIZE THE PS2 CONTROLLER TO RETURN MOUSE UPDATES	;
+MOUSE_DEV_ENABLE_REPORTING	equ 0xF4
+MOUSE_DEV_RESET	equ 0xFF
+
+MOUSE_LBTN_FLAG	equ 0b00000001
+MOUSE_RBTN_FLAG	equ 0b00000010
+
 mouse.init :
 pusha
 	call ps2.waitForWrite
-	mov al, 0xD4
-	out 0x64, al
+	mov al, PS2_SEND_PORT2
+	out PS2_COMMAND_PORT, al
 	call ps2.waitForWrite
-	mov al, 0xFF
-	out 0x60, al
+	mov al, MOUSE_DEV_RESET
+	out PS2_DATA_PORT, al
 	
 	call ps2.waitForWrite
-	mov al, 0xD4
-	out 0x64, al
+	mov al, PS2_SEND_PORT2
+	out PS2_COMMAND_PORT, al
 	call ps2.waitForWrite
-	mov al, 0xF4
-	out 0x60, al
+	mov al, MOUSE_DEV_ENABLE_REPORTING
+	out PS2_DATA_PORT, al
 popa
 ret
 	
 Mouse.loop :
 pusha
-	in al, 0x60
+	in al, PS2_DATA_PORT
 	mov bl, [Mouse.datpart]
 	cmp bl, 0x2	; I blame an uncaught ACK or something!
 		jne Mouse.loop.ret
-	test al, 0b1
+	test al, MOUSE_LBTN_FLAG
 		jz Mouse.loop.notleft
-	mov ebx, MOUSE_LBTN
+	mov ebx, MOUSE_LBTN_STR
 	jmp Mouse.loop.go
 	Mouse.loop.notleft :
-	test al, 0b10
+	test al, MOUSE_RBTN_FLAG
 		jz Mouse.loop.ret
-	mov ebx, MOUSE_RBTN
+	mov ebx, MOUSE_RBTN_STR
 	Mouse.loop.go :
 	call console.println
 Mouse.loop.ret :
@@ -51,9 +56,9 @@ Mouse.incpart :
 	mov [Mouse.datpart], bl
 ret
 
-MOUSE_LBTN :
+MOUSE_LBTN_STR :
 	db "[LEFT MOUSE]", 0x0
-MOUSE_RBTN :
+MOUSE_RBTN_STR :
 	db "[RIGHT MOUSE]", 0x0
 
 	
