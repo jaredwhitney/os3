@@ -60,10 +60,10 @@ setupPIC :
 	out dx, al
 	
 	mov dx, 0x21
-	mov al, 0b11111100	; 01
+	mov al, 0b11111000	; bit 2 cleared enables the slave (IRQs 7-15)
 	out dx, al
 	mov dx, 0xa1
-	mov al, 0b11111111
+	mov al, 0b11101111
 	out dx, al
 	
 	popa
@@ -295,11 +295,11 @@ IDTSTART :
 		db 0b10001110
 		dw (0x7e00+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 24
+		dw (0x7e00+_IRQC-$$) & 0xFFFF	; INT 24
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (0x7e00+_IRQC-$$) >> 16
 		
 		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 25
 		dw 0x8
@@ -511,18 +511,17 @@ _IRQ0 :
 	iret
 	
 _IRQ1 :
-	push ax
-	push dx
-	;call Keyboard.poll
+	pusha
+	call Keyboard.poll
 	call IRQ_FINISH
-	pop dx
-	pop ax
+	popa
 	iret
+	
 
 _IRQC :
 	pusha
-	;mov ebx, INT0_CALL
-	;call console.println
+	;jmp kernel.halt
+	call Mouse.loop
 	call IRQ_FINISH
 	popa
 	iret
@@ -536,9 +535,10 @@ _PRINTSTRING :
 	
 IRQ_FINISH :
 		pusha
-		mov dx, 0x20
 		mov al, 0x20
-		out dx, al
+		out 0xA0, al
+		mov al, 0x20
+		out 0x20, al
 		popa
 		ret
 		

@@ -187,6 +187,19 @@ pusha
 popa
 ret
 
+System.sleep :	; tics in eax
+pusha
+mov ebx, [Clock.tics]
+add eax, ebx
+System.sleepLoop :
+nop
+mov ebx, [Clock.tics]
+cmp ebx, eax
+	jle System.sleepLoop
+popa
+ret
+
+
 Clock.window :
 	dd 0x0
 Clock.pnum :

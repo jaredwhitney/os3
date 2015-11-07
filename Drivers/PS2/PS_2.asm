@@ -1,8 +1,13 @@
 ps2.init :
 pusha
+
+	;call ps2.discardAllData
+
 	; Disable all ps2 devices
+	call ps2.waitForWrite
 	mov al, 0xAD
 	out 0x64, al	; first controller
+	call ps2.waitForWrite
 	mov al, 0xA7
 	out 0x64, al	; second controller (if exists)
 	
@@ -21,16 +26,19 @@ pusha
 	mov al, cl
 	out 0x60, al
 	
+	;call ps2.discardAllData
+
+		;mov eax, 8000
+		;call System.sleep
+	
 	; Perform self-test
 	call ps2.waitForWrite
 	mov al, 0xAA
 	out 0x64, al
-	;call ps2.waitForData
-		ps2st.discardjunk :	; should not be needed...
-		in al, 0x60
-		cmp al, 0x67
-			je ps2st.discardjunk
-			mov [ps2firstrep], al
+	;					mov eax, 8000
+	;					call System.sleep
+	call ps2.waitForData
+	in al, 0x60
 	cmp al, 0x55
 		jne kernel.halt	; should handle this more gracefully...
 	
@@ -45,7 +53,43 @@ pusha
 	mov al, 0xA7
 	out 0x64, al
 	
-	; P
+	; Test both ports
+	call ps2.waitForWrite
+	mov al, 0xAB
+	out 0x64, al
+	call ps2.waitForData
+	in al, 0x60
+	cmp al, 0x0
+		jne kernel.halt	; should be handled better...
+		
+	call ps2.waitForWrite
+	mov al, 0xA9
+	out 0x64, al
+	call ps2.waitForData
+	in al, 0x60
+	cmp al, 0x0
+		jne kernel.halt	; should be handled better...
+		
+	; Enable ps2 devices
+	call ps2.waitForWrite
+	mov al, 0xAE
+	out 0x64, al
+	call ps2.waitForWrite
+	mov al, 0xA8
+	out 0x64, al
+	
+	; Enable ints on all devices (should probably check to see what kind of devices they are before blindly enabling them...)
+	call ps2.readConfigByte
+	or al, 0b11
+	mov cl, al
+	call ps2.waitForWrite
+	mov al, 0x60
+	out 0x64, al
+	call ps2.waitForWrite
+	mov al, cl
+	out 0x60, al
+	
+	call mouse.init	; this is a horrible idea...
 	
 popa
 ret
@@ -73,13 +117,18 @@ ret
 ps2.waitForData :
 in al, 0x64
 test al, 0b1
-	jnz ps2.waitForData
+	jz ps2.waitForData
 ret
 
 ps2.waitForWrite :
 in al, 0x64
 test al, 0b10
 	jnz ps2.waitForWrite
+ret
+
+ps2.waitForACK :
+mov al, 0xFA
+call ps2.waitForResponse
 ret
 
 ps2.waitForResponse :

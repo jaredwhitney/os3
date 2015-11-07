@@ -200,8 +200,8 @@ enter_PM :
 	cmp al, 0x4a
 	jne stop
 	
-	call ps2.init
 	call loadIDT
+	call ps2.init
 	
 	jmp Kernel.init
 	
