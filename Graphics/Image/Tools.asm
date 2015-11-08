@@ -81,6 +81,33 @@ Image.clear :	; eax = source, edx = size, ebx = color
 	popa
 	ret
 
+Image.clearRegion :	; eax = ulcoord, ebx = width, ecx = height, edx = color
+pusha
+	Image.clearRegion.loop1 :
+		; store lineflip
+		push eax
+		add eax, ebx
+		mov [Image.clearRegion.lineFlip], eax
+		pop eax
+			
+		Image.clearRegion.loop0 :
+		mov [eax], edx
+		add eax, 4
+		cmp eax, [Image.clearRegion.lineFlip]
+			jl Image.clearRegion.loop0
+	add eax, [Image.clearRegion.imagewidth]
+	sub eax, ebx
+	
+	sub ecx, 1
+	cmp ecx, 0
+		jne Image.clearRegion.loop1
+popa
+ret
+Image.clearRegion.imagewidth :
+	dd 0x0
+Image.clearRegion.lineFlip :
+	dd 0x0
+
 
 Image.copyFromWinSource :	; eax = source, ebx = dest, cx = regionWidth, dx = regionHeight, currentWindow = window
 pusha

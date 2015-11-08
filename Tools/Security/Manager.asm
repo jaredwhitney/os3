@@ -22,6 +22,7 @@ push ebx
 mov bl, 0xFF
 mov [Manager.locked], bl
 mov [Manager.reason], bl
+mov byte [INTERRUPT_DISABLE], 0xFF
 pop ebx
 ret
 
@@ -222,7 +223,7 @@ call drawStringDirect
 		call Keyboard.poll
 		call Keyboard.getKey
 		cmp bl, 0xfe
-		jne LockLoop
+			jne LockLoop
 	mov bl, 0x0
 	mov [Manager.locked], bl
 		mov bl, [Manager.reason]
@@ -232,6 +233,8 @@ call drawStringDirect
 	Manager.doLock.post.notFP :
 	
 	call Dolphin.redrawBG
+	
+	mov byte [INTERRUPT_DISABLE], 0x00
 	
 popa
 ret
@@ -255,6 +258,25 @@ jmp drawStringDirect.loop
 drawStringDirect.ret :
 pop dword [TextHandler.charpos]
 popa
+ret
+
+getCenteredString :
+push eax
+push ecx
+push edx
+	call String.getLength
+	mov eax, edx
+	imul eax, 6	; font width + 1
+	imul eax, [TextHandler.textSizeMultiplier]
+	xor edx, edx
+	mov ecx, 2
+	idiv ecx
+	mov ebx, [Graphics.bytesPerPixel]
+	imul eax, ebx
+	mov ebx, eax
+pop edx
+pop ecx
+pop eax
 ret
 
 Manager.direct.num :		; num in ebx

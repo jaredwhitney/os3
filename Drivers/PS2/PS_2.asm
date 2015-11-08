@@ -61,7 +61,7 @@ pusha
 	call ps2.waitForData
 	in al, PS2_DATA_PORT
 	cmp al, PS2_SELFTEST_SUCCESS
-		jne kernel.halt	; should handle this more gracefully...
+		jne ps2.sw_selftestFail
 	
 	; Check for second ps2 port
 	call ps2.waitForWrite
@@ -69,7 +69,7 @@ pusha
 	out PS2_COMMAND_PORT, al
 	call ps2.readConfigByte
 	test al, PS2_P2CLKDSBL_FLAG
-		jnz kernel.halt	; should be handled... (single port ps2) 
+		jnz ps2.sw_singlePortController
 	call ps2.waitForWrite
 	mov al, PS2_DISABLE_PORT2
 	out PS2_COMMAND_PORT, al
@@ -81,7 +81,7 @@ pusha
 	call ps2.waitForData
 	in al, PS2_DATA_PORT
 	cmp al, 0x0
-		jne kernel.halt	; should be handled better...
+		jne ps2.sw_test1fail
 		
 	call ps2.waitForWrite
 	mov al, PS2_TEST_PORT2
@@ -89,7 +89,7 @@ pusha
 	call ps2.waitForData
 	in al, PS2_DATA_PORT
 	cmp al, 0x0
-		jne kernel.halt	; should be handled better...
+		jne ps2.sw_test2fail
 		
 	; Enable ps2 devices
 	call ps2.waitForWrite
@@ -160,3 +160,85 @@ ps2.waitForResponse :
 	cmp al, bl
 		jne ps2.waitForResponse.loop
 ret
+
+ps2.commandPort1 :	; is this right?
+push ax
+	call ps2.waitForWrite
+	out PS2_DATA_PORT, al
+pop ax
+ret
+
+ps2.commandPort2 :
+push ax
+	mov ah, al
+	call ps2.waitForWrite
+	mov al, PS2_SEND_PORT2
+	out PS2_COMMAND_PORT, al
+	call ps2.waitForWrite
+	mov al, ah
+	out PS2_DATA_PORT, al
+pop ax
+ret
+
+ps2.sw_selftestFail :
+		mov eax, SysHaltScreen.RESET
+		mov ebx, PS2.SELFTEST_FAILMSG
+		mov ecx, 5
+		call SysHaltScreen.show
+popa
+ret
+
+ps2.sw_singlePortController :
+		mov eax, SysHaltScreen.WARN
+		mov ebx, PS2.SINGLEPORT_MSG
+		mov ecx, 3
+		call SysHaltScreen.show
+popa
+ret
+
+ps2.sw_test1fail :
+		mov eax, SysHaltScreen.RESET
+		mov ebx, PS2.PORT1_FAILMSG
+		mov ecx, 5
+		call SysHaltScreen.show
+popa
+ret
+
+ps2.sw_test2fail :
+		mov eax, SysHaltScreen.WARN
+		mov ebx, PS2.PORT2_FAILMSG
+		mov ecx, 3
+		call SysHaltScreen.show
+popa
+ret
+
+ps2.sw_timeout :
+		mov eax, SysHaltScreen.RESET
+		mov ebx, PS2.TIMEOUT_MSG
+		mov ecx, 5
+		call SysHaltScreen.show
+popa
+ret
+
+ps2.resetCPU :
+call ps2.waitForWrite
+mov al, PS2_RESET_CPU
+out PS2_COMMAND_PORT, al
+mov eax, SysHaltScreen.WARN
+mov ebx, PS2.RESET_FAILMSG
+mov ecx, 10
+call SysHaltScreen.show
+ret
+
+PS2.RESET_FAILMSG :
+	db "Could not reset the CPU.", 0
+PS2.SELFTEST_FAILMSG :
+	db "PS/2 Controller test fail. Restarting the computer...", 0
+PS2.SINGLEPORT_MSG :
+	db "PS/2 Controller does not have a second port.", 0
+PS2.PORT1_FAILMSG :
+	db "PS/2 Port 1 test fail. Restarting the computer...", 0
+PS2.PORT2_FAILMSG :
+	db "PS/2 Port 2 test fail.", 0
+PS2.TIMEOUT_MSG :
+	db "PS/2 Controller not responding. Restarting the computer...", 0

@@ -487,11 +487,6 @@ IDTEND :
 
 IDTHANDLER :
 	pusha
-		;call USB_PrintActivePorts
-		;call Manager.customLock
-		;call Manager.doLock
-		;hlt
-		;jmp kernel.halt
 		call IRQ_FINISH
 	popa
 	iret
@@ -503,7 +498,7 @@ _IRQ0 :
 		add eax, 1
 		mov [Clock.tics], eax
 		; timer code goes here!
-		cmp byte [Manager.locked], 0x0
+		cmp byte [INTERRUPT_DISABLE], 0x0
 			jne _IRQ0.ret
 		call Dolphin.updateScreen
 	_IRQ0.ret :
@@ -512,7 +507,10 @@ _IRQ0 :
 	
 _IRQ1 :
 	pusha
-	call Keyboard.poll
+		;cmp byte [INTERRUPT_DISABLE], 0x0
+		;	jne _IRQ1.ret
+		call Keyboard.poll
+	_IRQ1.ret :
 	call IRQ_FINISH
 	popa
 	iret
@@ -520,8 +518,10 @@ _IRQ1 :
 
 _IRQC :
 	pusha
-	;jmp kernel.halt
-	call Mouse.loop
+		;cmp byte [INTERRUPT_DISABLE], 0x0
+		;	jne _IRQ0.ret
+		call Mouse.loop
+	_IRQC.ret :
 	call IRQ_FINISH
 	popa
 	iret
@@ -549,6 +549,9 @@ EXCEPTION8HANDLER :
 	;call Manager.handleLock
 	popad
 	iret
+	
+INTERRUPT_DISABLE :
+	db 0x0
 	
 IDT_INFO :
 	dw IDTEND-IDTSTART-1	; IDT SIZE - 1

@@ -66,6 +66,8 @@ pusha
 	sub cl, 4
 	jmp String.fromHex.start
 	String.fromHex.end :
+	mov al, 0x0
+	call String.fromHex.cprint
 popa
 ret
 String.fromHex.checkZ :
@@ -75,12 +77,12 @@ String.fromHex.checkZ :
 
 String.fromHex.cprint :
 pusha
-	mov ah, 0xFF
+	;mov ah, 0xFF
 	mov ebx, [String._buffer]
 	add ebx, [String._bufferOffs]
-	mov [ebx], ax
+	mov [ebx], al
 	mov ebx, [String._bufferOffs]
-	add ebx, 0x2
+	add ebx, 0x1
 	mov [String._bufferOffs], ebx
 popa
 ret

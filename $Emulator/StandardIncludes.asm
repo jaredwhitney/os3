@@ -24,7 +24,9 @@
 %include "..\Tools\System\GetValue.asm"
 
 %include "..\Tools\Utility\Clock.asm"
+
 %include "..\Tools\Security\Manager.asm"
+%include "..\Tools\Security\HaltScreen.asm"
 
 %include "..\Tools\String\General.asm"
 %include "..\Tools\String\EqualityTests.asm"

@@ -1,12 +1,16 @@
 Number.hexToBCD :	; eg 10b10 (0xF) -> 0x10	: inp in ebx, out in ebx
-pusha
+push eax
+push ecx
+push edx
 	cmp ebx, 101
 		jg Number.hexToBCD.noTable
 	mov eax, Number_BCDTTABLE
 	add eax, ebx
 	mov bl, [eax]
 	and ebx, 0xFF
-popa
+pop edx
+pop ecx
+pop eax
 ret
 Number.hexToBCD.noTable :
 ; perform actual calculations in here!
@@ -14,14 +18,18 @@ popa
 ret
 
 Number.BCDtoHex :	; eg 0x10 -> 10b10 (0xF)	: inp in ebx, out in ebx
-pusha
+push eax
+push ecx
+push edx
 	cmp ebx, 0xa0
 		jg Number.BCDtoHex.noTable
 	mov eax, Number_BCDFTABLE
 	add eax, ebx
 	mov bl, [eax]
 	and ebx, 0xFF
-popa
+pop edx
+pop ecx
+pop eax
 ret
 Number.BCDtoHex.noTable :
 ; perform actual calculations in here!

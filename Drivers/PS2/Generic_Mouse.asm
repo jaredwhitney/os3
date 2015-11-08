@@ -6,22 +6,13 @@ MOUSE_RBTN_FLAG	equ 0b00000010
 
 mouse.init :
 pusha
-	call ps2.waitForWrite
-	mov al, PS2_SEND_PORT2
-	out PS2_COMMAND_PORT, al
-	call ps2.waitForWrite
 	mov al, MOUSE_DEV_RESET
-	out PS2_DATA_PORT, al
-	
-	call ps2.waitForWrite
-	mov al, PS2_SEND_PORT2
-	out PS2_COMMAND_PORT, al
-	call ps2.waitForWrite
+	call ps2.commandPort2
 	mov al, MOUSE_DEV_ENABLE_REPORTING
-	out PS2_DATA_PORT, al
+	call ps2.commandPort2
 popa
 ret
-	
+
 Mouse.loop :
 pusha
 	in al, PS2_DATA_PORT

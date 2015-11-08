@@ -50,8 +50,6 @@ Kernel.init :
 			mov ebx, Guppy.div3
 			call TextMode.println
 			
-			
-	;jmp $
 		;	LOCK THE COMPUTER	;
 		xor edx, edx
 		mov dl, [ps2firstrep]
@@ -288,8 +286,8 @@ pusha
 	mov ebx, eax
 	mov eax, DebugStringStor
 	call String.fromHex
-	mov ebx, eax
-	call String.copyColorToRaw
+	;mov ebx, eax
+	;call String.copyColorToRaw
 	;call TextMode.clearScreen
 	call TextMode.print
 popa
