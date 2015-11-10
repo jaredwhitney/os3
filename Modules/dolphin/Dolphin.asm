@@ -134,6 +134,8 @@ pusha
 	Dolphin.doneDrawingWindows :
 	pop word [Dolphin.currentWindow]
 	
+	call Mouse.drawOnScreen
+	
 Dolphin.updateScreen.ret :
 popa
 ret

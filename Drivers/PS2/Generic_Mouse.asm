@@ -18,7 +18,8 @@ pusha
 	in al, PS2_DATA_PORT
 	mov bl, [Mouse.datpart]
 	cmp bl, 0x2	; I blame an uncaught ACK or something!
-		jne Mouse.loop.ret
+		jne Mouse.loop.handleMotion
+	call Mouse.storeSubs
 	test al, MOUSE_LBTN_FLAG
 		jz Mouse.loop.notleft
 	mov ebx, MOUSE_LBTN_STR
@@ -30,12 +31,51 @@ pusha
 	Mouse.loop.go :
 	call console.println
 Mouse.loop.ret :
+call Mouse.sanityCheckAndUpdate
 call Mouse.incpart
 popa
 ret
 
+Mouse.loop.handleMotion:
+mov ecx, Mouse_ysum
+and ebx, 0xFF
+cmp bl, 1
+	je Mouse.loop.handleMotion.ymotion
+mov ecx, Mouse_xsum
+Mouse.loop.handleMotion.ymotion :
+and eax, 0xFF
+mov edx, Mouse.xsub
+add edx, ebx	; because ebx is 0 for x and 1 for y and its a 1 byte value...
+mov bl, [edx]
+cmp bl, 0xFF
+	je Mouse.loop.handleMotion.subs
+add [ecx], eax
+jmp Mouse.loop.ret
+
+Mouse.loop.handleMotion.subs :
+neg al
+sub [ecx], eax
+jmp Mouse.loop.ret
+
 Mouse.datpart :
 db 0x0
+
+Mouse.storeSubs :
+pusha
+	mov cl, 0x00
+	test al, 0b10000
+		jz Mouse.storeSubs.noxn
+	mov cl, 0xFF
+	Mouse.storeSubs.noxn :
+	mov ch, 0x00
+	test al, 0b100000
+		jz Mouse.storeSubs.noyn
+	mov ch, 0xFF
+	Mouse.storeSubs.noyn :
+	mov [Mouse.xsub], cl
+	mov [Mouse.ysub], ch
+popa
+ret
 
 Mouse.incpart :
 	mov bl, [Mouse.datpart]
@@ -47,50 +87,54 @@ Mouse.incpart :
 	mov [Mouse.datpart], bl
 ret
 
+Mouse.sanityCheckAndUpdate :
+pusha
+	mov eax, [Mouse_xsum]
+	cmp eax, [Graphics.SCREEN_WIDTH]
+		jb Mouse.sCAU.nxfix	; jb because the value is unsigned
+	mov eax, [Graphics.SCREEN_WIDTH]
+	mov [Mouse_xsum], eax
+	Mouse.sCAU.nxfix :
+	mov [Mouse.x], eax
+	
+	mov eax, [Mouse_ysum]
+	cmp eax, [Graphics.SCREEN_HEIGHT]
+		jb Mouse.sCAU.nyfix
+	mov eax, [Graphics.SCREEN_HEIGHT]
+	mov [Mouse_ysum], eax
+	Mouse.sCAU.nyfix :
+	mov [Mouse.y], eax
+popa
+ret
+
+Mouse.drawOnScreen :
+pusha
+	mov eax, [Graphics.SCREEN_MEMPOS]
+	mov ebx, [Graphics.SCREEN_HEIGHT]
+	sub ebx, [Mouse.y]
+	imul ebx, [Graphics.SCREEN_WIDTH]
+	add eax, ebx
+	mov ecx, [Mouse.x]
+	imul ecx, 4
+	add eax, ecx
+	mov dword [eax], 0xFFFFFF
+popa
+ret
+
+Mouse.xsub :
+	db 0x0
+Mouse.ysub :
+	db 0x0
+Mouse_xsum :
+	dd 0x0
+Mouse_ysum :
+	dd 0x0
+Mouse.x :
+	dd 0x0
+Mouse.y :
+	dd 0x0
+
 MOUSE_LBTN_STR :
 	db "[LEFT MOUSE]", 0x0
 MOUSE_RBTN_STR :
 	db "[RIGHT MOUSE]", 0x0
-
-	
-	
-	
-	
-	
-; Mouse.setCompaqByte :
-	; call Mouse.waitForReady
-	; mov al, 0x20
-	; out MOUSE_COMMANDPORT, al
-	; in al, MOUSE_DATAPORT
-	; or al, 0b10
-	; mov bl, 0b100000
-	; not bl
-	; or al, bl
-	; call Mouse.waitForReady
-	; push ax
-	; mov al, 0x60
-	; out MOUSE_COMMANDPORT, al
-	; pop ax
-	; call Mouse.waitForReady
-	; out MOUSE_DATAPORT, al
-; ret
-
-; Mouse.waitForResponse :
-; mov bl, al
-; Mouse.waitForResponse.loop :
-; in al, 0x60
-; cmp al, bl
-	; jne Mouse.waitForResponse.loop
-; ret
-
-; Mouse.waitForReady :
-; in al, 0x64
-; test al, 0b10
-	; jnz Mouse.waitForReady
-; ret
-
-; MOUSE_FOUND_DEV_STR :
-	; db "Found an input device.", 0x0
-
-; MOUSE_COMMANDPORT equ 0x64
-; MOUSE_DATAPORT equ 0x60
