@@ -1,0 +1,6 @@
+disable all ints
+flood screen with bg color <---\
+drawStringDirect the error     |
+drawStringDirect the countdown |
+dec the countdown--------------/
+unfreeze ints and return

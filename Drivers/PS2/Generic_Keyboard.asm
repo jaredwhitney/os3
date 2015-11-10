@@ -344,6 +344,7 @@ KeyManager.toChar :
 
 KeyManager.handleSpecialKey :
 	pusha
+	mov byte [INTERRUPT_DISABLE], 0xFF
 	cmp bl, 0x50
 	je KeyManager.handleSpecialKey.down
 	cmp bl, 0x48
@@ -385,6 +386,7 @@ KeyManager.handleSpecialKey :
 		mov bl, [KeyManager.hsmode]
 		xor bl, 0xFF
 		mov [KeyManager.hsmode], bl
+		mov byte [INTERRUPT_DISABLE], 0x00
 		popa
 		jmp Keyboard.poll.drawKeyFinalize
 	KeyManager.handleSpecialKey.ret :
@@ -402,6 +404,7 @@ KeyManager.handleSpecialKey :
 	KeyManager.handleSpecialKey.size :
 		call Dolphin.sizeWindow
 	KeyManager.handleSpecialKey.aret :
+	mov byte [INTERRUPT_DISABLE], 0x00
 	popa
 	jmp Keyboard.poll.drawKeyFinalize
 

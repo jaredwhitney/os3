@@ -83,6 +83,7 @@ Dolphin.updateScreen :
 pusha
 	cmp byte [Dolphin_WAIT_FLAG], 0xFF
 		je Dolphin.updateScreen.ret
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
 	push word [Dolphin.currentWindow]
 			; 	If an exception occurs, blame Dolphin.	;
 	mov bl, Manager.CONTROL_DOLPHIN
@@ -96,13 +97,13 @@ pusha
 		mov eax, [Clock.tics]
 		mov [Dolphin.lastTic], eax
 		
-		mov eax, [tnums]
-		and eax, 0xFF
-		add eax, 0xa0000
-		mov dword [eax], 0xFF
-		mov eax, [tnums]
-		add eax, 1
-		mov [tnums], eax
+		;mov eax, [tnums]
+		;and eax, 0xFF
+		;add eax, 0xa0000
+		;mov dword [eax], 0xFF
+		;mov eax, [tnums]
+		;add eax, 1
+		;mov [tnums], eax
 			
 	call Dolphin.anyActiveWindows
 	cmp eax, 0x0
@@ -134,6 +135,7 @@ pusha
 	Dolphin.doneDrawingWindows :
 	pop word [Dolphin.currentWindow]
 	
+	mov byte [Dolphin_WAIT_FLAG], 0x0
 Dolphin.updateScreen.ret :
 popa
 ret
