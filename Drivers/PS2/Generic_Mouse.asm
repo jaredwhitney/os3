@@ -31,7 +31,7 @@ pusha
 	Mouse.loop.go :
 	call console.println
 Mouse.loop.ret :
-mov bl, [Mouse.datapart]
+mov bl, [Mouse.datpart]
 cmp bl, 0x01
 	jne Mouse.loop.ret.noup
 call Mouse.sanityCheckAndUpdate

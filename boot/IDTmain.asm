@@ -500,6 +500,11 @@ _IRQ0 :
 		; timer code goes here!
 		cmp byte [INTERRUPT_DISABLE], 0x0
 			jne _IRQ0.ret
+		xor edx, edx
+		mov ecx, 167
+		idiv ecx
+		cmp edx, 0x0	; update screen once every 83 tics (5000tics/sec * 60frames/sec)
+			jne _IRQ0.ret
 		call Dolphin.updateScreen
 	_IRQ0.ret :
 	popa
