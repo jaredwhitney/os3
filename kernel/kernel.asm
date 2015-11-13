@@ -10,12 +10,10 @@ Kernel.init :
 	call Graphics.init
 	call Guppy.init
 	
-	;call Paging.init
-	;Paging.ret :
-	;call Stubfunc
-	;jmp $
 	
 	call kernel.initModules
+	
+	call ATA.init
 	
 	call ProgramManager.getProgramNumber	; ~!! OHLL SETUP !!~
 	mov [OHLLPROTO_PNUM], bl
