@@ -300,25 +300,19 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.10_close
-push edx	; Math start
-mov ecx, 4
-mov edx, ecx
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.xPos
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov ecx, [eax]
-add ecx, edx
-pop edx	; Math end
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.xPos
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov [eax], ecx
+mov ecx, [iConsole.$global.window]
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ax, 0x0103
+int 0x30
+mov ecx, [iConsole.$global.window]
+mov ecx, [ecx]	; ptr
+push ecx
+mov ax, 0x0102
+int 0x30
+mov ax, 0x0103
+int 0x30
 iConsole.$loop_if.10_close :
 
 push ebx
