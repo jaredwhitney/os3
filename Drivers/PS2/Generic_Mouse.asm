@@ -122,6 +122,26 @@ pusha
 	imul ecx, 4
 	add eax, ecx
 	mov dword [eax], 0xFFFFFF
+	
+								pusha
+								mov ecx, [Mouse.x]
+								mov eax, [Mouse.lastx]
+								mov edx, [Mouse.y]
+								mov ebx, [Mouse.lasty]
+								cmp eax, ecx
+									jne Mouse.drawOnScreen.pchk1
+								cmp edx, ebx
+									je Mouse.drawOnScreen.nobother
+								Mouse.drawOnScreen.pchk1 :
+								mov eax, [Mouse.x]
+								imul eax, 4
+								mov ebx, [Graphics.SCREEN_HEIGHT]
+								sub ebx, [Mouse.y]
+								call Dolphin.moveWindowAbsolute
+								Mouse.drawOnScreen.nobother :
+								mov [Mouse.lastx], ecx
+								mov [Mouse.lasty], edx
+								popa
 popa
 ret
 
@@ -136,6 +156,10 @@ Mouse_ysum :
 Mouse.x :
 	dd 0x0
 Mouse.y :
+	dd 0x0
+Mouse.lastx :
+	dd 0x0
+Mouse.lasty :
 	dd 0x0
 
 MOUSE_LBTN_STR :

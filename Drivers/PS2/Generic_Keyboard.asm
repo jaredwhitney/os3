@@ -344,6 +344,7 @@ KeyManager.toChar :
 
 KeyManager.handleSpecialKey :
 	pusha
+	push word [Dolphin.currentWindow]
 	cmp bl, 0x50
 	je KeyManager.handleSpecialKey.down
 	cmp bl, 0x48
@@ -385,6 +386,7 @@ KeyManager.handleSpecialKey :
 		mov bl, [KeyManager.hsmode]
 		xor bl, 0xFF
 		mov [KeyManager.hsmode], bl
+		pop word [Dolphin.currentWindow]
 		popa
 		jmp Keyboard.poll.drawKeyFinalize
 	KeyManager.handleSpecialKey.ret :
@@ -402,6 +404,7 @@ KeyManager.handleSpecialKey :
 	KeyManager.handleSpecialKey.size :
 		call Dolphin.sizeWindow
 	KeyManager.handleSpecialKey.aret :
+	pop word [Dolphin.currentWindow]
 	popa
 	jmp Keyboard.poll.drawKeyFinalize
 
