@@ -94,11 +94,16 @@ ret
 Mouse.sanityCheckAndUpdate :
 pusha
 	mov eax, [Mouse_xsum]
-	cmp eax, [Graphics.SCREEN_WIDTH]
-		jb Mouse.sCAU.nxfix	; jb because the value is unsigned
-	mov eax, [Graphics.SCREEN_WIDTH]
+	test eax, 0xF0000000
+		jz Mouse.sCAU.nxfix1	; jb because the value is unsigned
+	mov eax, 0;[Graphics.SCREEN_REALWIDTH]
 	mov [Mouse_xsum], eax
-	Mouse.sCAU.nxfix :
+	Mouse.sCAU.nxfix1 :
+	;cmp eax, 0xFFFFFF00
+	;	jb Mouse.sCAU.nxfix2
+	;mov eax, 0
+	;mov [Mouse_xsum], eax
+	Mouse.sCAU.nxfix2 :
 	mov [Mouse.x], eax
 	
 	mov eax, [Mouse_ysum]
@@ -137,6 +142,7 @@ pusha
 								imul eax, 4
 								mov ebx, [Graphics.SCREEN_HEIGHT]
 								sub ebx, [Mouse.y]
+								add ebx, 8	; DONT HARDCODE THIS AGH
 								call Dolphin.moveWindowAbsolute
 								Mouse.drawOnScreen.nobother :
 								mov [Mouse.lastx], ecx
