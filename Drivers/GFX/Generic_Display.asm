@@ -127,6 +127,7 @@ Graphics.init :
 							;jmp ccacont	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
 	xor ebx, ebx
 	mov bx, [VESA_CLOSEST_XRES]
+	mov [Graphics.SCREEN_REALWIDTH], ebx
 	imul ebx, 4	; should not be hardcoded
 	mov [Graphics.SCREEN_WIDTH], ebx
 	xor ebx, ebx
@@ -172,6 +173,9 @@ Graphics.SCREEN_MEMPOS :
 dd 0xa0000
 
 Graphics.SCREEN_WIDTH :
+dd 0x140
+
+Graphics.SCREEN_REALWIDTH :
 dd 0x140
 
 Graphics.SCREEN_HEIGHT :
