@@ -145,6 +145,26 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	pop ecx
 	pop eax
 	ret
+	
+PCI.getDeviceByClassCodes :	; al = Subclass code, ah = Class code; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
+push eax
+push ecx
+push ebx
+	xor bl, bl
+	PCI.getDeviceByClassCodes.loop :
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		jne PCI.getDeviceByClassCodes.ret
+	add bl, 1
+	cmp bl, 0xFF
+		jne PCI.getDeviceByClassCodes.loop
+PCI.getDeviceByClassCodes.ret :
+pop ebx
+pop ecx
+pop eax
+ret
+
+
 
 PCI.STRING_gdID :
 	db "Device Address: 0x", 0

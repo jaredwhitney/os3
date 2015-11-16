@@ -1,0 +1,103 @@
+classdef AHCI
+	declared byte FIS_REG_HOSTTODEV = 0x27
+	declared byte FIS_REG_DEVTOHOST = 0x34
+	declared byte FIS_DMA_ACTIVATE = 0x39
+	declared byte FIS_DMA_SETUP = 0x41
+	declared byte FIS_DATA = 0x46
+	declared byte FIS_BIST = 0x58
+	declared byte FIS_PIO_SETUP = 0x5f
+	declared byte FIS_SET_DEV = 0xa1
+	
+	func SendIdentifyCommand (void : null)
+		FisRegHostToDev packet = FisRegHostToDev.Create()
+		packet.fisType = FIS_REG_HOSTTODEV
+		packet.command = 0xEC	; ATA_IDENTIFY
+		packet.dev = 0			; master
+		packet.flags = 1		; this is a command
+		
+		; hmm now how to send it... :\
+	
+classdef FisRegHostToDev
+	linked byte fisType
+	linked byte flags
+	linked byte command
+	linked byte feature_low
+	linked byte lba0_low
+	linked byte lba0_mid
+	linked byte lba0_high
+	linked byte dev
+	linked byte lba1_low
+	linked byte lba1_mid
+	linked byte lba1_high
+	linked byte feature_high
+	linked byte count_low
+	linked byte count_high
+	linked byte isochronCompletion
+	linked byte ctrl
+	linked int reserved0
+	linked func Create (FisRegHostToDev : null)
+		FisRegHostToDev ret = sys Program.Ealloc($LinkedClassSize)
+		ret.fisType = AHCI.FIS_REG_HOSTTODEV
+		return ret
+		
+classdef FisRegDevToHost
+	linked byte fisType
+	linked byte flags
+	linked byte status
+	linked byte error
+	linked byte lba0_low
+	linked byte lba0_mid
+	linked byte lba0_high
+	linked byte reserved0
+	linked byte count_low
+	linked byte count_high
+	linked int_s reserved1
+	linked int reserved2
+	linked func Create (FisRegDevToHost : null)
+		FisRegDevToHost ret = sys Program.Ealloc($LinkedClassSize)
+		ret.fisType = AHCI.FIS_REG_DEVTOHOST
+		return ret
+
+classdef FisDataHeader
+	linked byte fisType
+	linked byte flags
+	linked int_s reserved0
+	
+classdef FisPioSetup
+	linked byte fisType
+	linked byte flags
+	linked byte status
+	linked byte error
+	linked byte lba0_low
+	linked byte lba0_mid
+	linked byte lba0_high
+	linked byte dev
+	linked byte lba1_low
+	linked byte lba1_mid
+	linked byte lba1_high
+	linked byte reserved0
+	linked byte count_low
+	linked byte count_high
+	linked byte reserved1
+	linked byte newStatus
+	linked int_s transCount
+	linked int_s reserved2
+	linked func Create (FisPioSetup : null)
+		FisPioSetup ret = sys Program.Ealloc($LinkedClassSize)
+		ret.fisType = AHCI.FIS_PIO_SETUP
+		return ret
+
+classdef FisDmaSetup
+	linked byte fisType
+	linked byte flags
+	linked byte reserved0
+	linked int dmaBufID_low		; are these two in the correct order?
+	linked int dmaBufID_high
+	linked int reserved0
+	linked int dmaBufOffs
+	linked int transCount
+	linked int reserved1
+	linked func Create (FisDmaSetup : null)
+		FisDmaSetup ret = sys Program.Ealloc($LinkedClassSize)
+		ret.fisType = AHCI.FIS_DMA_SETUP
+		return ret
