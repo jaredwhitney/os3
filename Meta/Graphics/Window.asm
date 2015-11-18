@@ -214,6 +214,7 @@ Window.makeGlassSmart.sub2 :
 pusha
 	mov eax, [Window.makeGlassSmart.x]
 	add eax, [Window.makeGlassSmart.w]
+	mov [Window.makeGlassSmart.dx], eax
 	;
 	mov eax, [Window.makeGlassSmart.xl]
 	sub eax, [Window.makeGlassSmart.x]
@@ -287,10 +288,10 @@ pusha
 	sub eax, [Window.makeGlassSmart.y]
 	mov [Window.makeGlassSmart.dh], eax
 	;
-	mov eax, [Window.makeGlassSmart.yl]
+	mov eax, [Window.makeGlassSmart.dy]
 	imul eax, [Graphics.SCREEN_WIDTH]
 	add eax, [Graphics.SCREEN_MEMPOS]
-	add eax, [Window.makeGlassSmart.x]
+	add eax, [Window.makeGlassSmart.xl]
 	;
 	mov ebx, [Window.makeGlassSmart.dw]
 	;
