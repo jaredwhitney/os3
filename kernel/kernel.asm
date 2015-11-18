@@ -13,7 +13,14 @@ Kernel.init :
 	
 	call kernel.initModules
 	
-	call ATA0.init
+	;call ATA0.init
+	;call Disk.infoDebug
+		mov eax, 0x1
+		call Guppy.malloc
+		mov ecx, ebx
+	call ATA_SIMPLE.read
+	mov ebx, ecx
+	call console.println
 	
 	call ProgramManager.getProgramNumber	; ~!! OHLL SETUP !!~
 	mov [OHLLPROTO_PNUM], bl

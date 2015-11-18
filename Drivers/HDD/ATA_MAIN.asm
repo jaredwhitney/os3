@@ -20,9 +20,10 @@ pusha
 
 
 ;
-	mov ah, 1
-	mov al, 6
-	call PCI.getDeviceByClassCodes
+	mov ah, 0x01
+	mov al, 0x05
+	mov bl, 0x20
+	call PCI.getDeviceByDescription
 	cmp dh, 0xFF
 		je ATA0.nodevFound
 	jmp ATA0.unknownType
@@ -141,4 +142,82 @@ ATA_DEVUNKNOWNSTR :
 ATA_DEVMISSINGSTR :
 	db "No ATA device found.", 0
 	
+	
+Disk.infoDebug :
+pusha
+	mov ah, 0x01
+	mov al, 0x02
+	mov bl, 0x00
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c0
+	mov ebx, DISK_FDC
+	call console.println
+	Disk.iD.c0 :
+	mov ah, 0x01
+	mov al, 0x04
+	mov bl, 0x00
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c1
+	mov ebx, DISK_RAIDCT
+	call console.println
+	Disk.iD.c1 :
+	mov ah, 0x01
+	mov al, 0x05
+	mov bl, 0x20
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c2
+	mov ebx, DISK_ATASIN
+	call console.println
+	Disk.iD.c2 :
+	mov ah, 0x01
+	mov al, 0x05
+	mov bl, 0x30
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c3
+	mov ebx, DISK_ATACHN
+	call console.println
+	Disk.iD.c3 :
+	mov ah, 0x01
+	mov al, 0x06
+	mov bl, 0x00
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c4
+	mov ebx, DISK_SATAVN
+	call console.println
+	Disk.iD.c4 :
+	mov ah, 0x01
+	mov al, 0x06
+	mov bl, 0x01
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je Disk.iD.c5
+	mov ebx, DISK_SATAV1
+	call console.println
+	Disk.iD.c5 :
+	mov ah, 0x0C
+	mov al, 0x03
+	mov bl, 0x20
+	call PCI.getDeviceByDescription
+	cmp dh, 0xFF
+		je kernel.halt
+popa
+ret
+
+DISK_FDC :
+	db "Found 'Floppy disk controller'", 0
+DISK_RAIDCT :
+	db "Found 'RAID controller'", 0
+DISK_ATASIN :
+	db "Found 'ATA controller (single DMA)'", 0
+DISK_ATACHN :
+	db "Found 'ATA controller (chain DMA)'", 0
+DISK_SATAVN :
+	db "Found 'SATA controller (Vendor Spec)'", 0
+DISK_SATAV1 :
+	db "Found 'SATA controller (AHCI 1.0)'", 0
 	

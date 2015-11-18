@@ -109,16 +109,17 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	mov al, [fnc]
 	add al, 1
 	mov [fnc], al
-		;mov ebx, eax
-		;and ebx, 0xFF
-		;call console.numOut
+	;	mov ebx, eax
+	;	and ebx, 0xFF
+	;	call console.numOut
 	cmp al, 0b1000
 	pop ax
-		jne PCI.getDeviceByDescription.loop
+		jne PCI.getDeviceByDescription.loop	; ???
 	mov edx, 0xFFFFFFFF
 	pop eax
 	PCI.getDeviceByDescription.done :
-		jmp PCI.getDeviceByDescription.noPrint	; only comment to debug
+	cmp edx, 0xFFFFFFFF
+		je PCI.getDeviceByDescription.noPrint	; only comment to debug
 		;	printing stuff
 		mov ebx, edx
 		and ebx, 0xFF

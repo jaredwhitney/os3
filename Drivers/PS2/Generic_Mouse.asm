@@ -95,23 +95,28 @@ Mouse.sanityCheckAndUpdate :
 pusha
 	mov eax, [Mouse_xsum]
 	test eax, 0xF0000000
-		jz Mouse.sCAU.nxfix1	; jb because the value is unsigned
-	mov eax, 0;[Graphics.SCREEN_REALWIDTH]
+		jz Mouse.sCAU.nxfix1
+	mov eax, 0
 	mov [Mouse_xsum], eax
 	Mouse.sCAU.nxfix1 :
-	;cmp eax, 0xFFFFFF00
-	;	jb Mouse.sCAU.nxfix2
-	;mov eax, 0
-	;mov [Mouse_xsum], eax
+	cmp eax, [Graphics.SCREEN_REALWIDTH]
+		jl Mouse.sCAU.nxfix2
+	mov eax, [Graphics.SCREEN_REALWIDTH]
+	mov [Mouse_xsum], eax
 	Mouse.sCAU.nxfix2 :
 	mov [Mouse.x], eax
 	
 	mov eax, [Mouse_ysum]
+	test eax, 0xF0000000
+		jz Mouse.sCAU.nyfix1
+	mov eax, 0
+	mov [Mouse_ysum], eax
+	Mouse.sCAU.nyfix1 :
 	cmp eax, [Graphics.SCREEN_HEIGHT]
-		jb Mouse.sCAU.nyfix
+		jl Mouse.sCAU.nyfix2
 	mov eax, [Graphics.SCREEN_HEIGHT]
 	mov [Mouse_ysum], eax
-	Mouse.sCAU.nyfix :
+	Mouse.sCAU.nyfix2 :
 	mov [Mouse.y], eax
 popa
 ret
