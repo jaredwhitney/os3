@@ -114,6 +114,207 @@ Window.create.allocNewWindow :
 	pop ebx
 ret
 
+Window.makeGlassSmart :
+pusha
+	mov bl, [Window.X_POS]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.x], eax
+	mov bl, [Window.LASTX_POS]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.xl], eax
+	mov bl, [Window.Y_POS]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.y], eax
+	mov bl, [Window.LASTY_POS]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.yl], eax
+	mov bl, [Window.WIDTH]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.w], eax
+	mov bl, [Window.HEIGHT]
+	call Dolphin.getAttribWord
+	and eax, 0xFFFF
+	mov [Window.makeGlassSmart.h], eax
+	mov eax, [Graphics.SCREEN_WIDTH]
+	mov [Image.clearRegion.imagewidth], eax
+	;
+	mov eax, [Window.makeGlassSmart.x]
+	mov ebx, [Window.makeGlassSmart.xl]
+	mov ecx, [Window.makeGlassSmart.y]
+	mov edx, [Window.makeGlassSmart.yl]
+	;
+	cmp ebx, eax
+		jge Window.makeGlassSmart.nif0
+	cmp edx, ecx
+		jge Window.makeGlassSmart.nif0
+				call Window.makeGlassSmart.sub1
+				call Window.makeGlassSmart.sub3
+				jmp Window.makeGlass.ret
+	Window.makeGlassSmart.nif0 :
+	cmp ebx, eax
+		jle Window.makeGlassSmart.nif1
+	cmp edx, ecx
+		jle Window.makeGlassSmart.nif1
+				call Window.makeGlassSmart.sub4
+				call Window.makeGlassSmart.sub2
+				jmp Window.makeGlass.ret
+	Window.makeGlassSmart.nif1 :
+	call Window.makeGlass
+Window.makeGlass.ret :
+popa
+ret
+
+Window.makeGlassSmart.x :
+	dd 0x0
+Window.makeGlassSmart.xl :
+	dd 0x0
+Window.makeGlassSmart.y :
+	dd 0x0
+Window.makeGlassSmart.yl :
+	dd 0x0
+Window.makeGlassSmart.w :
+	dd 0x0
+Window.makeGlassSmart.h :
+	dd 0x0
+Window.makeGlassSmart.dx :
+	dd 0x0
+Window.makeGlassSmart.dy :
+	dd 0x0
+Window.makeGlassSmart.dw :
+	dd 0x0
+Window.makeGlassSmart.dh :
+	dd 0x0
+
+Window.makeGlassSmart.sub1 :
+pusha
+	mov eax, [Window.makeGlassSmart.x]
+	sub eax, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.dw], eax
+	;
+	mov eax, [Window.makeGlassSmart.yl]
+	imul eax, [Graphics.SCREEN_WIDTH]
+	add eax, [Graphics.SCREEN_MEMPOS]
+	add eax, [Window.makeGlassSmart.xl]
+	;
+	mov ebx, [Window.makeGlassSmart.dw]
+	;
+	mov ecx, [Window.makeGlassSmart.h]
+	;
+	mov edx, 0x00FF00
+	call Image.clearRegion
+popa
+ret
+
+Window.makeGlassSmart.sub2 :
+pusha
+	mov eax, [Window.makeGlassSmart.x]
+	add eax, [Window.makeGlassSmart.w]
+	;
+	mov eax, [Window.makeGlassSmart.xl]
+	sub eax, [Window.makeGlassSmart.x]
+	mov [Window.makeGlassSmart.dw], eax
+	;
+	mov eax, [Window.makeGlassSmart.yl]
+	imul eax, [Graphics.SCREEN_WIDTH]
+	add eax, [Graphics.SCREEN_MEMPOS]
+	add eax, [Window.makeGlassSmart.dx]
+	;
+	mov ebx, [Window.makeGlassSmart.dw]
+	;
+	mov ecx, [Window.makeGlassSmart.h]
+	;
+	mov edx, 0x00FF00
+	call Image.clearRegion
+popa
+ret
+
+Window.makeGlassSmart.sub3 :
+pusha
+	mov eax, [Window.makeGlassSmart.xl]
+	add eax, [Window.makeGlassSmart.w]
+	sub eax, [Window.makeGlassSmart.x]
+	mov [Window.makeGlassSmart.dw], eax
+	;
+	mov eax, [Window.makeGlassSmart.y]
+	sub eax, [Window.makeGlassSmart.yl]
+	mov [Window.makeGlassSmart.dh], eax
+	;
+	mov eax, [Window.makeGlassSmart.yl]
+	imul eax, [Graphics.SCREEN_WIDTH]
+	add eax, [Graphics.SCREEN_MEMPOS]
+	add eax, [Window.makeGlassSmart.x]
+	;
+	mov ebx, [Window.makeGlassSmart.dw]
+	;
+	mov ecx, [Window.makeGlassSmart.dh]
+	;
+	mov edx, 0x00FF00
+	call Image.clearRegion
+popa
+ret
+
+Window.makeGlassSmart.sub3star :
+pusha
+	mov eax, [Window.makeGlassSmart.x]
+	mov ebx, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.xl], eax
+	mov [Window.makeGlassSmart.x], ebx
+			call Window.makeGlassSmart.sub3
+	mov eax, [Window.makeGlassSmart.x]
+	mov ebx, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.xl], eax
+	mov [Window.makeGlassSmart.x], ebx
+popa
+ret
+
+Window.makeGlassSmart.sub4 :
+pusha
+	mov eax, [Window.makeGlassSmart.y]
+	add eax, [Window.makeGlassSmart.h]
+	mov [Window.makeGlassSmart.dy], eax
+	;
+	mov eax, [Window.makeGlassSmart.x]
+	add eax, [Window.makeGlassSmart.w]
+	sub eax, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.dw], eax
+	;
+	mov eax, [Window.makeGlassSmart.yl]
+	sub eax, [Window.makeGlassSmart.y]
+	mov [Window.makeGlassSmart.dh], eax
+	;
+	mov eax, [Window.makeGlassSmart.yl]
+	imul eax, [Graphics.SCREEN_WIDTH]
+	add eax, [Graphics.SCREEN_MEMPOS]
+	add eax, [Window.makeGlassSmart.x]
+	;
+	mov ebx, [Window.makeGlassSmart.dw]
+	;
+	mov ecx, [Window.makeGlassSmart.dh]
+	;
+	mov edx, 0x00FF00
+	call Image.clearRegion
+popa
+ret
+
+Window.makeGlassSmart.sub4star :
+pusha
+	mov eax, [Window.makeGlassSmart.x]
+	mov ebx, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.xl], eax
+	mov [Window.makeGlassSmart.x], ebx
+			call Window.makeGlassSmart.sub4
+	mov eax, [Window.makeGlassSmart.x]
+	mov ebx, [Window.makeGlassSmart.xl]
+	mov [Window.makeGlassSmart.xl], eax
+	mov [Window.makeGlassSmart.x], ebx
+popa
+ret
+
 Window.makeGlass :
 pusha
 	mov bl, [Window.X_POS]
