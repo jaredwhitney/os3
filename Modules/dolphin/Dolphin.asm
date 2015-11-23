@@ -176,7 +176,7 @@ Dolphin.compositeWindow :
 		pop eax
 		mov dx, [edx+8]	; height back
 
-		call Image.copy
+		;call Image.copy
 
 ret
 

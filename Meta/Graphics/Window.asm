@@ -131,14 +131,17 @@ pusha
 	mov bl, [Window.LASTY_POS]
 	call Dolphin.getAttribWord
 	and eax, 0xFFFF
+	sub eax, 8
 	mov [Window.makeGlassSmart.yl], eax
 	mov bl, [Window.WIDTH]
 	call Dolphin.getAttribWord
 	and eax, 0xFFFF
+	sub eax, 8
 	mov [Window.makeGlassSmart.w], eax
 	mov bl, [Window.HEIGHT]
 	call Dolphin.getAttribWord
 	and eax, 0xFFFF
+	add eax, 8
 	mov [Window.makeGlassSmart.h], eax
 	mov eax, [Graphics.SCREEN_WIDTH]
 	mov [Image.clearRegion.imagewidth], eax
@@ -164,6 +167,22 @@ pusha
 				call Window.makeGlassSmart.sub2
 				jmp Window.makeGlass.ret
 	Window.makeGlassSmart.nif1 :
+	cmp ebx, eax
+		jle Window.makeGlassSmart.nif2
+	cmp edx, ecx
+		jge Window.makeGlassSmart.nif2
+				call Window.makeGlassSmart.sub3star
+				call Window.makeGlassSmart.sub2
+				jmp Window.makeGlass.ret
+	Window.makeGlassSmart.nif2 :
+	cmp ebx, eax
+		jge Window.makeGlassSmart.nif3
+	cmp edx, ecx
+		jle Window.makeGlassSmart.nif3
+				call Window.makeGlassSmart.sub1
+				call Window.makeGlassSmart.sub4star
+				jmp Window.makeGlass.ret
+	Window.makeGlassSmart.nif3 :
 	call Window.makeGlass
 Window.makeGlass.ret :
 popa
@@ -205,7 +224,10 @@ pusha
 	;
 	mov ecx, [Window.makeGlassSmart.h]
 	;
-	mov edx, 0x00FF00
+	push ebx
+	call Dolphin.getSolidBGColor
+	mov edx, ebx
+	pop ebx
 	call Image.clearRegion
 popa
 ret
@@ -218,6 +240,7 @@ pusha
 	;
 	mov eax, [Window.makeGlassSmart.xl]
 	sub eax, [Window.makeGlassSmart.x]
+		add eax, 8
 	mov [Window.makeGlassSmart.dw], eax
 	;
 	mov eax, [Window.makeGlassSmart.yl]
@@ -229,7 +252,10 @@ pusha
 	;
 	mov ecx, [Window.makeGlassSmart.h]
 	;
-	mov edx, 0x00FF00
+	push ebx
+	call Dolphin.getSolidBGColor
+	mov edx, ebx
+	pop ebx
 	call Image.clearRegion
 popa
 ret
@@ -254,7 +280,10 @@ pusha
 	;
 	mov ecx, [Window.makeGlassSmart.dh]
 	;
-	mov edx, 0x00FF00
+	push ebx
+	call Dolphin.getSolidBGColor
+	mov edx, ebx
+	pop ebx
 	call Image.clearRegion
 popa
 ret
@@ -273,10 +302,11 @@ pusha
 popa
 ret
 
-Window.makeGlassSmart.sub4 :
+Window.makeGlassSmart.sub4 :	; this is broken for some reason :(
 pusha
 	mov eax, [Window.makeGlassSmart.y]
 	add eax, [Window.makeGlassSmart.h]
+		sub eax, 8
 	mov [Window.makeGlassSmart.dy], eax
 	;
 	mov eax, [Window.makeGlassSmart.x]
@@ -286,6 +316,7 @@ pusha
 	;
 	mov eax, [Window.makeGlassSmart.yl]
 	sub eax, [Window.makeGlassSmart.y]
+		add eax, 8
 	mov [Window.makeGlassSmart.dh], eax
 	;
 	mov eax, [Window.makeGlassSmart.dy]
@@ -297,7 +328,10 @@ pusha
 	;
 	mov ecx, [Window.makeGlassSmart.dh]
 	;
-	mov edx, 0x00FF00
+	push ebx
+	call Dolphin.getSolidBGColor
+	mov edx, ebx
+	pop ebx
 	call Image.clearRegion
 popa
 ret
@@ -318,10 +352,10 @@ ret
 
 Window.makeGlass :
 pusha
-	mov bl, [Window.X_POS]
+	mov bl, [Window.LASTX_POS]
 	call Dolphin.getAttribWord
 	push eax
-	mov bl, [Window.Y_POS]
+	mov bl, [Window.LASTY_POS]
 	call Dolphin.getAttribWord
 	sub eax, 8
 	mov ebx, eax
