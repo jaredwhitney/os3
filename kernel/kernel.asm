@@ -13,7 +13,7 @@ Kernel.init :
 	
 	call kernel.initModules
 	
-	call ATA0.init
+	call ATA_DETECT
 	
 	call ProgramManager.getProgramNumber	; ~!! OHLL SETUP !!~
 	mov [OHLLPROTO_PNUM], bl
@@ -49,8 +49,8 @@ Kernel.init :
 			call TextMode.println
 			
 		;	LOCK THE COMPUTER	;
-		xor edx, edx
-		mov dx, [ATA_DEVNUM]
+;		xor edx, edx
+;		mov dx, [ATA_DEVNUM]
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock

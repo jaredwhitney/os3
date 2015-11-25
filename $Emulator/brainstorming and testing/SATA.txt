@@ -1,0 +1,17 @@
+PCI Bridges:
+6 4 0
+6 4 1
+6 9 40
+6 9 80
+
+HDD interface:
+1 1 --
+1 4 0
+1 5 20
+1 5 30
+1 6 00
+1 6 01
+
+so the computer has a vendor specific sata! (... :\)
+
+turns out its an Intel SATA Controller (http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html)
