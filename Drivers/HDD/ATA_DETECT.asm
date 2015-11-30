@@ -17,10 +17,21 @@ pusha
 	mov al, dh	; bus
 	mov bl, [fnc]	; func
 	mov bh, 0x0	; reg
+	pusha
 	call PCI.read
 	mov ebx, eax
 	call console.numOut
 	call console.newline
+	popa
+	mov bh, 0xE;	p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
+	call PCI.read
+	mov ebx, eax
+	call console.numOut
+	call console.newline
+	;add ebx, 0x10	; version
+	;mov ebx, [ebx]
+	;call console.numOut
+	;call console.newline
 	; show halt screen
 	mov eax, SysHaltScreen.WARN
 	mov ebx, ATA_STR
