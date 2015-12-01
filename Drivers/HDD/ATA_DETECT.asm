@@ -17,15 +17,26 @@ pusha
 	mov al, dh	; bus
 	mov bl, [fnc]	; func
 	mov bh, 0x0	; reg
-	pusha
+	push ebx
+	push eax
 	call PCI.read
 	mov ebx, eax
 	call console.numOut
 	call console.newline
-	popa
-	mov bh, 0xE;	p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
-	call PCI.read
-	mov ebx, eax
+		mov al, 0x1
+		mov ebx, 1
+		call Guppy.malloc	; alloc ram to store the ahci data in
+		mov ecx, ebx
+	pop eax
+	pop ebx
+	mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
+	call PCI.write
+	mov [AHCI_MEMLOC], ecx
+	;
+	;	should wait until it is actually updated?
+	;
+	add ecx, 0xC
+	mov ebx, [ecx]
 	call console.numOut
 	call console.newline
 	;add ebx, 0x10	; version
@@ -70,3 +81,6 @@ db 1, 5, 0x20
 db 1, 5, 0x30
 db 1, 6, 0x00
 db 1, 6, 0x01
+
+AHCI_MEMLOC :
+	dd 0x0

@@ -20,6 +20,23 @@ PCI.read :	; al = bus, ah = device, bl = function, bh = reg; returns data in eax
 	pop edx
 	ret
 
+PCI.getObjectFromRaw :	; transforms a PCI address in the form of al=bus, ah=dev, bl=func into a double (ecx)
+		xor ecx, ecx
+		mov ch, al
+		mov cl, ah
+		shl ecx, 8
+		mov cl, bl
+	ret
+
+PCI.getRawFromObject :	; [internal] transforms a double (ecx) into a PCI address in the form of al=bus, ah=dev, bl=func
+	push ecx
+		mov bl, cl
+		shr ecx, 8
+		mov ah, cl
+		mov al, ch
+	pop ecx
+	ret
+	
 PCI.write :	; al = bus, ah = device, bl = function, bh = reg, data = ecx
 	pusha
 	push ecx
@@ -64,7 +81,7 @@ PCI.getAddr :	; only meant for use inside PCI driver!
 	ret
 
 PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program IF; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
-	push eax
+	push eax	; MAKE WORK WITH PCI.getObjectFromRaw !
 	push ecx
 	push ebx
 	
@@ -147,7 +164,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	ret
 	
 PCI.getDeviceByClassCodes :	; al = Subclass code, ah = Class code; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
-push eax
+push eax	; MAKE WORK WITH PCI.getObjectFromRaw
 push ecx
 push ebx
 	xor bl, bl
