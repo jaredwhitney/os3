@@ -36,7 +36,21 @@ PCI.getRawFromObject :	; [internal] transforms a double (ecx) into a PCI address
 		mov al, ch
 	pop ecx
 	ret
-	
+
+PCI.readFromObject :	; returns in ecx
+push eax
+push ebx
+push edx
+call PCI.getRawFromObject
+call PCI.read
+mov ecx, eax
+pop edx
+pop ebx
+pop eax
+ret
+
+; need a PCI.writeFromObject
+
 PCI.write :	; al = bus, ah = device, bl = function, bh = reg, data = ecx
 	pusha
 	push ecx
@@ -78,6 +92,19 @@ PCI.getAddr :	; only meant for use inside PCI driver!
 	
 	or eax, 0b10000000000000000000000000000000
 	
+	ret
+
+PCI.getObjectFromSearch :	; returns in ecx
+	push eax
+	push ebx
+	push edx
+	mov al, dh
+	mov ah, dl
+	mov bl, [fnc]
+	call PCI.getObjectFromRaw
+	pop edx
+	pop ebx
+	pop eax
 	ret
 
 PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program IF; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
