@@ -193,7 +193,7 @@ PCI.getDeviceByDescription :	; al = Subclass code, ah = Class code, bl = Program
 	ret
 	
 PCI.getDeviceByClassCodes :	; al = Subclass code, ah = Class code; returns dl = device number, dh = device bus (0xFF if fail), [fnc] = function
-	push eax	; MAKE WORK WITH PCI.getObjectFromRaw
+	push eax	; there is a MUCH better way to do this!!
 	push ecx
 	push ebx
 		xor bl, bl
