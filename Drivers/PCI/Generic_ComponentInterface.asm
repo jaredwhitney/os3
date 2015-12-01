@@ -49,7 +49,14 @@ pop ebx
 pop eax
 ret
 
-; need a PCI.writeFromObject
+PCI.writeFromObject :	; eax = data, ecx = obj
+	pusha
+	mov edx, eax
+	call PCI.getRawFromObject
+	mov ecx, edx
+	call PCI.write
+	popa
+	ret
 
 PCI.write :	; al = bus, ah = device, bl = function, bh = reg, data = ecx
 	pusha
