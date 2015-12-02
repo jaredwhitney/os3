@@ -12,31 +12,31 @@ pusha
 	call PCI.getDeviceByDescription
 	cmp dh, 0xFF
 		je ATA_DETECT.nof0
+	call PCI.getObjectFromSearch
+	mov [ATA_DEVICE], ecx
 	; print some infos
-	mov ah, dl	; devnum
-	mov al, dh	; bus
-	mov bl, [fnc]	; func
+	mov ecx, [ATA_DEVICE]
 	mov bh, 0x0	; reg
-	push ebx
-	push eax
-	call PCI.read
-	mov ebx, eax
+	call PCI.readFromObject
+	mov ebx, ecx
 	call console.numOut
 	call console.newline
 		mov al, 0x1
 		mov ebx, 1
 		call Guppy.malloc	; alloc ram to store the ahci data in
-		mov ecx, ebx
-	pop eax
-	pop ebx
+		mov eax, ebx
+	mov ecx, [ATA_DEVICE]
 	mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
-	call PCI.write
+	call PCI.readFromObject
 	mov [AHCI_MEMLOC], ecx
 	;
 	;	should wait until it is actually updated?
 	;
-	add ecx, 0xC
-	mov ebx, [ecx]
+	mov eax, 2000
+	call System.sleep
+	;
+	;add ecx, 0xC
+	mov ebx, ecx;[ecx]
 	call console.numOut
 	call console.newline
 	;add ebx, 0x10	; version
@@ -45,6 +45,7 @@ pusha
 	;call console.newline
 	; show halt screen
 	mov eax, SysHaltScreen.WARN
+	mov ecx, 1	; not right
 	mov ebx, ATA_STR
 	imul ecx, 4
 	add ebx, ecx
@@ -81,6 +82,9 @@ db 1, 5, 0x20
 db 1, 5, 0x30
 db 1, 6, 0x00
 db 1, 6, 0x01
+
+ATA_DEVICE :
+	dd 0x0
 
 AHCI_MEMLOC :
 	dd 0x0
