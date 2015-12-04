@@ -6,8 +6,8 @@ pusha
 	mov edx, ecx
 	imul edx, 3
 	add edx, ATA_DAT
-	mov al, [edx]
-	mov ah, [edx+1]
+	mov al, [edx+1]
+	mov ah, [edx]
 	mov bl, [edx+2]
 	call PCI.getDeviceByDescription
 	cmp dh, 0xFF
@@ -21,22 +21,29 @@ pusha
 	mov ebx, ecx
 	call console.numOut
 	call console.newline
-		mov al, 0x1
-		mov ebx, 1
-		call Guppy.malloc	; alloc ram to store the ahci data in
-		mov eax, ebx
-	mov ecx, [ATA_DEVICE]
-	mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
-	call PCI.readFromObject
-	mov [AHCI_MEMLOC], ecx
+		;mov al, 0x1
+		;mov ebx, 1
+		;call Guppy.malloc	; alloc ram to store the ahci data in
+		;mov eax, ebx
+	;mov eax, 0xFA000000
+	;mov ecx, [ATA_DEVICE]
+	;mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
+	;call PCI.writeFromObject
 	;
 	;	should wait until it is actually updated?
 	;
-	mov eax, 2000
-	call System.sleep
+	;mov eax, 2000
+	;call System.sleep
 	;
 	;add ecx, 0xC
-	mov ebx, ecx;[ecx]
+	mov ecx, [ATA_DEVICE]
+	mov bh, 0x24
+	call PCI.readFromObject
+	mov [AHCI_MEMLOC], ecx
+	
+	mov ebx, [AHCI_MEMLOC]
+	add ebx, 0xC
+	mov ebx, [ebx]
 	call console.numOut
 	call console.newline
 	;add ebx, 0x10	; version
