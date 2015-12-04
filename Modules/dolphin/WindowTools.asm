@@ -200,7 +200,7 @@ Dolphin.moveWindow :	; xchange in eax, y change in ebx
 pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 
-	call Window.makeGlass
+	call Window.makeGlassSmart
 
 	mov edx, eax
 	mov ecx, ebx
@@ -224,7 +224,16 @@ pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 mov ecx, ebx
 
-call Window.makeGlass
+pusha
+	mov bl, [Window.X_POS]
+	call Dolphin.getAttribWord
+	mov bl, [Window.LASTX_POS]
+	call Dolphin.setAttribWord
+	mov bl, [Window.Y_POS]
+	call Dolphin.getAttribWord
+	mov bl, [Window.LASTY_POS]
+	call Dolphin.setAttribWord
+popa
 
 mov bl, [Window.X_POS]
 call Dolphin.setAttribWord
@@ -232,6 +241,9 @@ call Dolphin.setAttribWord
 mov eax, ecx
 mov bl, [Window.Y_POS]
 call Dolphin.setAttribWord
+
+call Window.makeGlassSmart
+
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
