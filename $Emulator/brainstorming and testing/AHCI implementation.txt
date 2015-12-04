@@ -1,0 +1,23 @@
+get a list of active ports
+allocate memory for components, set their addresses
+
+send an identify command
+wait for it to return
+check to make sure it is valid
+
+// do anything else that you want to do!
+
+
+
+need code to: 
+get active port list
+allocate memory for all structures for each port
+create all of the FIS types
+handle the interrupt
+read partition tables!!~!
+
+
+allocation (per port) :
+ealloc(1) = command list
+ealloc(1) = FIS (only 256 bytes used)
+ealloc(8) = command table
