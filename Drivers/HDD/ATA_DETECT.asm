@@ -14,45 +14,44 @@ pusha
 		je ATA_DETECT.nof0
 	call PCI.getObjectFromSearch
 	mov [ATA_DEVICE], ecx
-	; print some infos
-	mov ecx, [ATA_DEVICE]
-	mov bh, 0x0	; reg
-	call PCI.readFromObject
-	mov ebx, ecx
-	call console.numOut
-	call console.newline
-		;mov al, 0x1
-		;mov ebx, 1
-		;call Guppy.malloc	; alloc ram to store the ahci data in
-		;mov eax, ebx
-	;mov eax, 0xFA000000
-	;mov ecx, [ATA_DEVICE]
-	;mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
-	;call PCI.writeFromObject
-	;
-	;	should wait until it is actually updated?
-	;
-	;mov eax, 2000
-	;call System.sleep
-	;
-	;add ecx, 0xC
-	mov ecx, [ATA_DEVICE]
-	mov bh, 0x24
-	call PCI.readFromObject
-	mov [AHCI_MEMLOC], ecx
-	
-	mov ebx, [AHCI_MEMLOC]
-	add ebx, 0xC
-	mov ebx, [ebx]
-	call console.numOut
-	call console.newline
-	;add ebx, 0x10	; version
-	;mov ebx, [ebx]
-	;call console.numOut
-	;call console.newline
-	; show halt screen
+				; print some infos
+				mov ecx, [ATA_DEVICE]
+				mov bh, 0x0	; reg
+				call PCI.readFromObject
+				mov ebx, ecx
+				call console.numOut
+				call console.newline
+					;mov al, 0x1
+					;mov ebx, 1
+					;call Guppy.malloc	; alloc ram to store the ahci data in
+					;mov eax, ebx
+				;mov eax, 0xFA000000
+				;mov ecx, [ATA_DEVICE]
+				;mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
+				;call PCI.writeFromObject
+				;
+				;	should wait until it is actually updated?
+				;
+				;mov eax, 2000
+				;call System.sleep
+				;
+				;add ecx, 0xC
+				mov ecx, [ATA_DEVICE]
+				mov bh, 0x24
+				call PCI.readFromObject
+				mov [AHCI_MEMLOC], ecx
+				
+				mov ebx, [AHCI_MEMLOC]
+				add ebx, 0xC
+				mov ebx, [ebx]
+				call console.numOut
+				call console.newline
+				;add ebx, 0x10	; version
+				;mov ebx, [ebx]
+				;call console.numOut
+				;call console.newline
+				; show halt screen
 	mov eax, SysHaltScreen.WARN
-	mov ecx, 1	; not right
 	mov ebx, ATA_STR
 	imul ecx, 4
 	add ebx, ecx
@@ -95,3 +94,17 @@ ATA_DEVICE :
 
 AHCI_MEMLOC :
 	dd 0x0
+	
+DISK_DEVICELIST :
+	times 255 dq 0, 0, 0, 0	; support up to 255 'PCI_DEVICE's
+	
+; PCI_DEVICE :
+; 	dd Internal Name [String]	; 0x0
+; 	dd Hardware Type [String]	; 0x4
+;	dd CLASSCODE | SUBCLASS CODE | PROG_IF | 0 (int)	; 0x8
+; 	dd Vendor Name [String]	; 0xC
+;	dw Vendor ID (int)	; 0x10
+; 	dd Device Name [String] <unimplemented>	; 0x12
+; 	dw Device ID (int)	; 0x16
+; 	dd PCI object (int)	; 0x18
+;	dd Status (int) <initialized | in use | disconnected | unresponsive | slept>	; 0x22
