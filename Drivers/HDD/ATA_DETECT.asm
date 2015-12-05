@@ -52,6 +52,7 @@ pusha
 				;call console.newline
 				; show halt screen
 	mov eax, SysHaltScreen.WARN
+	mov ecx, 1
 	mov ebx, ATA_STR
 	imul ecx, 4
 	add ebx, ecx
@@ -95,8 +96,8 @@ ATA_DEVICE :
 AHCI_MEMLOC :
 	dd 0x0
 	
-DISK_DEVICELIST :
-	times 255 dq 0, 0, 0, 0	; support up to 255 'PCI_DEVICE's
+;DISK_DEVICELIST :
+;	times 255 dq 0, 0, 0, 0	; support up to 255 'PCI_DEVICE's
 	
 ; PCI_DEVICE :
 ; 	dd Internal Name [String]	; 0x0
