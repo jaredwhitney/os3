@@ -18,6 +18,7 @@
 %include "..\Drivers\GFX\Generic_Display.asm"
 
 %include "..\Drivers\PCI\Generic_ComponentInterface.asm"
+;%include "..\Drivers\PCI\PCI_LookupTables.asm"
 %include "..\Drivers\USB\Generic_EHCI.asm"
 
 %include "..\Tools\System\Time.asm"

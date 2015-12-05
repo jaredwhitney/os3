@@ -3,11 +3,12 @@
 Kernel.init :
 	cmp dword [DisplayMode], MODE_TEXT
 		je Kernel.textInit
-	kernel.cont :
 	
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
 	call Graphics.init
+	
+	kernel.cont :
 	call Guppy.init
 	
 	
@@ -246,6 +247,15 @@ pusha
 popa
 ret
 
+TextMode.cprint :
+pusha
+mov ecx, [TextMode.charpos]
+mov [ecx], ax
+add ecx, 2
+mov [TextMode.charpos], ecx
+popa
+ret
+
 TextMode.newline :
 pusha
 	mov eax, [TextMode.charpos]
@@ -258,6 +268,7 @@ pusha
 	imul eax, 160
 	add eax, 0xb8000
 	mov [TextMode.charpos], eax
+	call TextMode.scroll
 popa
 ret
 
@@ -294,13 +305,20 @@ ret
 TextMode.scroll :
 pusha
 	mov ecx, [TextMode.charpos]
-	cmp ecx, 0xb9000
+	cmp ecx, 0xb8ec0	; should be less than b9000!
 		jle TextMode.scroll.ret
-	call TextMode.clearScreen
+;	call TextMode.clearScreen
 	;mov esi, 0xb9000
 	;mov edx, 0xb8000
 	;mov ecx, 0x1000
 	;rep movsb
+	sub ecx, 0xA0
+	mov [TextMode.charpos], ecx
+	mov eax, 0xb80A0
+	mov ebx, 0xb8000
+	mov ecx, 0x1000
+	mov edx, 1
+	call Image.copyLinear
 TextMode.scroll.ret :
 popa
 ret

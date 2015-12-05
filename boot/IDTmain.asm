@@ -500,6 +500,8 @@ _IRQ0 :
 		; timer code goes here!
 		cmp byte [INTERRUPT_DISABLE], 0x0
 			jne _IRQ0.ret
+		cmp dword [DisplayMode], MODE_TEXT
+			je _IRQ0.ret
 		xor edx, edx
 		mov ecx, 83;167
 		idiv ecx

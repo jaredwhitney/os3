@@ -7,7 +7,7 @@ push edx
 	PCI_TABLES.lookupVendorString.loop :
 	cmp [ebx], ecx
 		je PCI_TABLES.lookupVendorString.ret
-	cmp [ebx], 0xFFFF
+	cmp word [ebx], 0xFFFF
 		je PCI_TABLES.lookupVendorString.ret
 	add ebx, 1
 	call String.getLength

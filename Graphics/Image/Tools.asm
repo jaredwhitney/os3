@@ -56,7 +56,7 @@ Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	imul ecx, edx
 	Image.copyLinear_loop :
 	mov edx, [eax]
-							or eax, CHANGE_MASK
+	;						or eax, CHANGE_MASK
 	mov [ebx], edx
 	add eax, 4
 	add ebx, 4

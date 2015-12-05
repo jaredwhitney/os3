@@ -270,8 +270,9 @@ ret
 ;ret
 
 console.print :
+cmp dword [DisplayMode], MODE_TEXT
+	je TextMode.print
 pusha
-
 push ebx
 	xor ebx, ebx
 	mov bl, [console.winNum]
@@ -408,6 +409,8 @@ jmp console.numOut.dontcare
 
 ; newline
 console.newline :
+	cmp dword [DisplayMode], MODE_TEXT
+		je TextMode.newline
 	pusha
 		push ebx
 	xor ebx, ebx
@@ -544,6 +547,8 @@ mov [eax], bx
 jmp console.loop.checkKeyBuffer
 
 console.cprint :
+cmp dword [DisplayMode], MODE_TEXT
+	je TextMode.cprint
 pusha
 
 	mov ah, [console.vgacolor]
@@ -588,6 +593,8 @@ popa
 ret
 
 console.clearScreen :
+cmp dword [DisplayMode], MODE_TEXT
+	je TextMode.clearScreen
 pusha
 	xor ebx, ebx
 	mov bl, [console.winNum]

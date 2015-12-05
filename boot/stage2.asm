@@ -12,9 +12,12 @@ stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
 	
-	mov dword [DisplayMode], MODE_TEXT
-	call boot.useVGAmode
-								;jmp stage2.novesa	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
+	mov dword [DisplayMode], MODE_GRAPHICS	; MODE_TEXT or MODE_GRAPHICS
+	
+	cmp dword [DisplayMode], MODE_TEXT
+		je stage2.novesa
+		
+	call boot.useVGAmode	; as a fallback
 	
 	mov ax, 0x0
 	mov es, ax
