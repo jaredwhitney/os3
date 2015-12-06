@@ -221,7 +221,7 @@ ret
 
 Dolphin.moveWindowAbsolute :	; x in eax, y in ebx
 pusha
-mov byte [Dolphin_WAIT_FLAG], 0xFF
+;mov byte [Dolphin_WAIT_FLAG], 0xFF
 mov ecx, ebx
 
 pusha
@@ -244,7 +244,7 @@ call Dolphin.setAttribWord
 
 call Window.makeGlassSmart
 
-mov byte [Dolphin_WAIT_FLAG], 0x0
+;mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 

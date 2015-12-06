@@ -341,9 +341,9 @@ ret
 Dolphin.updateWindows :
 pusha
 Dolphin.updateWindows.wait :
-cmp byte [Dolphin_WAIT_FLAG], 0xFF
-	je Dolphin.updateWindows.wait
-mov byte [Dolphin_WAIT_FLAG], 0xFF
+;cmp byte [Dolphin_WAIT_FLAG], 0xFF
+;	je Dolphin.updateWindows.wait
+;mov byte [Dolphin_WAIT_FLAG], 0xFF
 	xor ecx, ecx
 	mov ebx, Dolphin.windowStructs
 	
@@ -358,7 +358,7 @@ mov byte [Dolphin_WAIT_FLAG], 0xFF
 	add ecx, 4
 	;cmp ecx, 20*4
 	;	jle Dolphin.updateWindows.loop
-	mov byte [Dolphin_WAIT_FLAG], 0x0
+;	mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
 ret
 

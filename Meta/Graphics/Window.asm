@@ -151,6 +151,7 @@ pusha
 	mov ecx, [Window.makeGlassSmart.y]
 	mov edx, [Window.makeGlassSmart.yl]
 	;
+	add edx, 8	; whoops
 	cmp ebx, eax
 		jge Window.makeGlassSmart.nif0
 	cmp edx, ecx
@@ -183,7 +184,7 @@ pusha
 				call Window.makeGlassSmart.sub4
 				jmp Window.makeGlass.ret
 	Window.makeGlassSmart.nif3 :
-	;call Window.makeGlass
+	call Window.makeGlass
 Window.makeGlass.ret :
 popa
 ret
@@ -306,7 +307,6 @@ Window.makeGlassSmart.sub4 :	; this is broken for some reason :(
 pusha
 	mov eax, [Window.makeGlassSmart.y]
 	add eax, [Window.makeGlassSmart.h]
-		add eax, 8	; ????
 	mov [Window.makeGlassSmart.dy], eax
 	;
 	mov eax, [Window.makeGlassSmart.x]
@@ -316,7 +316,7 @@ pusha
 	;
 	mov eax, [Window.makeGlassSmart.yl]
 	sub eax, [Window.makeGlassSmart.y]
-		add eax, 17	; 8 offs + 8 offs + 1 padding?
+		add eax, 8	; 8 offs + 8 offs + 1 padding?
 	mov [Window.makeGlassSmart.dh], eax
 	;
 	mov eax, [Window.makeGlassSmart.dy]
@@ -328,11 +328,11 @@ pusha
 	;
 	mov ecx, [Window.makeGlassSmart.dh]
 	;
-	;push ebx
-	;call Dolphin.getSolidBGColor
-	;mov edx, ebx
-	;pop ebx
-		mov edx, 0xFF00FF
+	push ebx
+	call Dolphin.getSolidBGColor
+	mov edx, ebx
+	pop ebx
+	;	mov edx, 0xFF00FF
 	call Image.clearRegion
 popa
 ret
@@ -417,6 +417,9 @@ ret
 
 Window.forceFlush :	; winnum in currentWindow
 pusha
+Window.forceFlush.wait :
+;cmp byte [Dolphin_WAIT_FLAG], 0xFF
+;	je Window.forceFlush.wait
 ;mov byte [Dolphin_WAIT_FLAG], 0xFF
 	mov bl, [Window.OLDBUFFER]
 	call Dolphin.getAttribDouble
