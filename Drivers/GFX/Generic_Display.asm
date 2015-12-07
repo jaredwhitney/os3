@@ -143,6 +143,7 @@ Graphics.init :
 	mov [Graphics.VESA_MODE], bl
 	mov ebx, 0x4	; and this also should NOT be hardcoded
 	mov [Graphics.bytesPerPixel], ebx
+	call Graphics.grabCardName
 	;popa
 	;ret
 	ccacont :
@@ -150,12 +151,106 @@ Graphics.init :
 		call Graphics.setVGApalette
 	popa
 	ret
+	
+Graphics.grabCardName :
+	pusha
+		mov ax, [0x2006]
+		mov bx, [0x2008]
+		and ebx, 0xFFFF
+		and eax, 0xFFFF
+		imul ebx, 0x10
+		add eax, ebx
+		mov ebx, eax
+		mov [Graphics.CARDNAME], ebx
+	popa
+	ret
+	
+Graphics.printModeInfo :
+	pusha
+		
+		mov eax, [0x2000]
+		mov [VESA_TAG], eax
+		mov ebx, VESA_TAGMSG
+		call console.print
+		mov ebx, VESA_TAG
+		call console.println
+		
+		mov ax, [0x2004]
+		and eax, 0xFFFF
+		mov ebx, VESA_VER
+		call console.print
+		call DebugLogEAX
+		call console.newline
+		
+		mov ebx, VESA_OEMMSG
+		call console.print
+		mov ebx, [Graphics.CARDNAME]
+		call console.println
+		
+		mov ax, [0x200E]
+		mov bx, [0x2010]
+		and ebx, 0xFFFF
+		and eax, 0xFFFF
+		imul ebx, 0x1000
+		add eax, ebx
+		Txmlp_0.qo :
+		mov bx, [eax]
+		add eax, 2
+		add ecx, 1
+		cmp bx, 0xFFFF
+			jne Txmlp_0.qo
+		
+		mov eax, ecx
+		mov ebx, VESA_VMODENUMMSG
+		call console.print
+		call DebugLogEAX
+		call console.newline
+		
+		mov ebx, VESA_CLOSEST_MATCHMSG
+		call console.print
+		xor eax, eax
+		mov ax, [VESA_CLOSEST_MATCH]
+		call DebugLogEAX
+		call console.newline
+		
+		mov ebx, VESA_CLOSEST_RESMSG
+		call console.print
+		
+		xor eax, eax
+		mov ax, [VESA_CLOSEST_XRES]
+		call DebugLogEAX
+		
+		mov ebx, VESA_CLOSEST_RESDIV
+		call console.print
+		
+		xor eax, eax
+		mov ax, [VESA_CLOSEST_YRES]
+		call DebugLogEAX
+		
+		mov ebx, VESA_CLOSEST_BPPMSG
+		call console.print
+		
+		xor eax, eax
+		mov ax, [VESA_CLOSEST_BPP]
+		call DebugLogEAX
+		call console.newline
+		
+		mov ebx, VESA_CLOSEST_BUFFERLOCMSG
+		call console.print
+		mov eax, [VESA_CLOSEST_BUFFERLOC]
+		call DebugLogEAX
+		call console.newline
+	popa
+	ret
+	
 
 Graphics.PALETTE_NODEFAULT :
 db "Applying patch to palette...", 0
 	
 Graphics.VESA_SUPPORTED_MSG :
 db "VESA Support: ", 0x0
+
+Graphics.VESA_VER equ 0x2004	; word
 
 Graphics.VESA_SUPPORTED :
 dw 0x4d
