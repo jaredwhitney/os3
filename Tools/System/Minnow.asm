@@ -140,46 +140,30 @@ Minnow.navToFirst :
 	ret
 
 Minnow.byName :	; pointer to name in ebx, returns file location in ebx
-	mov ecx, ebx
+	mov [Minnow.dfstor], ebx
 	call Minnow.navToFirst	; at filesize
 	
 	Minnow.byName.loop1 :
 	mov eax, [ebx]
-		push ecx
-		mov ecx, eax
-		cmp ecx, 0x0
-		pop ecx
-		je Minnow.byName.fileNotFound
+	mov [Minnow.sstor], eax
+		cmp eax, 0x0
+			je Minnow.byName.fileNotFound
 	add ebx, 4	; at filetype
 		call String.getLength
 		add ebx, edx
-	;add ebx, 4	; at filename
-	mov edx, [ebx]
-	mov [Minnow.cstor], edx
-	add ebx, 4
-	mov edx, [ebx]
-	push ebx
-	mov ebx, Minnow.cstor
-	add ebx, 4
-	mov [ebx], edx
-	pop ebx
+	; at filename
+	mov [Minnow.cstor], ebx
 	
-	mov edx, eax
-	push ebx
-	mov ebx, Minnow.cstor
-	mov eax, ecx
-		push ebx
-		push ecx
-		push edx
+	mov ebx, [Minnow.cstor]
+	mov eax, [Minnow.dfstor]
 	call os.seq
-		pop edx
-		pop ecx
-		pop ebx
-	pop ebx
-	add ebx, 4
+		mov ebx, [Minnow.cstor]
+		call String.getLength
+	mov ebx, [Minnow.cstor]
+	add ebx, edx
 	cmp al, 1
 		je Minnow.byName.kret
-	add ebx, edx
+	add ebx, [Minnow.sstor]
 	jmp Minnow.byName.loop1
 	
 	Minnow.byName.kret :
@@ -244,4 +228,8 @@ db ": ", 0
 Minnow.stag :
 db "[0x", 0
 Minnow.cstor :
-db 0, 0, 0, 0, 0, 0, 0, 0, 0
+dd 0
+Minnow.sstor :
+dd 0
+Minnow.dfstor :
+dd 0
