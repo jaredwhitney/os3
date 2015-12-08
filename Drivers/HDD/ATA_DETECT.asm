@@ -72,7 +72,32 @@ ret
 				mov ebx, 10
 				call Guppy.malloc
 				mov [AHCI_PORTALLOCEDMEM], ebx
+
 				
+				
+				mov ebx, [AHCI_MEMLOC]
+				add ebx, 0x100	; port 0 info pointer at this address
+				mov ebx, [ebx]	; port 0 info pointer
+				mov ecx, [AHCI_PORTALLOCEDMEM]
+				mov [ebx+0], ecx	; write command list address
+				mov ecx, [AHCI_PORTALLOCEDMEM]
+				add ecx, 0x1000
+				mov [ebx+8], ecx	; write FIS address ? what exactly is this used for
+				
+				; Command Header
+				mov ebx, [AHCI_PORTALLOCEDMEM]
+				mov byte [ebx+0], (0b010 << 5) | (16)	; 010 or 011 ?
+				mov byte [ebx+1], 0b00000000	; is this right?
+				mov word [ebx+2], 1	; 1 PRDT
+				mov dword [ebx+4], ebx+0x1000	; command table descriptor
+				mov dword [ebx+8], 0x0	; upper
+				mov dword [ebx+12], 0x0
+				mov dword [ebx+16], 0x0
+				mov dword [ebx+20], 0x0
+				mov dword [ebx+24], 0x0
+				
+				; Command FIS
+				mov ebx, [AHCI_PORTALLOCEDMEM]
 				mov byte [ebx+0x1000], 0x27
 				mov byte [ebx+0x1000+1], 1
 				mov byte [ebx+0x1000+2], 0xEC; command
@@ -91,18 +116,8 @@ ret
 				mov byte [ebx+0x1000+15], 0	; control reg
 				mov dword [ebx+0x1000+16], 0	; resv
 				
-				
-				mov ebx, [AHCI_MEMLOC]
-				add ebx, 0x100	; port 0 info pointer at this address
-				mov ebx, [ebx]	; port 0 info pointer
-				mov ecx, [AHCI_PORTALLOCEDMEM]
-				mov [ebx+0], ecx	; write command list address
-				mov ecx, [AHCI_PORTALLOCEDMEM]
-				add ecx, 0x1000
-				mov [ebx+8], ecx	; write FIS address
-				
-				
-				
+				; PRDT
+				;mov 
 				
 			popa
 			ret
