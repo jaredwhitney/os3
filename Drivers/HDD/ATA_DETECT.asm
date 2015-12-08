@@ -14,7 +14,27 @@ pusha
 		je ATA_DETECT.nof0
 	call PCI.getObjectFromSearch
 	mov [ATA_DEVICE], ecx
-				; print some infos
+	
+		call AHCI_INIT
+	
+	mov eax, SysHaltScreen.WARN
+	mov ecx, 1
+	mov ebx, ATA_STR
+	imul ecx, 4
+	add ebx, ecx
+	mov ebx, [ebx]
+	mov ecx, 5
+	call SysHaltScreen.show
+	ATA_DETECT.nof0 :
+	pop ecx
+	add ecx, 1
+	cmp ecx, 6
+		jl ATA_DETECT.loop
+popa
+ret
+		AHCI_INIT :
+			pusha
+			; print some infos
 				mov ecx, [ATA_DEVICE]
 				mov bh, 0x0	; reg
 				call PCI.readFromObject
@@ -44,28 +64,48 @@ pusha
 				mov ebx, [AHCI_MEMLOC]
 				add ebx, 0xC
 				mov ebx, [ebx]
+				mov [AHCI_PORTMASK], ebx
 				call console.numOut
 				call console.newline
-				;add ebx, 0x10	; version
-				;mov ebx, [ebx]
-				;call console.numOut
-				;call console.newline
-				; show halt screen
-	mov eax, SysHaltScreen.WARN
-	mov ecx, 1
-	mov ebx, ATA_STR
-	imul ecx, 4
-	add ebx, ecx
-	mov ebx, [ebx]
-	mov ecx, 5
-	call SysHaltScreen.show
-	ATA_DETECT.nof0 :
-	pop ecx
-	add ecx, 1
-	cmp ecx, 6
-		jl ATA_DETECT.loop
-popa
-ret
+				
+				mov eax, 0x05
+				mov ebx, 10
+				call Guppy.malloc
+				mov [AHCI_PORTALLOCEDMEM], ebx
+				
+				mov byte [ebx+0x1000], 0x27
+				mov byte [ebx+0x1000+1], 1
+				mov byte [ebx+0x1000+2], 0xEC; command
+				mov byte [ebx+0x1000+3], 0 ; feature
+				mov byte [ebx+0x1000+4], 0	; lbalow
+				mov byte [ebx+0x1000+5], 0	; lbamid
+				mov byte [ebx+0x1000+6], 0	; lbahigh
+				mov byte [ebx+0x1000+7], 0	; dev
+				mov byte [ebx+0x1000+8], 0
+				mov byte [ebx+0x1000+9], 0
+				mov byte [ebx+0x1000+10], 0
+				mov byte [ebx+0x1000+11], 0
+				mov byte [ebx+0x1000+12], 0	; countlow
+				mov byte [ebx+0x1000+13], 0	; counthigh
+				mov byte [ebx+0x1000+14], 0	; isynccompletion
+				mov byte [ebx+0x1000+15], 0	; control reg
+				mov dword [ebx+0x1000+16], 0	; resv
+				
+				
+				mov ebx, [AHCI_MEMLOC]
+				add ebx, 0x100	; port 0 info pointer at this address
+				mov ebx, [ebx]	; port 0 info pointer
+				mov ecx, [AHCI_PORTALLOCEDMEM]
+				mov [ebx+0], ecx	; write command list address
+				mov ecx, [AHCI_PORTALLOCEDMEM]
+				add ecx, 0x1000
+				mov [ebx+8], ecx	; write FIS address
+				
+				
+				
+				
+			popa
+			ret
 
 ATA_STR :
 dd ATA_STR0, ATA_STR1, ATA_STR2, ATA_STR3, ATA_STR4, ATA_STR5
@@ -94,6 +134,12 @@ ATA_DEVICE :
 	dd 0x0
 
 AHCI_MEMLOC :
+	dd 0x0
+	
+AHCI_PORTMASK :
+	dd 0x0
+	
+AHCI_PORTALLOCEDMEM :
 	dd 0x0
 	
 ;DISK_DEVICELIST :
