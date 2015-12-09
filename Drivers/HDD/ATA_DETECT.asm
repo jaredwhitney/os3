@@ -82,14 +82,17 @@ ret
 				mov [ebx+0], ecx	; write command list address
 				mov ecx, [AHCI_PORTALLOCEDMEM]
 				add ecx, 0x1000
-				mov [ebx+8], ecx	; write FIS address ? what exactly is this used for
+				mov [ebx+8], ecx	; write FIS address (should NOT be pointing here... is where the FIS that is sent back is placed)
+				mov dword [ebx+12], 0x0
 				
 				; Command Header
 				mov ebx, [AHCI_PORTALLOCEDMEM]
 				mov byte [ebx+0], (0b010 << 5) | (16)	; 010 or 011 ?
 				mov byte [ebx+1], 0b00000000	; is this right?
 				mov word [ebx+2], 1	; 1 PRDT
-				mov dword [ebx+4], ebx+0x1000	; command table descriptor
+				mov ecx, ebx
+				add ecx, 0x1000
+				mov dword [ebx+4], ecx	; command table descriptor
 				mov dword [ebx+8], 0x0	; upper
 				mov dword [ebx+12], 0x0
 				mov dword [ebx+16], 0x0
@@ -116,11 +119,43 @@ ret
 				mov byte [ebx+0x1000+15], 0	; control reg
 				mov dword [ebx+0x1000+16], 0	; resv
 				
-				; PRDT
-				;mov 
+				; PRDTs
+					mov al, 0x5
+					mov ebx, 1
+					call Guppy.malloc
+					mov [AHCI_RECVPLACE], ebx
+					mov dword [ebx], 0x0
+				mov ecx, ebx
+				mov ebx, [AHCI_PORTALLOCEDMEM]
+				mov dword [ebx+0x1080], ecx
+				mov dword [ebx+0x1080+4], 0
+				mov dword [ebx+0x1080+8], 0	; resv
+				mov dword [ebx+0x1080+12], 255	; 255 bytes?
+				
+				mov ebx, [AHCI_MEMLOC]
+				mov dword [ebx+0x38], 1	; activate command 0
+				
+				mov eax, 5000
+				call System.sleep
+				
+				test dword [ebx+0x38], 1
+					jnz kernel.halt	; if fail, freeze the system
+				
+				mov ebx, [AHCI_MEMLOC]
+				cmp dword [ebx+0x100+0x10], 0x0
+					je ATA_NOCHNG
+				mov eax, SysHaltScreen.WARN	; so it works... but where the recieved data go??
+				mov ebx, AHCI_IDENTIFYSUCCESS
+				mov ecx, 4
+				call SysHaltScreen.show
+				ATA_NOCHNG :
 				
 			popa
 			ret
+			AHCI_IDENTIFYSUCCESS :
+				db "IDENTIFY command worked!", 0
+			AHCI_RECVPLACE :
+				dd 0x0
 
 ATA_STR :
 dd ATA_STR0, ATA_STR1, ATA_STR2, ATA_STR3, ATA_STR4, ATA_STR5

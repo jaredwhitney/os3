@@ -1,0 +1,36 @@
+command list -> list of 1 to 32 command headers (slots)
+command header: FIS, buffer, PRDTs
+
+construct header
+set bit in HBAPORT Command Issue reg
+the command will be automatically sent to the device
+if it succeeds :
+	the bit in Command Issue reg will be cleared
+	the data will be copied
+
+
+command header :
+	byte: prefetchable | write | ATAPI | FIS dword len (2-16)
+	byte: portmul (4) | rsv | bsyclr | BIST | Reset
+	word: num of PRDTs
+	dword: physical region descriptor byte transfer count
+	dword: Command Table Descriptor Base Address
+	dword: upper dword of the above
+	dword: resv
+	dword: resv
+	dword: resv
+	dword: resv
+
+command list (reg CLB) contains command headers (point to Command Tables, see above)
+
+Command Table :
+	0x00-0x40: Command FIS
+	0x40-0x50: ATAPI Command Buffer
+	0x50-0x80: resv
+	0x80-(0x80+0x10*up to 65535 entries): PRDTs
+
+PRDT: 
+	dword: DBA address
+	dword: upper dword of above
+	dword: resv
+	dword: interrupt | resv (9) | dev bytecount (22) | 1
