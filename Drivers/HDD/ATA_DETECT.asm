@@ -73,7 +73,8 @@ ret
 				call Guppy.malloc
 				mov [AHCI_PORTALLOCEDMEM], ebx
 
-				
+				mov eax, [AHCI_PORTALLOCEDMEM+0x118]
+				or eax, 0b10000	; set bit 4 to enable FIS returning
 				
 				mov ebx, [AHCI_MEMLOC]
 				add ebx, 0x100	; port 0 info pointer at this address
@@ -84,12 +85,12 @@ ret
 				add ecx, 0x1000
 				mov [ebx+8], ecx	; write FIS address (should NOT be pointing here... is where the FIS that is sent back is placed)
 				mov dword [ebx+12], 0x0
-				
+								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.65
 				; Command Header
 				mov ebx, [AHCI_PORTALLOCEDMEM]
-				mov byte [ebx+0], (0b010 << 5) | (16)	; 010 or 011 ?
+				mov word [ebx+2], 0	; 0 PRDTs
 				mov byte [ebx+1], 0b00000000	; is this right?
-				mov word [ebx+2], 1	; 1 PRDT
+				mov byte [ebx+0], 0b01100101	; 0b011 or 0b010?
 				mov ecx, ebx
 				add ecx, 0x1000
 				mov dword [ebx+4], ecx	; command table descriptor
@@ -120,17 +121,17 @@ ret
 				mov dword [ebx+0x1000+16], 0	; resv
 				
 				; PRDTs
-					mov al, 0x5
-					mov ebx, 1
-					call Guppy.malloc
-					mov [AHCI_RECVPLACE], ebx
-					mov dword [ebx], 0x0
-				mov ecx, ebx
-				mov ebx, [AHCI_PORTALLOCEDMEM]
-				mov dword [ebx+0x1080], ecx
-				mov dword [ebx+0x1080+4], 0
-				mov dword [ebx+0x1080+8], 0	; resv
-				mov dword [ebx+0x1080+12], 255	; 255 bytes?
+				;	mov al, 0x5
+				;	mov ebx, 1
+				;	call Guppy.malloc
+				;	mov [AHCI_RECVPLACE], ebx
+				;	mov dword [ebx], 0x0
+				;mov ecx, ebx
+				;mov ebx, [AHCI_PORTALLOCEDMEM]
+				;mov dword [ebx+0x1080], ecx
+				;mov dword [ebx+0x1080+4], 0
+				;mov dword [ebx+0x1080+8], 0	; resv
+				;mov dword [ebx+0x1080+12], 255	; 255 bytes?
 				
 				mov ebx, [AHCI_MEMLOC]
 				mov dword [ebx+0x38], 1	; activate command 0

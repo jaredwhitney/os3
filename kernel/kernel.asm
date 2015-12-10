@@ -50,8 +50,10 @@ Kernel.init :
 			call TextMode.println
 			
 		;	LOCK THE COMPUTER	;
-;		xor edx, edx
-;		mov dx, [ATA_DEVNUM]
+		;xor edx, edx
+		mov edx, [AHCI_PORTALLOCEDMEM]
+		add edx, 0x1000+0x20
+		mov edx, [edx]
 	call Manager.lock
 		;	CHECK TO SEE IF THE COMPUTER IS LOCKED	;
 	call Manager.handleLock
