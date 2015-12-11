@@ -1,0 +1,5 @@
+GHC.AE -> 1
+PxCMD.ST, PxCMD.CR, PxCMD.FRE, PxCMD.FR check clear (if yes, port is idle)
+if NOT place in idle (clear PxCMD.ST and wait for PxCMD.CR to = 0 (wait of at least 500ms), IF set clear PxCMD.FRE and wait for PxCMD.FR to = 0)
+for each active port CLEAR the corresponding bit in PxSERR
+ONCE PxTFD.STS.BSY,PxTFD.STS.DRQ = 0, PxSSTS.DET = 3, and PxCLB is valid: SET PxCMD.ST to 1
