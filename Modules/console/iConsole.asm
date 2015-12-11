@@ -23,6 +23,13 @@ pusha
 	mov [console.windowStructLoc], ecx
 	mov [console.winNum], bl	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
 	
+	mov ebx, [console.windowStructLoc]
+	add bl, [Window.WIDTH]
+	mov word [ebx], 0x3C0	; need to fix window width so it is NOT dependent on bpp!
+	mov ebx, [console.windowStructLoc]
+	add bl, [Window.HEIGHT]
+	mov word [ebx], 0xC8
+	
 	call console.createWindow
 	
 	;mov ah, 0xF	; yellow
@@ -51,7 +58,7 @@ console.createWindow :
 	mov [console.draw], ebx
 
 	call console.clearScreen
-	call JASM.console.post_init		; FIX THIS!!!
+	;call JASM.console.post_init		; FIX THIS!!!
 	;call console.update
 	popa
 	ret
@@ -64,54 +71,54 @@ pusha
 popa
 ret
 
-console.loop :
-pusha
-
-	mov bl, [console.pnum]
-	call ProgramManager.setActive	; Make removable Later
-	
-	xor ebx, ebx
-	mov bl, [console.winNum]
-	mov [Dolphin.currentWindow], ebx
-
-mov ebx, [console.draw]
-cmp ebx, 0x0
-je console.update.gone
-	mov [console.dat], ebx
-	;call console.update
-;mov bl, [console.winNum]
-;mov [Dolphin.currentWindow], bl
-	console.loop.checkKeyBuffer :
-		mov ebx, [KeyManager.bufferpos]
-		cmp ebx, 0x0	; is there any data avaliable?
-			je console.loop.ret
-		call Keyboard.getKey
-		cmp bl, 0x0		; was the program allowed to get data?
-			je console.loop.ret
-		cmp bl, 0xff	; was the character a backspace?
-			je console.doBackspace
-		cmp bl, 0xfe	; was the character an enter?
-			jne console.loop.notEnter
-		call JASM.console.handleEnter
-		jmp console.loop.checkKeyBuffer
-		console.loop.notEnter :
-			cmp bl, 0xfb
-				jne console.loop.notUp
-			mov ah, 0xFF
-			mov ebx, console.lastLine
-			call console.print
-			jmp console.loop.checkKeyBuffer
-		console.loop.notUp :
-			mov al, bl
-			mov ah, 0xFF
-			call console.cprint
-		jmp console.loop.checkKeyBuffer
-console.loop.ret :
-
-	call ProgramManager.finalize	; Make removable Later
-
-popa
-ret
+;console.loop :	; UNUSED
+;pusha
+;
+;	mov bl, [console.pnum]
+;	call ProgramManager.setActive	; Make removable Later
+;	
+;	xor ebx, ebx
+;	mov bl, [console.winNum]
+;	mov [Dolphin.currentWindow], ebx
+;
+;mov ebx, [console.draw]
+;cmp ebx, 0x0
+;je console.update.gone
+;	mov [console.dat], ebx
+;	;call console.update
+;;mov bl, [console.winNum]
+;;mov [Dolphin.currentWindow], bl
+;	console.loop.checkKeyBuffer :
+;		mov ebx, [KeyManager.bufferpos]
+;		cmp ebx, 0x0	; is there any data avaliable?
+;			je console.loop.ret
+;		call Keyboard.getKey
+;		cmp bl, 0x0		; was the program allowed to get data?
+;			je console.loop.ret
+;		cmp bl, 0xff	; was the character a backspace?
+;			je console.doBackspace
+;		cmp bl, 0xfe	; was the character an enter?
+;			jne console.loop.notEnter
+;		call JASM.console.handleEnter
+;		jmp console.loop.checkKeyBuffer
+;		console.loop.notEnter :
+;			cmp bl, 0xfb
+;				jne console.loop.notUp
+;			mov ah, 0xFF
+;			mov ebx, console.lastLine
+;			call console.print
+;			jmp console.loop.checkKeyBuffer
+;		console.loop.notUp :
+;			mov al, bl
+;			mov ah, 0xFF
+;			call console.cprint
+;		jmp console.loop.checkKeyBuffer
+;console.loop.ret :
+;
+;	call ProgramManager.finalize	; Make removable Later
+;
+;popa
+;ret
 
 console.setWidth :
 pusha
@@ -544,7 +551,8 @@ mov [eax], bx
 add eax, 2
 mov [eax], bx
 ;call console.update
-jmp console.loop.checkKeyBuffer
+;jmp console.loop.checkKeyBuffer
+jmp kernel.halt
 
 console.cprint :
 cmp dword [DisplayMode], MODE_TEXT
