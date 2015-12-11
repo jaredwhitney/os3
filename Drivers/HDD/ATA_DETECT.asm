@@ -72,9 +72,6 @@ ret
 				mov ebx, 10
 				call Guppy.malloc
 				mov [AHCI_PORTALLOCEDMEM], ebx
-
-				mov eax, [AHCI_PORTALLOCEDMEM+0x118]
-				or eax, 0b10000	; set bit 4 to enable FIS returning
 				
 				mov ebx, [AHCI_MEMLOC]
 				add ebx, 0x100	; port 0 info pointer at this address
@@ -85,7 +82,11 @@ ret
 				add ecx, 0x1000
 				mov [ebx+8], ecx	; write FIS address (should NOT be pointing here... is where the FIS that is sent back is placed)
 				mov dword [ebx+12], 0x0
-								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.65
+				
+				mov eax, [AHCI_PORTALLOCEDMEM+0x118]
+				or eax, 0b10000	; set bit 4 to enable FIS returning
+				
+								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.65 AND p.81
 				; Command Header
 				mov ebx, [AHCI_PORTALLOCEDMEM]
 				mov word [ebx+2], 0	; 0 PRDTs
@@ -157,7 +158,74 @@ ret
 				db "IDENTIFY command worked!", 0
 			AHCI_RECVPLACE :
 				dd 0x0
+				
+AHCI.initialize :	; the read function as opposed to the above test
+	pusha
+	
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x04	; GHC
+		mov ecx, [ebx]
+		or ecx, 0b1<<31	; SET AHCI enable (GHC.AE)
+		
+		; Idle port detection
+		call AHCI.initialize.ensureIdle
+		
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x30	; PxSERR (port errors)
+		mov dword [ebx], 0x0	; CLEAR PxSERR
+		
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 
+		
+	popa
+	ret
+	
+AHCI.initialize.ensureIdle :
+	pusha
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x18	; PxCMD
+		test [ebx], 0b1000000000000001	; b0 = PxCMD.ST, b15= PxCMD.CR
+			jz AHCI.initialize.portIdle_0
+		; Clear PxCMD.ST and PxCMD.CR
+		mov ecx, [ebx]
+		and ecx, ~(0b1)
+		mov [ebx], ecx	; clear PxCMD.ST
+		; wait for PxCMD.CR to clear
+		mov eax, [Clock.tics]
+		AHCI.initialize.makePortIdle.loop0 :
+			mov ecx, [ebx]
+			test ecx, 0b1000000000000000
+				jz AHCI.initialize.portIdle_0
+			mov edx, [Clock.tics]
+			sub edx, eax
+			cmp edx, 2500	; 500ms
+				jg AHCI.initialize.showFailMsg
+			jmp AHCI.initialize.makePortIdle.loop0
+		AHCI.initialize.portIdle_0 :
+		test [ebx], 0b100000000010000	; b4 = PxCMD.FRE, b14 = PxCMD.FR
+			jz AHCI.initialize.portIdle_1
+		; Clear PxCMD.FRE and PxCMD.FR
+			mov ecx, [ebx]
+			and ecx, ~(0b10000)
+			mov [ebx], ecx	; clear PxCMD.FRE
+			; wait for PxCMD.FR to clear
+			mov eax, [Clock.tics]
+			AHCI.initialize.makePortIdle.loop1 :
+				mov ecx, [ebx]
+				test ecx, 0b100000000000000
+					jz AHCI.initialize.portIdle_1 :
+				mov edx, [Clock.tics]
+				sub edx, eax
+				cmp edx, 2500	; 500ms
+					jg AHCI.initialize.showFailMsg
+				jmp AHCI.initialize.makePortIdle.loop1
+		AHCI.initialize.portIdle_1 :
+	popa
+	ret
 
+	
 ATA_STR :
 dd ATA_STR0, ATA_STR1, ATA_STR2, ATA_STR3, ATA_STR4, ATA_STR5
 ATA_STR0 :
