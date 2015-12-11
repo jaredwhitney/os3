@@ -8,4 +8,4 @@ System.getValue :	; val in ebx, returns in ecx
 ret
 
 System.valueLocations :
-	dd Graphics.VESA_MODE, Graphics.SCREEN_WIDTH, Graphics.SCREEN_HEIGHT, Graphics.bytesPerPixel, Guppy.totalRAM, Guppy.usedRAM, Clock.tics, Graphics.CARDNAME, ProgramManager.PnumCounter
+	dd Graphics.VESA_MODE, Graphics.SCREEN_WIDTH, Graphics.SCREEN_HEIGHT, Graphics.bytesPerPixel, Guppy.totalRAM, Guppy.usedRAM, Clock.tics, Graphics.CARDNAME, ProgramManager.PnumCounter, DisplayMode

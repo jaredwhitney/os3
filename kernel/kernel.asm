@@ -2,7 +2,7 @@
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
 	cmp dword [DisplayMode], MODE_TEXT
-		je Kernel.textInit
+		je kernel.cont
 	
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 		;	SETUP GRAPHICS MODE		;
@@ -11,8 +11,11 @@ Kernel.init :
 	kernel.cont :
 	call Guppy.init
 	
-	
 	call kernel.initModules
+	
+	cmp dword [DisplayMode], MODE_TEXT
+		je kernel.textInit
+	kernel.cont2 :
 	
 	call ATA_DETECT
 	
@@ -122,12 +125,12 @@ db 0x0
 	
 %include "../$Emulator/StandardIncludes.asm"
 
-Kernel.textInit :
+kernel.textInit :
 		call console.clearScreen
 		mov ebx, TEXTMODE_INIT
 		call console.println	
 		call console.newline
-	jmp kernel.cont
+	jmp kernel.cont2
 
 TEXTMODE_INIT :
 	db "Booted into debug (text) mode.", 0

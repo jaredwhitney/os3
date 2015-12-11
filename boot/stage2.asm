@@ -12,7 +12,7 @@ stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
 	
-	mov dword [DisplayMode], MODE_TEXT	; MODE_TEXT or MODE_GRAPHICS
+	mov dword [DisplayMode], MODE_GRAPHICS	; MODE_TEXT or MODE_GRAPHICS
 	
 	cmp dword [DisplayMode], MODE_TEXT
 		je stage2.novesa

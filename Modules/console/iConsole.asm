@@ -25,17 +25,17 @@ pusha
 	
 	call console.createWindow
 	
-	mov ah, 0xF	; yellow
-	call JASM.console.init	; initiallize the console
+	;mov ah, 0xF	; yellow
+	;call JASM.console.init	; initiallize the console
 	
-	call console.clearScreen
+	;call console.clearScreen
 	
 	;mov ah, 0xFF
 	;call Time.printToConsole
 	
-	call JASM.console.post_init
+	;call JASM.console.post_init
 	
-	call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+	;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
 	
 	;call console.update
 	
@@ -48,7 +48,7 @@ console.createWindow :
 	pusha
 		
 	mov ebx, 0x1
-	mov [JASM.console.draw], ebx
+	mov [console.draw], ebx
 
 	call console.clearScreen
 	call JASM.console.post_init		; FIX THIS!!!
@@ -74,7 +74,7 @@ pusha
 	mov bl, [console.winNum]
 	mov [Dolphin.currentWindow], ebx
 
-mov ebx, [JASM.console.draw]
+mov ebx, [console.draw]
 cmp ebx, 0x0
 je console.update.gone
 	mov [console.dat], ebx
@@ -239,7 +239,7 @@ ret
 
 ; console.update :
 ; pusha
-; mov ebx, [JASM.console.draw]
+; mov ebx, [console.draw]
 ; cmp ebx, 0x0
 ; je console.update.gone
 	; xor ebx, ebx
@@ -701,6 +701,9 @@ console.color :
 	dd 0xFF0000
 
 console.pos :	; should be removed, use the window's position instead
+dd 0x0
+
+console.draw :
 dd 0x0
 
 console.cstor :
