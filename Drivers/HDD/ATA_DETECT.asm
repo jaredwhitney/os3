@@ -1,5 +1,5 @@
 ATA_DETECT :
-pusha
+	pusha
 	xor ecx, ecx
 	ATA_DETECT.loop :
 	push ecx
@@ -174,6 +174,14 @@ AHCI.initialize :	; the read function as opposed to the above test
 		mov ecx, [ebx]
 		or ecx, 0b1<<31	; SET AHCI enable (GHC.AE)
 		
+		; Check to ensure that port 0 is implemented (should make this work with all ports) (2)
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x0C	; PI
+		mov ecx, [ebx]
+		mov [AHCI_PORTMASK], ecx
+		test ecx, 0b1
+			jz AHCI.initialize.showFailMsg
+		
 		; Idle port detection (3)
 		call AHCI.initialize.ensureIdle
 		
@@ -199,6 +207,15 @@ AHCI.initialize :	; the read function as opposed to the above test
 		mov eax, [ebx]
 		or eax, 0b10000	; set bit 4 (PxCMD.FR)
 		mov [ebx], eax
+		
+		; Enable the port(SET PxCMD.ST) (should make this work with all ports)
+		call AHCI.initialize.checkReadyToEnable
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0
+		add ebx, 0x18	; PxCMD
+		mov ecx, [ebx]
+		or ecx, 0b1
+		mov [ebx], ecx
 		
 	popa
 	ret
@@ -256,6 +273,7 @@ AHCI.initialize.programMemoryLocations :
 		add ebx, 0x0	; PxCLB
 		mov ecx, [AHCI_PORTALLOCEDMEM]
 		mov [ebx], ecx ; PxCLB points to a 1k region
+		mov [AHCI_P0CLB], ecx
 		
 		; (Set upper dword)
 		mov ebx, [AHCI_MEMLOC]
@@ -270,12 +288,33 @@ AHCI.initialize.programMemoryLocations :
 		mov ecx, [AHCI_PORTALLOCEDMEM]
 		add ecx, 0x1000
 		mov [ebx], ecx	; PxFB points to a 256 byte region
+		mov [AHCI_P0FB], ecx
 		
 		; (Set upper dword)
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, 0x100	; Port 0 (should make this word with all ports)
 		add ebx, 0xC	; PxFBU
 		mov dword [ebx], 0	; No support for 64bit atm
+		
+	popa
+	ret
+
+AHCI.initialize.checkReadyToEnable :
+	pusha
+		
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0
+		add ebx, 0x20	; PxTFD
+		mov ecx, [ebx]
+		test ecx, 0b10001000	; PxTFD.STS.BSY | PxTFS.STS.DRQ
+			jnz AHCI.initialize.showFailMsg
+		
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0
+		add ebx, 0x28	; PxSSTS
+		mov ecx, [ebx]
+		test ecx, 0b011
+			jnz AHCI.initialize.showFailMsg
 		
 	popa
 	ret
@@ -325,6 +364,12 @@ AHCI_PORTMASK :
 	dd 0x0
 	
 AHCI_PORTALLOCEDMEM :
+	dd 0x0
+	
+AHCI_P0CLB :
+	dd 0x0
+
+AHCI_P0FB :
 	dd 0x0
 	
 ;DISK_DEVICELIST :
