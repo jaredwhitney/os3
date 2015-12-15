@@ -1,163 +1,165 @@
 ATA_DETECT :
 	pusha
-	xor ecx, ecx
-	ATA_DETECT.loop :
-	push ecx
-	mov edx, ecx
-	imul edx, 3
-	add edx, ATA_DAT
-	mov al, [edx+1]
-	mov ah, [edx]
-	mov bl, [edx+2]
-	call PCI.getDeviceByDescription
-	cmp dh, 0xFF
-		je ATA_DETECT.nof0
-	call PCI.getObjectFromSearch
-	mov [ATA_DEVICE], ecx
-	
+		xor ecx, ecx
+		ATA_DETECT.loop :
+		push ecx
+		mov edx, ecx
+		imul edx, 3
+		add edx, ATA_DAT
+		mov al, [edx+1]
+		mov ah, [edx]
+		mov bl, [edx+2]
+		call PCI.getDeviceByDescription
+		cmp dh, 0xFF
+			je ATA_DETECT.nof0
+		call PCI.getObjectFromSearch
+		mov [ATA_DEVICE], ecx
+		
 		call AHCI.initialize
 	
-	mov eax, SysHaltScreen.WARN
-	mov ecx, 1
-	mov ebx, ATA_STR
-	imul ecx, 4
-	add ebx, ecx
-	mov ebx, [ebx]
-	mov ecx, 5
-	call SysHaltScreen.show
-	ATA_DETECT.nof0 :
-	pop ecx
-	add ecx, 1
-	cmp ecx, 6
-		jl ATA_DETECT.loop
-popa
-ret
-		AHCI_INIT :
-			pusha
-			; print some infos
-				mov ecx, [ATA_DEVICE]
-				mov bh, 0x0	; reg
-				call PCI.readFromObject
-				mov ebx, ecx
-				call console.numOut
-				call console.newline
-					;mov al, 0x1
-					;mov ebx, 1
-					;call Guppy.malloc	; alloc ram to store the ahci data in
-					;mov eax, ebx
-				;mov eax, 0xFA000000
-				;mov ecx, [ATA_DEVICE]
-				;mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
-				;call PCI.writeFromObject
-				;
-				;	should wait until it is actually updated?
-				;
-				;mov eax, 2000
-				;call System.sleep
-				;
-				;add ecx, 0xC
-				mov ecx, [ATA_DEVICE]
-				mov bh, 0x24
-				call PCI.readFromObject
-				mov [AHCI_MEMLOC], ecx
-				
-				mov ebx, [AHCI_MEMLOC]
-				add ebx, 0xC
-				mov ebx, [ebx]
-				mov [AHCI_PORTMASK], ebx
-				call console.numOut
-				call console.newline
-				
-				mov eax, 0x05
-				mov ebx, 10
-				call Guppy.malloc
-				mov [AHCI_PORTALLOCEDMEM], ebx
-				
-				mov ebx, [AHCI_MEMLOC]
-				add ebx, 0x100	; port 0 info pointer at this address
-				mov ebx, [ebx]	; port 0 info pointer
-				mov ecx, [AHCI_PORTALLOCEDMEM]
-				mov [ebx+0], ecx	; write command list address
-				mov ecx, [AHCI_PORTALLOCEDMEM]
-				add ecx, 0x1000
-				mov [ebx+8], ecx	; write FIS address (should NOT be pointing here... is where the FIS that is sent back is placed)
-				mov dword [ebx+12], 0x0
-				
-				mov eax, [AHCI_PORTALLOCEDMEM+0x118]
-				or eax, 0b10000	; set bit 4 to enable FIS returning
-				
-								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.71 AND p.81
-				; Command Header
-				mov ebx, [AHCI_PORTALLOCEDMEM]
-				mov word [ebx+2], 0	; 0 PRDTs
-				mov byte [ebx+1], 0b00000000	; is this right?
-				mov byte [ebx+0], 0b01100101	; 0b011 or 0b010?
-				mov ecx, ebx
-				add ecx, 0x1000
-				mov dword [ebx+4], ecx	; command table descriptor
-				mov dword [ebx+8], 0x0	; upper
-				mov dword [ebx+12], 0x0
-				mov dword [ebx+16], 0x0
-				mov dword [ebx+20], 0x0
-				mov dword [ebx+24], 0x0
-				
-				; Command FIS
-				mov ebx, [AHCI_PORTALLOCEDMEM]
-				mov byte [ebx+0x1000], 0x27
-				mov byte [ebx+0x1000+1], 1
-				mov byte [ebx+0x1000+2], 0xEC; command
-				mov byte [ebx+0x1000+3], 0 ; feature
-				mov byte [ebx+0x1000+4], 0	; lbalow
-				mov byte [ebx+0x1000+5], 0	; lbamid
-				mov byte [ebx+0x1000+6], 0	; lbahigh
-				mov byte [ebx+0x1000+7], 0	; dev
-				mov byte [ebx+0x1000+8], 0
-				mov byte [ebx+0x1000+9], 0
-				mov byte [ebx+0x1000+10], 0
-				mov byte [ebx+0x1000+11], 0
-				mov byte [ebx+0x1000+12], 0	; countlow
-				mov byte [ebx+0x1000+13], 0	; counthigh
-				mov byte [ebx+0x1000+14], 0	; isynccompletion
-				mov byte [ebx+0x1000+15], 0	; control reg
-				mov dword [ebx+0x1000+16], 0	; resv
-				
-				; PRDTs
-				;	mov al, 0x5
-				;	mov ebx, 1
-				;	call Guppy.malloc
-				;	mov [AHCI_RECVPLACE], ebx
-				;	mov dword [ebx], 0x0
-				;mov ecx, ebx
-				;mov ebx, [AHCI_PORTALLOCEDMEM]
-				;mov dword [ebx+0x1080], ecx
-				;mov dword [ebx+0x1080+4], 0
-				;mov dword [ebx+0x1080+8], 0	; resv
-				;mov dword [ebx+0x1080+12], 255	; 255 bytes?
-				
-				mov ebx, [AHCI_MEMLOC]
-				mov dword [ebx+0x38], 1	; activate command 0
-				
-				mov eax, 5000
-				call System.sleep
-				
-				test dword [ebx+0x38], 1
-					jnz kernel.halt	; if fail, freeze the system
-				
-				mov ebx, [AHCI_MEMLOC]
-				cmp dword [ebx+0x100+0x10], 0x0
-					je ATA_NOCHNG
-				mov eax, SysHaltScreen.WARN	; so it works... but where the recieved data go??
-				mov ebx, AHCI_IDENTIFYSUCCESS
-				mov ecx, 4
-				call SysHaltScreen.show
-				ATA_NOCHNG :
-				
-			popa
-			ret
-			AHCI_IDENTIFYSUCCESS :
-				db "IDENTIFY command worked!", 0
-			AHCI_RECVPLACE :
-				dd 0x0
+		mov eax, SysHaltScreen.WARN
+		mov ecx, 1
+		mov ebx, ATA_STR
+		imul ecx, 4
+		add ebx, ecx
+		mov ebx, [ebx]
+		mov ecx, 5
+		call SysHaltScreen.show
+		ATA_DETECT.nof0 :
+		pop ecx
+		add ecx, 1
+		cmp ecx, 6
+			jl ATA_DETECT.loop
+	popa
+	ret
+
+
+; AHCI_INIT :	; OBSOLETE AND BROKEN
+	; pusha
+	; ; print some infos
+		; mov ecx, [ATA_DEVICE]
+		; mov bh, 0x0	; reg
+		; call PCI.readFromObject
+		; mov ebx, ecx
+		; call console.numOut
+		; call console.newline
+			; ;mov al, 0x1
+			; ;mov ebx, 1
+			; ;call Guppy.malloc	; alloc ram to store the ahci data in
+			; ;mov eax, ebx
+		; ;mov eax, 0xFA000000
+		; ;mov ecx, [ATA_DEVICE]
+		; ;mov bh, 0x24;	set ahci memory location ; p.571 http://www.intel.com/content/www/us/en/chipsets/5-chipset-3400-chipset-datasheet.html
+		; ;call PCI.writeFromObject
+		; ;
+		; ;	should wait until it is actually updated?
+		; ;
+		; ;mov eax, 2000
+		; ;call System.sleep
+		; ;
+		; ;add ecx, 0xC
+		; mov ecx, [ATA_DEVICE]
+		; mov bh, 0x24
+		; call PCI.readFromObject
+		; mov [AHCI_MEMLOC], ecx
+		
+		; mov ebx, [AHCI_MEMLOC]
+		; add ebx, 0xC
+		; mov ebx, [ebx]
+		; mov [AHCI_PORTMASK], ebx
+		; call console.numOut
+		; call console.newline
+		
+		; mov eax, 0x05
+		; mov ebx, 10
+		; call Guppy.malloc
+		; mov [AHCI_PORTALLOCEDMEM], ebx
+		
+		; mov ebx, [AHCI_MEMLOC]
+		; add ebx, 0x100	; port 0 info pointer at this address
+		; mov ebx, [ebx]	; port 0 info pointer
+		; mov ecx, [AHCI_PORTALLOCEDMEM]
+		; mov [ebx+0], ecx	; write command list address
+		; mov ecx, [AHCI_PORTALLOCEDMEM]
+		; add ecx, 0x1000
+		; mov [ebx+8], ecx	; write FIS address (should NOT be pointing here... is where the FIS that is sent back is placed)
+		; mov dword [ebx+12], 0x0
+		
+		; mov eax, [AHCI_PORTALLOCEDMEM+0x118]
+		; or eax, 0b10000	; set bit 4 to enable FIS returning
+		
+						; ;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.71 AND p.81
+		; ; Command Header
+		; mov ebx, [AHCI_PORTALLOCEDMEM]
+		; mov word [ebx+2], 0	; 0 PRDTs
+		; mov byte [ebx+1], 0b00000000	; is this right?
+		; mov byte [ebx+0], 0b01100101	; 0b011 or 0b010?
+		; mov ecx, ebx
+		; add ecx, 0x1000
+		; mov dword [ebx+4], ecx	; command table descriptor
+		; mov dword [ebx+8], 0x0	; upper
+		; mov dword [ebx+12], 0x0
+		; mov dword [ebx+16], 0x0
+		; mov dword [ebx+20], 0x0
+		; mov dword [ebx+24], 0x0
+		
+		; ; Command FIS
+		; mov ebx, [AHCI_PORTALLOCEDMEM]
+		; mov byte [ebx+0x1000], 0x27
+		; mov byte [ebx+0x1000+1], 1
+		; mov byte [ebx+0x1000+2], 0xEC; command
+		; mov byte [ebx+0x1000+3], 0 ; feature
+		; mov byte [ebx+0x1000+4], 0	; lbalow
+		; mov byte [ebx+0x1000+5], 0	; lbamid
+		; mov byte [ebx+0x1000+6], 0	; lbahigh
+		; mov byte [ebx+0x1000+7], 0	; dev
+		; mov byte [ebx+0x1000+8], 0
+		; mov byte [ebx+0x1000+9], 0
+		; mov byte [ebx+0x1000+10], 0
+		; mov byte [ebx+0x1000+11], 0
+		; mov byte [ebx+0x1000+12], 0	; countlow
+		; mov byte [ebx+0x1000+13], 0	; counthigh
+		; mov byte [ebx+0x1000+14], 0	; isynccompletion
+		; mov byte [ebx+0x1000+15], 0	; control reg
+		; mov dword [ebx+0x1000+16], 0	; resv
+		
+		; ; PRDTs
+		; ;	mov al, 0x5
+		; ;	mov ebx, 1
+		; ;	call Guppy.malloc
+		; ;	mov [AHCI_RECVPLACE], ebx
+		; ;	mov dword [ebx], 0x0
+		; ;mov ecx, ebx
+		; ;mov ebx, [AHCI_PORTALLOCEDMEM]
+		; ;mov dword [ebx+0x1080], ecx
+		; ;mov dword [ebx+0x1080+4], 0
+		; ;mov dword [ebx+0x1080+8], 0	; resv
+		; ;mov dword [ebx+0x1080+12], 255	; 255 bytes?
+		
+		; mov ebx, [AHCI_MEMLOC]
+		; mov dword [ebx+0x38], 1	; activate command 0
+		
+		; mov eax, 5000
+		; call System.sleep
+		
+		; test dword [ebx+0x38], 1
+			; jnz kernel.halt	; if fail, freeze the system
+		
+		; mov ebx, [AHCI_MEMLOC]
+		; cmp dword [ebx+0x100+0x10], 0x0
+			; je ATA_NOCHNG
+		; mov eax, SysHaltScreen.WARN	; so it works... but where the recieved data go??
+		; mov ebx, AHCI_IDENTIFYSUCCESS
+		; mov ecx, 4
+		; call SysHaltScreen.show
+		; ATA_NOCHNG :
+		
+	; popa
+	; ret
+; AHCI_IDENTIFYSUCCESS :
+	; db "IDENTIFY command worked!", 0
+; AHCI_RECVPLACE :
+	; dd 0x0
 				
 AHCI.initialize :	; the read function as opposed to the above test
 	pusha
@@ -320,13 +322,14 @@ AHCI.initialize.checkReadyToEnable :
 	ret
 
 AHCI.initialize.showFailMsg :
-pusha
-mov eax, AHCI_FAILMSG
-mov ebx, SysHaltScreen.KILL
-mov ecx, 30
-call SysHaltScreen.show
-popa
-jmp kernel.halt
+	pusha
+		mov eax, AHCI_FAILMSG
+		mov ebx, SysHaltScreen.KILL
+		mov ecx, 30
+		call SysHaltScreen.show
+	popa
+	jmp kernel.halt
+
 AHCI_FAILMSG :
 	db "AHCI Initialize failed.", 0
 
