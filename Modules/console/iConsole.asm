@@ -120,6 +120,13 @@ ret
 ;popa
 ;ret
 
+console.runOHLL_workaround :
+		mov bl, [OHLLPROTO_PNUM]
+		call ProgramManager.setActive
+			call iConsole._loop
+		call ProgramManager.finalize
+	ret
+
 console.setWidth :
 pusha
 and ebx, 0xFFFF

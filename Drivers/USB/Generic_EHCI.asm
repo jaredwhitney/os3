@@ -1,3 +1,10 @@
+USB.init :
+	pusha
+		;call USB_InitController
+		;call USB_EnablePlugAndPlay
+	popa
+	ret
+
 USB_PrintControllerInfo :
 pusha
 	call USB_CheckExists

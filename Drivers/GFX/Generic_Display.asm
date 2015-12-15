@@ -115,6 +115,8 @@ Graphics.doVESAtest.sub :
 	ret
 
 Graphics.init :
+	cmp dword [DisplayMode], MODE_TEXT
+		je Graphics.init.ret
 	pusha
 	mov ebx, Graphics.VESA_SUPPORTED_MSG
 	call debug.print
@@ -150,6 +152,7 @@ Graphics.init :
 		call Graphics.setGrayscalePalette
 		call Graphics.setVGApalette
 	popa
+	Graphics.init.ret :
 	ret
 	
 Graphics.grabCardName :

@@ -15,7 +15,7 @@ pusha
 	call PCI.getObjectFromSearch
 	mov [ATA_DEVICE], ecx
 	
-		call AHCI_INIT
+		call AHCI.initialize
 	
 	mov eax, SysHaltScreen.WARN
 	mov ecx, 1
@@ -86,7 +86,7 @@ ret
 				mov eax, [AHCI_PORTALLOCEDMEM+0x118]
 				or eax, 0b10000	; set bit 4 to enable FIS returning
 				
-								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.65 AND p.81
+								;	use http://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/serial-ata-ahci-spec-rev1_1.pdf p.71 AND p.81
 				; Command Header
 				mov ebx, [AHCI_PORTALLOCEDMEM]
 				mov word [ebx+2], 0	; 0 PRDTs
@@ -162,21 +162,43 @@ ret
 AHCI.initialize :	; the read function as opposed to the above test
 	pusha
 	
+		; Store AHCI memory location
+		mov ecx, [ATA_DEVICE]
+		mov bh, 0x24
+		call PCI.readFromObject
+		mov [AHCI_MEMLOC], ecx
+		
+		; Tell the controller that it should be in AHCI mode (1)
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, 0x04	; GHC
 		mov ecx, [ebx]
 		or ecx, 0b1<<31	; SET AHCI enable (GHC.AE)
 		
-		; Idle port detection
+		; Idle port detection (3)
 		call AHCI.initialize.ensureIdle
 		
+		; Allocate memory for ports (5a)
+		mov eax, 5
+		mov ebx, 10	; allocate 10 sectors
+		call Guppy.malloc
+		mov [AHCI_PORTALLOCEDMEM], ebx
+		
+		; Program controller with memory locations (5b)
+		call AHCI.initialize.programMemoryLocations
+		
+		; Clear the error register (6)
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, 0x100	; Port 0 (should make this work with all ports)
 		add ebx, 0x30	; PxSERR (port errors)
-		mov dword [ebx], 0x0	; CLEAR PxSERR
+		mov dword [ebx], 0x1	; CLEAR PxSERR (Should maybe just be ~0 to make sure it clears everything? The language in the spec is rather ambiguous...)
 		
+		; Enable FIS return
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x18	; PxCMD
+		mov eax, [ebx]
+		or eax, 0b10000	; set bit 4 (PxCMD.FR)
+		mov [ebx], eax
 		
 	popa
 	ret
@@ -186,7 +208,7 @@ AHCI.initialize.ensureIdle :
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, 0x100	; Port 0 (should make this work with all ports)
 		add ebx, 0x18	; PxCMD
-		test [ebx], 0b1000000000000001	; b0 = PxCMD.ST, b15= PxCMD.CR
+		test dword [ebx], 0b1000000000000001	; b0 = PxCMD.ST, b15= PxCMD.CR
 			jz AHCI.initialize.portIdle_0
 		; Clear PxCMD.ST and PxCMD.CR
 		mov ecx, [ebx]
@@ -204,7 +226,7 @@ AHCI.initialize.ensureIdle :
 				jg AHCI.initialize.showFailMsg
 			jmp AHCI.initialize.makePortIdle.loop0
 		AHCI.initialize.portIdle_0 :
-		test [ebx], 0b100000000010000	; b4 = PxCMD.FRE, b14 = PxCMD.FR
+		test dword [ebx], 0b100000000010000	; b4 = PxCMD.FRE, b14 = PxCMD.FR
 			jz AHCI.initialize.portIdle_1
 		; Clear PxCMD.FRE and PxCMD.FR
 			mov ecx, [ebx]
@@ -215,7 +237,7 @@ AHCI.initialize.ensureIdle :
 			AHCI.initialize.makePortIdle.loop1 :
 				mov ecx, [ebx]
 				test ecx, 0b100000000000000
-					jz AHCI.initialize.portIdle_1 :
+					jz AHCI.initialize.portIdle_1
 				mov edx, [Clock.tics]
 				sub edx, eax
 				cmp edx, 2500	; 500ms
@@ -224,6 +246,50 @@ AHCI.initialize.ensureIdle :
 		AHCI.initialize.portIdle_1 :
 	popa
 	ret
+
+AHCI.initialize.programMemoryLocations :
+	pusha
+	
+		; Set Command List location
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x0	; PxCLB
+		mov ecx, [AHCI_PORTALLOCEDMEM]
+		mov [ebx], ecx ; PxCLB points to a 1k region
+		
+		; (Set upper dword)
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x4	; PxCLBU
+		mov dword [ebx], 0	; No support for 64bit atm
+		
+		; Set FIS location
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this work with all ports)
+		add ebx, 0x8	; PxFB
+		mov ecx, [AHCI_PORTALLOCEDMEM]
+		add ecx, 0x1000
+		mov [ebx], ecx	; PxFB points to a 256 byte region
+		
+		; (Set upper dword)
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, 0x100	; Port 0 (should make this word with all ports)
+		add ebx, 0xC	; PxFBU
+		mov dword [ebx], 0	; No support for 64bit atm
+		
+	popa
+	ret
+
+AHCI.initialize.showFailMsg :
+pusha
+mov eax, AHCI_FAILMSG
+mov ebx, SysHaltScreen.KILL
+mov ecx, 30
+call SysHaltScreen.show
+popa
+jmp kernel.halt
+AHCI_FAILMSG :
+	db "AHCI Initialize failed.", 0
 
 	
 ATA_STR :
