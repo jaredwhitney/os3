@@ -216,7 +216,13 @@ AHCI.initialize :	; the read function as opposed to the above test
 		add ebx, 0x100	; Port 0
 		add ebx, 0x18	; PxCMD
 		mov ecx, [ebx]
-		or ecx, 0b1
+		or ecx, 0b1000	; PxCMD.CLO 
+		mov [ebx], ecx
+		AHCI.initialize.enable.wait :
+			mov ecx, [ebx]
+			test ecx, 0b1000
+				jnz AHCI.initialize.enable.wait
+		or ecx, 0b1	; PxCMD.ST
 		mov [ebx], ecx
 		
 	popa
@@ -315,7 +321,8 @@ AHCI.initialize.checkReadyToEnable :
 		add ebx, 0x100	; Port 0
 		add ebx, 0x28	; PxSSTS
 		mov ecx, [ebx]
-		test ecx, 0b011
+		and ecx, 0b111	; PxSSTS.DET
+		cmp ecx, 0b011
 			jnz AHCI.initialize.showFailMsg
 		
 	popa
@@ -323,8 +330,8 @@ AHCI.initialize.checkReadyToEnable :
 
 AHCI.initialize.showFailMsg :
 	pusha
-		mov eax, AHCI_FAILMSG
-		mov ebx, SysHaltScreen.KILL
+		mov eax, SysHaltScreen.KILL
+		mov ebx, AHCI_FAILMSG
 		mov ecx, 30
 		call SysHaltScreen.show
 	popa

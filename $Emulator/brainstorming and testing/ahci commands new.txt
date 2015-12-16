@@ -1,0 +1,34 @@
+Section 5.6.2.3 (Structure of a DMA Read):
+
+  see section 5.5.1
+  PRD table YES
+  ATAPI NO
+  queued NO
+  CH(slot).W ZEROED
+  CH(slot).P MAY BE ZERO OR ONE
+
+  returns a data FIS
+
+Steps:
+  build FIS at PxCLB[CH(slot)]:CFIS
+  if ATAPI fill ACMD (its not)
+  build header at PxCLB[CH(slot)]:
+      PRDTL with num of PRD entries
+      CFL = length of cmd in CFIS
+      'A' = SET if ATAPI
+      'W' = SET if write
+      'P' = Prefetch....
+      PMP is port multiplier (ignore atm)
+
+
+; atm for os3:
+;	[AHCI_PORTALLOCEDMEM]+0x0000: PxCLB
+;	[AHCI_PORTALLOCEDMEM]+0x1000: PxFB
+
+; so when making a command:
+;   alloc some memory for the FIS, PRDTs, etx
+;   build the FIS at the alloced memory
+;   build the PRDTs at the alloced memory
+;   find a free slot in PxCLB
+;   build a command header in the free slot pointing to the alloced memory
+;   set the port command issue bit for the slot (PxCI|=1<<slot)
