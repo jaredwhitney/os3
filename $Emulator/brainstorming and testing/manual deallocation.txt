@@ -1,0 +1,15 @@
+just for now force programs to call:
+	"dealloc ObjectName" in OrcaHLL
+	"push [ObjectName]" \ "call ProgramManager.dealloc" in asm
+
+
+PM memory map::
+	dd start1
+	dd size1
+	dd start2
+	dd size2
+	dd start3
+	dd size3
+	...
+	etx
+
