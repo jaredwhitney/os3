@@ -14,6 +14,7 @@
 %include "..\Drivers\PS2\Generic_Keyboard.asm"
 
 %include "..\Drivers\HDD\ATA_DETECT.asm"
+%include "..\Drivers\HDD\AHCI_COMMANDS.asm"
 
 %include "..\Drivers\GFX\Generic_Display.asm"
 
