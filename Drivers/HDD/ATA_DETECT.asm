@@ -382,6 +382,25 @@ AHCI_P0CLB :
 AHCI_P0FB :
 	dd 0x0
 	
+	
+AHCI_PxCLB equ 0x0
+AHCI_PxCLBU equ 0x4
+AHCI_PxFB equ 0x8
+AHCI_PxFBU equ 0xC
+AHCI_PxIS equ 0x10
+AHCI_PxIE equ 0x14
+AHCI_PxCMD equ 0x18
+AHCI_PxTFD equ 0x20
+AHCI_PxSIG equ 0x24
+AHCI_PxSSTS equ 0x28
+AHCI_PxSCTL equ 0x2C
+AHCI_PxSERR equ 0x30
+AHCI_PxSACT equ 0x34
+AHCI_PxCI equ 0x38
+AHCI_PxSNTF equ 0x3C
+
+AHCI_PORT0 equ 0x100
+	
 ;DISK_DEVICELIST :
 ;	times 255 dq 0, 0, 0, 0	; support up to 255 'PCI_DEVICE's
 	

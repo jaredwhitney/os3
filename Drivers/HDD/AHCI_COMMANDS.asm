@@ -28,8 +28,8 @@ AHCI.DMAread.allocateMemory :
 		mov ecx, 40000000
 		xor edx, edx
 		idiv ecx
-		add ecx, 1
-		mov [AHCI_DMAread_PRDTcount], ecx; need ecx PRDTs
+		add eax, 1
+		mov [AHCI_DMAread_PRDTcount], eax; need ecx PRDTs
 		imul ecx, 32	; 32 bytes per PRDT
 		add ecx, 0x80	; other bytes needed in the command
 		mov eax, ecx
@@ -43,10 +43,6 @@ AHCI.DMAread.allocateMemory :
 		mov ebx, ecx
 		call Guppy.malloc
 		mov [AHCI_DMAread_commandLoc], ebx
-		; zero out the buffer
-		mov eax, [AHCI_DMAread_commandLoc]
-		mov ebx, [AHCI_DMAread_byteCount]
-		call Buffer.clear
 		; need to also allocate data buffer here!!!!~!
 		mov eax, [AHCI_DMAread_byteCount]
 		sub eax, 1
@@ -58,6 +54,12 @@ AHCI.DMAread.allocateMemory :
 		mov eax, 0x5
 		call Guppy.malloc
 		mov [AHCI_DMAread_dataBuffer], ebx
+		
+		; zero out the buffer
+		mov eax, [AHCI_DMAread_dataBuffer]
+		mov ebx, [AHCI_DMAread_byteCount]
+		call Buffer.clear
+		
 	popa
 	ret
 
@@ -65,9 +67,9 @@ AHCI.DMAread.buildFIS :
 	pusha
 		mov ebx, [AHCI_DMAread_commandLoc]
 		mov byte [ebx+0x0], 0x27	; h2d
-		mov byte [ebx+0x1], 0x01	; no port mul, is a command
+		mov byte [ebx+0x1], 0x01	; no port mul, is a command	... OR 0x80 ??
 		mov byte [ebx+0x2], 0x25	; the command [means ATA DMA...?]
-		mov byte [ebx+0x3], 0x00	; should be the feature low byte?
+		mov byte [ebx+0x3], 0x00	; should be the feature low byte?	zeroed for now
 		mov cl, [AHCI_DMAread_LL]
 		mov [ebx+0x4], cl
 		mov cl, [AHCI_DMAread_LM]
@@ -81,7 +83,7 @@ AHCI.DMAread.buildFIS :
 		mov [ebx+0x9], cl
 		mov cl, [AHCI_DMAread_HH]
 		mov [ebx+0xA], cl
-		mov byte [ebx+0xB], 0x00	; should be the feature high byte
+		mov byte [ebx+0xB], 0x00	; should be the feature high byte	zeroed for now
 		mov eax, edx
 		sub eax, 1
 		mov ecx, 0x1000
@@ -89,7 +91,6 @@ AHCI.DMAread.buildFIS :
 		idiv ecx
 		add eax, 1
 		mov [ebx+0xC], al	; CALCLUATE COUNT LOW (SECTORS) AND PUT IT HERE
-		shr eax, 8
 		mov [ebx+0xD], ah	; CALCULATE COUNT HIGH (SECTORS) AND PUT IT HERE
 		mov byte [ebx+0xE], 0x00	; should be isync command completion
 		mov byte [ebx+0xF], 0x00	; should be the control register?
@@ -109,7 +110,7 @@ AHCI.DMAread.buildPRDTs :
 			mov dword [ecx+4], 0x0	; upper dword
 			mov dword [ecx+8], 0x0	; resv
 			cmp edx, 0b1000000000000000000000	; the number of bytes in a max size PRDT
-				jl AHCI.DMAread.buildPRDTs.handleSmallRead
+				jmp AHCI.DMAread.buildPRDTs.handleSmallRead
 			mov dword [ecx+12], 0b111111111111111111111	; size, although NOT REALLY! the last PRDT should NOT have this size reported! (size-1)
 			jmp AHCI.DMAread.buildPRDTs.countHandlingDone
 			AHCI.DMAread.buildPRDTs.handleSmallRead :
@@ -131,12 +132,12 @@ AHCI.DMAread.findFreeSlot :	; based off of http://wiki.osdev.org/AHCI
 	pusha
 		; if the bit in PxSACT and PxCI are both free, the slot is free
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0
-		add ebx, 0x38	; PxCI
+		add ebx, AHCI_PORT0	; Port 0
+		add ebx, AHCI_PxCI	; PxCI
 		mov ecx, [ebx]
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0
-		add ebx, 0x34	; PxSACT
+		add ebx, AHCI_PORT0	; Port 0
+		add ebx, AHCI_PxSACT	; PxSACT
 		or ecx, [ebx]
 		mov eax, 0x0
 		AHCI.DMAread.findFreeSlot.loop :
@@ -181,8 +182,8 @@ AHCI.DMAread.buildCommandHeader :
 AHCI.DMAread.sendCommand :
 	pusha
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0
-		add ebx, 0x38	; PxCI
+		add ebx, AHCI_PORT0	; Port 0
+		add ebx, AHCI_PxCI	; PxCI
 		mov cl, [AHCI_DMAread_commandSlot]
 		mov eax, 1
 		shl eax, cl	; mask into position
@@ -195,10 +196,10 @@ AHCI.DMAread.sendCommand :
 AHCI.DMAread.waitForCompletion :
 	pusha
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0
-		add ebx, 0x38	; PxCI
+		add ebx, AHCI_PORT0	; Port 0
+		add ebx, AHCI_PxCI	; PxCI
 		mov cl, [AHCI_DMAread_commandSlot]
-		mov eax, 12
+		mov eax, 1
 		shl eax, cl
 		AHCI.DMAread.waitForCompletion.loop :
 		mov edx, [ebx]
