@@ -30,9 +30,8 @@ AHCI.DMAread.allocateMemory :
 		idiv ecx
 		add eax, 1
 		mov [AHCI_DMAread_PRDTcount], eax; need ecx PRDTs
-		imul ecx, 32	; 32 bytes per PRDT
-		add ecx, 0x80	; other bytes needed in the command
-		mov eax, ecx
+		imul eax, 32	; 32 bytes per PRDT
+		add eax, 0x80	; other bytes needed in the command
 		sub eax, 1
 		mov ecx, 0x1000	; sector size
 		xor edx, edx
@@ -68,7 +67,7 @@ AHCI.DMAread.buildFIS :
 		mov ebx, [AHCI_DMAread_commandLoc]
 		mov byte [ebx+0x0], 0x27	; h2d
 		mov byte [ebx+0x1], 0x01	; no port mul, is a command	... OR 0x80 ??
-		mov byte [ebx+0x2], 0x25	; the command [means ATA DMA...?]
+		mov byte [ebx+0x2], 0x25	; the command [means ATA DMA READ]
 		mov byte [ebx+0x3], 0x00	; should be the feature low byte?	zeroed for now
 		mov cl, [AHCI_DMAread_LL]
 		mov [ebx+0x4], cl
@@ -162,12 +161,17 @@ AHCI.DMAread.buildCommandHeader :
 		mov ecx, [AHCI_PORTALLOCEDMEM]
 		add ecx, eax	; ecx points to the command header
 		; FIS size is 20
-		mov ax, [AHCI_DMAread_PRDTcount]
-		shl eax, 16
-		mov ax, 0b00000100000;	PMP (4) | resv | clearBusy | BIST | Reset | Prefetch | Write | ATAPI
-		shl ax, 5
-		or ax, 5	; 5 dwords in the FIS
+		mov eax, [AHCI_DMAread_PRDTcount]
+		shl eax, 16-5
+		or eax, 0b00000100000;	PMP (4) | resv | clearBusy | BIST | Reset | Prefetch | Write | ATAPI
+		shl eax, 5
+		or eax, 5	; 5 dwords in the FIS
 		mov [ecx], eax	; write the first dword
+			pusha
+			mov ebx, eax
+			call console.numOut
+			call console.newline
+			popa
 		mov dword [ecx+0x4], 0	; stores the number of bytes that have already been transferred
 		mov eax, [AHCI_DMAread_commandLoc]
 		mov [ecx+0x8], eax	; write the third dword
@@ -200,11 +204,18 @@ AHCI.DMAread.waitForCompletion :
 		add ebx, AHCI_PxCI	; PxCI
 		mov cl, [AHCI_DMAread_commandSlot]
 		mov eax, 1
-		shl eax, cl
+		;shl eax, cl
 		AHCI.DMAread.waitForCompletion.loop :
 		mov edx, [ebx]
 		test edx, eax
 			jnz AHCI.DMAread.waitForCompletion.loop
+				pusha
+				mov ebx, [AHCI_PORTALLOCEDMEM]
+				add ebx, 0x1000
+				mov ebx, [ebx]
+				call console.numOut
+				call console.newline
+				popa
 	popa
 	ret
 

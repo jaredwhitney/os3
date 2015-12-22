@@ -198,14 +198,14 @@ AHCI.initialize :	; the read function as opposed to the above test
 		
 		; Clear the error register (6)
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0 (should make this work with all ports)
-		add ebx, 0x30	; PxSERR (port errors)
+		add ebx, AHCI_PORT0	; Port 0 (should make this work with all ports)
+		add ebx, AHCI_PxSERR	; PxSERR (port errors)
 		mov dword [ebx], 0x1	; CLEAR PxSERR (Should maybe just be ~0 to make sure it clears everything? The language in the spec is rather ambiguous...)
 		
 		; Enable FIS return
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0 (should make this work with all ports)
-		add ebx, 0x18	; PxCMD
+		add ebx, AHCI_PORT0	; Port 0 (should make this work with all ports)
+		add ebx, AHCI_PxCMD	; PxCMD
 		mov eax, [ebx]
 		or eax, 0b10000	; set bit 4 (PxCMD.FR)
 		mov [ebx], eax
@@ -213,8 +213,8 @@ AHCI.initialize :	; the read function as opposed to the above test
 		; Enable the port(SET PxCMD.ST) (should make this work with all ports)
 		call AHCI.initialize.checkReadyToEnable
 		mov ebx, [AHCI_MEMLOC]
-		add ebx, 0x100	; Port 0
-		add ebx, 0x18	; PxCMD
+		add ebx, AHCI_PORT0	; Port 0
+		add ebx, AHCI_PxCMD	; PxCMD
 		mov ecx, [ebx]
 		or ecx, 0b1000	; PxCMD.CLO 
 		mov [ebx], ecx
@@ -224,6 +224,14 @@ AHCI.initialize :	; the read function as opposed to the above test
 				jnz AHCI.initialize.enable.wait
 		or ecx, 0b1	; PxCMD.ST
 		mov [ebx], ecx
+		
+		; Set the FIS Recieve Enable bit
+		mov ebx, [AHCI_MEMLOC]
+		add ebx, AHCI_PORT0
+		add ebx, AHCI_PxCMD
+		mov eax, [ebx]
+		or eax, 0b10000
+		mov [ebx], eax
 		
 	popa
 	ret
