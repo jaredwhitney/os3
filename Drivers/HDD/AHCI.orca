@@ -1,0 +1,71 @@
+classdef AHCI
+
+	Buffer dataBuffer
+	Buffer commandBuffer
+	int PRDTcount
+	
+	declared int AHCI.PxCI		= 0x38
+	declared int AHCI.PxSACT	= 0x34
+	
+	func DMAread (Buffer : HBAval val, int length)
+		int port = 0	; should not be hardcoded
+		AllocateReadMemory(length)
+		BuildReadFIS()
+		BuildReadPRDTs()
+		byte slot = findFreeSlot(port)
+		BuildReadCommandHeader(port, slot)
+		SendCommand(port, slot)
+		WaitForCommandCompletion()
+		sys ShowHaltScreen(SysHaltScreen.WARN, readCompleteMsg, 5)
+		return dataBuffer
+	
+	func AllocateReadMemory (void : int length)
+		PRDTcount = (length - 1) / 40000000
+		int commandSize = (PRDTcount * 32) + 0x80
+		commandBuffer = new Buffer(commandSize)
+		dataBuffer = new Buffer(length)
+		
+	func BuildReadFIS (void : HBAval hba, int length)
+		memcopy(new DMAreadFIS(hba, length), sizeof(DMAreadFIS), commandBuffer.location)	; unsure as to whether or not the last argument in all of these calls needs and '@' or not
+	
+	func BuildReadPRDTs (void : int length)
+		int pos = commandBuffer.location + 0x80
+		int dataLoc = dataBuffer.location
+		for (int loopCount = PRDTcount : loopCount > 0 : loopCount -= 1)
+			int size = 0x200000
+			if (loopCount == 1)
+				size = length
+			memcopy(new PRDT(dataLoc, size), sizeof(PRDT), pos)
+			length -= 0x200000
+			dataLoc += 0x200000
+			pos += 10
+			
+	func FindFreeSlot (byte : int port)
+		int poffs = (port * 0x80) + 0x100
+		int commandMask = @(asm_var(AHCI_MEMLOC) + poffs + AHCI.PxCI)
+		int activeMask = @(asm_var(AHCI_MEMLOC) + poffs + AHCI.PxSACT)
+		int mask = commandMask | activeMask
+		for (byte slot = 0 : slot < 32 : slot++)
+			if ((mask & 1) == 0)
+				return slot
+			mask = mask >> 1
+		sys ShowHaltScreen(SysHaltScreen.KILL, readFailMsg, 5)
+	
+	func BuildReadCommandHeader (void : int port, byte slot)
+		int sloffs = slot * 0x20
+		int commandHeaderLoc = asm_var(PORTALLOCEDMEM) + sloffs
+		AHCICommandHeader header = new AHCICommandHeader(PRDTcount, 0, AHCICommandHeader.CLEAR_BUSY, sizeof(DMAreadFIS), commandBuffer)
+		memcopy(header, sizeof(AHCICommandHeader), commandHeaderLoc)
+		
+	func SendCommand (void : int port, byte slot)
+		int poffs = (port * 0x80) + 0x100
+		int commandIssue = asm_var(AHCI_MEMLOC) + poffs + AHCI.PxCI
+		int mod = 1 << slot
+		@commandIssue |= mod
+	
+	func WaitForCommandCompletion (void : null)
+		int poffs = (port * 0x80) + 0x100
+		int commandIssue = asm_var(AHCI_MEMLOC) + poffs + AHCI.PxCI
+		int mod = 1 << slot
+		while ((@commandIssue & mod) != 0)
+	
