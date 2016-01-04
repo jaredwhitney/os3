@@ -15,6 +15,7 @@
 
 %include "..\Drivers\HDD\ATA_DETECT.asm"
 %include "..\Drivers\HDD\AHCI_COMMANDS.asm"
+%include "..\Drivers\HDD\ATA_PIO.asm"
 
 %include "..\Drivers\GFX\Generic_Display.asm"
 
