@@ -20,15 +20,15 @@ pusha
 
 
 ;
-	mov ah, 0x01
-	mov al, 0x05
-	mov bl, 0x20
-	call PCI.getDeviceByDescription
-	cmp dh, 0xFF
-		je ATA0.nodevFound
-	jmp ATA0.unknownType
-popa
-ret
+;	mov ah, 0x01
+;	mov al, 0x05
+;	mov bl, 0x20
+;	call PCI.getDeviceByDescription
+;	cmp dh, 0xFF
+;		je ATA0.nodevFound
+;	jmp ATA0.unknownType
+;popa
+;ret
 
 	mov dx, ATA1_STATPORT
 	in al, dx

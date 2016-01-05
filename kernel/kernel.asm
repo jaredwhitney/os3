@@ -39,6 +39,9 @@ Kernel.init :
 		call console.newline
 		
 		;call ATAPIO.init
+
+		;call ATA0.init
+
 	;	SET UP THE ORCAHLL CONSOLE AND MEMORY WORKAROUND	;
 		call kernel.OrcaHLLsetup_memhack
 	

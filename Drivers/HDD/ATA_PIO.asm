@@ -6,6 +6,7 @@ ATA_PIO0_LBAmid		equ 0x1F4
 ATA_PIO0_LBAhigh	equ 0x1F5
 ATA_PIO0_DRVSEL		equ 0x1F6
 ATA_PIO0_CMD		equ 0x1F7
+ATA_PIO0_STAT		equ 0x1F7
 ATA_PIO0_CTRL8		equ 0x1F8
 
 ATA_PIO1_CTRL0	equ 0x170
@@ -16,10 +17,11 @@ ATA_PIO1_CTRL4	equ 0x174
 ATA_PIO1_CTRL5	equ 0x175
 ATA_PIO1_CTRL6	equ 0x176
 ATA_PIO1_CTRL7	equ 0x177
+ATA_PIO1_STAT	equ 0x177
 ATA_PIO1_CTRL8	equ 0x178
 
-ATA_PIO0_STAT	equ 0x3F6
-ATA_PIO1_STAT	equ 0x376
+ATA_PIO0_ASTAT	equ 0x3F6
+ATA_PIO1_ASTAT	equ 0x376
 
 ATA_PIO_DRIVE0	equ 0xA0
 ATA_PIO_DRIVE1	equ 0xB0
@@ -50,8 +52,9 @@ ATAPIO.checkFloat :
 	pusha
 		mov dx, ATA_PIO0_STAT
 		in al, dx
+		mov ebx, ATAPIO.STR_FOUNDFLOAT
 		cmp al, 0xFF
-			je kernel.halt	; ATA DEV MASTER MISSING
+			je ATAPIO.showMessage
 	popa
 	ret
 
@@ -143,7 +146,14 @@ ATAPIO.doIdentifyOther :
 		cmp ax, 0x3CC3
 			je ATAPIO.showMessage
 		
-	jmp kernel.halt	; ATA DEV UNKNOWN
+		xor ebx, ebx
+		mov bx, ax
+		mov eax, ATAPIO.STR_DEVUNKNOWN
+		add eax, 31
+		call String.fromHex
+		
+		mov ebx, ATAPIO.STR_DEVUNKNOWN
+		jmp ATAPIO.showMessage	; ATA DEV UNKNOWN
 
 ATAPIO.showMessage :
 	mov eax, SysHaltScreen.WARN
@@ -158,6 +168,10 @@ ATAPIO.STR_FOUNDSATA :
 	db "ATA Found a SATA Device", 0
 ATAPIO.STR_FOUNDATA :
 	db "ATA Found and ATA Device", 0
+ATAPIO.STR_DEVUNKNOWN :
+	db "ATA Unable to Identify Device: ", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+ATAPIO.STR_FOUNDFLOAT :
+	db "ATA Floating Bus Detected", 0
 	
 ATA_PIO0.IDENTIFY_RESPONSE :
 	dd 0x0
