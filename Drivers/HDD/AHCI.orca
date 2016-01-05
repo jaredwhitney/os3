@@ -1,3 +1,6 @@
+import "HBAval"
+import "DMAreadFIS"
+
 classdef AHCI
 
 	Buffer dataBuffer

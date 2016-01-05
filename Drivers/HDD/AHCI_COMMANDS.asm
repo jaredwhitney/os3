@@ -154,12 +154,12 @@ AHCI.DMAread.findFreeSlot :	; based off of http://wiki.osdev.org/AHCI
 
 AHCI.DMAread.buildCommandHeader :
 	pusha
-		xor eax, eax
-		mov al, [AHCI_DMAread_commandSlot]
-		mov ecx, 0x20
-		imul ecx
+		;;;xor eax, eax
+		;;;mov al, [AHCI_DMAread_commandSlot]
+		;;;mov ecx, 0x20
+		;;;imul ecx
 		mov ecx, [AHCI_PORTALLOCEDMEM]
-		add ecx, eax	; ecx points to the command header
+		;;;add ecx, eax	; ecx points to the command header
 		; FIS size is 20
 		mov eax, [AHCI_DMAread_PRDTcount]
 		shl eax, 16-5
@@ -210,9 +210,9 @@ AHCI.DMAread.waitForCompletion :
 		test edx, eax
 			jnz AHCI.DMAread.waitForCompletion.loop
 				pusha
-				mov ebx, [AHCI_PORTALLOCEDMEM]
-				add ebx, 0x1000
-				mov ebx, [ebx]
+				;mov ebx, [AHCI_PORTALLOCEDMEM]
+				;add ebx, 0x1000
+				mov ebx, edx;[ebx]
 				call console.numOut
 				call console.newline
 				popa

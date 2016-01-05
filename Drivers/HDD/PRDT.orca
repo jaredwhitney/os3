@@ -1,0 +1,13 @@
+classdef PRDT
+	
+	linked int pos
+	linked int pos_upper
+	linked int resv
+	linked int size
+	
+	func Create (PRDT : int dloc, int size)
+		PRDT ret = sys Program.Ealloc($LinkedClassSize)
+		ret.pos = dloc
+		ret.size = size
+		return ret
+	
