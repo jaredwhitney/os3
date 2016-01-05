@@ -19,26 +19,26 @@ Kernel.init :
 		call kernel.checkRunTextModeInit
 	
 	;	INITIALIZE THE AHCI DRIVER	;
-		;call ATA_DETECT
-		;mov eax, 0x0
-		;mov bx, 0x0
-		;mov edx, 0x1000
-		;call AHCI.DMAread
+		call ATA_DETECT
+		mov eax, 0x0
+		mov bx, 0x0
+		mov edx, 0x1000
+		call AHCI.DMAread
 		;add ecx, 0x1BE
-		;mov ebx, [ecx]
-		;call console.numOut
-		;call console.newline
-		;mov ebx, [ecx+4]
-		;call console.numOut
-		;call console.newline
-		;mov ebx, [ecx+8]
-		;call console.numOut
-		;call console.newline
-		;mov ebx, [ecx+12]
-		;call console.numOut
-		;call console.newline
+		mov ebx, [ecx]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+4]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+8]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+12]
+		call console.numOut
+		call console.newline
 		
-		call ATAPIO.init
+		;call ATAPIO.init
 	;	SET UP THE ORCAHLL CONSOLE AND MEMORY WORKAROUND	;
 		call kernel.OrcaHLLsetup_memhack
 	

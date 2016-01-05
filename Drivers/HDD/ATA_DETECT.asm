@@ -1,6 +1,8 @@
 ATA_DETECT :
 	pusha
+	
 		xor ecx, ecx
+		;call AHCI.initialize.showFailMsg
 		ATA_DETECT.loop :
 		push ecx
 		mov edx, ecx
@@ -16,7 +18,7 @@ ATA_DETECT :
 		mov [ATA_DEVICE], ecx
 		
 		call AHCI.initialize
-	
+		
 		mov eax, SysHaltScreen.WARN
 		mov ecx, 1
 		mov ebx, ATA_STR
@@ -200,7 +202,7 @@ AHCI.initialize :	; the read function as opposed to the above test
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, AHCI_PORT0	; Port 0 (should make this work with all ports)
 		add ebx, AHCI_PxSERR	; PxSERR (port errors)
-		mov dword [ebx], 0x1	; CLEAR PxSERR (Should maybe just be ~0 to make sure it clears everything? The language in the spec is rather ambiguous...)
+		mov dword [ebx], 0xFFFFFFFF	; CLEAR PxSERR (Should maybe just be ~0 to make sure it clears everything? The language in the spec is rather ambiguous...)
 		
 		; Enable FIS return
 		mov ebx, [AHCI_MEMLOC]
@@ -365,10 +367,10 @@ ATA_STR5 :
 db "Found SATA Controller (AHCI 1.0).", 0
 
 ATA_DAT :
-db 1, 1, 0x00
-db 1, 4, 0x00
-db 1, 5, 0x20
-db 1, 5, 0x30
+;db 1, 1, 0x00
+;db 1, 4, 0x00
+;db 1, 5, 0x20
+;db 1, 5, 0x30
 db 1, 6, 0x00
 db 1, 6, 0x01
 

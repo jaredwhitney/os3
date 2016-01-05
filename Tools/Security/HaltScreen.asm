@@ -5,6 +5,13 @@ SysHaltScreen.RESET	equ 0x3
 SysHaltScreen.show :	; warn type in eax, message in ebx, timeout in ecx (if applicable)
 pusha
 mov byte [INTERRUPT_DISABLE], 0xFF
+
+	;
+	;pusha
+	;mov ah, 0xFF
+	;call console.println
+	;popa
+	;
 	
 	mov [SHS.wtyp], eax
 	mov [SHS.ss], ebx

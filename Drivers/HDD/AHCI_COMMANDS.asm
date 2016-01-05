@@ -2,6 +2,8 @@ AHCI.DMAread :	; HBA low = eax, HBA high = bx, length = edx, returns ecx = data 
 	push eax
 	push ebx
 	push edx
+		mov eax, 0x1000
+		call System.sleep
 		call AHCI.DMAread.storeHBAvals
 		call AHCI.DMAread.allocateMemory
 		call AHCI.DMAread.buildFIS
@@ -9,6 +11,7 @@ AHCI.DMAread :	; HBA low = eax, HBA high = bx, length = edx, returns ecx = data 
 		call AHCI.DMAread.findFreeSlot
 		call AHCI.DMAread.buildCommandHeader
 		call AHCI.DMAread.sendCommand
+		;call AHCI.DMAread.showFailMsg
 		call AHCI.DMAread.waitForCompletion
 		mov eax, SysHaltScreen.WARN
 		mov ebx, AHCI_DMAread_COMPLETEMSG
@@ -141,10 +144,10 @@ AHCI.DMAread.findFreeSlot :	; based off of http://wiki.osdev.org/AHCI
 		mov eax, 0x0
 		AHCI.DMAread.findFreeSlot.loop :
 			test ecx, 0b1
-				je AHCI.DMAread.findFreeSlot.ret
+				jz AHCI.DMAread.findFreeSlot.ret
 			add eax, 1
 			cmp eax, 32	; slot 32 and above do not exist!
-				jmp AHCI.DMAread.showFailMsg
+				jge AHCI.DMAread.showFailMsg
 			shr ecx, 1
 			jmp AHCI.DMAread.findFreeSlot.loop
 		AHCI.DMAread.findFreeSlot.ret :
@@ -199,12 +202,14 @@ AHCI.DMAread.sendCommand :
 
 AHCI.DMAread.waitForCompletion :
 	pusha
+		;mov eax, 0x1000
+		;call System.sleep
 		mov ebx, [AHCI_MEMLOC]
 		add ebx, AHCI_PORT0	; Port 0
 		add ebx, AHCI_PxCI	; PxCI
 		mov cl, [AHCI_DMAread_commandSlot]
 		mov eax, 1
-		;shl eax, cl
+		shl eax, cl
 		AHCI.DMAread.waitForCompletion.loop :
 		mov edx, [ebx]
 		test edx, eax
