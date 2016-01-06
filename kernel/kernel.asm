@@ -22,9 +22,9 @@ Kernel.init :
 		call ATA_DETECT
 		mov eax, 0x0
 		mov bx, 0x0
-		mov edx, 0x1000
+		mov edx, 0x4000
 		call AHCI.DMAread
-		;add ecx, 0x1BE
+		add ecx, 0x1BE
 		mov ebx, [ecx]
 		call console.numOut
 		call console.newline

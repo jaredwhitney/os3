@@ -2,8 +2,6 @@ AHCI.DMAread :	; HBA low = eax, HBA high = bx, length = edx, returns ecx = data 
 	push eax
 	push ebx
 	push edx
-		mov eax, 0x1000
-		call System.sleep
 		call AHCI.DMAread.storeHBAvals
 		call AHCI.DMAread.allocateMemory
 		call AHCI.DMAread.buildFIS
@@ -18,12 +16,41 @@ AHCI.DMAread :	; HBA low = eax, HBA high = bx, length = edx, returns ecx = data 
 		mov ecx, 5
 		call SysHaltScreen.show
 		mov ecx, [AHCI_DMAread_dataBuffer]
+		call AHCI.DMAread.displayErrors
 	pop edx
 	pop ebx
 	pop eax
 	ret
-
+AHCI.DMAread.displayErrors :
+	pusha
+		mov eax, [AHCI_MEMLOC]
+		add eax, AHCI_PORT0
+		add eax, AHCI_PxCLB
+		mov ebx, [eax]
+		call console.numOut
+		call console.newline
+		mov eax, [AHCI_MEMLOC]
+		add eax, AHCI_PORT0
+		add eax, AHCI_PxCLBU
+		mov ebx, [eax]
+		call console.numOut
+		call console.newline
+		mov eax, [AHCI_MEMLOC]
+		add eax, AHCI_PORT0
+		add eax, AHCI_PxFB
+		mov ebx, [eax]
+		call console.numOut
+		call console.newline
+		mov eax, [AHCI_MEMLOC]
+		add eax, AHCI_PORT0
+		add eax, AHCI_PxFBU
+		mov ebx, [eax]
+		call console.numOut
+		call console.newline
+	popa
+	ret
 AHCI.DMAread.allocateMemory :
+
 	pusha
 		mov eax, edx
 		mov [AHCI_DMAread_byteCount], eax
@@ -69,7 +96,7 @@ AHCI.DMAread.buildFIS :
 	pusha
 		mov ebx, [AHCI_DMAread_commandLoc]
 		mov byte [ebx+0x0], 0x27	; h2d
-		mov byte [ebx+0x1], 0x01	; no port mul, is a command	... OR 0x80 ??
+		mov byte [ebx+0x1], 0x80	; no port mul, is a command	... OR 0x80 ??
 		mov byte [ebx+0x2], 0x25	; the command [means ATA DMA READ]
 		mov byte [ebx+0x3], 0x00	; should be the feature low byte?	zeroed for now
 		mov cl, [AHCI_DMAread_LL]
@@ -92,6 +119,8 @@ AHCI.DMAread.buildFIS :
 		xor edx, edx
 		idiv ecx
 		add eax, 1
+						;	mov al, 1
+						;	mov ah, 0
 		mov [ebx+0xC], al	; CALCLUATE COUNT LOW (SECTORS) AND PUT IT HERE
 		mov [ebx+0xD], ah	; CALCULATE COUNT HIGH (SECTORS) AND PUT IT HERE
 		mov byte [ebx+0xE], 0x00	; should be isync command completion
@@ -197,6 +226,12 @@ AHCI.DMAread.sendCommand :
 		mov edx, [ebx]
 		or edx, eax	; 'or' it back in
 		mov [ebx], edx
+				mov ebx, [ebx]
+				call console.numOut
+				call console.newline
+				mov ebx, [Clock.tics]
+				call console.numOut
+				call console.newline
 	popa
 	ret
 
@@ -218,6 +253,9 @@ AHCI.DMAread.waitForCompletion :
 				;mov ebx, [AHCI_PORTALLOCEDMEM]
 				;add ebx, 0x1000
 				mov ebx, edx;[ebx]
+				call console.numOut
+				call console.newline
+				mov ebx, [Clock.tics]
 				call console.numOut
 				call console.newline
 				popa
