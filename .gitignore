@@ -220,3 +220,4 @@ pip-log.txt
 _not os code/~DO NOT SYNC/DadCard.asm
 $Emulator/os.img
 kernel/kernel.asm
+*.path

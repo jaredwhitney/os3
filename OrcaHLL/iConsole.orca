@@ -1,0 +1,101 @@
+import "Window"
+import "String"
+import "KeyCodes"
+import "CharCodes"
+classdef iConsole
+	Window window
+	Window win
+	String command
+	
+	func _init (void : null)
+		window = sys Console.GetWindow()
+		command = sys Program.Ealloc(80)
+		sys Console.Print("Console: ")
+		
+	func _loop (void : null)
+		if sys Keyboard.HasEvent(window)
+			char ch = sys Keyboard.TakeEvent(window)
+			
+			if ch != KeyCodes.ENTER
+				if ch != KeyCodes.KEY_SHIFT
+					command.AppendChar(ch)
+					sys Console.PrintChar(ch)
+				
+			if ch == KeyCodes.ENTER
+				sys Console.Newline()
+				
+				if command.Equals("help")
+					sys Console.PrintLine("clear: Clears the screen.")
+					sys Console.PrintLine("exit: Exits the console.")
+					sys Console.PrintLine("fullscreen: Toggles fullscreen mode.")
+					sys Console.PrintLine("help: Displays this prompt.")
+					sys Console.PrintLine("lock: Locks the computer.")
+					sys Console.PrintLine("memstat: Prints out the percentage of RAM in use.")
+					sys Console.PrintLine("restart: Restarts the computer.")
+					sys Console.PrintLine("time: Prints out the current time.")
+					sys Console.PrintLine("tree: Displays all mounted files.")
+					sys Console.PrintLine("partition: Detects and displays partition info.")
+					
+				if command.Equals("clear")
+					sys Console.Clear()
+					
+				if command.Equals("exit")
+					sys Dolphin.UnregisterWindow(window)
+					
+				if command.Equals("fullscreen")
+					window.xPos = 0
+					window.yPos = 8
+					window.width = sys System.GetValue(SCREEN_BYTEWIDTH)
+					window.height = sys System.GetValue(SCREEN_HEIGHT)
+				
+				if command.Equals("lock")
+					asm("call Manager.lock")
+				
+				if command.Equals("memstat")
+					sys Console.Print("Usage: ")
+					sys Console.PrintHex(sys System.GetValue(RAM_USED))
+					sys Console.Print(" / ")
+					sys Console.PrintHex(sys System.GetValue(RAM_TOTAL))
+					sys Console.Newline()
+					
+				if command.Equals("test")
+					sys Console.PrintLine("No test function is implemented at this time.")
+					
+				if command.Equals("time")
+					sys Console.SetVGAcolor(0x0B)
+					sys Console.PrintHex(sys Time.GetHour())
+					sys Console.Print(":")
+					sys Console.PrintHex(sys Time.GetMinute())
+					sys Console.Print(":")
+					sys Console.PrintHex(sys Time.GetSecond())
+					sys Console.Print(" ")
+					sys Console.PrintHex(sys Time.GetMonth())
+					sys Console.Print("-")
+					sys Console.PrintHex(sys Time.GetDay())
+					sys Console.Print("-")
+					sys Console.PrintHex(sys Time.GetYear())
+					sys Console.Newline()
+					
+				if command.Equals("tree")
+					asm("call Minnow.ctree")
+					
+				if command.Equals("restart")
+					asm("mov eax, SysHaltScreen.RESET")
+					"Restarting the computer."
+					asm("mov ebx, ecx")
+					asm("mov ecx, 5")
+					asm("call SysHaltScreen.show")
+				
+				if command.Equals("partition")
+					asm("call AHCI.printPartitionInfo")
+				
+				if command.Equals("OHLL lib")
+					asm("call Library._init")
+				if command.Equals("OHLL videoinfo")
+					asm("call VideoInfo._init")
+				if command.Equals("OHLL test")
+					asm("call TestProgram._init")
+				
+				sys Console.Print("Console: ")
+				command.SetChar(0, CharCodes.NUL)
+				
