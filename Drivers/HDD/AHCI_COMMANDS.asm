@@ -100,17 +100,23 @@ AHCI.DMAread.buildFIS :
 		mov byte [ebx+0x2], 0x25	; the command [means ATA DMA READ]
 		mov byte [ebx+0x3], 0x00	; should be the feature low byte?	zeroed for now
 		mov cl, [AHCI_DMAread_LL]
+							mov cl, 0x0
 		mov [ebx+0x4], cl
 		mov cl, [AHCI_DMAread_LM]
+							mov cl, 0x0
 		mov [ebx+0x5], cl
 		mov cl, [AHCI_DMAread_LH]
+							mov cl, 0x0
 		mov [ebx+0x6], cl
-		mov byte [ebx+0x7], 0b1000000	; should be the device register [this means LBA...?]
+		mov byte [ebx+0x7], 0x40	; should be the device register [this means LBA...?]
 		mov cl, [AHCI_DMAread_HL]
+							mov cl, 0x0
 		mov [ebx+0x8], cl
 		mov cl, [AHCI_DMAread_HM]
+							mov cl, 0x0
 		mov [ebx+0x9], cl
 		mov cl, [AHCI_DMAread_HH]
+							mov cl, 0x0
 		mov [ebx+0xA], cl
 		mov byte [ebx+0xB], 0x00	; should be the feature high byte	zeroed for now
 		mov eax, edx
@@ -119,8 +125,8 @@ AHCI.DMAread.buildFIS :
 		xor edx, edx
 		idiv ecx
 		add eax, 1
-						;	mov al, 1
-						;	mov ah, 0
+							mov al, 1
+							mov ah, 0
 		mov [ebx+0xC], al	; CALCLUATE COUNT LOW (SECTORS) AND PUT IT HERE
 		mov [ebx+0xD], ah	; CALCULATE COUNT HIGH (SECTORS) AND PUT IT HERE
 		mov byte [ebx+0xE], 0x00	; should be isync command completion
@@ -195,7 +201,7 @@ AHCI.DMAread.buildCommandHeader :
 		; FIS size is 20
 		mov eax, [AHCI_DMAread_PRDTcount]
 		shl eax, 16-5
-		or eax, 0b00000100000;	PMP (4) | resv | clearBusy | BIST | Reset | Prefetch | Write | ATAPI
+		or eax, 0b0;0b00000100000;	PMP (4) | resv | clearBusy | BIST | Reset | Prefetch | Write | ATAPI
 		shl eax, 5
 		or eax, 5	; 5 dwords in the FIS
 		mov [ecx], eax	; write the first dword
@@ -204,7 +210,7 @@ AHCI.DMAread.buildCommandHeader :
 			call console.numOut
 			call console.newline
 			popa
-		mov dword [ecx+0x4], 0	; stores the number of bytes that have already been transferred
+		mov dword [ecx+0x4], 0x200	; stores the number of bytes to be transferred?;;that have already been transferred
 		mov eax, [AHCI_DMAread_commandLoc]
 		mov [ecx+0x8], eax	; write the third dword
 		mov dword [ecx+0xC], 0x0	; upper dword of last

@@ -22,7 +22,7 @@ Kernel.init :
 		call ATA_DETECT
 		mov eax, 0x0
 		mov bx, 0x0
-		mov edx, 0x4000
+		mov edx, 0x200
 		call AHCI.DMAread
 		add ecx, 0x1BE
 		mov ebx, [ecx]
