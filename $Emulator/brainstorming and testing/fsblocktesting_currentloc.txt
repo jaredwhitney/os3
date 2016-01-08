@@ -1,0 +1,11 @@
+0x10 clusters @ 0x35E098LCN
+0x20 clusters @ 0x16CCEF4LCN
+0x40 clusters @ 0x16B9100LCN
+0x84 clusters @ 0x1699160LCN
+0xF5 clusters @ 0x1821AD4LCN
+
+0x1000 bytes per cluster
+0x200 bytes per sector
+
+so 0x80 sectors @ lba 28247232 decimal
+so 0x7A8 sectors @ lba 202430112 decimal
