@@ -89,10 +89,10 @@ AHCI.DMAread.allocateMemory :
 		mov ecx, 0x1000	; sector size
 		xor edx, edx
 		idiv ecx
-		add ecx, 1
+		add eax, 1
 		; need to allocate ecx sectors for the command
+		mov ebx, eax
 		mov eax, 0x5
-		mov ebx, ecx
 		call Guppy.malloc
 		mov [AHCI_DMAread_commandLoc], ebx
 		; need to also allocate data buffer here!!!!~!
@@ -114,7 +114,7 @@ AHCI.DMAread.allocateMemory :
 		
 	popa
 	ret
-
+	
 AHCI.DMAread.buildFIS :
 	pusha
 		mov ebx, [AHCI_DMAread_commandLoc]

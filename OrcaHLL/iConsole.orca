@@ -59,7 +59,7 @@ classdef iConsole
 					sys Console.Newline()
 					
 				if command.Equals("test")
-					sys Console.PrintLine("No test function is implemented at this time.")
+					asm("call console.test")
 					
 				if command.Equals("time")
 					sys Console.SetVGAcolor(0x0B)
