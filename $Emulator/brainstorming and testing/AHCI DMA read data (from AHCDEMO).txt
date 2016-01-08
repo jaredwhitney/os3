@@ -1,0 +1,26 @@
+FRlo 0
+Cmd 25
+Cbit 80
+FIS 27
+Dev 40
+LBAlo 0
+FRhi 0
+LBAhi 0
+DCtrl 0
+ICC 0
+SChi 0
+SClo 1
+Resv 0
+Resv 0
+AUXhi 0
+AUXlo 0
+
+Command Header::
+5 0 1 0 00 2 0 0 0 4 0 20 dw0
+dw0 dw0 dw0 dw0 dw0
+
+PRD list::
+0 50 0 20 dw0 dw0 FF 1 00
+
+recieve numerous FIS, unused have first dw set to DEADDEAD
+
