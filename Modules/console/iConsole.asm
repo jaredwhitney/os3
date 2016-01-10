@@ -174,16 +174,17 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov ecx, [C.test.val]
-	mov eax, [ecx]
-	add eax, 1
-	mov [ecx], eax
+
+	mov eax, 0x0
+	call Minnow.getBuffer
+	mov ebx, [ecx]
+	call console.numOut
+	call console.newline
 	
-	mov eax, 0x1
-	mov bx, 0x0
-	mov ecx, [C.test.val]
-	mov edx, 0x200	; length
-	call AHCI.DMAwrite
+	mov dword [ecx], 0x053EEEA4
+	mov eax, 0x0
+	call Minnow.writeBuffer
+
 popa
 ret
 C.test.val :

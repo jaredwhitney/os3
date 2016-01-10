@@ -25,8 +25,9 @@ AHCI.DMAreadToBuffer :	; HBA low = eax, HBA high = bx, length = edx, [must manua
 	push eax
 	push ebx
 	push edx
+		mov [AHCI_DMAread_dataBuffer], ecx
 		call AHCI.DMAread.storeHBAvals
-		call AHCI.DMAread.allocateMemory
+		;call AHCI.DMAread.allocateMemory
 		call AHCI.DMAread.buildFIS
 		call AHCI.DMAread.buildPRDTs
 		call AHCI.DMAread.findFreeSlot
@@ -421,123 +422,123 @@ AHCI.printPartitionInfo.STR_LOC :
 	db "  Location: ", 0
 	
 	
-AHCI.searchForDataBlock :
-	pusha
-	
-		mov eax, 0x0	; dummy read to ensure memory is initialized
-		mov bx, 0x0
-		mov edx, 0x200
-		call AHCI.DMAread
-		
-		AHCI.searchForDataBlock.loop :
-		add eax, 1
-		mov bx, 0x0
-		mov edx, 0x300
-		call AHCI.DMAreadToBuffer
-		
-		push eax
-		mov eax, AHCI.searchForDataBlock.STR_MATCH
-		mov ebx, ecx
-		mov ecx, 0x300
-		call Buffer.findMatch
-		cmp al, 0xFF
-			pop eax
-			je AHCI.searchForDataBlock.done
-		jmp AHCI.searchForDataBlock.loop
-		
-		AHCI.searchForDataBlock.done :
-		mov ebx, ecx
-		call console.numOut
-		mov ebx, AHCI.searchForDataBlock.STR_SEP1
-		call console.print
-		mov ebx, eax
-		call console.numOut
-		call console.newline
-		
-	popa
-	ret
-
-AHCI.searchForDataBlock.STR_MATCH :
-	db "Minnow Filesystem Storage Block", 0
-AHCI.searchForDataBlock.STR_SEP1 :
-	db " offs from LBA: ", 0
-	
-; Buffer.findMatch :	; oh boy :/
-	; push ecx
-	; push edx
-		; mov edx, ebx
-		; Buffer.findMatch.loop :
-		; mov ebx, [edx]
-		; push eax
-		; call os.seq
-		; cmp al, 0x1
-			; pop eax
-			; je Buffer.findMatch.yret
-		; add edx, 1
-		; sub ecx, 1
-		; cmp ecx, 0x0
-			; je Buffer.findMatch.ret
-		; jmp Buffer.findMatch.loop
-	; Buffer.findMatch.yret :
-	; mov al, 0xFF
-	; Buffer.findMatch.ret :
-				; add edx, 1
-				; mov ebx, [edx] ; !! not correct !!
-	; pop edx
-	; pop ecx
-	; ret
-	
-	
-Buffer.findMatch :	; String to match is in eax, Buffer to search is in ebx, buffer size is in ecx, returns al = 0x0 for failure al = 0xFF for success and ecx = offset within the buffer
-	pusha
-		
-		mov [Buffer.findMatch.string], eax
-		mov [Buffer.findMatch.bufferp], ebx
-		mov [Buffer.findMatch.bufsize], ecx
-		
-		mov dl, [eax]	; dl contains the first char of the String
-		
-		Buffer.findMatch.mainloop :
-		mov dh, [ebx]
-		cmp dl, dh
-			jne Buffer.findMatch.noFirstCharMatch
-		
-			; deal with the fact that this _might_ actually be a match
-			pusha
-			mov eax, [Buffer.findMatch.string]
-			mov ebx, [Buffer.findMatch.bufferp]
-			call os.seq
-			
-			cmp al, 0x0
-			popa
-				jne Buffer.findMatch.returnMatch
-		
-		Buffer.findMatch.noFirstCharMatch :
-		mov ebx, [Buffer.findMatch.bufferp]
-		add ebx, 1
-		mov [Buffer.findMatch.bufferp], ebx
-		
-		sub ecx, 1
-		
-		cmp ecx, 0x0
-			je Buffer.findMatch.mainloop.exit
-		
-		jmp Buffer.findMatch.mainloop
-		
-		Buffer.findMatch.mainloop.exit :
-		mov al, 0x00
-	popa
-	ret
-	
-		Buffer.findMatch.returnMatch :
-		mov ecx, [Buffer.findMatch.bufferp]
-		mov al, 0xFF
-	popa
-	ret
-
-Buffer.findMatch.string :
-	dd 0x0
-Buffer.findMatch.bufferp :
-	dd 0x0
-Buffer.findMatch.bufsize :
-	dd 0x0
+;AHCI.searchForDataBlock :
+;	pusha
+;	
+;		mov eax, 0x0	; dummy read to ensure memory is initialized
+;		mov bx, 0x0
+;		mov edx, 0x200
+;		call AHCI.DMAread
+;		
+;		AHCI.searchForDataBlock.loop :
+;		add eax, 1
+;		mov bx, 0x0
+;		mov edx, 0x300
+;		call AHCI.DMAreadToBuffer
+;		
+;		push eax
+;		mov eax, AHCI.searchForDataBlock.STR_MATCH
+;		mov ebx, ecx
+;		mov ecx, 0x300
+;		call Buffer.findMatch
+;		cmp al, 0xFF
+;			pop eax
+;			je AHCI.searchForDataBlock.done
+;		jmp AHCI.searchForDataBlock.loop
+;		
+;		AHCI.searchForDataBlock.done :
+;		mov ebx, ecx
+;		call console.numOut
+;		mov ebx, AHCI.searchForDataBlock.STR_SEP1
+;		call console.print
+;		mov ebx, eax
+;		call console.numOut
+;		call console.newline
+;		
+;	popa
+;	ret
+;
+;AHCI.searchForDataBlock.STR_MATCH :
+;	db "Minnow Filesystem Storage Block", 0
+;AHCI.searchForDataBlock.STR_SEP1 :
+;	db " offs from LBA: ", 0
+;	
+;; Buffer.findMatch :	; oh boy :/
+;	; push ecx
+;	; push edx
+;		; mov edx, ebx
+;		; Buffer.findMatch.loop :
+;		; mov ebx, [edx]
+;		; push eax
+;		; call os.seq
+;		; cmp al, 0x1
+;			; pop eax
+;			; je Buffer.findMatch.yret
+;		; add edx, 1
+;		; sub ecx, 1
+;		; cmp ecx, 0x0
+;			; je Buffer.findMatch.ret
+;		; jmp Buffer.findMatch.loop
+;	; Buffer.findMatch.yret :
+;	; mov al, 0xFF
+;	; Buffer.findMatch.ret :
+;				; add edx, 1
+;				; mov ebx, [edx] ; !! not correct !!
+;	; pop edx
+;	; pop ecx
+;	; ret
+;	
+;	
+;Buffer.findMatch :	; String to match is in eax, Buffer to search is in ebx, buffer size is in ecx, returns al = 0x0 for failure al = 0xFF for success and ecx = offset within the buffer
+;	pusha
+;		
+;		mov [Buffer.findMatch.string], eax
+;		mov [Buffer.findMatch.bufferp], ebx
+;		mov [Buffer.findMatch.bufsize], ecx
+;		
+;		mov dl, [eax]	; dl contains the first char of the String
+;		
+;		Buffer.findMatch.mainloop :
+;		mov dh, [ebx]
+;		cmp dl, dh
+;			jne Buffer.findMatch.noFirstCharMatch
+;		
+;			; deal with the fact that this _might_ actually be a match
+;			pusha
+;			mov eax, [Buffer.findMatch.string]
+;			mov ebx, [Buffer.findMatch.bufferp]
+;			call os.seq
+;			
+;			cmp al, 0x0
+;			popa
+;				jne Buffer.findMatch.returnMatch
+;		
+;		Buffer.findMatch.noFirstCharMatch :
+;		mov ebx, [Buffer.findMatch.bufferp]
+;		add ebx, 1
+;		mov [Buffer.findMatch.bufferp], ebx
+;		
+;		sub ecx, 1
+;		
+;		cmp ecx, 0x0
+;			je Buffer.findMatch.mainloop.exit
+;		
+;		jmp Buffer.findMatch.mainloop
+;		
+;		Buffer.findMatch.mainloop.exit :
+;		mov al, 0x00
+;	popa
+;	ret
+;	
+;		Buffer.findMatch.returnMatch :
+;		mov ecx, [Buffer.findMatch.bufferp]
+;		mov al, 0xFF
+;	popa
+;	ret
+;
+;Buffer.findMatch.string :
+;	dd 0x0
+;Buffer.findMatch.bufferp :
+;	dd 0x0
+;Buffer.findMatch.bufsize :
+;	dd 0x0

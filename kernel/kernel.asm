@@ -21,16 +21,17 @@ Kernel.init :
 	;	INITIALIZE THE AHCI DRIVER	;
 		call ATA_DETECT
 		
+		call Minnow.loadFS
 		;call AHCI.searchForDataBlock	; be really surprised if this works!
-		mov eax, 0x1
-		mov bx, 0x0
-		mov edx, 0x200
-		call AHCI.DMAread
+		;mov eax, 0x1
+		;mov bx, 0x0
+		;mov edx, 0x200
+		;call AHCI.DMAread
 		;add ecx, 0x1BE
-		mov [C.test.val], ecx
-		mov ebx, [ecx]
-		call console.numOut
-		call console.newline
+		;mov [C.test.val], ecx
+		;mov ebx, [ecx]
+		;call console.numOut
+		;call console.newline
 		;mov ebx, [ecx+4]
 		;call console.numOut
 		;call console.newline

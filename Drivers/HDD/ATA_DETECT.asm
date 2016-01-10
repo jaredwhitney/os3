@@ -235,6 +235,8 @@ AHCI.initialize :	; the read function as opposed to the above test
 		or eax, 0b10000
 		mov [ebx], eax
 		
+		mov byte [AHCI_STATUS], 0x1
+		
 	popa
 	ret
 	
@@ -410,6 +412,9 @@ AHCI_PxCI equ 0x38
 AHCI_PxSNTF equ 0x3C
 
 AHCI_PORT0 equ 0x100
+
+AHCI_STATUS :
+	dd 0x0
 	
 ;DISK_DEVICELIST :
 ;	times 255 dq 0, 0, 0, 0	; support up to 255 'PCI_DEVICE's
