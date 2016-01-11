@@ -175,15 +175,17 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 
-	mov eax, 0x0
-	call Minnow.getBuffer
-	mov ebx, [ecx]
-	call console.numOut
-	call console.newline
+	;mov eax, 0x0
+	;call Minnow.getBuffer
+	;mov ebx, [ecx]
+	;call console.numOut
+	;call console.newline
 	
-	mov dword [ecx], 0x053EEEA4
-	mov eax, 0x0
-	call Minnow.writeBuffer
+	;mov dword [ecx], 0x0
+	;mov eax, 0x0
+	;call Minnow.writeBuffer
+	
+	call Minnow.checkFSsize
 
 popa
 ret

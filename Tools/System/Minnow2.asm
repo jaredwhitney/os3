@@ -68,7 +68,7 @@ Minnow.getBuffer :	; byte of offs in eax, returns 0x200+ size buffer in ecx
 	ret
 
 ; NOTE: Should make writeBuffer work like getBuffer so that it will figure out which sector the offs is in, read the data prior to the start of the buffer, append the buffer back to it, then write the combined buffer back out to the disk!
-Minnow.writeBuffer :	; sector of offs in eax, buffer of 200 bytes in ecx
+Minnow.writeBuffer :	; sector of offs in eax, buffer of 0x200 bytes in ecx
 	pusha
 		add eax, [Minnow.dev_offs]
 		xor bx, bx
@@ -77,61 +77,84 @@ Minnow.writeBuffer :	; sector of offs in eax, buffer of 200 bytes in ecx
 		call AHCI.DMAwrite
 	popa
 	ret
-; Minnow.checkFSsize :
-	; pusha
+
+Minnow.checkFSsize :
+	pusha
+		mov eax, 0x0
+		Minnow.checkFSsize.loop :
+		call Minnow.getBuffer
+		mov ebx, [ecx]
+		cmp ebx, 0x0
+			je Minnow.checkFSsize.done
+		call Minnow.checkFSsize.navToEndOfSubs
+		add eax, ebx
+		jmp Minnow.checkFSsize.loop
+	Minnow.checkFSsize.done :
+		mov ebx, eax
+		call console.numOut
+		call console.newline
+	popa
+	ret
+	Minnow.checkFSsize.navToEndOfSubs :
+	push ebx
+	push edx
+	push ecx
+		add ecx, 4	; in buffer
+		add eax, 4	; in offset
+		mov ebx, ecx
+		call String.getLength
+		add ecx, edx	; in buffer
+		add eax, edx	; in offset
+		mov ebx, ecx
+		call String.getLength
+		add eax, edx	; in offset
+	pop ecx
+	pop edx
+	pop ebx
+	ret
+
+Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr, return ecx = offs
+	pusha
+		; save things
+		mov eax, 0x0
+		Minnow.nameAndTypeToPointer.loop :
+		call Minnow.getBuffer
+		mov ebx, [ecx]
+		mov [Minnow.nameAndTypeToPointer.sizeStor], ebx
+		cmp ebx, 0x0
+			je Minnow.nameAndTypeToPointer.doesNotExist
+		mov ebx, ecx
+		add ebx, 4
+		mov eax, [Minnow.nameAndTypeToPointer.namestr]
+		call os.seq
+			cmp al, 0x0
+				je Minnow.nameAndTypeToPointer.failed
+		call String.getLength
+		add ebx, edx
+		mov eax, [Minnow.nameAndTypeToPointer.typestr]
+		call os.seq
+			cmp al, 0x0
+				jne Minnow.nameAndTypeToPointer.foundMatch
+		call String.getLength
+		add ebx, edx
+		add ebx, 4	; does not work... ebx isnt the thing that needs to be increased this whole time... eax is...
+		add ebx, [Minnow.nameAndTypeToPointer.sizeStor]
+		jmp Minnow.nameAndTypeToPointer
 		
-		; mov eax, [Minnow.dev_offs]
-		; mov bx, 0x0
-		; mov ecx, [Minnow.data]
-		; call AHCI.DMAreadToBuffer
-		; mov ebx, [ecx]
-		; call console.numOut
-		; call console.newline
-		; mov ebx, [ecx+4]
-		; call console.numOut
-		; call console.newline
-		; mov ebx, [Minnow.dev_offs]
-		; call console.numOut
-		; call console.newline
-		; ;mov ecx, [Minnow.dev_offs]
-		; ;imul ecx, 0x200
-		; ;mov [Minnow.checkFSsize.loc], ecx
-		; ;
-		; ;Minnow.checkFSsize.loop :
-		; ;	mov ecx, [Minnow.checkFSsize.loc]
-		; ;	call Minnow.makeBlockAndOffset
-		; ;	mov ecx, [Minnow.data]
-		; ;	mov bx, 0x0
-		; ;	push edx
-		; ;	mov edx, 0x300
-		; ;	call AHCI.DMAreadToBuffer
-		; ;	pop edx
-		; ;	add ecx, edx
-		; ;	mov eax, [ecx]
-		; ;				push ebx
-		; ;				mov ebx, ecx
-		; ;				call console.numOut
-		; ;				call console.newline
-		; ;				mov ebx, eax
-		; ;				call console.numOut
-		; ;				call console.newline
-		; ;				pop ebx
-		; ;	cmp eax, 0x0
-		; ;		je Minnow.checkFSsize.done
-		; ;	mov ecx, [Minnow.checkFSsize.loc]
-		; ;	add ecx, eax
-		; ;	mov [Minnow.checkFSsize.loc], ecx
-		; ;	;jmp Minnow.checkFSsize.loop
-		; ;
-		; ;Minnow.checkFSsize.done :
-		; ;mov ebx, [Minnow.checkFSsize.loc]
-		; ;mov eax, [Minnow.dev_offs]
-		; ;imul eax, 0x200
-		; ;sub ebx, eax
-		; ;call console.numOut
-		; ;call console.newline
-	; popa
-	; ret
+	popa
+	ret
+
+Minnow.readFile :	; eax = offs, return ecx = buffer and edx = buffersize
+	pusha
+	
+	popa
+	ret
+
+Minnow.writeFile :	; eax = offs, ecx = buffer, edx = buffersize	NOTE:: need to figure out what to do if buffersize increases
+	pusha
+	
+	popa
+	ret
 
 Minnow.makeBlockAndOffset :	; in ecx = number, out eax = blocklow edx=offs
 	push ebx

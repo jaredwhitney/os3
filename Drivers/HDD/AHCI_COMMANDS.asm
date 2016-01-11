@@ -257,12 +257,6 @@ AHCI.DMAread.sendCommand :
 		mov edx, [ebx]
 		or edx, eax	; 'or' it back in
 		mov [ebx], edx
-				mov ebx, [ebx]
-				call console.numOut
-				call console.newline
-				mov ebx, [Clock.tics]
-				call console.numOut
-				call console.newline
 	popa
 	ret
 
