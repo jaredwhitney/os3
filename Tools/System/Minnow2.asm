@@ -115,33 +115,33 @@ Minnow.checkFSsize :
 
 Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr, return ecx = offs
 	pusha
-		; save things
-		mov eax, 0x0
-		Minnow.nameAndTypeToPointer.loop :
-		call Minnow.getBuffer
-		mov ebx, [ecx]
-		mov [Minnow.nameAndTypeToPointer.sizeStor], ebx
-		cmp ebx, 0x0
-			je Minnow.nameAndTypeToPointer.doesNotExist
-		mov ebx, ecx
-		add ebx, 4
-		mov eax, [Minnow.nameAndTypeToPointer.namestr]
-		call os.seq
-			cmp al, 0x0
-				je Minnow.nameAndTypeToPointer.failed
-		call String.getLength
-		add ebx, edx
-		mov eax, [Minnow.nameAndTypeToPointer.typestr]
-		call os.seq
-			cmp al, 0x0
-				jne Minnow.nameAndTypeToPointer.foundMatch
-		call String.getLength
-		add ebx, edx
-		add ebx, 4	; does not work... ebx isnt the thing that needs to be increased this whole time... eax is...
-		add ebx, [Minnow.nameAndTypeToPointer.sizeStor]
-		jmp Minnow.nameAndTypeToPointer
+		; ; save things
+		; mov eax, 0x0
+		; Minnow.nameAndTypeToPointer.loop :
+		; call Minnow.getBuffer
+		; mov ebx, [ecx]
+		; mov [Minnow.nameAndTypeToPointer.sizeStor], ebx
+		; cmp ebx, 0x0
+			; je Minnow.nameAndTypeToPointer.doesNotExist
+		; mov ebx, ecx
+		; add ebx, 4
+		; mov eax, [Minnow.nameAndTypeToPointer.namestr]
+		; call os.seq
+			; cmp al, 0x0
+				; je Minnow.nameAndTypeToPointer.failed
+		; call String.getLength
+		; add ebx, edx
+		; mov eax, [Minnow.nameAndTypeToPointer.typestr]
+		; call os.seq
+			; cmp al, 0x0
+				; jne Minnow.nameAndTypeToPointer.foundMatch
+		; call String.getLength
+		; add ebx, edx
+		; add ebx, 4	; does not work... ebx isnt the thing that needs to be increased this whole time... eax is...
+		; add ebx, [Minnow.nameAndTypeToPointer.sizeStor]
+		; jmp Minnow.nameAndTypeToPointer
 		
-	popa
+	; popa
 	ret
 
 Minnow.readFile :	; eax = offs, return ecx = buffer and edx = buffersize
