@@ -41,33 +41,21 @@ Minnow.loadFS.mount :
 	popa
 	ret
 
-Minnow.getBuffer :	; byte of offs in eax, returns 0x200+ size buffer in ecx
+Minnow.getBuffer :	; sector in eax, returns 0x200 size buffer in ecx
 	push edx
 	push ebx
 	push eax
-		push eax
-			xor edx, edx
-			mov ecx, 0x200
-			idiv ecx	; eax now contains the sector offset
 			add eax, [Minnow.dev_offs]	; add dev offset
 			xor bx, bx
 			adc bx, 0	; i think this works?
 			mov ecx, [Minnow.data]
-			mov edx, 0x400	; 0x200 + size of buffer
+			mov edx, 0x200
 			call AHCI.DMAreadToBuffer
-		pop eax
-		xor edx, edx
-		push ecx
-		mov ecx, 0x200
-		idiv ecx
-		pop ecx
-		add ecx, edx	; ecx now points to the correct position in the returned buffer
 	pop eax
 	pop ebx
 	pop edx
 	ret
 
-; NOTE: Should make writeBuffer work like getBuffer so that it will figure out which sector the offs is in, read the data prior to the start of the buffer, append the buffer back to it, then write the combined buffer back out to the disk!
 Minnow.writeBuffer :	; sector of offs in eax, buffer of 0x200 bytes in ecx
 	pusha
 		add eax, [Minnow.dev_offs]
@@ -78,78 +66,136 @@ Minnow.writeBuffer :	; sector of offs in eax, buffer of 0x200 bytes in ecx
 	popa
 	ret
 
-Minnow.checkFSsize :
+Minnow.test :
 	pusha
+	
+		mov byte [Minnow.test.printNext], 0xFF
 		mov eax, 0x0
-		Minnow.checkFSsize.loop :
+		Minnow.test.loop :
 		call Minnow.getBuffer
-		mov ebx, [ecx]
-		cmp ebx, 0x0
-			je Minnow.checkFSsize.done
-		call Minnow.checkFSsize.navToEndOfSubs
-		add eax, ebx
-		jmp Minnow.checkFSsize.loop
-	Minnow.checkFSsize.done :
-		mov ebx, eax
-		call console.numOut
-		call console.newline
-	popa
-	ret
-	Minnow.checkFSsize.navToEndOfSubs :
-	push ebx
-	push edx
-	push ecx
-		add ecx, 4	; in buffer
-		add eax, 4	; in offset
-		mov ebx, ecx
-		call String.getLength
-		add ecx, edx	; in buffer
-		add eax, edx	; in offset
-		mov ebx, ecx
-		call String.getLength
-		add eax, edx	; in offset
-	pop ecx
-	pop edx
-	pop ebx
-	ret
-
-Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr, return ecx = offs
-	pusha
-		; save things
-		mov eax, 0x0
-		Minnow.nameAndTypeToPointer.loop :
-		call Minnow.getBuffer
-		mov ebx, [ecx]
-		mov [Minnow.nameAndTypeToPointer.sizeStor], ebx
-		cmp ebx, 0x0
-			je Minnow.nameAndTypeToPointer.doesNotExist
-		mov ebx, ecx
-		add ebx, 4
-		mov eax, [Minnow.nameAndTypeToPointer.namestr]
-		call os.seq
-			cmp al, 0x0
-				je Minnow.nameAndTypeToPointer.failed
-		call String.getLength
-		add ebx, edx
-		mov eax, [Minnow.nameAndTypeToPointer.typestr]
-		call os.seq
-			cmp al, 0x0
-				jne Minnow.nameAndTypeToPointer.foundMatch
-		call String.getLength
-		add ebx, edx
-		add ebx, 4	; does not work... ebx isnt the thing that needs to be increased this whole time... eax is...
-		add ebx, [Minnow.nameAndTypeToPointer.sizeStor]
-		jmp Minnow.nameAndTypeToPointer
 		
-	popa
-	ret
-
-Minnow.readFile :	; eax = offs, return ecx = buffer and edx = buffersize
-	pusha
+		mov al, [Minnow.test.printNext]	; if so print it
+		cmp al, 0x0
+			je Minnow.test.noprintrep
+		mov ebx, ecx
+		add ebx, 8
+		call console.println
+		
+		mov ebx, ecx
+		add ebx, 8
+		call String.getLength
+		add ebx, edx
+		call console.println
+		Minnow.test.noprintrep :
+		
+		mov byte [Minnow.test.printNext], 0x00	; should it print the next info?
+		mov eax, [ecx+4]
+		cmp eax, 0x0
+			jne Minnow.test.dontSetNext
+		mov byte [Minnow.test.printNext], 0xFF
+		Minnow.test.dontSetNext :
+		
+		mov eax, [ecx]
+		cmp eax, 0x0
+			jne Minnow.test.loop
 	
 	popa
 	ret
+Minnow.test.printNext :
+	db 0xFF
 
+Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr
+	push eax
+	push ebx
+	push edx
+		mov [Minnow.nameAndTypeToPointer.namestr], eax
+		mov [Minnow.nameAndTypeToPointer.typestr], ebx
+		mov eax, 0x0
+		Minnow.nameAndTypeToPointer.loop :
+		call Minnow.getBuffer
+		push eax
+		mov ebx, ecx
+		add ebx, 8
+		mov eax, [Minnow.nameAndTypeToPointer.namestr]
+		call os.seq	; check 1
+		cmp al, 0x0
+			je Minnow.nameAndTypeToPointer.goon
+		mov ebx, ecx
+		add ebx, 8
+		call String.getLength
+		add ebx, edx
+		mov eax, [Minnow.nameAndTypeToPointer.typestr]
+		call os.seq	; check 2
+		cmp al, 0x0
+			jne Minnow.nameAndTypeToPointer.gotPointer
+		Minnow.nameAndTypeToPointer.goon :
+		pop eax
+		add eax, [ecx]
+		cmp dword [ecx], 0x0
+			je Minnow.nameAndTypeToPointer.notFound
+		jmp Minnow.nameAndTypeToPointer.loop
+	Minnow.nameAndTypeToPointer.notFound :
+	mov ebx, Minnow.nATTP.STR_NOTFOUND
+	call console.println
+	mov ecx, 0xFFFFFFFF
+	pop edx
+	pop ebx
+	pop eax
+	ret
+Minnow.nameAndTypeToPointer.gotPointer :
+	pop eax
+	mov ecx, eax
+	pop edx
+	pop ebx
+	pop eax
+	ret
+Minnow.nATTP.STR_NOTFOUND :
+	db "[Minnow] File not found.", 0
+Minnow.nameAndTypeToPointer.namestr :
+	dd 0x0
+Minnow.nameAndTypeToPointer.typestr :
+	dd 0x0
+	
+Minnow.readFileBlock :	; eax = ptr, ebx = block (H->L), return ecx = buffer
+	push eax
+	push ebx
+	push edx
+		Minnow.readFileBlock.loop :
+		call Minnow.getBuffer
+		cmp dword [ecx+0x4], ebx
+			je Minnow.readFileBlock.cont
+			jg Minnow.readFileBlock.err
+		mov eax, [ecx]
+		jmp Minnow.readFileBlock.loop
+		Minnow.readFileBlock.cont :
+		; ecx is already pointing to the buffer
+	pop edx
+	pop ebx
+	pop eax
+	ret
+Minnow.readFileBlock.err :
+	mov eax, SysHaltScreen.KILL
+	mov ebx, Minnow.rFB.STR_ERR
+	mov ecx, 5
+	call SysHaltScreen.show
+	hlt
+Minnow.rFB.STR_ERR :
+	db "[Minnow] A program attempted to access an invalid block.", 0
+
+Minnow.skipHeader :	; pos in ecx, returns ecx = file start
+	push ebx
+	push edx
+		add ecx, 8
+		mov ebx, ecx
+		call String.getLength
+		add ecx, edx
+		mov ebx, ecx
+		call String.getLength
+		add ecx, edx
+	pop edx
+	pop ebx
+	ret
+	
 Minnow.writeFile :	; eax = offs, ecx = buffer, edx = buffersize	NOTE:: need to figure out what to do if buffersize increases
 	pusha
 	

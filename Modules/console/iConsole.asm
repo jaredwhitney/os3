@@ -177,20 +177,30 @@ pusha
 
 	;mov eax, 0x0
 	;call Minnow.getBuffer
-	;mov ebx, [ecx]
-	;call console.numOut
-	;call console.newline
 	
-	;mov dword [ecx], 0x0
+	;mov byte [ecx+0x39], 0x0	; drr
+	
 	;mov eax, 0x0
 	;call Minnow.writeBuffer
 	
-	call Minnow.checkFSsize
-
+	mov eax, C.test.val
+	mov ebx, C.test.val2
+	call Minnow.nameAndTypeToPointer
+	
+	mov eax, ecx
+	mov ebx, 0x0	; read the last block in the file
+	call Minnow.readFileBlock
+	call Minnow.skipHeader
+	
+	mov ebx, ecx
+	call console.println
+	
 popa
 ret
 C.test.val :
-	dd 0x0
+	db "System", 0
+C.test.val2 :
+	db "Text", 0
 
 console.memstat :
 	mov ah, 0xFF
