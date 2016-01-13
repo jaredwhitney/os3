@@ -12,6 +12,8 @@ stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
 	
+	;call stage2.checkBootFlags
+	
 	mov dword [DisplayMode], MODE_GRAPHICS	; MODE_TEXT or MODE_GRAPHICS
 	
 	cmp dword [DisplayMode], MODE_TEXT
@@ -369,5 +371,69 @@ RMGDTSAVE :
 	
 DisplayMode :
 	dd 0x0
-	
+;
+;
+;
+;stage2.checkBootFlags :
+;	pusha
+;		mov dl, 0x80
+;		s2.cBF.loop :
+;		mov eax, 0x0
+;		mov bx, 0x0
+;		mov cx, 1
+;		call stage2.readFromDisk
+;		add cx, 0x1EE
+;		add cx, 4
+;		mov bx, [ecx]
+;		cmp bx, 0x30
+;			je stage2.readBootFlags
+;		add dl, 1
+;		cmp dl, 0xFF
+;			jl s2.cBF.loop
+;	popa
+;	ret
+;stage2.readBootFlags :
+;	pusha
+;		jmp stop
+;	popa
+;	ret
+;stage2.readFromDisk :	; disk in dl, LBA in eax+bx, sectors to load in cx, returns buffer in cx
+;	push ax
+;	push bx
+;	push dx
+;	
+;		mov [stage2.rFDdat.lbal], eax
+;		and ebx, 0xFFFF
+;		mov [stage2.rFDdat.lbah], ebx
+;		mov [stage2.rFDdat.sec], cx
+;		
+;		mov di, 0x0
+;		mov si, stage2.rFD.buf
+;		mov ah, 0x42
+;		int 0x13
+;		jc $
+;		
+;		xor ecx, ecx
+;		mov cx, stage2.rFD.buf
+;		
+;	pop dx
+;	pop bx
+;	pop ax
+;	ret
+;stage2.rFDdat :
+;	db 0x10	; packet size
+;	db 0	; always 0
+;stage2.rFDdat.sec :
+;	dw 1	; sectors to load
+;	dw stage2.rFD.buf	; offs
+;	dw 0x0	; seg
+;stage2.rFDdat.lbal :
+;	dd 0x0	; start LBA
+;stage2.rFDdat.lbah :
+;	dd 0x0	; upper LBA
+;stage2.rFD.buf :
+;times 0x200 db 0x0
+;
+;
+;
 %include "..\kernel\kernel.asm"

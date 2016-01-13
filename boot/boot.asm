@@ -36,53 +36,31 @@
 	mov bx, 0x7e00
 	mov cl, 2
 	mov dh, 0x40
-	call boot.load
+	call boot.ATAload
 
 	; Call the auxilary bootloader steps
 	mov bl, 0x0
 	jmp 0x7e01
-	
-	; Alert the user that we are attempting to enable the A20 Gate
-	;mov bx, EnableA20
-	;call boot.print
 
-	boot.load :
-		pusha
-		push ax
-		push bx
-		mov ah, 0	; reset floppy controller
-		mov bl, dl
-		mov dl, 0
-		int 0x13
-		mov dl, bl
-		pop bx
-		pop ax
-		push es
-		mov es, ax
-		mov ah, 0x02	;telling bios we want to read from memory	|	location to read to sent in as BX
-		mov al, dh		;the number of sectors to read				|	sent in as DH
-		mov dh, 0x0	;head to read from
 
+boot.ATAload :
+	pusha
+		mov di, 0x0
+		mov si, boot.ATAdata
+		mov ah, 0x42
+		mov dl, 0x80
 		int 0x13
-		pop es
-		
-		cmp ah, 0x0
-			jne lret
-		
-		cmp dh, al
-			jne sload_error
-		
-		popa
-		ret
-		
-	lret:
-		mov bx, ERRORrt
-		call boot.print
-		mov ax, 0xF
-		mov [0x1000], ax
-		popa
-		mov dl, 0x0
-		jmp boot.load
+			jc sload_error
+	popa
+	ret
+boot.ATAdata :
+	db 0x10	; packet size
+	db 0	; always 0
+	dw 0xF00	; sectors to load
+	dw 0x7e00	; offs
+	dw 0x0	; seg
+	dd 0x1	; start LBA
+	dd 0x0	; upper LBA
 		
 	sload_error:
 		mov bx, ERRORs
