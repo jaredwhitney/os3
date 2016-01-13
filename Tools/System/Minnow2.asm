@@ -156,10 +156,14 @@ Minnow.nameAndTypeToPointer.namestr :
 Minnow.nameAndTypeToPointer.typestr :
 	dd 0x0
 	
-Minnow.readFileBlock :	; eax = ptr, ebx = block (H->L), return ecx = buffer
+Minnow.readFileBlock :	; eax = ptr, ebx = block (L->H), return ecx = buffer
 	push eax
 	push ebx
 	push edx
+		call Minnow.getBuffer
+		mov edx, [ecx+0x4]
+		sub edx, ebx
+		mov ebx, edx
 		Minnow.readFileBlock.loop :
 		call Minnow.getBuffer
 		cmp dword [ecx+0x4], ebx
@@ -195,11 +199,107 @@ Minnow.skipHeader :	; pos in ecx, returns ecx = file start
 	pop edx
 	pop ebx
 	ret
+
+Minnow.getHeaderSize :	; buffer in ecx, returns ecx = header length
+	push eax
+		mov eax, ecx
+		call Minnow.skipHeader
+		sub ecx, eax
+	pop eax
+	ret
 	
-Minnow.writeFile :	; eax = offs, ecx = buffer, edx = buffersize	NOTE:: need to figure out what to do if buffersize increases
+Minnow.writeFile :	; eax = namestr, ebx = typestr, ecx = buffer, edx = buffersize	[UNFINISHED!]
 	pusha
-	
+		mov [Minnow.writeFile.namestr], eax
+		mov [Minnow.writeFile.typestr], ebx
+		mov [Minnow.writeFile.buffer], ecx
+		call Minnow.nameAndTypeToPointer
+		cmp ecx, 0xFFFFFFFF
+			je Minnow.writeFile.createNewFile
+		mov eax, ecx
+		
+		push eax
+		mov eax, edx
+		mov edx, 0x200
+		call Minnow.getHeaderSize
+		mov [Minnow.writeFile.headerSize], ecx
+		sub edx, ecx
+		mov ecx, edx	; ecx contains the amount of usable data in each block
+		mov [Minnow.writeFile.blockSize], ecx
+		xor edx, edx
+		idiv ecx
+		add eax, 1
+		mov edx, eax
+		pop eax
+		mov ecx, [Minnow.writeFile.buffer]
+		
+		; ...
+		mov eax, 0
+		call Minnow.findNextOpenBlock
+		mov [Minnow.writeFile.blocknum], ecx
+		Minnow.writeFile.loop :
+		push ecx
+		call Minnow.findNextOpenBlock
+		mov [Minnow.writeFile.nextblocknum], ecx
+		call Minnow.writeFile.makeBufferWithHeader
+		mov eax, [Minnow.writeFile.blocknum]
+		call Minnow.writeBuffer
+		pop ecx
+		add ecx, [Minnow.writeFile.blockSize]
+		sub edx, 1
+		cmp edx, 0x0
+			jg Minnow.writeFile.loop
+		
 	popa
+	ret
+Minnow.writeFile.createNewFile :
+		; code goes here
+	popa
+	ret
+Minnow.writeFile.makeBufferWithHeader :
+	push eax
+	push ebx
+	push edx
+	push edx
+		mov eax, ecx
+		mov ebx, [Minnow.data]
+		add ebx, 0x500
+		add ebx, [Minnow.writeFile.headerSize]
+		mov ecx, [Minnow.writeFile.blockSize]
+		mov edx, 1
+		call Image.copyLinear
+		sub ebx, [Minnow.writeFile.headerSize]
+		mov ecx, ebx
+		mov edx, [Minnow.writeFile.nextblocknum]	; should be a pointer to the next data block!
+		mov [ecx], edx
+		pop edx
+		mov [ecx+4], edx	; blocks left in the file
+		mov ebx, ecx
+		add ebx, 8
+		mov eax, [Minnow.writeFile.namestr]
+		call String.copy
+		call String.getLength
+		add ebx, edx
+		mov eax, [Minnow.writeFile.typestr]
+		call String.copy
+	pop edx
+	pop ebx
+	pop eax
+Minnow.writeFile.namestr :
+	dd 0x0
+Minnow.writeFile.typestr :
+	dd 0x0
+
+Minnow.findNextOpenBlock :	; block num to start at in eax, returns first free block in ecx
+	push eax
+		Minnow.findNextOpenBlock.loop :	; should make sure it won't return blocks outside of the partition!
+		call Minnow.getBuffer
+		cmp dword [ecx], 0x0
+			je Minnow.findNextOpenBlock.ret
+		add eax, 1
+		jmp Minnow.findNextOpenBlock.loop
+		mov ecx, eax
+	pop eax
 	ret
 
 Minnow.makeBlockAndOffset :	; in ecx = number, out eax = blocklow edx=offs
