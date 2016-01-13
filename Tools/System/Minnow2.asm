@@ -66,45 +66,65 @@ Minnow.writeBuffer :	; sector of offs in eax, buffer of 0x200 bytes in ecx
 	popa
 	ret
 
-Minnow.test :
+Minnow.ctree :
 	pusha
 	
-		mov byte [Minnow.test.printNext], 0xFF
+		mov byte [Minnow.ctree.printNext], 0xFF
 		mov eax, 0x0
-		Minnow.test.loop :
+		Minnow.ctree.loop :
 		call Minnow.getBuffer
 		
-		mov al, [Minnow.test.printNext]	; if so print it
+		mov al, [Minnow.ctree.printNext]	; if so print it
 		cmp al, 0x0
-			je Minnow.test.noprintrep
+			je Minnow.ctree.noprintrep
+		
 		mov ebx, ecx
 		add ebx, 8
-		call console.println
+		call console.print
+		
+		mov ebx, Minnow.ctree.sep0
+		call console.print
 		
 		mov ebx, ecx
 		add ebx, 8
 		call String.getLength
 		add ebx, edx
-		call console.println
-		Minnow.test.noprintrep :
+		call console.print
 		
-		mov byte [Minnow.test.printNext], 0x00	; should it print the next info?
+		mov ebx, Minnow.ctree.sep1
+		call console.print
+		
+		mov ebx, [ecx+4]
+		add ebx, 1
+		call console.numOut
+		
+		mov ebx, Minnow.ctree.sep2
+		call console.println
+		
+		Minnow.ctree.noprintrep :
+		
+		mov byte [Minnow.ctree.printNext], 0x00	; should it print the next info?
 		mov eax, [ecx+4]
 		cmp eax, 0x0
-			jne Minnow.test.dontSetNext
-		mov byte [Minnow.test.printNext], 0xFF
-		Minnow.test.dontSetNext :
+			jne Minnow.ctree.dontSetNext
+		mov byte [Minnow.ctree.printNext], 0xFF
+		Minnow.ctree.dontSetNext :
 		
 		mov eax, [ecx]
 		cmp eax, 0x0
-			jne Minnow.test.loop
-	
+			jne Minnow.ctree.loop
+		
 	popa
 	ret
-Minnow.test.printNext :
+Minnow.ctree.printNext :
 	db 0xFF
-
-Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr
+Minnow.ctree.sep0 :
+	db " (", 0
+Minnow.ctree.sep1 :
+	db ", ", 0
+Minnow.ctree.sep2 :
+	db ")", 0
+Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr (still looks in headers of blocks with non-full headers!! D:)
 	push eax
 	push ebx
 	push edx
@@ -135,8 +155,8 @@ Minnow.nameAndTypeToPointer :	; eax = namestr, ebx = typestr
 			je Minnow.nameAndTypeToPointer.notFound
 		jmp Minnow.nameAndTypeToPointer.loop
 	Minnow.nameAndTypeToPointer.notFound :
-	mov ebx, Minnow.nATTP.STR_NOTFOUND
-	call console.println
+	;mov ebx, Minnow.nATTP.STR_NOTFOUND
+	;call console.println
 	mov ecx, 0xFFFFFFFF
 	pop edx
 	pop ebx
@@ -215,44 +235,94 @@ Minnow.writeFile :	; eax = namestr, ebx = typestr, ecx = buffer, edx = buffersiz
 		mov [Minnow.writeFile.buffer], ecx
 		call Minnow.nameAndTypeToPointer
 		cmp ecx, 0xFFFFFFFF
-			je Minnow.writeFile.createNewFile
-		mov eax, ecx
+			jne Minnow.writeFile.editExistingFile
+		mov eax, ecx	; Ends with eax -> file
 		
 		push eax
 		mov eax, edx
 		mov edx, 0x200
-		call Minnow.getHeaderSize
+			mov ecx, 24
+			;	Calculating the header size
+			mov ecx, 0x8
+			push edx
+			push ebx
+			mov ebx, [Minnow.writeFile.namestr]
+			call String.getLength
+			add ecx, edx
+			mov ebx, [Minnow.writeFile.typestr]
+			call String.getLength
+			add ecx, edx
+			pop ebx
+			pop edx
+			;
 		mov [Minnow.writeFile.headerSize], ecx
-		sub edx, ecx
-		mov ecx, edx	; ecx contains the amount of usable data in each block
-		mov [Minnow.writeFile.blockSize], ecx
+		add eax, ecx	; buffersize + headersize = totalsize
+		sub eax, 8
+		mov ecx, 0x200-0x8
 		xor edx, edx
 		idiv ecx
-		add eax, 1
+		add eax, 1	; edx = number of writes needed
 		mov edx, eax
 		pop eax
-		mov ecx, [Minnow.writeFile.buffer]
+		
+		mov eax, 0x200
+		sub eax, [Minnow.writeFile.headerSize]
+		mov [Minnow.writeFile.blockSize], eax
 		
 		; ...
 		mov eax, 0
 		call Minnow.findNextOpenBlock
+		mov [Minnow.writeFile.firstBlockLoc], ecx
 		mov [Minnow.writeFile.blocknum], ecx
+		
+		mov byte [Minnow.writeFile.firstBlock], 0xFF
+		mov ecx, [Minnow.writeFile.buffer]	; ecx = buffer to read from
+		
 		Minnow.writeFile.loop :
+		sub edx, 1
 		push ecx
-		call Minnow.findNextOpenBlock
-		mov [Minnow.writeFile.nextblocknum], ecx
-		call Minnow.writeFile.makeBufferWithHeader
-		mov eax, [Minnow.writeFile.blocknum]
-		call Minnow.writeBuffer
+		push ecx
+			mov ecx, 0x0
+			cmp edx, 0x0
+				je Minnow.writeFile.loop.noNextBlock
+			mov eax, [Minnow.writeFile.blocknum]
+			add eax, 1
+			call Minnow.findNextOpenBlock
+			Minnow.writeFile.loop.noNextBlock :
+			mov [Minnow.writeFile.nextblocknum], ecx
+			
+		cmp byte [Minnow.writeFile.firstBlock], 0x0
+			je Minnow.writeFile.loop.notFirstBlock
+			mov byte [Minnow.writeFile.firstBlock], 0x0
+			pop ecx
+			call Minnow.writeFile.makeBufferWithHeader
+			mov eax, [Minnow.writeFile.blocknum]
+			call Minnow.writeBuffer
 		pop ecx
 		add ecx, [Minnow.writeFile.blockSize]
-		sub edx, 1
+		jmp Minnow.writeFile.loop.kcont
+		
+		Minnow.writeFile.loop.notFirstBlock :
+			pop ecx
+			call Minnow.writeFile.makeBufferWithPartialHeader
+			mov eax, [Minnow.writeFile.blocknum]
+			call Minnow.writeBuffer
+		pop ecx
+		add ecx, 0x200-0x8
+		
+		Minnow.writeFile.loop.kcont :
+		mov eax, [Minnow.writeFile.nextblocknum]
+		mov [Minnow.writeFile.blocknum], eax
 		cmp edx, 0x0
 			jg Minnow.writeFile.loop
 		
+		mov eax, 0x0
+		mov ebx, [Minnow.writeFile.firstBlockLoc]
+		call Minnow.replaceTargetRef
+		
 	popa
 	ret
-Minnow.writeFile.createNewFile :
+Minnow.writeFile.editExistingFile :
 		; code goes here
 	popa
 	ret
@@ -285,20 +355,61 @@ Minnow.writeFile.makeBufferWithHeader :
 	pop edx
 	pop ebx
 	pop eax
+	ret
+Minnow.writeFile.makeBufferWithPartialHeader :
+	push eax
+	push ebx
+	push edx
+	push edx
+		mov eax, ecx
+		mov ebx, [Minnow.data]
+		add ebx, 0x500
+		add ebx, 0x8
+		mov ecx, 0x200-0x8
+		mov edx, 1
+		call Image.copyLinear
+		sub ebx, 0x8
+		mov ecx, ebx
+		mov edx, [Minnow.writeFile.nextblocknum]
+		mov [ecx], edx
+		pop edx
+		mov [ecx+4], edx
+	pop edx
+	pop ebx
+	pop eax
+	ret
 Minnow.writeFile.namestr :
 	dd 0x0
 Minnow.writeFile.typestr :
+	dd 0x0
+Minnow.writeFile.buffer :
+	dd 0x0
+Minnow.writeFile.nextblocknum :
+	dd 0x0
+Minnow.writeFile.blocknum :
+	dd 0x0
+Minnow.writeFile.headerSize :
+	dd 0x0
+Minnow.writeFile.blockSize :
+	dd 0x0
+Minnow.writeFile.firstBlock :
+	db 0x0
+Minnow.writeFile.firstBlockLoc :
 	dd 0x0
 
 Minnow.findNextOpenBlock :	; block num to start at in eax, returns first free block in ecx
 	push eax
 		Minnow.findNextOpenBlock.loop :	; should make sure it won't return blocks outside of the partition!
 		call Minnow.getBuffer
-		cmp dword [ecx], 0x0
-			je Minnow.findNextOpenBlock.ret
+		cmp dword [ecx], 0x0	; end of filesystem ONLY IF blocksleft = 0
+			jne Minnow.findNextOpenBlock.cont
+		cmp dword [ecx+4], 0x0
+			jne Minnow.findNextOpenBlock.ret
+		Minnow.findNextOpenBlock.cont :
 		add eax, 1
 		jmp Minnow.findNextOpenBlock.loop
-		mov ecx, eax
+	Minnow.findNextOpenBlock.ret :
+	mov ecx, eax
 	pop eax
 	ret
 
@@ -312,6 +423,51 @@ Minnow.makeBlockAndOffset :	; in ecx = number, out eax = blocklow edx=offs
 	pop ecx
 	pop ebx
 	ret
+
+Minnow.deleteFile :	; sector in eax
+	pusha
+		push eax
+		Minnow.deleteFile.loop :
+		call Minnow.getBuffer
+		mov edx, [ecx]
+		mov dword [ecx], 0x0
+		mov ebx, [ecx+4]
+		mov dword [ecx+4], 0xFFFFFFFF
+		call Minnow.writeBuffer
+		mov eax, ebx
+		cmp eax, 0x0
+			je Minnow.deleteFile.gotRef
+		mov eax, edx
+		jmp Minnow.deleteFile.loop
+		Minnow.deleteFile.gotRef :
+		pop eax
+		mov ebx, edx
+		call Minnow.replaceTargetRef	; finds refs that pointed to the original file and replaces them with refs pointing to the next file in the chain
+	popa
+	ret
+
+Minnow.replaceTargetRef :
+	pusha
+		mov [Minnow.replaceTargetRef.old], eax
+		mov [Minnow.replaceTargetRef.new], ebx
+		mov eax, 0x0
+		Minnow.replaceTargetRef.loop :
+		call Minnow.getBuffer
+		mov ebx, [ecx]
+		cmp ebx, [Minnow.replaceTargetRef.old]
+			je Minnow.replaceTargetRef.gotRef
+		mov eax, [ecx]
+		jmp Minnow.replaceTargetRef.loop
+		Minnow.replaceTargetRef.gotRef :
+		mov ebx, [Minnow.replaceTargetRef.new]
+		mov [ecx], ebx
+		call Minnow.writeBuffer
+	popa
+	ret
+Minnow.replaceTargetRef.old :
+	dd 0x0
+Minnow.replaceTargetRef.new :
+	dd 0x0
 
 Minnow.checkFSsize.loc :
 	dd 0x0

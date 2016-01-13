@@ -19,14 +19,15 @@ ATA_DETECT :
 		
 		call AHCI.initialize
 		
-		mov eax, SysHaltScreen.WARN
-		mov ecx, 1
-		mov ebx, ATA_STR
-		imul ecx, 4
-		add ebx, ecx
-		mov ebx, [ebx]
-		mov ecx, 5
-		call SysHaltScreen.show
+		jmp ATA_DETECT.ret
+		;mov eax, SysHaltScreen.WARN
+		;mov ecx, 1
+		;mov ebx, ATA_STR
+		;imul ecx, 4
+		;add ebx, ecx
+		;mov ebx, [ebx]
+		;mov ecx, 5
+		;call SysHaltScreen.show
 		ATA_DETECT.nof0 :
 		pop ecx
 		add ecx, 1
@@ -34,7 +35,10 @@ ATA_DETECT :
 			jl ATA_DETECT.loop
 	popa
 	ret
-
+ATA_DETECT.ret :
+pop ecx
+popa
+ret
 
 ; AHCI_INIT :	; OBSOLETE AND BROKEN
 	; pusha

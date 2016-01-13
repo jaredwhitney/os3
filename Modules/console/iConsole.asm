@@ -174,33 +174,46 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-
-	;mov eax, 0x0
-	;call Minnow.getBuffer
 	
-	;mov byte [ecx+0x39], 0x0	; drr
-	
-	;mov eax, 0x0
-	;call Minnow.writeBuffer
-	
-	mov eax, C.test.val
-	mov ebx, C.test.val2
+	call Minnow.ctree
+	mov eax, Console.test.FileName
+	mov ebx, Console.test.FileType
 	call Minnow.nameAndTypeToPointer
-	
+	cmp ecx, 0xFFFFFFFF
+		je console.test.doesntexist
 	mov eax, ecx
-	mov ebx, 0x0	; read the last block in the file
-	call Minnow.readFileBlock
-	call Minnow.skipHeader
+	call Minnow.deleteFile
+	call Minnow.ctree
+	console.test.doesntexist :
 	
+	mov eax, Console.test.FileName
+	mov ebx, Console.test.FileType
+	mov ecx, C.test.val3
+		push ebx
+		mov ebx, C.test.val3
+		call String.getLength
+		pop ebx
+	call Minnow.writeFile
+	
+	call Minnow.ctree
+	
+	mov eax, Console.test.FileName
+	mov ebx, Console.test.FileType
+	call Minnow.nameAndTypeToPointer
+	mov eax, ecx
+	call Minnow.getBuffer
+	call Minnow.skipHeader
 	mov ebx, ecx
 	call console.println
 	
 popa
 ret
-C.test.val :
-	db "System", 0
-C.test.val2 :
+Console.test.FileName :
+	db "Write Test", 0
+Console.test.FileType :
 	db "Text", 0
+C.test.val3 :
+	db "This is some test text that should be written to the filesystem with the new Minnow.writeFile command!", 0
 
 console.memstat :
 	mov ah, 0xFF

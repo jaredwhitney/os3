@@ -69,64 +69,64 @@ Minnow.dtree.nprint :
 	popa
 	ret
 	
-Minnow.ctree :
-	pusha
-	call Minnow.navToFirst; at filesize
-	Minnow.ctree.scr1done :
-	mov edx, [ebx]
-	cmp edx, 0x0
-	push edx
-	je Minnow.ctree.ret
-	push ebx
-	push ebx
-	mov ebx, Minnow.stag
-	call console.print
-	pop ebx
-	;mov ebx, edx	; uncommented = size, commented = loc
-	add ebx, 0x10	; comment for size, uncomment for loc
-	call console.numOut
-	pop ebx
-	mov al, "]"
-	call console.cprint
-	add ebx, 4	; at filetype
-	mov ecx, 4
-	call console.print
-	push ebx
-	mov ebx, Minnow.sep
-	call console.print
-	pop ebx
-	call String.getLength
-	add ebx, edx	; at filename
-	mov ecx, 8
-	call console.print
-	call console.newline
-	call String.getLength
-	add ebx, edx	; at start of file
-	pop edx
-	add ebx, edx	; at header for next file
-	jmp Minnow.ctree.scr1done
-	Minnow.ctree.ret :
-	;call console.update
-	pop edx
-	popa
-	ret
-Minnow.ctree.nprint :
-	pusha
-	mov edx, 0x0
-	Minnow.ctree.lnam :
-		mov al, [ebx]
-		cmp al, "_"
-		je Minnow.ctree.nprint.noprint
-			call console.cprint
-		Minnow.ctree.nprint.noprint :
-		add ebx, 1
-		add edx, 1
-		cmp edx, ecx
-		je Minnow.ctree.lnam.done
-		jmp Minnow.ctree.lnam
-	Minnow.ctree.lnam.done :
-	popa
-	ret
+;Minnow.ctree :
+;	pusha
+;	call Minnow.navToFirst; at filesize
+;	Minnow.ctree.scr1done :
+;	mov edx, [ebx]
+;	cmp edx, 0x0
+;	push edx
+;	je Minnow.ctree.ret
+;	push ebx
+;	push ebx
+;	mov ebx, Minnow.stag
+;	call console.print
+;	pop ebx
+;	;mov ebx, edx	; uncommented = size, commented = loc
+;	add ebx, 0x10	; comment for size, uncomment for loc
+;	call console.numOut
+;	pop ebx
+;	mov al, "]"
+;	call console.cprint
+;	add ebx, 4	; at filetype
+;	mov ecx, 4
+;	call console.print
+;	push ebx
+;	mov ebx, Minnow.sep
+;	call console.print
+;	pop ebx
+;	call String.getLength
+;	add ebx, edx	; at filename
+;	mov ecx, 8
+;	call console.print
+;	call console.newline
+;	call String.getLength
+;	add ebx, edx	; at start of file
+;	pop edx
+;	add ebx, edx	; at header for next file
+;	jmp Minnow.ctree.scr1done
+;	Minnow.ctree.ret :
+;	;call console.update
+;	pop edx
+;	popa
+;	ret
+;Minnow.ctree.nprint :
+;	pusha
+;	mov edx, 0x0
+;	Minnow.ctree.lnam :
+;		mov al, [ebx]
+;		cmp al, "_"
+;		je Minnow.ctree.nprint.noprint
+;			call console.cprint
+;		Minnow.ctree.nprint.noprint :
+;		add ebx, 1
+;		add edx, 1
+;		cmp edx, ecx
+;		je Minnow.ctree.lnam.done
+;		jmp Minnow.ctree.lnam
+;	Minnow.ctree.lnam.done :
+;	popa
+;	ret
 
 Minnow.navToFirst :
 	mov ebx, MINNOW_START

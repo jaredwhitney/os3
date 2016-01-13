@@ -6,11 +6,15 @@ classdef iConsole
 	Window window
 	Window win
 	String command
+	String fstorstr
+	byte sub
 	
 	func _init (void : null)
 		window = sys Console.GetWindow()
 		command = sys Program.Ealloc(80)
+		fstorstr = sys Program.Ealloc(80)
 		sys Console.Print("Console: ")
+		sub = 0x0
 		
 	func _loop (void : null)
 		if sys Keyboard.HasEvent(window)
@@ -23,6 +27,25 @@ classdef iConsole
 				
 			if ch == KeyCodes.ENTER
 				sys Console.Newline()
+				
+				if sub == 0x2
+					fstorstr
+					asm("mov eax, ecx")
+					command
+					asm("mov ebx, ecx")
+					asm("call Minnow.nameAndTypeToPointer")
+					asm("mov eax, ecx")
+					asm("call Minnow.getBuffer")
+					asm("call Minnow.skipHeader")
+					asm("mov ebx, ecx")
+					asm("call console.println")
+					sub = 0x0
+				
+				if sub == 0x1
+					fstorstr.SetChar(0, CharCodes.NUL)
+					fstorstr.Append(command)
+					sys Console.Print("File type: ")
+					sub = 0x2
 				
 				if command.Equals("help")
 					sys Console.PrintLine("clear: Clears the screen.")
@@ -88,6 +111,10 @@ classdef iConsole
 				
 				if command.Equals("partition")
 					asm("call AHCI.printPartitionInfo")
+					
+				if command.Equals("readfile")
+					sys Console.Print("File name: ")
+					sub = 0x1
 				
 				if command.Equals("OHLL lib")
 					asm("call Library._init")
@@ -96,6 +123,7 @@ classdef iConsole
 				if command.Equals("OHLL test")
 					asm("call TestProgram._init")
 				
-				sys Console.Print("Console: ")
+				if sub == 0x0
+					sys Console.Print("Console: ")
 				command.SetChar(0, CharCodes.NUL)
 				
