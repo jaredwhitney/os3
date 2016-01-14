@@ -2,6 +2,7 @@ import "Window"
 import "String"
 import "KeyCodes"
 import "CharCodes"
+import "MinnowTest"	; this actually works :) [but ONLY if there are no double imports :\]
 classdef iConsole
 	Window window
 	Window win
@@ -15,6 +16,7 @@ classdef iConsole
 		fstorstr = sys Program.Ealloc(80)
 		sys Console.Print("Console: ")
 		sub = 0x0
+		MinnowTest._init()
 		
 	func _loop (void : null)
 		if sys Keyboard.HasEvent(window)
@@ -58,6 +60,8 @@ classdef iConsole
 					sys Console.PrintLine("time: Prints out the current time.")
 					sys Console.PrintLine("tree: Displays all mounted files.")
 					sys Console.PrintLine("partition: Detects and displays partition info.")
+					sys Console.PrintLine("readfile: Prints out the contents of a text file.")
+					sys Console.PrintLine("FSDEMO: Runs a filesystem demo.")
 					
 				if command.Equals("clear")
 					sys Console.Clear()
@@ -116,12 +120,8 @@ classdef iConsole
 					sys Console.Print("File name: ")
 					sub = 0x1
 				
-				if command.Equals("OHLL lib")
-					asm("call Library._init")
-				if command.Equals("OHLL videoinfo")
-					asm("call VideoInfo._init")
-				if command.Equals("OHLL test")
-					asm("call TestProgram._init")
+				if command.Equals("FSDEMO")
+					MinnowTest.RunTest()
 				
 				if sub == 0x0
 					sys Console.Print("Console: ")

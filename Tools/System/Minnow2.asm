@@ -464,6 +464,31 @@ Minnow.replaceTargetRef :
 		call Minnow.writeBuffer
 	popa
 	ret
+
+Minnow.assumeDefragmentedAndFormatSpace :
+	pusha
+		mov eax, 0x0
+		Minnow.SafeFormatSpace.loop :
+			call Minnow.getBuffer
+			mov edx, eax
+			mov eax, [ecx]
+			cmp dword [ecx], 0x0
+				jne Minnow.SafeFormatSpace.loop
+		add edx, 1
+		mov eax, edx
+		mov edx, 40000
+		Minnow.AssumeDefragmentedAndFormatSpace.loop :
+			call Minnow.getBuffer
+			mov dword [ecx], 0x0
+			mov dword [ecx+0x4], 0xFFFFFFFF
+			call Minnow.writeBuffer
+			add eax, 1
+			sub edx, 1
+			cmp edx, 0x0
+				jg Minnow.AssumeDefragmentedAndFormatSpace.loop
+	popa
+	ret
+
 Minnow.replaceTargetRef.old :
 	dd 0x0
 Minnow.replaceTargetRef.new :

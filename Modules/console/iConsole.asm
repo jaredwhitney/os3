@@ -175,45 +175,26 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	
-	call Minnow.ctree
 	mov eax, Console.test.FileName
 	mov ebx, Console.test.FileType
 	call Minnow.nameAndTypeToPointer
 	cmp ecx, 0xFFFFFFFF
-		je console.test.doesntexist
+		je Console.test.nodel
 	mov eax, ecx
 	call Minnow.deleteFile
-	call Minnow.ctree
-	console.test.doesntexist :
-	
+	Console.test.nodel :
 	mov eax, Console.test.FileName
 	mov ebx, Console.test.FileType
-	mov ecx, C.test.val3
-		push ebx
-		mov ebx, C.test.val3
-		call String.getLength
-		pop ebx
+	mov ecx, [Graphics.SCREEN_MEMPOS]
+	mov edx, [Graphics.SCREEN_SIZE]
 	call Minnow.writeFile
-	
-	call Minnow.ctree
-	
-	mov eax, Console.test.FileName
-	mov ebx, Console.test.FileType
-	call Minnow.nameAndTypeToPointer
-	mov eax, ecx
-	call Minnow.getBuffer
-	call Minnow.skipHeader
-	mov ebx, ecx
-	call console.println
 	
 popa
 ret
 Console.test.FileName :
-	db "Write Test", 0
+	db "Screenshot", 0
 Console.test.FileType :
-	db "Text", 0
-C.test.val3 :
-	db "This is some test text that should be written to the filesystem with the new Minnow.writeFile command!", 0
+	db "Image", 0
 
 console.memstat :
 	mov ah, 0xFF

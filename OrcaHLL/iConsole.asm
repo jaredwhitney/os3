@@ -39,6 +39,7 @@ mov ax, 0x0100
 int 0x30
 mov ecx, 0x0
 mov [iConsole.$global.sub], cl
+call MinnowTest._init
 pop edx
 pop ebx
 pop eax
@@ -77,12 +78,12 @@ xor ecx, ecx
 mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-jne iConsole.$comp_16.true
+jne iConsole.$comp_18.true
 mov cl, 0x0
-jmp iConsole.$comp_16.done
-iConsole.$comp_16.true :
+jmp iConsole.$comp_18.done
+iConsole.$comp_18.true :
 mov cl, 0xFF
-iConsole.$comp_16.done :
+iConsole.$comp_18.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.1_close
@@ -94,12 +95,12 @@ xor ecx, ecx
 mov cl, [Key.$global.KEY_SHIFT]
 cmp edx, ecx
 pop edx
-jne iConsole.$comp_17.true
+jne iConsole.$comp_19.true
 mov cl, 0x0
-jmp iConsole.$comp_17.done
-iConsole.$comp_17.true :
+jmp iConsole.$comp_19.done
+iConsole.$comp_19.true :
 mov cl, 0xFF
-iConsole.$comp_17.done :
+iConsole.$comp_19.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.2_close
@@ -127,12 +128,12 @@ xor ecx, ecx
 mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-je iConsole.$comp_21.true
+je iConsole.$comp_23.true
 mov cl, 0x0
-jmp iConsole.$comp_21.done
-iConsole.$comp_21.true :
+jmp iConsole.$comp_23.done
+iConsole.$comp_23.true :
 mov cl, 0xFF
-iConsole.$comp_21.done :
+iConsole.$comp_23.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.3_close
@@ -145,12 +146,12 @@ mov edx, ecx
 mov ecx, 0x2
 cmp edx, ecx
 pop edx
-je iConsole.$comp_24.true
+je iConsole.$comp_26.true
 mov cl, 0x0
-jmp iConsole.$comp_24.done
-iConsole.$comp_24.true :
+jmp iConsole.$comp_26.done
+iConsole.$comp_26.true :
 mov cl, 0xFF
-iConsole.$comp_24.done :
+iConsole.$comp_26.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.4_close
@@ -175,12 +176,12 @@ mov edx, ecx
 mov ecx, 0x1
 cmp edx, ecx
 pop edx
-je iConsole.$comp_37.true
+je iConsole.$comp_39.true
 mov cl, 0x0
-jmp iConsole.$comp_37.done
-iConsole.$comp_37.true :
+jmp iConsole.$comp_39.done
+iConsole.$comp_39.true :
 mov cl, 0xFF
-iConsole.$comp_37.done :
+iConsole.$comp_39.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.5_close
@@ -252,6 +253,14 @@ push ecx
 mov ax, 0x0101
 int 0x30
 mov ecx, [iConsole.$loop_if.6.string_10]
+push ecx
+mov ax, 0x0101
+int 0x30
+mov ecx, [iConsole.$loop_if.6.string_11]
+push ecx
+mov ax, 0x0101
+int 0x30
+mov ecx, [iConsole.$loop_if.6.string_12]
 push ecx
 mov ax, 0x0101
 int 0x30
@@ -514,30 +523,8 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.18_close
-call Library._init	; INLINE ASSEMBLY
+call MinnowTest.RunTest
 iConsole.$loop_if.18_close :
-
-push ebx
-mov ebx, iConsole.$global.command
-mov ecx, [iConsole.$loop_if.19.string_0]
-push ecx
-call String.Equals
-pop ebx
-cmp cl, 0xFF
-	jne iConsole.$loop_if.19_close
-call VideoInfo._init	; INLINE ASSEMBLY
-iConsole.$loop_if.19_close :
-
-push ebx
-mov ebx, iConsole.$global.command
-mov ecx, [iConsole.$loop_if.20.string_0]
-push ecx
-call String.Equals
-pop ebx
-cmp cl, 0xFF
-	jne iConsole.$loop_if.20_close
-call TestProgram._init	; INLINE ASSEMBLY
-iConsole.$loop_if.20_close :
 
 push edx
 xor ecx, ecx
@@ -554,12 +541,12 @@ mov cl, 0xFF
 iConsole.$comp_119.done :
 
 cmp cl, 0xFF
-	jne iConsole.$loop_if.21_close
-mov ecx, [iConsole.$loop_if.21.string_0]
+	jne iConsole.$loop_if.19_close
+mov ecx, [iConsole.$loop_if.19.string_0]
 push ecx
 mov ax, 0x0100
 int 0x30
-iConsole.$loop_if.21_close :
+iConsole.$loop_if.19_close :
 
 push ebx
 mov ebx, iConsole.$global.command
@@ -580,20 +567,18 @@ pop eax
 push dword [iConsole._loop.returnVal]
 ret
 	;Vars:
+iConsole.$loop_if.6.string_11 :
+	dd iConsole.$loop_if.6.string_11_data
 iConsole.$loop_if.6.string_10_data :
 	db "partition: Detects and displays partition info.", 0
 iConsole.$loop_if.7.string_0_data :
 	db "clear", 0
-iConsole.$loop_if.10.string_0 :
-	dd iConsole.$loop_if.10.string_0_data
 iConsole.$loop_if.13.string_1_data :
 	db ":", 0
+iConsole.$loop_if.17.string_1 :
+	dd iConsole.$loop_if.17.string_1_data
 iConsole.$loop_if.6.string_9_data :
 	db "tree: Displays all mounted files.", 0
-iConsole.$loop_if.17.string_0 :
-	dd iConsole.$loop_if.17.string_0_data
-iConsole.$loop_if.13.string_2 :
-	dd iConsole.$loop_if.13.string_2_data
 iConsole.$loop_if.6.string_5 :
 	dd iConsole.$loop_if.6.string_5_data
 iConsole.$loop_if.6.string_8_data :
@@ -607,119 +592,121 @@ iConsole.$loop_if.6.string_4 :
 iConsole.$loop_if.13.string_2_data :
 	db ":", 0
 iConsole.$loop_if.18.string_0_data :
-	db "OHLL lib", 0
+	db "FSDEMO", 0
 iConsole.$loop_if.12.string_0_data :
 	db "test", 0
 iConsole.$loop_if.6.string_7 :
 	dd iConsole.$loop_if.6.string_7_data
 iConsole.$loop_if.6.string_4_data :
 	db "help: Displays this prompt.", 0
-iConsole.$loop_if.20.string_0_data :
-	db "OHLL test", 0
-iConsole.$loop_if.19.string_0 :
-	dd iConsole.$loop_if.19.string_0_data
+iConsole.$loop_if.13.string_0 :
+	dd iConsole.$loop_if.13.string_0_data
+iConsole.$loop_if.9.string_0 :
+	dd iConsole.$loop_if.9.string_0_data
 iConsole.$loop_if.11.string_2_data :
 	db " / ", 0
-iConsole.$loop_if.20.string_0 :
-	dd iConsole.$loop_if.20.string_0_data
+iConsole.$loop_if.15.string_1 :
+	dd iConsole.$loop_if.15.string_1_data
+iConsole.$loop_if.13.string_3 :
+	dd iConsole.$loop_if.13.string_3_data
+iConsole.$loop_if.11.string_1 :
+	dd iConsole.$loop_if.11.string_1_data
 iConsole.$loop_if.6.string_0_data :
 	db "help", 0
+iConsole.$loop_if.12.string_0 :
+	dd iConsole.$loop_if.12.string_0_data
 iConsole.$loop_if.16.string_0_data :
 	db "partition", 0
-iConsole.$loop_if.11.string_0 :
-	dd iConsole.$loop_if.11.string_0_data
 iConsole.$loop_if.6.string_7_data :
 	db "restart: Restarts the computer.", 0
 iConsole.$loop_if.10.string_0_data :
 	db "lock", 0
 iConsole.$loop_if.13.string_0_data :
 	db "time", 0
+iConsole.$loop_if.8.string_0 :
+	dd iConsole.$loop_if.8.string_0_data
+iConsole.$loop_if.10.string_0 :
+	dd iConsole.$loop_if.10.string_0_data
 iConsole.$loop_if.19.string_0_data :
-	db "OHLL videoinfo", 0
+	db "Console: ", 0
 iConsole.$loop_if.9.string_0_data :
 	db "fullscreen", 0
 iConsole.$loop_if.6.string_3_data :
 	db "fullscreen: Toggles fullscreen mode.", 0
 iConsole.$loop_if.15.string_1_data :
 	db "Restarting the computer.", 0
-iConsole.$loop_if.13.string_5 :
-	dd iConsole.$loop_if.13.string_5_data
 iConsole.$loop_if.13.string_3_data :
 	db " ", 0
-iConsole.$loop_if.18.string_0 :
-	dd iConsole.$loop_if.18.string_0_data
+iConsole.$loop_if.7.string_0 :
+	dd iConsole.$loop_if.7.string_0_data
 iConsole.$loop_if.17.string_0_data :
 	db "readfile", 0
 iConsole.$loop_if.6.string_1_data :
 	db "clear: Clears the screen.", 0
 iConsole.$loop_if.6.string_0 :
 	dd iConsole.$loop_if.6.string_0_data
+iConsole.$loop_if.14.string_0 :
+	dd iConsole.$loop_if.14.string_0_data
 iConsole.$loop_if.6.string_6_data :
 	db "memstat: Prints out the percentage of RAM in use.", 0
-iConsole.$loop_if.11.string_2 :
-	dd iConsole.$loop_if.11.string_2_data
-iConsole.$loop_if.13.string_3 :
-	dd iConsole.$loop_if.13.string_3_data
-iConsole.$loop_if.17.string_1 :
-	dd iConsole.$loop_if.17.string_1_data
-iConsole.$loop_if.7.string_0 :
-	dd iConsole.$loop_if.7.string_0_data
-iConsole.$loop_if.15.string_1 :
-	dd iConsole.$loop_if.15.string_1_data
+iConsole.$loop_if.17.string_0 :
+	dd iConsole.$loop_if.17.string_0_data
+iConsole.$loop_if.15.string_0 :
+	dd iConsole.$loop_if.15.string_0_data
+iConsole.$loop_if.16.string_0 :
+	dd iConsole.$loop_if.16.string_0_data
+iConsole.$loop_if.13.string_4 :
+	dd iConsole.$loop_if.13.string_4_data
+iConsole.$loop_if.6.string_12_data :
+	db "FSDEMO: Runs a filesystem demo.", 0
 iConsole.$loop_if.11.string_1_data :
 	db "Usage: ", 0
 iConsole.$loop_if.8.string_0_data :
 	db "exit", 0
-iConsole.$loop_if.13.string_1 :
-	dd iConsole.$loop_if.13.string_1_data
+iConsole.$loop_if.13.string_2 :
+	dd iConsole.$loop_if.13.string_2_data
 iConsole.$loop_if.17.string_1_data :
 	db "File name: ", 0
 iConsole.$loop_if.6.string_9 :
 	dd iConsole.$loop_if.6.string_9_data
 iConsole.$loop_if.13.string_4_data :
 	db "-", 0
+iConsole.$loop_if.18.string_0 :
+	dd iConsole.$loop_if.18.string_0_data
 iConsole.$loop_if.5.string_0_data :
 	db "File type: ", 0
-iConsole.$loop_if.13.string_0 :
-	dd iConsole.$loop_if.13.string_0_data
-iConsole.$loop_if.13.string_4 :
-	dd iConsole.$loop_if.13.string_4_data
-iConsole.$loop_if.8.string_0 :
-	dd iConsole.$loop_if.8.string_0_data
+iConsole.$loop_if.6.string_12 :
+	dd iConsole.$loop_if.6.string_12_data
 iConsole.$loop_if.6.string_3 :
 	dd iConsole.$loop_if.6.string_3_data
-iConsole.$loop_if.21.string_0_data :
-	db "Console: ", 0
+iConsole.$loop_if.13.string_1 :
+	dd iConsole.$loop_if.13.string_1_data
+iConsole.$loop_if.13.string_5 :
+	dd iConsole.$loop_if.13.string_5_data
 iConsole.$loop_if.0.$local.ch :
 	db 0x0
-iConsole.$loop_if.15.string_0 :
-	dd iConsole.$loop_if.15.string_0_data
 iConsole.$loop_if.6.string_10 :
 	dd iConsole.$loop_if.6.string_10_data
 iConsole.$loop_if.13.string_5_data :
 	db "-", 0
-iConsole.$loop_if.16.string_0 :
-	dd iConsole.$loop_if.16.string_0_data
 iConsole.$loop_if.6.string_2_data :
 	db "exit: Exits the console.", 0
-iConsole.$loop_if.12.string_0 :
-	dd iConsole.$loop_if.12.string_0_data
-iConsole.$loop_if.14.string_0 :
-	dd iConsole.$loop_if.14.string_0_data
 iConsole.$loop_if.11.string_0_data :
 	db "memstat", 0
-iConsole.$loop_if.11.string_1 :
-	dd iConsole.$loop_if.11.string_1_data
-iConsole.$loop_if.21.string_0 :
-	dd iConsole.$loop_if.21.string_0_data
-iConsole.$loop_if.9.string_0 :
-	dd iConsole.$loop_if.9.string_0_data
+iConsole.$loop_if.19.string_0 :
+	dd iConsole.$loop_if.19.string_0_data
+iConsole.$loop_if.6.string_11_data :
+	db "readfile: Prints out the contents of a text file.", 0
 iConsole.$loop_if.14.string_0_data :
 	db "tree", 0
 iConsole.$loop_if.5.string_0 :
 	dd iConsole.$loop_if.5.string_0_data
 iConsole.$loop_if.6.string_6 :
 	dd iConsole.$loop_if.6.string_6_data
+iConsole.$loop_if.11.string_0 :
+	dd iConsole.$loop_if.11.string_0_data
+iConsole.$loop_if.11.string_2 :
+	dd iConsole.$loop_if.11.string_2_data
 iConsole.$loop_if.6.string_5_data :
 	db "lock: Locks the computer.", 0
 iConsole.$loop_if.6.string_2 :
@@ -1390,6 +1377,323 @@ Char.$global.NUL :
 Char.$global.NEWLINE :
 	db 0x0A
 Char.$FILE_END :
+
+
+; *** LIB IMPORT 'MinnowTest' ***
+[bits 32]
+dd MinnowTest.$FILE_END - MinnowTest.$FILE_START
+db "OrcaHLL Class", 0
+db "MinnowTest", 0
+MinnowTest.$FILE_START :
+
+MinnowTest.$global.nameToDelete :
+	dd 0x0
+MinnowTest.$global.type :
+	dd 0x0
+MinnowTest.$global.fileContents :
+	dd 0x0
+MinnowTest.$global.nameToUse :
+	dd 0x0
+MinnowTest.$global.name1 :
+	dd 0x0
+MinnowTest.$global.name0 :
+	dd 0x0
+MinnowTest.$global.switch :
+	db 0x0
+MinnowTest._init: 
+pop dword [MinnowTest._init.returnVal]
+push eax
+push ebx
+push edx
+mov ecx, 20
+push ecx
+mov ax, 0x0502
+int 0x30
+mov [MinnowTest.$global.nameToUse], ecx
+mov ecx, 20
+push ecx
+mov ax, 0x0502
+int 0x30
+mov [MinnowTest.$global.nameToDelete], ecx
+mov ecx, [MinnowTest._init.string_0]
+mov [MinnowTest.$global.name0], ecx
+mov ecx, [MinnowTest._init.string_1]
+mov [MinnowTest.$global.name1], ecx
+mov ecx, [MinnowTest._init.string_2]
+mov [MinnowTest.$global.type], ecx
+mov ecx, [MinnowTest._init.string_3]
+mov [MinnowTest.$global.fileContents], ecx
+pop edx
+pop ebx
+pop eax
+push dword [MinnowTest._init.returnVal]
+ret
+	;Vars:
+MinnowTest._init.string_3 :
+	dd MinnowTest._init.string_3_data
+MinnowTest._init.string_0_data :
+	db "Write Test", 0
+MinnowTest._init.string_0 :
+	dd MinnowTest._init.string_0_data
+MinnowTest._init.string_1_data :
+	db "Filesystem Test", 0
+MinnowTest._init.string_2_data :
+	db "Text", 0
+MinnowTest._init.string_3_data :
+	db "This is some test text that has been written to the filesystem with the new Minnow.WriteFile() command!", 0
+MinnowTest._init.string_1 :
+	dd MinnowTest._init.string_1_data
+MinnowTest._init.string_2 :
+	dd MinnowTest._init.string_2_data
+MinnowTest._init.returnVal:
+	dd 0x0
+
+
+MinnowTest.RunTest: 
+pop dword [MinnowTest.RunTest.returnVal]
+push eax
+push ebx
+push edx
+push ebx
+mov ebx, MinnowTest.$global.nameToUse
+mov ecx, 0
+push ecx
+mov ecx, 0
+push ecx
+call String.SetChar
+pop ebx
+push ebx
+mov ebx, MinnowTest.$global.nameToDelete
+mov ecx, 0
+push ecx
+mov ecx, 0
+push ecx
+call String.SetChar
+pop ebx
+mov ecx, [MinnowTest.$global.name1]
+push ecx
+mov ecx, [MinnowTest.$global.type]
+push ecx
+call Minnow.CheckExists
+cmp cl, 0xFF
+	jne MinnowTest.$loop_if.0_close
+push ebx
+mov ebx, MinnowTest.$global.nameToUse
+mov ecx, [MinnowTest.$global.name0]
+push ecx
+call String.Append
+pop ebx
+push ebx
+mov ebx, MinnowTest.$global.nameToDelete
+mov ecx, [MinnowTest.$global.name1]
+push ecx
+call String.Append
+pop ebx
+MinnowTest.$loop_if.0_close :
+
+mov ecx, [MinnowTest.$global.name0]
+push ecx
+mov ecx, [MinnowTest.$global.type]
+push ecx
+call Minnow.CheckExists
+cmp cl, 0xFF
+	jne MinnowTest.$loop_if.1_close
+push ebx
+mov ebx, MinnowTest.$global.nameToUse
+mov ecx, [MinnowTest.$global.name1]
+push ecx
+call String.Append
+pop ebx
+push ebx
+mov ebx, MinnowTest.$global.nameToDelete
+mov ecx, [MinnowTest.$global.name0]
+push ecx
+call String.Append
+pop ebx
+MinnowTest.$loop_if.1_close :
+
+mov ecx, [MinnowTest.$global.nameToDelete]
+push ecx
+mov ecx, [MinnowTest.$global.type]
+push ecx
+call Minnow.DeleteFile
+mov ecx, [MinnowTest.$global.nameToUse]
+push ecx
+mov ecx, [MinnowTest.$global.type]
+push ecx
+mov ecx, [MinnowTest.$global.fileContents]
+push ecx
+push ebx
+mov ebx, MinnowTest.$global.fileContents
+call String.GetLength
+pop ebx
+push ecx
+call Minnow.WriteFile
+pop edx
+pop ebx
+pop eax
+push dword [MinnowTest.RunTest.returnVal]
+ret
+	;Vars:
+MinnowTest.RunTest.returnVal:
+	dd 0x0
+
+
+MinnowTest.$FILE_END :
+; *** LIB IMPORT 'Minnow' ***
+[bits 32]
+dd Minnow.$FILE_END - Minnow.$FILE_START
+db "OrcaHLL Class", 0
+db "Minnow", 0
+Minnow.$FILE_START :
+
+Minnow.ReadFileBlock: 
+pop dword [Minnow.ReadFileBlock.returnVal]
+pop ecx
+mov [Minnow.ReadFileBlock.$local.block], ecx
+pop ecx
+mov [Minnow.ReadFileBlock.$local.fileType], ecx
+pop ecx
+mov [Minnow.ReadFileBlock.$local.fileName], ecx
+push eax
+push ebx
+push edx
+mov ecx, [Minnow.ReadFileBlock.$local.fileName]
+mov eax, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.ReadFileBlock.$local.fileType]
+mov ebx, ecx	; INLINE ASSEMBLY
+call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
+mov eax, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.ReadFileBlock.$local.block]
+mov ebx, ecx	; INLINE ASSEMBLY
+call Minnow.readFileBlock	; INLINE ASSEMBLY
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.ReadFileBlock.returnVal]
+ret
+	;Vars:
+Minnow.ReadFileBlock.$local.fileName :
+	dd 0x0
+Minnow.ReadFileBlock.$local.block :
+	dd 0x0
+Minnow.ReadFileBlock.$local.fileType :
+	dd 0x0
+Minnow.ReadFileBlock.returnVal:
+	dd 0x0
+
+
+Minnow.WriteFile: 
+pop dword [Minnow.WriteFile.returnVal]
+pop ecx
+mov [Minnow.WriteFile.$local.bufferSize], ecx
+pop ecx
+mov [Minnow.WriteFile.$local.buffer], ecx
+pop ecx
+mov [Minnow.WriteFile.$local.fileType], ecx
+pop ecx
+mov [Minnow.WriteFile.$local.fileName], ecx
+push eax
+push ebx
+push edx
+mov ecx, [Minnow.WriteFile.$local.fileName]
+mov eax, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.WriteFile.$local.fileType]
+mov ebx, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.WriteFile.$local.bufferSize]
+mov edx, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.WriteFile.$local.buffer]
+call Minnow.writeFile	; INLINE ASSEMBLY
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.WriteFile.returnVal]
+ret
+	;Vars:
+Minnow.WriteFile.$local.fileName :
+	dd 0x0
+Minnow.WriteFile.$local.buffer :
+	dd 0x0
+Minnow.WriteFile.$local.fileType :
+	dd 0x0
+Minnow.WriteFile.$local.bufferSize :
+	dd 0x0
+Minnow.WriteFile.returnVal:
+	dd 0x0
+
+
+Minnow.CheckExists: 
+pop dword [Minnow.CheckExists.returnVal]
+pop ecx
+mov [Minnow.CheckExists.$local.fileType], ecx
+pop ecx
+mov [Minnow.CheckExists.$local.fileName], ecx
+push eax
+push ebx
+push edx
+mov ecx, [Minnow.CheckExists.$local.fileName]
+mov eax, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.CheckExists.$local.fileType]
+mov ebx, ecx	; INLINE ASSEMBLY
+call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
+cmp cl, 0xFF
+	jne Minnow.$loop_if.0_close
+mov ecx, 0x0
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.CheckExists.returnVal]
+ret
+Minnow.$loop_if.0_close :
+
+mov ecx, 0xFF
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.CheckExists.returnVal]
+ret
+	;Vars:
+Minnow.CheckExists.$local.fileName :
+	dd 0x0
+Minnow.CheckExists.$local.fileType :
+	dd 0x0
+Minnow.CheckExists.returnVal:
+	dd 0x0
+
+
+Minnow.DeleteFile: 
+pop dword [Minnow.DeleteFile.returnVal]
+pop ecx
+mov [Minnow.DeleteFile.$local.fileType], ecx
+pop ecx
+mov [Minnow.DeleteFile.$local.fileName], ecx
+push eax
+push ebx
+push edx
+mov ecx, [Minnow.DeleteFile.$local.fileName]
+mov eax, ecx	; INLINE ASSEMBLY
+mov ecx, [Minnow.DeleteFile.$local.fileType]
+mov ebx, ecx	; INLINE ASSEMBLY
+call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
+mov eax, ecx	; INLINE ASSEMBLY
+call Minnow.deleteFile	; INLINE ASSEMBLY
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.DeleteFile.returnVal]
+ret
+	;Vars:
+Minnow.DeleteFile.$local.fileName :
+	dd 0x0
+Minnow.DeleteFile.$local.fileType :
+	dd 0x0
+Minnow.DeleteFile.returnVal:
+	dd 0x0
+
+
+Minnow.$FILE_END :
+
+
 
 
 

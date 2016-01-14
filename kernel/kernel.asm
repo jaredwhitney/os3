@@ -198,16 +198,3 @@ kernel.textInit :
 
 	TEXTMODE_INIT :
 		db "Booted into debug (text) mode.", 0
-	
-	
-;	THE "FILESYSTEM" STARTS HERE IN RAM	;
-
-	MINNOW_START :
-
-	
-;	INCLUDES TO BE LISTED AS FILES	;
-
-	%include "..\OrcaHLL\iConsole.asm"
-	%include "..\OrcaHLL\Library.asm"
-	%include "..\OrcaHLL\VideoInfo.asm"
-	%include "..\OrcaHLL\TestProgram.asm"

@@ -1,0 +1,29 @@
+import "Minnow"
+classdef MinnowTest
+	byte switch
+	String name0
+	String name1
+	String type
+	String fileContents
+	String nameToUse
+	String nameToDelete
+	func _init (void : null)
+		nameToUse = sys Program.Ealloc(20)
+		nameToDelete = sys Program.Ealloc(20)
+		name0 = "Write Test"
+		name1 = "Filesystem Test"
+		type = "Text"
+		fileContents = "This is some test text that has been written to the filesystem with the new Minnow.WriteFile() command!"
+		
+	func RunTest (void : null)
+		nameToUse.SetChar(0, 0)
+		nameToDelete.SetChar(0, 0)
+		if Minnow.CheckExists(name1, type)
+			nameToUse.Append(name0)
+			nameToDelete.Append(name1)
+		if Minnow.CheckExists(name0, type)	; else statements aren't really a thing...
+			nameToUse.Append(name1)
+			nameToDelete.Append(name0)
+		Minnow.DeleteFile(nameToDelete, type)
+		Minnow.WriteFile(nameToUse, type, fileContents, fileContents.GetLength())
+	

@@ -1,0 +1,37 @@
+classdef Minnow
+	func ReadFileBlock (Buffer : String fileName, String fileType, int block)
+		fileName
+		asm("mov eax, ecx")
+		fileType
+		asm("mov ebx, ecx")
+		asm("call Minnow.nameAndTypeToPointer")
+		asm("mov eax, ecx")
+		block
+		asm("mov ebx, ecx")
+		asm("call Minnow.readFileBlock")
+	func WriteFile (void : String fileName, String fileType, Buffer buffer, int bufferSize)
+		fileName
+		asm("mov eax, ecx")
+		fileType
+		asm("mov ebx, ecx")
+		bufferSize
+		asm("mov edx, ecx")
+		buffer
+		asm("call Minnow.writeFile")
+	func CheckExists (byte : String fileName, String fileType)
+		fileName
+		asm("mov eax, ecx")
+		fileType
+		asm("mov ebx, ecx")
+		if asm("call Minnow.nameAndTypeToPointer") == 0xFFFFFFFF
+			return 0x0
+		return 0xFF
+	func DeleteFile (void : String fileName, String fileType)
+		fileName
+		asm("mov eax, ecx")
+		fileType
+		asm("mov ebx, ecx")
+		asm("call Minnow.nameAndTypeToPointer")
+		asm("mov eax, ecx")
+		asm("call Minnow.deleteFile")
+	
