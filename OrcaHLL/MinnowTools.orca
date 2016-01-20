@@ -1,0 +1,39 @@
+import "Buffer"
+classdef MinnowTools
+	int lastBlocks
+	Buffer dat
+	func ValidateFS (byte : null)
+		lastBlocks = 0
+		ValidateFS_Loop()
+	
+	func ValidateFS_Loop (byte : null)
+		asm("ValidateFS_Loop.__START :")
+		int ptr = dat.ReadInt(0)
+		int blocks = dat.ReadInt(4)
+		if lastBlocks != 0
+			if blocks != lastBlocks - 1
+				sys Console.PrintLine("Quitting on invalid block!")
+				return 0
+		if lastBlocks == 0
+			sys Console.Print("Ptr: ")
+			sys Console.PrintHex(ptr)
+			sys Console.Newline()
+			sys Console.Print("Blocks: ")
+			sys Console.PrintHex(blocks)
+			sys Console.Newline()
+			String name = dat + 8
+			String type = name + name.GetLength()
+			sys Console.Print("Name: ")
+			sys Console.PrintLine(name)
+			sys Console.Print("Type: ")
+			sys Console.PrintLine(type)
+		if ptr == 0
+			if blocks != 0
+				sys Console.PrintLine("Quitting on invalid block!")
+				return 0
+			sys Console.PrintLine("[End Filesystem]")
+			return 0xFF
+		lastBlocks = blocks
+		dat = Minnow.ReadBlock(dat)
+		asm("jmp ValidateFS_Loop.__START")
+	

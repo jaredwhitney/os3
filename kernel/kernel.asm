@@ -2,7 +2,7 @@
 
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
-
+		
 	;	PREVENT WINDOWS FROM BEING DRAWN	;
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 	

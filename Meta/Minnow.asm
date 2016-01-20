@@ -149,5 +149,27 @@ Minnow.DeleteFile.returnVal:
 	dd 0x0
 
 
+Minnow.ReadBlock: 
+pop dword [Minnow.ReadBlock.returnVal]
+pop ecx
+mov [Minnow.ReadBlock.$local.block], ecx
+push eax
+push ebx
+push edx
+mov ecx, [Minnow.ReadBlock.$local.block]
+mov eax, ecx	; INLINE ASSEMBLY
+call Minnow.getBuffer	; INLINE ASSEMBLY
+pop edx
+pop ebx
+pop eax
+push dword [Minnow.ReadBlock.returnVal]
+ret
+	;Vars:
+Minnow.ReadBlock.$local.block :
+	dd 0x0
+Minnow.ReadBlock.returnVal:
+	dd 0x0
+
+
 Minnow.$FILE_END :
 

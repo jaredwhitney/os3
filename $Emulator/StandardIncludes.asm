@@ -1,3 +1,6 @@
+%include "..\boot\betterRealMode.asm"
+%include "..\boot\realMode.asm"
+
 %include "..\modules\dolphin\Dolphin.asm"
 %include "..\modules\dolphin\WindowTools.asm"
 %include "..\modules\dolphin\Update_Text.asm"
@@ -46,7 +49,6 @@
 %include "..\debug\TextMode.asm"
 %include "..\debug\print.asm"	; depricated
 %include "..\boot\IDTmain.asm"
-%include "..\boot\realMode.asm"
 
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"

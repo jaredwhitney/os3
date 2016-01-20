@@ -1,0 +1,17 @@
+IF os key is pressed THEN snap the mouse pointer to the current window's position
+THEN UNTIL the mouse is leftclicked OR the os key is pressed snap the window to the mouse pos
+
+if KeyPressed(OS_KEY & !active)
+	active = true
+	start_mx = Mouse.GetX()
+	start_my = Mouse.GetY()
+	Mouse.SetX(currentWindow.x)
+	Mouse.SetY(currentWindow.y)
+if active
+	if KeyPressed(OS_KEY) | Mouse.hasLeftClicked()
+		active = false
+		Mouse.SetX(start_mx)
+		Mouse.SetY(start_my)
+if active
+	Window.SetX(Mouse.GetX())
+	Window.SetY(Mouse.GetY())

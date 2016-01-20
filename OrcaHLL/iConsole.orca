@@ -3,6 +3,8 @@ import "String"
 import "KeyCodes"
 import "CharCodes"
 import "MinnowTest"	; this actually works :) [but ONLY if there are no double imports :\]
+import "MinnowTools"
+import "Minnow"
 classdef iConsole
 	Window window
 	Window win
@@ -122,6 +124,9 @@ classdef iConsole
 				
 				if command.Equals("FSDEMO")
 					MinnowTest.RunTest()
+				
+				if command.Equals("VERIFY")
+					MinnowTools.ValidateFS()
 				
 				if sub == 0x0
 					sys Console.Print("Console: ")

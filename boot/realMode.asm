@@ -146,6 +146,7 @@ rRM.ERRORrt :
 rRM.ERRORs :
 	db "Warning: Unable to read all sectors.", 0xD, 0xA, 0
 
+align 16
 rmIDT :
 dw 0x3ff
 dd 0x0

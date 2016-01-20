@@ -8,7 +8,7 @@ classdef Minnow
 		asm("mov eax, ecx")
 		block
 		asm("mov ebx, ecx")
-		asm("call Minnow.readFileBlock")
+		return asm("call Minnow.readFileBlock")
 	func WriteFile (void : String fileName, String fileType, Buffer buffer, int bufferSize)
 		fileName
 		asm("mov eax, ecx")
@@ -34,4 +34,8 @@ classdef Minnow
 		asm("call Minnow.nameAndTypeToPointer")
 		asm("mov eax, ecx")
 		asm("call Minnow.deleteFile")
+	func ReadBlock (Buffer : int block)
+		block
+		asm("mov eax, ecx")
+		return asm("call Minnow.getBuffer")
 	

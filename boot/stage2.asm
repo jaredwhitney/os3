@@ -11,6 +11,7 @@ DESIRED_YRES equ	768
 stage2:
 	;	Perform extraneous tasks here	;
 	sgdt [RMGDTSAVE]
+	sidt [RMIDTSAVE]
 	
 	;call stage2.checkBootFlags
 	
@@ -366,6 +367,9 @@ MEMORY_BUFFMAXMSG :
 	db "Memory allocated up to: 0x", 0x0
 
 RMGDTSAVE :
+	dd 0x0
+	dd 0x0
+RMIDTSAVE :
 	dd 0x0
 	dd 0x0
 	

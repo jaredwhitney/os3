@@ -175,19 +175,24 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	
-	mov eax, Console.test.FileName
-	mov ebx, Console.test.FileType
-	call Minnow.nameAndTypeToPointer
-	cmp ecx, 0xFFFFFFFF
-		je Console.test.nodel
-	mov eax, ecx
-	call Minnow.deleteFile
-	Console.test.nodel :
-	mov eax, Console.test.FileName
-	mov ebx, Console.test.FileType
-	mov ecx, [Graphics.SCREEN_MEMPOS]
-	mov edx, [Graphics.SCREEN_SIZE]
-	call Minnow.writeFile
+;	mov eax, Console.test.FileName
+;	mov ebx, Console.test.FileType
+;	call Minnow.nameAndTypeToPointer
+;	cmp ecx, 0xFFFFFFFF
+;		je Console.test.nodel
+;	mov eax, ecx
+;	call Minnow.deleteFile
+;	Console.test.nodel :
+;	mov eax, Console.test.FileName
+;	mov ebx, Console.test.FileType
+;	mov ecx, [Graphics.SCREEN_MEMPOS]
+;	mov edx, [Graphics.SCREEN_SIZE]
+;	call Minnow.writeFile
+
+	call os.hopToRealMode
+	mov ebx, [outVal0]
+	call console.numOut
+	call console.newline
 	
 popa
 ret

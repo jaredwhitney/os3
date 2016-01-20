@@ -1,0 +1,14 @@
+atm 34391 bytes... some of which can be offloaded eventually to the filesystem
+aka 44 sectors of actual code
+
+currently loading 126 sectors in the bootloader...
+
+leaves 126-44= 82 sectors left to use
+
+82 sectors = 0xA400 aka 41,984 bytes aka safely assume 40kb per transfer?
+at which rate it would take 59 reads to read a 1024*768*3 image to the filesystem. ugh.
+assuming it can transfer and reboot in ~15 seconds it will take approx 15 minutes to transfer an image??
+
+hmmmng time to figure out jumping back to real mode so BIOS can do all the USB driver work without needing to reboot...
+
+ALTHOUGH the above currently loading number can maybe be raised a lot by having multiple loads called?
