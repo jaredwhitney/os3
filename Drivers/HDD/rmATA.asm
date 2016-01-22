@@ -89,11 +89,51 @@ rmATA.DMAread.readData :
 			jg rmATA.DMAread.loop
 	popa
 	ret
-
+rmATA.DMAwrite :	; HBA low = eax, HBA high = bx, length = edx, buffer = ecx
+	pusha
+		call rmATA.DMAread.storeVals
+		call rmATA.DMAread.getSectorCount
+		call rmATA.DMAwrite.writeData
+	popa
+	ret
+rmATA.DMAwrite.writeData :	; UNTESTED
+	pusha
+		mov dword [os_RealMode_functionPointer], rmATA.DMAwrite.writeFunc
+		mov edx, [rmATA.DMAread.sectorCount]
+		mov eax, [rmATA.DMAread.dataBuffer]
+		rmATA.DMAwrite.loop :
+		mov ebx, 0x7c00
+		mov ecx, 0x200
+		push edx
+		mov edx, 1
+		call Image.copyLinear
+		pop edx
+		call os.hopToRealMode
+		add eax, 0x200
+		mov ecx, [rmATA.DMAread.HBA_low]
+		add ecx, 1
+		cmp ecx, 0x0
+			jne rmATA.DMAreadToBuffer.noRollover
+		mov ecx, [rmATA.DMAread.HBA_high]
+		add ecx, 1
+		mov [rmATA.DMAread.HBA_high], ecx
+		mov ecx, 0x0
+		rmATA.DMAwrite.noRollover :
+		mov [rmATA.DMAread.HBA_low], ecx
+		sub edx, 1
+		cmp edx, 0
+			jg rmATA.DMAwrite.loop
+	popa
+	ret
 [bits 16]
 rmATA.DMAread.loadFunc :
 		mov eax, [rmATA.DMAread.HBA_low]
 		mov bx, [rmATA.DMAread.HBA_high]
 		call realMode.ATAload
+	ret
+rmATA.DMAwrite.writeFunc :
+		mov eax, [rmATA.DMAread.HBA_low]
+		mov bx, [rmATA.DMAread.HBA_high]
+		call realMode.ATAwrite
 	ret
 [bits 32]

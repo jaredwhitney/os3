@@ -261,12 +261,25 @@ rm.ATAdata :
 	rm.ATAdata.LBA_high :
 		dd 0x0	; upper LBA
 sload_error:
-	;mov ebx, ERRORs
-	;call consolePM.print
 	popa
 	ret
-ERRORs :
-	db "Warning: Unable to read all sectors.", 0xD, 0xA, 0
+realMode.ATAwrite :	; eax = LBA low, bx = LBA high (data to copy at 0x7c00)
+	pusha
+		mov [rm.ATAdata.LBA_low], eax
+		and ebx, 0xFFFF
+		mov [rm.ATAdata.LBA_high], ebx
+		
+		mov di, 0x0
+		mov si, rm.ATAdata
+		mov dl, 0x80
+		mov ah, 0x43
+		int 0x13
+			jc swrite_error
+	popa
+	ret
+swrite_error:
+	popa
+	ret
 [bits 32]
 
 %include "..\boot\init_GDT.asm"
