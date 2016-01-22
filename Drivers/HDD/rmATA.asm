@@ -113,7 +113,7 @@ rmATA.DMAwrite.writeData :	; UNTESTED
 		mov ecx, [rmATA.DMAread.HBA_low]
 		add ecx, 1
 		cmp ecx, 0x0
-			jne rmATA.DMAreadToBuffer.noRollover
+			jne rmATA.DMAwrite.noRollover
 		mov ecx, [rmATA.DMAread.HBA_high]
 		add ecx, 1
 		mov [rmATA.DMAread.HBA_high], ecx
