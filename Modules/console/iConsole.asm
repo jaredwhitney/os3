@@ -174,40 +174,24 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
+
 	mov eax, [os_imageDataBaseLBA]
-	;add eax, 18	; ??
-	mov [console_testval], eax
-	mov eax, 0x2
-	mov ebx, 4824
-	call Guppy.malloc
-	mov [console_testbuffer], ebx
-	mov edx, 4824
-	
-	console.test.loop :
-	call os.hopToRealMode
-	mov eax, 0x7c00
-	mov ecx, 0x200
-	push edx
-	mov edx, 1
-	call Image.copyLinear
-	pop edx
-	add ebx, 0x200
-	mov ecx, [console_testval]
-	add ecx, 1
-	mov [console_testval], ecx
-	sub edx, 1
-	cmp edx, 0
-		jg console.test.loop
+	mov bx, 0x0
+	mov edx, 1024*603*4
+	call rmATA.DMAread
 	
 	mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
-	mov eax, [console_testbuffer]
+	mov eax, ecx
 	mov ebx, [Graphics.SCREEN_MEMPOS]
 	mov cx, 1024*4
 	mov dx, 603
 	call Image.copy
 	
-	jmp $
+	mov eax, 5000*5
+	call System.sleep
+	
+	mov byte [Dolphin_WAIT_FLAG], 0x00
 	
 popa
 ret

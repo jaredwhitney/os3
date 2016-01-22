@@ -51,9 +51,7 @@ os.inRealMode :
 	mov ss, ax
 	lidt [realModeIDT]
 	sti
-					mov eax, [console_testval]
-					mov bx, 0x0
-					call realMode.ATAload
+		call [os_RealMode_functionPointer]
 	cli
 	jmp 0x0:os.finishRealMode
 
@@ -77,6 +75,7 @@ os.backToPmode :
 	sti
 	call setupPIC
 	mov byte [Dolphin_WAIT_FLAG], 0x00
+	call Keyboard.poll	; don't know why its needed but it prevents the PS2 things from freezing up
 	jmp os.hopToRealMode.ret
 
 
@@ -95,7 +94,8 @@ realModeIDT :
 	dw 0x3ff
 	dd 0x0
 	
-	
+os_RealMode_functionPointer :
+	dd 0x0
 
 RMdisablePIC :
 	pusha

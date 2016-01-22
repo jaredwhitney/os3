@@ -16,6 +16,7 @@
 %include "..\Drivers\PS2\Generic_Mouse.asm"
 %include "..\Drivers\PS2\Generic_Keyboard.asm"
 
+%include "..\Drivers\HDD\rmATA.asm"
 %include "..\Drivers\HDD\ATA_DETECT.asm"
 %include "..\Drivers\HDD\AHCI_COMMANDS.asm"
 %include "..\Drivers\HDD\AHCI_DMAWRITE.asm"
