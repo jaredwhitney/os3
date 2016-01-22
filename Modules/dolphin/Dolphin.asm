@@ -20,7 +20,7 @@ Dolphin.init :
 		;call Guppy.malloc
 		;mov [Dolphin.SCREEN_FLIPBUFFER], ebx
 		
-		call Dolphin.redrawBG
+		;call Dolphin.redrawBG
 	
 	popa
 	ret

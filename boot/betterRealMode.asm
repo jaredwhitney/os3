@@ -1,12 +1,15 @@
 [bits 32]
 os.hopToRealMode :
 	pusha
-	
+		
+		mov byte [Dolphin_WAIT_FLAG], 0xFF
+		
+		cli
+		call RMdisablePIC
 		cli
 		
 		; save stack position
 		mov [stack_locSave], esp
-		mov [stack_locSave+4], ebp
 		
 		; swap out gdt and idt
 		sgdt [pmode_gdtSave]
@@ -46,10 +49,12 @@ os.inRealMode :
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	lidt [rmIDT]
+	lidt [realModeIDT]
 	sti
-			; do things!
-			mov dword [outVal0], 0xDEADF154
+					mov ax, 0x4f03
+					int 0x10
+					and ebx, 0xFFFF
+					mov [outVal0], ebx
 	cli
 	jmp 0x0:os.finishRealMode
 
@@ -70,12 +75,12 @@ os.backToPmode :
 	mov ss, ax
 	lidt [pmode_idtSave]
 	mov esp, [stack_locSave]
-	mov ebp, [stack_locSave+4]
 	sti
+	call setupPIC
+	mov byte [Dolphin_WAIT_FLAG], 0x00
 	jmp os.hopToRealMode.ret
 
 stack_locSave :
-	dd 0x0
 	dd 0x0
 align 16
 pmode_gdtSave :
@@ -85,3 +90,15 @@ pmode_idtSave :
 	times 2 dq 0x0
 outVal0 :
 	dd 0x0
+align 16
+realModeIDT :
+	dw 0x3ff
+	dd 0x0
+
+RMdisablePIC :
+	pusha
+		mov al, 0xFF
+		out 0xa1, al
+		out 0x21, al
+	popa
+	ret

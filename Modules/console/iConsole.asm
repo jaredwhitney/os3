@@ -193,6 +193,10 @@ pusha
 	mov ebx, [outVal0]
 	call console.numOut
 	call console.newline
+	xor ebx, ebx
+	mov bx, [VESA_CLOSEST_MATCH]
+	call console.numOut
+	call console.newline
 	
 popa
 ret
