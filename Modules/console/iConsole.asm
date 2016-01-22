@@ -174,37 +174,65 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
+	mov eax, [os_imageDataBaseLBA]
+	;add eax, 18	; ??
+	mov [console_testval], eax
+	mov eax, 0x2
+	mov ebx, 4824
+	call Guppy.malloc
+	mov [console_testbuffer], ebx
+	mov edx, 4824
 	
-;	mov eax, Console.test.FileName
-;	mov ebx, Console.test.FileType
-;	call Minnow.nameAndTypeToPointer
-;	cmp ecx, 0xFFFFFFFF
-;		je Console.test.nodel
-;	mov eax, ecx
-;	call Minnow.deleteFile
-;	Console.test.nodel :
-;	mov eax, Console.test.FileName
-;	mov ebx, Console.test.FileType
-;	mov ecx, [Graphics.SCREEN_MEMPOS]
-;	mov edx, [Graphics.SCREEN_SIZE]
-;	call Minnow.writeFile
-
+	console.test.loop :
 	call os.hopToRealMode
-	mov ebx, [outVal0]
-	call console.numOut
-	call console.newline
-	xor ebx, ebx
-	mov bx, [VESA_CLOSEST_MATCH]
-	call console.numOut
-	call console.newline
+	mov eax, 0x7c00
+	mov ecx, 0x200
+	push edx
+	mov edx, 1
+	call Image.copyLinear
+	pop edx
+	add ebx, 0x200
+	mov ecx, [console_testval]
+	add ecx, 1
+	mov [console_testval], ecx
+	sub edx, 1
+	cmp edx, 0
+		jg console.test.loop
+	
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
+	
+	mov eax, [console_testbuffer]
+	mov ebx, [Graphics.SCREEN_MEMPOS]
+	mov cx, 1024*4
+	mov dx, 603
+	call Image.copy
+	
+	jmp $
 	
 popa
 ret
-Console.test.FileName :
-	db "Screenshot", 0
-Console.test.FileType :
-	db "Image", 0
-
+console_testval:
+	dd 0x0
+console_testbuffer :
+	dd 0x0
+;console.takeScreenshot :
+;	pusha
+;		mov eax, Console.test.FileName
+;		mov ebx, Console.test.FileType
+;		call Minnow.nameAndTypeToPointer
+;		cmp ecx, 0xFFFFFFFF
+;			je Console.test.nodel
+;		mov eax, ecx
+;		call Minnow.deleteFile
+;		Console.test.nodel :
+;		mov eax, Console.test.FileName
+;		mov ebx, Console.test.FileType
+;		mov ecx, [Graphics.SCREEN_MEMPOS]
+;		mov edx, [Graphics.SCREEN_SIZE]
+;		call Minnow.writeFile
+;	popa
+;	ret
+	
 console.memstat :
 	mov ah, 0xFF
 	pusha

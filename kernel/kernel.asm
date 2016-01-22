@@ -198,3 +198,11 @@ kernel.textInit :
 
 	TEXTMODE_INIT :
 		db "Booted into debug (text) mode.", 0
+
+os_imageDataBaseLBA :
+	dd ($-$$)/0x200+2	; 1 additional because the bootloader is LBA 0
+
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the code to the nearest sector
+
+; External files to include
+incbin "..\_not os code\image\TEAMBLDR.vesa.dsp"

@@ -51,10 +51,9 @@ os.inRealMode :
 	mov ss, ax
 	lidt [realModeIDT]
 	sti
-					mov ax, 0x4f03
-					int 0x10
-					and ebx, 0xFFFF
-					mov [outVal0], ebx
+					mov eax, [console_testval]
+					mov bx, 0x0
+					call realMode.ATAload
 	cli
 	jmp 0x0:os.finishRealMode
 
@@ -80,6 +79,7 @@ os.backToPmode :
 	mov byte [Dolphin_WAIT_FLAG], 0x00
 	jmp os.hopToRealMode.ret
 
+
 stack_locSave :
 	dd 0x0
 align 16
@@ -94,6 +94,8 @@ align 16
 realModeIDT :
 	dw 0x3ff
 	dd 0x0
+	
+	
 
 RMdisablePIC :
 	pusha

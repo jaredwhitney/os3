@@ -1,5 +1,6 @@
+S2_CODE_LOC equ 0x8000	; Must match corresponding header in boot.asm!
 [bits 16]
-[org 0x7e00]
+[org S2_CODE_LOC]
 db 0x4a
 
 MODE_TEXT equ 0x0
@@ -201,7 +202,7 @@ enter_PM :
 	mov ah, 0xB
 	call consolePM.print
 	
-	mov al, [0x7e00]
+	mov al, [S2_CODE_LOC]
 	mov [0xb8000], al
 	cmp al, 0x4a
 	jne stop
@@ -233,86 +234,41 @@ consolePM.print :
 	printdonepPM :
 	popa
 	ret
-	
-;VESA.cinfo :
-	;pusha
-	;mov edx, 0x2000
-	;add edx, 15
-	;mov ebx, [edx]
-	;mov ebx, [ebx]
-	;call console.numOut
-	;popa
-	;ret
-;
-;VESA.cprintall :
-	;pusha
-	;mov edx, 0x2000
-	;call console.newline
-;	
-	;call VESAhandle16	; mode attribs
-	;call VESAhandle8	; win a attribs
-	;call VESAhandle8	; win b attribs
-	;call VESAhandle16	; win granularity
-	;call VESAhandle16	; win size
-	;call VESAhandle16	; win a start seg
-	;call VESAhandle16	; win b start seg
-	;call VESAhandle32	; rm ptr to win func
-	;call VESAhandle16	; bytes per scanline
-	;call console.newline
-;	
-	;call VESAhandle16	; x res
-	;call VESAhandle16	; y res
-	;call VESAhandle8	; x charsize
-	;call VESAhandle8	; y charsize
-	;call console.newline
-;	
-	;call VESAhandle8	; num of planes
-	;call VESAhandle8	; bpp
-	;call VESAhandle8	; num of banks
-	;call VESAhandle8	; mem model num
-	;call VESAhandle8	; bank size
-	;call VESAhandle8	; num of image pages
-	;call VESAhandle8	; reserved (should be 1)
-	;call console.newline
-	
-	;	NEVERMIND, this isn't working at all :\
-	
-	;call VESAhandle32
-	;call VESAhandle32
-	;call VESAhandle16
-	;call console.newline
-	
-;	popa
-	;ret
-;VESAhandle32 :
-		;xor ebx, ebx
-		;mov ebx, [edx]
-		;call console.numOut
-		;add edx, 32
-		;call VESA.sep
-		;ret
-;VESAhandle16 :
-		;xor ebx, ebx
-		;mov bx, [edx]
-		;call console.numOut
-		;add edx, 16
-		;call VESA.sep
-		;ret
-;VESAhandle8 :
-		;xor ebx, ebx
-		;mov bl, [edx]
-		;call console.numOut
-		;add edx, 8
-		;call VESA.sep
-		;ret
-;VESA.sep :
-	;push ax
-	;mov al, ':'
-	;mov ah, 0xFF
-	;call console.cprint
-	;pop ax
-	;ret
-	
+
+[bits 16]
+realMode.ATAload :	; eax = LBA low, bx = LBA high
+	pusha
+		mov [rm.ATAdata.LBA_low], eax
+		and ebx, 0xFFFF
+		mov [rm.ATAdata.LBA_high], ebx
+		
+		mov di, 0x0
+		mov si, rm.ATAdata
+		mov dl, 0x80
+		mov ah, 0x42
+		int 0x13
+			jc sload_error
+	popa
+	ret
+rm.ATAdata :
+	db 0x10	; packet size
+	db 0	; always 0
+	dw 1	; sectors to load
+	dw 0x7c00	; offs
+	dw 0x0	; seg
+	rm.ATAdata.LBA_low :
+		dd 0x0	; start LBA
+	rm.ATAdata.LBA_high :
+		dd 0x0	; upper LBA
+sload_error:
+	;mov ebx, ERRORs
+	;call consolePM.print
+	popa
+	ret
+ERRORs :
+	db "Warning: Unable to read all sectors.", 0xD, 0xA, 0
+[bits 32]
+
 %include "..\boot\init_GDT.asm"
 
 ENTER_PM :
@@ -372,72 +328,8 @@ RMGDTSAVE :
 RMIDTSAVE :
 	dd 0x0
 	dd 0x0
-	
+
 DisplayMode :
 	dd 0x0
-;
-;
-;
-;stage2.checkBootFlags :
-;	pusha
-;		mov dl, 0x80
-;		s2.cBF.loop :
-;		mov eax, 0x0
-;		mov bx, 0x0
-;		mov cx, 1
-;		call stage2.readFromDisk
-;		add cx, 0x1EE
-;		add cx, 4
-;		mov bx, [ecx]
-;		cmp bx, 0x30
-;			je stage2.readBootFlags
-;		add dl, 1
-;		cmp dl, 0xFF
-;			jl s2.cBF.loop
-;	popa
-;	ret
-;stage2.readBootFlags :
-;	pusha
-;		jmp stop
-;	popa
-;	ret
-;stage2.readFromDisk :	; disk in dl, LBA in eax+bx, sectors to load in cx, returns buffer in cx
-;	push ax
-;	push bx
-;	push dx
-;	
-;		mov [stage2.rFDdat.lbal], eax
-;		and ebx, 0xFFFF
-;		mov [stage2.rFDdat.lbah], ebx
-;		mov [stage2.rFDdat.sec], cx
-;		
-;		mov di, 0x0
-;		mov si, stage2.rFD.buf
-;		mov ah, 0x42
-;		int 0x13
-;		jc $
-;		
-;		xor ecx, ecx
-;		mov cx, stage2.rFD.buf
-;		
-;	pop dx
-;	pop bx
-;	pop ax
-;	ret
-;stage2.rFDdat :
-;	db 0x10	; packet size
-;	db 0	; always 0
-;stage2.rFDdat.sec :
-;	dw 1	; sectors to load
-;	dw stage2.rFD.buf	; offs
-;	dw 0x0	; seg
-;stage2.rFDdat.lbal :
-;	dd 0x0	; start LBA
-;stage2.rFDdat.lbah :
-;	dd 0x0	; upper LBA
-;stage2.rFD.buf :
-;times 0x200 db 0x0
-;
-;
-;
+
 %include "..\kernel\kernel.asm"

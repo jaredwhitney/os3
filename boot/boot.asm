@@ -1,6 +1,6 @@
+S2_CODE_LOC equ 0x8000	; Must match corresponding header in stage2.asm!
 [bits 16]
 [org 0x7c00]
-
 
 	jmp short bootstart
 	nop
@@ -33,14 +33,14 @@
 	; Load the kernel into RAM
 	mov dl, 0x80
 	mov ch, 0
-	mov bx, 0x7e00
+	mov bx, S2_CODE_LOC
 	mov cl, 2
 	mov dh, 0x40
 	call boot.ATAload
 
 	; Call the auxilary bootloader steps
 	mov bl, 0x0
-	jmp 0x7e01
+	jmp (S2_CODE_LOC+1)
 
 
 boot.ATAload :
@@ -57,7 +57,7 @@ boot.ATAdata :
 	db 0x10	; packet size
 	db 0	; always 0
 	dw 126	; sectors to load
-	dw 0x7e00	; offs
+	dw S2_CODE_LOC	; offs
 	dw 0x0	; seg
 	dd 0x1	; start LBA
 	dd 0x0	; upper LBA

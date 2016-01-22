@@ -79,407 +79,407 @@ setupPIC :
 IDTSTART :
 
 	_IDT0 :
-		dw (0x7e00+_IRQ0-$$) & 0xFFFF	; INT 0
+		dw (S2_CODE_LOC+_IRQ0-$$) & 0xFFFF	; INT 0
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_IRQ0-$$) >> 16
+		dw (S2_CODE_LOC+_IRQ0-$$) >> 16
 
-		dw (0x7e00+_IRQ1-$$) & 0xFFFF	; INT 1
+		dw (S2_CODE_LOC+_IRQ1-$$) & 0xFFFF	; INT 1
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_IRQ1-$$) >> 16
+		dw (S2_CODE_LOC+_IRQ1-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 4
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 4
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 5
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 5
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 6
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 6
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 7
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 7
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+EXCEPTION8HANDLER-$$) & 0xFFFF	; INT 8
+		dw (S2_CODE_LOC+EXCEPTION8HANDLER-$$) & 0xFFFF	; INT 8
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+EXCEPTION8HANDLER-$$) >> 16
+		dw (S2_CODE_LOC+EXCEPTION8HANDLER-$$) >> 16
 		
-		dw (0x7e00+_PRINTSTRING-$$) & 0xFFFF	; INT 9
+		dw (S2_CODE_LOC+_PRINTSTRING-$$) & 0xFFFF	; INT 9
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_PRINTSTRING-$$) >> 16
+		dw (S2_CODE_LOC+_PRINTSTRING-$$) >> 16
 
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT A
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT A
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT B
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT B
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT C
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT C
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT D
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT D
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+_PAGEFAULT-$$) & 0xFFFF	; INT E
+		dw (S2_CODE_LOC+_PAGEFAULT-$$) & 0xFFFF	; INT E
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_PAGEFAULT-$$) >> 16
+		dw (S2_CODE_LOC+_PAGEFAULT-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT F
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT F
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 10
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 10
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 11
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 11
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 12
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 12
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 13
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 13
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 14
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 14
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 15
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 15
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 16
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 17
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 17
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 18
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 18
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 19
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 19
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1A
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1A
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1B
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1B
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1C
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1C
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1D
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1D
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1E
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1E
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 1F
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 1F
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 20
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 20
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 21
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 21
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 22
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 22
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 23
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 23
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+_IRQC-$$) & 0xFFFF	; INT 24
+		dw (S2_CODE_LOC+_IRQC-$$) & 0xFFFF	; INT 24
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_IRQC-$$) >> 16
+		dw (S2_CODE_LOC+_IRQC-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 25
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 25
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 26
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 26
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 27
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 27
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 28
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 28
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 29
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 29
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2A
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2A
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2B
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2B
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2C
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2C
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2D
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2D
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2E
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2E
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 2F
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 2F
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+_HANDLEFUNC1-$$) & 0xFFFF	; INT 30
+		dw (S2_CODE_LOC+_HANDLEFUNC1-$$) & 0xFFFF	; INT 30
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+_HANDLEFUNC1-$$) >> 16
+		dw (S2_CODE_LOC+_HANDLEFUNC1-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 31
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 31
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 32
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 32
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 33
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 33
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 34
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 34
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 35
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 35
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 36
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 36
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 37
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 37
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 38
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 38
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 39
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 39
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3A
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3A
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3B
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3B
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3C
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3C
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3D
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3D
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3E
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3E
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 3F
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 3F
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 40
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 40
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 41
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 41
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 		
-		dw (0x7e00+IDTHANDLER-$$) & 0xFFFF	; INT 42
+		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 42
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (0x7e00+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
 
 IDTEND :
 
