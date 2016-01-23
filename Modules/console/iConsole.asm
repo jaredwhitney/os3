@@ -157,18 +157,15 @@ ret
 
 JASM.console.safeFullscreen :
 pusha
-	mov eax, 0
-	mov bl, [Window.X_POS]
-	call Dolphin.setAttribWord
-	mov eax, 8
-	mov bl, [Window.Y_POS]
-	call Dolphin.setAttribWord
+
+	mov ebx, [console.windowStructLoc]
+	mov word [ebx+Window_xpos], 0
+	mov word [ebx+Window_ypos], 8
 	mov eax, [Graphics.SCREEN_WIDTH]
-	mov bl, [Window.WIDTH]
-	call Dolphin.setAttribWord
+	mov [ebx+Window_width], ax
 	mov eax, [Graphics.SCREEN_HEIGHT]
-	mov bl, [Window.HEIGHT]
-	call Dolphin.setAttribWord
+	mov [ebx+Window_height], ax
+	
 popa
 ret
 
@@ -180,19 +177,8 @@ pusha
 	mov edx, 1024*603*4
 	call rmATA.DMAread
 	
-	mov byte [Dolphin_WAIT_FLAG], 0xFF
-	
-	mov eax, ecx
-	mov ebx, [Graphics.SCREEN_MEMPOS]
-	mov cx, 1024*4
-	mov dx, 603
-	call Image.copy
-	
-	mov ebx, eax
+	mov ebx, ecx
 	call Dolphin.makeBG
-	
-	mov byte [Dolphin_WAIT_FLAG], 0x00
-	
 	
 popa
 ret

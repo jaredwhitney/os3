@@ -47,7 +47,7 @@ Dolphin.redrawBG :
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 		mov ebx, [bglocstor]
 		call Dolphin.makeBG
-		mov byte [Dolphin_WAIT_FLAG], 0x0
+		mov byte [Dolphin_WAIT_FLAG], 0x00
 	pop ebx
 	ret
 
@@ -163,11 +163,11 @@ Dolphin.compositeWindow :
 		
 		mov [atwstor2X], ax
 		
-		mov eax, [edx+22]	; windowbuffer
+		mov eax, [edx+Window_windowbuffer]	; windowbuffer
 		
 		xor ecx, ecx
-		mov cx, [edx+4]	; width
-		mov dx, [edx+8]	; height
+		mov cx, [edx+Window_width]	; width
+		mov dx, [edx+Window_height]	; height
 		and edx, 0xFFFF
 
 		mov ebx, eax
@@ -179,15 +179,15 @@ Dolphin.compositeWindow :
 		pop edx
 		push eax
 		xor eax, eax
-		mov ax, [edx+16]	; ypos
+		mov ax, [edx+Window_ypos]	; ypos
 		imul eax, [Graphics.SCREEN_WIDTH]
 			
 		add ebx, eax	; add ypos
 		xor eax, eax
-		mov ax, [edx+12]
+		mov ax, [edx+Window_xpos]
 		add ebx, eax	; add xpos
 		pop eax
-		mov dx, [edx+8]	; height back
+		mov dx, [edx+Window_height]	; height back
 
 		call Image.copy
 

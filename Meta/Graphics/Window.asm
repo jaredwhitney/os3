@@ -104,13 +104,13 @@ Window.create.allocNewWindow :
 	add ebx, 1
 	mov byte [ebx], 0		; depth
 	add ebx, 1
-	mov dword [ebx], 0		; buffer
-	add ebx, 4
 	mov dword [ebx], 0		; windowbuffer
+	add ebx, 4
+	mov dword [ebx], 0		; buffer
 	add ebx, 4
 	mov dword [ebx], 0		; buffersize
 	add ebx, 8
-	mov byte [ebx], 0	; needsRectUpdate
+	mov byte [ebx], 0	; unused (winNum)
 	pop ebx
 ret
 
@@ -450,3 +450,20 @@ Window.OLDBUFFER :
 db 34
 Window.WIN_NUM :
 db 38
+
+Window_title equ 0
+Window_width equ 4
+Window_lastwidth equ 6
+Window_height equ 8
+Window_lastheight equ 10
+Window_xpos equ 12
+Window_lastxpos equ 14
+Window_ypos equ 16
+Window_lastypos equ 18
+Window_type equ 20
+Window_depth equ 21
+Window_windowbuffer equ 22
+Window_buffer equ 26
+Window_buffersize equ 30
+Window_oldbuffer equ 34
+Window_winnum equ 38

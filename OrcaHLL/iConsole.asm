@@ -300,44 +300,7 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.9_close
-mov ecx, 0
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.xPos
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov [eax], ecx
-mov ecx, 8
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.yPos
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov [eax], ecx
-mov ecx, 0x1	; System Constant
-push ecx
-mov ax, 0x0001
-int 0x30
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.width
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov [eax], ecx
-mov ecx, 0x2	; System Constant
-push ecx
-mov ax, 0x0001
-int 0x30
-push edx	; Begin getting subvar
-mov edx, [iConsole.$global.window]
-add dl, Window.height
-mov eax, edx
-mov edx, [edx]
-pop edx	; End getting subvar
-mov [eax], ecx
+call JASM.console.safeFullscreen	; INLINE ASSEMBLY
 iConsole.$loop_if.9_close :
 
 push ebx
@@ -544,12 +507,12 @@ mov edx, ecx
 mov ecx, 0x0
 cmp edx, ecx
 pop edx
-je iConsole.$comp_124.true
+je iConsole.$comp_121.true
 mov cl, 0x0
-jmp iConsole.$comp_124.done
-iConsole.$comp_124.true :
+jmp iConsole.$comp_121.done
+iConsole.$comp_121.true :
 mov cl, 0xFF
-iConsole.$comp_124.done :
+iConsole.$comp_121.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.20_close

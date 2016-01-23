@@ -1,5 +1,6 @@
 Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 	pusha
+	push dword [bstor]
 	mov [bstor], ebx
 	Image.wupdate.loop0 :
 		push cx
@@ -48,6 +49,7 @@ Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 			pop eax
 			cmp dx, 0
 				jg Image.wupdate.loop0
+	pop dword [bstor]
 	popa
 	ret
 	
