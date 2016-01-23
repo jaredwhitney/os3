@@ -224,12 +224,8 @@ pusha
 	mov ebx, [Window.makeGlassSmart.dw]
 	;
 	mov ecx, [Window.makeGlassSmart.h]
-	;
-	push ebx
-	call Dolphin.getSolidBGColor
-	mov edx, ebx
-	pop ebx
-	call Image.clearRegion
+	;	;	;
+	call Dolphin.redrawBackgroundRegion
 popa
 ret
 
@@ -252,12 +248,8 @@ pusha
 	mov ebx, [Window.makeGlassSmart.dw]
 	;
 	mov ecx, [Window.makeGlassSmart.h]
-	;
-	push ebx
-	call Dolphin.getSolidBGColor
-	mov edx, ebx
-	pop ebx
-	call Image.clearRegion
+	;	;	;
+	call Dolphin.redrawBackgroundRegion
 popa
 ret
 
@@ -280,12 +272,8 @@ pusha
 	mov ebx, [Window.makeGlassSmart.dw]
 	;
 	mov ecx, [Window.makeGlassSmart.dh]
-	;
-	push ebx
-	call Dolphin.getSolidBGColor
-	mov edx, ebx
-	pop ebx
-	call Image.clearRegion
+	;	;	;
+	call Dolphin.redrawBackgroundRegion
 popa
 ret
 
@@ -327,13 +315,8 @@ pusha
 	mov ebx, [Window.makeGlassSmart.dw]
 	;
 	mov ecx, [Window.makeGlassSmart.dh]
-	;
-	push ebx
-	call Dolphin.getSolidBGColor
-	mov edx, ebx
-	pop ebx
-	;	mov edx, 0xFF00FF
-	call Image.clearRegion
+	;	;	;
+	call Dolphin.redrawBackgroundRegion
 popa
 ret
 
@@ -381,21 +364,9 @@ pusha
 	imul ebx, [Graphics.SCREEN_WIDTH]
 	add eax, ebx	; window position on screen
 	
-	call Dolphin.getSolidBGColor
-	
-	Window.mG_l0 :
-		push ecx
-		Window.mG_l1 :
-			mov [eax], ebx
-			add eax, 4
-			sub ecx, 4
-			cmp ecx, 0
-				jg Window.mG_l1
-		pop ecx
-		add eax, [Window.makeGlass.lineVal]
-		sub edx, 1
-		cmp edx, 0
-			jg Window.mG_l0
+	mov ebx, ecx
+	mov ecx, edx
+	call Dolphin.redrawBackgroundRegion
 	
 popa
 ret

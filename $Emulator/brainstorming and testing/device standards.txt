@@ -1,0 +1,50 @@
+Object Grouping
+Hardware Type
+Interface Type
+Internal ID
+Friendly Name
+Device Status
+Interface-Specific
+	\
+	/
+      __\__
+
+EG::
+dd Devices.TYPE_STORAGE
+dd Storage.TYPE_HARD_DRIVE
+dd Storage.INTERFACE_AHCI
+dd 0xCF00A537
+dd thing.dFnamePtr
+dd thing.status
+dd thing.portno
+dd thing.partno
+dd thing.lbastart
+dd thing.lbaend
+...
+thing.dFnamePtr :
+db "Hard Drive 0", 0
+
+EG::
+dd Devices.TYPE_GRAPHICS
+dd Graphics.TYPE_GRAPHICSCARD
+dd Graphics.INTERFACE_GENERIC_ADAPTER
+dd 0x89EBFCA5
+dd thing2.dFnamePtr
+dd thing2.status
+dd thing2.modelistptr
+dd thing2.devid
+...
+thing2.dFnamePtr :
+db "Intel Ironlake(R) Graphics Adapter", 0
+
+EG::
+dd Devices.TYPE_INPUT
+dd Input.TYPE_POINTER
+dd Input.INTERFACE_PS2
+dd 0x1266D62C
+dd thing3.dFnamePtr
+dd thing3.status
+dd PS2.PORT_SLAVE
+...
+thing3.dFnamePtr :
+db "PS/2 Mouse", 0

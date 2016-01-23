@@ -188,10 +188,11 @@ pusha
 	mov dx, 603
 	call Image.copy
 	
-	mov eax, 5000*5
-	call System.sleep
+	mov ebx, eax
+	call Dolphin.makeBG
 	
 	mov byte [Dolphin_WAIT_FLAG], 0x00
+	
 	
 popa
 ret

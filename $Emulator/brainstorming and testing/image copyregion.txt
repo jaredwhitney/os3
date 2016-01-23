@@ -1,0 +1,43 @@
+pos to start copying from	obuf
+pos to start copying to		nbuf
+height of section		h
+width of section		w
+width of first image		ow
+width of second image		nw
+
+
+q = nw-w
+x = ow-w
+repeat h times
+	repeat w times
+		obuf -> nbuf
+	nbuf += q
+	obuf += x
+
+mov eax, [Image.copyRegion.ow]
+sub eax, [Image.copyRegion.w]
+mov [Image.copyRegion.owa], eax
+mov eax, [Image.copyRegion.nw]
+sub eax, [Image.copyRegion.w]
+mov [Image.copyRegion.nwa], eax
+
+mov edx, [Image.copyRegion.h]
+mov eax, [Image.copyRegion.obuf]
+mov ebx, [Image.copyRegion.nbuf]
+Image.copyRegion.loop1 :
+	push edx
+	mov edx, [Image.copyRegion.w]
+	Image.copyRegion.loop2 :
+		mov ecx, [eax]
+		mov [ebx], ecx
+		add eax, 4
+		add ebx, 4
+		sub edx, 1
+		cmp edx, 0x0
+			jg Image.copyRegion.loop2
+	pop edx
+	add ebx, [Image.copyRegion.nwa]
+	add eax, [Image.copyRegion.owa]
+	sub edx, 1
+	cmp edx, 0x0
+		jg Image.copyRegion.loop1

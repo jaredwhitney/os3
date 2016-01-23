@@ -108,6 +108,55 @@ Image.clearRegion.imagewidth :
 Image.clearRegion.lineFlip :
 	dd 0x0
 
+Image.copyRegion :
+	pusha
+		mov eax, [Image.copyRegion.ow]
+		sub eax, [Image.copyRegion.w]
+		;sub eax, 4
+		mov [Image.copyRegion.owa], eax
+		mov eax, [Image.copyRegion.nw]
+		sub eax, [Image.copyRegion.w]
+		;sub eax, 4
+		mov [Image.copyRegion.nwa], eax
+
+		mov edx, [Image.copyRegion.h]
+		mov eax, [Image.copyRegion.obuf]
+		mov ebx, [Image.copyRegion.nbuf]
+		Image.copyRegion.loop1 :
+			push edx
+			mov edx, [Image.copyRegion.w]
+			Image.copyRegion.loop2 :
+				mov ecx, [eax]
+				mov [ebx], ecx
+				add eax, 4
+				add ebx, 4
+				sub edx, 4
+				cmp edx, 0x0
+					jg Image.copyRegion.loop2
+			pop edx
+			add ebx, [Image.copyRegion.nwa]
+			add eax, [Image.copyRegion.owa]
+			sub edx, 1
+			cmp edx, 0x0
+				jg Image.copyRegion.loop1
+	popa
+	ret
+Image.copyRegion.w :
+	dd 0x0
+Image.copyRegion.ow :
+	dd 0x0
+Image.copyRegion.nw :
+	dd 0x0
+Image.copyRegion.h :
+	dd 0x0
+Image.copyRegion.obuf :
+	dd 0x0
+Image.copyRegion.nbuf :
+	dd 0x0
+Image.copyRegion.owa :
+	dd 0x0
+Image.copyRegion.nwa :
+	dd 0x0
 
 Image.copyFromWinSource :	; eax = source, ebx = dest, cx = regionWidth, dx = regionHeight, currentWindow = window
 pusha

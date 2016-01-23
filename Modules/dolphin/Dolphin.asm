@@ -57,7 +57,7 @@ Dolphin.makeBG :	; ebx contains location of data
 		mov [bglocstor], ebx
 		cmp ebx, 0x0
 			je Dolphin.solidBG
-		mov eax, ebx
+		mov eax, ebx	; should also be smarter than this...
 		mov ebx, [Graphics.SCREEN_MEMPOS]
 		mov ecx, [Graphics.SCREEN_WIDTH]
 		mov edx, [Graphics.SCREEN_HEIGHT]
@@ -236,6 +236,31 @@ Dolphin.updateWindows :
 			add ecx, 4
 			; should check and if needed jump back to the start of the loop
 			
+	popa
+	ret
+
+Dolphin.redrawBackgroundRegion :
+	pusha
+		cmp dword [bglocstor], 0x0
+			jne Dolphin.redrawBackgroundRegion.redrawImage
+		push ebx
+		call Dolphin.getSolidBGColor
+		mov edx, ebx
+		pop ebx
+		call Image.clearRegion
+	popa
+	ret
+Dolphin.redrawBackgroundRegion.redrawImage :	; ebx:w, eax:nbuf, ecx:h
+		mov [Image.copyRegion.w], ebx
+		mov edx, [Graphics.SCREEN_WIDTH]
+		mov [Image.copyRegion.nw], edx
+		mov [Image.copyRegion.ow], edx	; should be set to the image's width
+		mov [Image.copyRegion.h], ecx
+		mov [Image.copyRegion.nbuf], eax
+		sub eax, [Graphics.SCREEN_MEMPOS]
+		add eax, [bglocstor]	; should be smarter than this... map x,y to x,y etx
+		mov [Image.copyRegion.obuf], eax
+		call Image.copyRegion
 	popa
 	ret
 
