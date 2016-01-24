@@ -68,14 +68,14 @@ rmATA.DMAread.readData :
 		rmATA.DMAread.loop :
 		call os.hopToRealMode
 		mov eax, 0x7c00
-		mov ecx, 0x200
+		mov ecx, 0x200*4;0x200
 		push edx
 		mov edx, 1
 		call Image.copyLinear	; could really use a buffer copy func at some point
 		pop edx
-		add ebx, 0x200
+		add ebx, 0x200*4;0x200
 		mov ecx, [rmATA.DMAread.HBA_low]
-		add ecx, 1
+		add ecx, 4;1
 		cmp ecx, 0x0
 			jne rmATA.DMAread.noRollover
 		mov ecx, [rmATA.DMAread.HBA_high]
@@ -84,7 +84,7 @@ rmATA.DMAread.readData :
 		mov ecx, 0x0
 		rmATA.DMAread.noRollover :
 		mov [rmATA.DMAread.HBA_low], ecx
-		sub edx, 1
+		sub edx, 4;1
 		cmp edx, 0
 			jg rmATA.DMAread.loop
 	popa

@@ -70,10 +70,8 @@ os.backToPmode :
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	lidt [pmode_idtSave]
 	mov esp, [stack_locSave]
-	sti
-	call setupPIC
+	call loadIDT
 	mov byte [Dolphin_WAIT_FLAG], 0x00
 	call Keyboard.poll	; don't know why its needed but it prevents the PS2 things from freezing up
 	jmp os.hopToRealMode.ret

@@ -247,7 +247,7 @@ realMode.ATAload :	; eax = LBA low, bx = LBA high
 rm.ATAdata :
 	db 0x10	; packet size
 	db 0	; always 0
-	dw 1	; sectors to load
+	dw 4;1	; sectors to load
 	dw 0x7c00	; offs
 	dw 0x0	; seg
 	rm.ATAdata.LBA_low :

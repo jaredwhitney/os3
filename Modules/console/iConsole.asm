@@ -172,19 +172,83 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 
+	mov byte [Dolphin_WAIT_FLAG], 0xFF
+	
+	;mov ecx, [Graphics.SCREEN_MEMPOS]
+	mov [rmATA.DMAread.dataBuffer], ecx
 	mov eax, [os_imageDataBaseLBA]
 	mov bx, 0x0
-	mov edx, 1024*603*4
-	call rmATA.DMAread
+	mov edx, 1024/8*576/8*4
+	call rmATA.DMAread;ToBuffer
+	mov [console_testbuffer], ecx
 	
-	mov ebx, ecx
-	call Dolphin.makeBG
+	;mov ebx, ecx
+	;call Dolphin.makeBG	; get first image so its displayed
+	
+	mov eax, 0x9	; need to standardize
+	mov ebx, console.test.FRAME_SIZE/0x200
+	call Guppy.malloc
+	mov [rmATA.DMAread.dataBuffer], ebx
+	mov eax, [os_imageDataBaseLBA]
+	add eax, (1024/8*576/8*4)/0x200+1
+	mov bx, 0
+	mov edx, console.test.FRAME_SIZE
+	
+	console.test.loop :
+	call rmATA.DMAreadToBuffer
+	call console.test.proccessFrame
+	add eax, console.test.FRAME_SIZE/0x200
+	jmp console.test.loop
 	
 popa
 ret
+console.test.FRAME_SIZE equ 0x10000
 console_testval:
 	dd 0x0
 console_testbuffer :
+	dd 0x0
+console.test.proccessFrame :
+pusha
+	mov ebx, console.test.FRAME_SIZE
+	console.test.proccessFrame.loop :
+	mov eax, [ecx]	; eax: DATA | POSH | POSM | POSL
+	and eax, 0xFFFFFF	; here check eax, if less than last then ensure that 5000/FPS tics have passed (wait until they have if not) to lock the FPS to the desired value
+		cmp eax, [console.test.proccessFrame.lastVal]
+			jg console.test.proccessFrame.cont
+			pusha	; draw the frame to the screen
+					mov eax, [console_testbuffer]
+					mov ebx, [Graphics.SCREEN_MEMPOS]
+					mov ecx, 1024/8*4
+					mov edx, 576/8
+					call Image.copy
+				mov eax, [Clock.tics]
+				sub eax, [console.test.proccessFrame.startTime]
+				cmp eax, 5000/30	; 5000/FPS
+					jge console.test.proccessFrame.onTimeOrSlow
+				mov ebx, 5000/30	; the time the frame should be shown for
+				sub ebx, eax	; subtract the time that has passed
+				mov eax, ebx
+				;call System.sleep	; and sleep for the remainder [nope because this freezes it up a lot??]
+				console.test.proccessFrame.onTimeOrSlow :
+				mov eax, [Clock.tics]
+				mov [console.test.proccessFrame.startTime], eax
+			popa
+		console.test.proccessFrame.cont :
+		mov [console.test.proccessFrame.lastVal], eax
+	mov edx, [console_testbuffer]
+	add edx, eax
+	mov eax, [ecx]
+	shr eax, 24
+	mov [edx], al
+	add ecx, 4
+	sub ebx, 4
+	cmp ebx, 0
+		jg console.test.proccessFrame.loop
+popa
+ret
+console.test.proccessFrame.lastVal :
+	dd 0x0
+console.test.proccessFrame.startTime :
 	dd 0x0
 ;console.takeScreenshot :
 ;	pusha
