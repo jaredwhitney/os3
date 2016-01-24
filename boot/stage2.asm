@@ -1,13 +1,7 @@
-S2_CODE_LOC equ 0x8000	; Must match corresponding header in boot.asm!
+%include "..\boot\config.asm"
 [bits 16]
 [org S2_CODE_LOC]
 db 0x4a
-
-MODE_TEXT equ 0x0
-MODE_GRAPHICS equ 0x1
-
-DESIRED_XRES equ	1366
-DESIRED_YRES equ	768
 
 stage2:
 	;	Perform extraneous tasks here	;
@@ -16,7 +10,7 @@ stage2:
 	
 	;call stage2.checkBootFlags
 	
-	mov dword [DisplayMode], MODE_GRAPHICS	; MODE_TEXT or MODE_GRAPHICS
+	mov dword [DisplayMode], DISPLAY_MODE	; MODE_TEXT or MODE_GRAPHICS
 	
 	cmp dword [DisplayMode], MODE_TEXT
 		je stage2.novesa

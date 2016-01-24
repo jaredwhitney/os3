@@ -1,4 +1,4 @@
-S2_CODE_LOC equ 0x8000	; Must match corresponding header in stage2.asm!
+%include "..\boot\config.asm"
 [bits 16]
 [org 0x7c00]
 
@@ -85,17 +85,8 @@ boot.ATAdata :
 		popa
 		ret		
 
-Greeting :
-	db "Hello World!", 0xD, 0xA, 0
-
 boot_drive :
-	db 0x0, 0x0
-
-LoadGDT :
-	db "Loading GDT...", 0
-
-ERRORrt :
-	db "Error: Retrying...", 0xD, 0xA, 0
+	db 0x0
 
 ERRORs :
 	db "Warning: Unable to read all sectors.", 0xD, 0xA, 0

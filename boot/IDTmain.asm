@@ -563,8 +563,3 @@ INTERRUPT_DISABLE :
 IDT_INFO :
 	dw IDTEND-IDTSTART-1	; IDT SIZE - 1
 	dd IDTSTART
-	
-INT_CALL :
-db "Hello from inside an interrupt handler!", 0
-INT0_CALL :
-db "I choose you, Pikachu!", 0
