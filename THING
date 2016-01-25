@@ -1,0 +1,31 @@
+classdef WindowComponent
+	linked int x
+	linked int y
+	linked int w
+	linked int h
+	linked Image render
+	linked int subcomponentsPointer	; better way to do this?
+	func Create (WindowComponent : int x, int y)
+		Buffer obuf = sys Program.Alloc($LinkedClassSize)
+		WindowComponent ret = CreateAsSub(obuf, x, y)
+		return ret
+	func CreateAsSub(WindowComponent : Buffer buf, int x, int y)
+		WindowComponent ret = buf as WindowComponent
+		ret.x = x
+		return ret
+	linked func RenderComponent (Image : int x, int y)
+		return this.render
+
+classdef TextLine
+	linked int x
+	linked int y
+	linked int w
+	linked int h
+	linked Image render
+	linked int subcomponentsPointer
+	linked String text
+	func Create (TextLine : String str, int x, int y)
+		TextLine ret = Program.Alloc($LinkedClassSize)
+		WindowComponent.CreateAsSub(ret)
+		
+		
