@@ -42,7 +42,7 @@ os.beginRealMode :
 	jmp 0x0:os.inRealMode	;??
 	
 os.inRealMode :
-	mov sp, 0x7c00	; emm... but k cause it grows downwards...
+	mov sp, 0x3000	; emm... but k cause it grows downwards...
 	mov ax, 0x0
 	mov ds, ax
 	mov es, ax
