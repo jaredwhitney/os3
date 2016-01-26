@@ -205,5 +205,5 @@ os_imageDataBaseLBA :
 times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the code to the nearest sector
 
 ; External files to include
-incbin "C:\Users\Jared\Documents\Java\FrameGrabber\output\VIDEO.simplevideo"
-times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector
+;incbin "C:\Users\Jared\Documents\Java\FrameGrabber\output\VIDEO.simplevideo"
+;times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector
