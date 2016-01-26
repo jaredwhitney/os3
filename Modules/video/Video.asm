@@ -1,7 +1,11 @@
 Video.display :
 	pusha
 	
+		mov dword [Video.proccessRawFramecount], 0
+		
 		mov byte [INTERRUPT_DISABLE], 0xFF
+			mov ah, [Dolphin.activeWindow]
+			mov [Dolphin.currentWindow], ah
 		
 		mov eax, [Graphics.SCREEN_MEMPOS]
 		mov ebx, [Graphics.SCREEN_HEIGHT]
@@ -36,15 +40,18 @@ Video.display :
 		call Video.readData
 		call Video.proccessRawFrame
 		add eax, console.test.FRAME_SIZE/0x200
-		jmp console.test.loop
+		call Keyboard.poll
+		call Keyboard.getKey
+		cmp bl, 0xfe
+			jne console.test.loop
 		
-		;mov byte [INTERRUPT_DISABLE], 0x00
+		mov byte [INTERRUPT_DISABLE], 0x00
 		
 	popa
 	ret
 console.test.FRAME_SIZE equ 0x200*48
-Video.IMAGE_WIDTH	equ 1024/4
-Video.IMAGE_HEIGHT	equ 576/4
+Video.IMAGE_WIDTH	equ 1024/2
+Video.IMAGE_HEIGHT	equ 576/2
 Video.outputBuffer :
 	dd 0x0
 Video.proccessFrame :
@@ -97,11 +104,31 @@ cmp eax, console.test.FRAME_SIZE
 		mov eax, 0x3000
 		mov ebx, [console_testbuffer]
 		add ebx, [Video.proccessRawFramecount]
-		mov ecx, console.test.FRAME_SIZE/4
+		mov ecx, console.test.FRAME_SIZE
 		mov esi, eax
 		mov edi, ebx
-		cld
-		rep movsd
+		Video.proccessRawFrame.memloop_0 :
+		movdqu xmm0, [esi]
+		movdqu xmm1, [esi+0x10]
+		movdqu xmm2, [esi+0x20]
+		movdqu xmm3, [esi+0x30]
+		movdqu xmm4, [esi+0x40]
+		movdqu xmm5, [esi+0x50]
+		movdqu xmm6, [esi+0x60]
+		movdqu xmm7, [esi+0x70]
+		movdqu [edi], xmm0
+		movdqu [edi+0x10], xmm1
+		movdqu [edi+0x20], xmm2
+		movdqu [edi+0x30], xmm3
+		movdqu [edi+0x40], xmm4
+		movdqu [edi+0x50], xmm5
+		movdqu [edi+0x60], xmm6
+		movdqu [edi+0x70], xmm7
+		add edi, 0x80
+		add esi, 0x80
+		sub ecx, 0x80
+		cmp ecx, 0x0
+			jg Video.proccessRawFrame.memloop_0
 	mov ecx, [Video.proccessRawFramecount]
 	add ecx, console.test.FRAME_SIZE
 	mov [Video.proccessRawFramecount], ecx
@@ -109,12 +136,31 @@ jmp Video.proccessRawFrame.doneHandling
 Video.proccessRawFrame.handleIntersection :
 ; copy over eax bytes of the buffer (from:0x3000 to:[console_testbuffer]+[Video.proccessRawFramecount] size:eax)
 		mov ecx, eax
-		shr ecx, 2
 		mov esi, 0x3000
 		mov edi, [console_testbuffer]
 		add edi, [Video.proccessRawFramecount]
-		cld
-		rep movsd
+		Video.proccessRawFrame.memloop_1 :
+			movdqu xmm0, [esi]
+			movdqu xmm1, [esi+0x10]
+			movdqu xmm2, [esi+0x20]
+			movdqu xmm3, [esi+0x30]
+			movdqu xmm4, [esi+0x40]
+			movdqu xmm5, [esi+0x50]
+			movdqu xmm6, [esi+0x60]
+			movdqu xmm7, [esi+0x70]
+			movdqu [edi], xmm0
+			movdqu [edi+0x10], xmm1
+			movdqu [edi+0x20], xmm2
+			movdqu [edi+0x30], xmm3
+			movdqu [edi+0x40], xmm4
+			movdqu [edi+0x50], xmm5
+			movdqu [edi+0x60], xmm6
+			movdqu [edi+0x70], xmm7
+			add edi, 0x80
+			add esi, 0x80
+			sub ecx, 0x80
+			cmp ecx, 0x0
+				jg Video.proccessRawFrame.memloop_1
 pusha
 	mov eax, [console_testbuffer]
 	mov ebx, [Video.outputBuffer]
@@ -134,8 +180,28 @@ push ecx
 		add eax, 0x3000
 		mov esi, eax
 		mov edi, ebx
-		shr ecx, 2
-		rep movsd
+		Video.proccessRawFrame.memloop_2 :
+			movdqu xmm0, [esi]
+			movdqu xmm1, [esi+0x10]
+			movdqu xmm2, [esi+0x20]
+			movdqu xmm3, [esi+0x30]
+			movdqu xmm4, [esi+0x40]
+			movdqu xmm5, [esi+0x50]
+			movdqu xmm6, [esi+0x60]
+			movdqu xmm7, [esi+0x70]
+			movdqu [edi], xmm0
+			movdqu [edi+0x10], xmm1
+			movdqu [edi+0x20], xmm2
+			movdqu [edi+0x30], xmm3
+			movdqu [edi+0x40], xmm4
+			movdqu [edi+0x50], xmm5
+			movdqu [edi+0x60], xmm6
+			movdqu [edi+0x70], xmm7
+			add edi, 0x80
+			add esi, 0x80
+			sub ecx, 0x80
+			cmp ecx, 0x0
+				jg Video.proccessRawFrame.memloop_2
 pop ecx
 	mov edx, [Video.proccessRawFramecount]
 	add edx, ecx
@@ -185,11 +251,33 @@ pop ebx
 mov esi, eax
 mov edi, ebx
 cld
-shr ecx, 2	; div by 4
 ; repeat height times
 mov ebx,  ecx
 Video.imagecopy.loop :
-rep movsd	; copy a row
+		movdqu xmm0, [esi]
+		movdqu xmm1, [esi+0x10]
+		movdqu xmm2, [esi+0x20]
+		movdqu xmm3, [esi+0x30]
+		movdqu xmm4, [esi+0x40]
+		movdqu xmm5, [esi+0x50]
+		movdqu xmm6, [esi+0x60]
+		movdqu xmm7, [esi+0x70]
+		movntdq [edi], xmm0
+		movntdq [edi], xmm0
+		movntdq [edi+0x10], xmm1
+		movntdq [edi+0x20], xmm2
+		movntdq [edi+0x30], xmm3
+		movntdq [edi+0x40], xmm4
+		movntdq [edi+0x50], xmm5
+		movntdq [edi+0x60], xmm6
+		movntdq [edi+0x70], xmm7
+		add edi, 0x80
+		add esi, 0x80
+		sub ecx, 0x80
+		cmp ecx, 0x0
+			jg Video.imagecopy.loop
+			add edi, ecx	; if it has gone negative make sure edi and esi are moved back
+			add esi, ecx
 mov ecx, ebx
 add edi, [Video.imagecopy.tadd]
 
