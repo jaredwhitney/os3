@@ -171,7 +171,7 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	call Video.display
+	call TextLine.RenderTest
 ;	mov byte [Dolphin_WAIT_FLAG], 0xFF
 ;	
 ;	;mov ecx, [Graphics.SCREEN_MEMPOS]
