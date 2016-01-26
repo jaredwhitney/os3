@@ -6,6 +6,8 @@ Kernel.init :
 	;	PREVENT WINDOWS FROM BEING DRAWN	;
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
+		call SSE.enable
+	
 	;	SETUP GRAPHICS MODE		;
 		call Graphics.init
 	
@@ -193,6 +195,38 @@ kernel.textInit :
 	
 	ret
 
+	
+	SSE.enable :
+		pusha
+			mov eax, 1
+			cpuid
+			test edx, 1<<25
+				jz kernel.halt	; no SSE support
+			mov eax, cr0
+			and eax, ~(0b100)
+			or eax, 0b10
+			mov cr0, eax
+			mov eax, cr4
+			or eax, 0b11000000000
+			mov cr4, eax
+			
+			movdqu xmm0, [SSETESTDATA]
+			movdqu [SSETESTDATAREP], xmm0
+			cmp dword [SSETESTDATAREP], 0
+				jne kernel.halt
+			cmp dword [SSETESTDATAREP+4], 1
+				jne kernel.halt
+			cmp dword [SSETESTDATAREP+8], 2
+				jne kernel.halt
+			cmp dword [SSETESTDATAREP+12], 3
+				jne kernel.halt
+		popa
+		ret
+
+	SSETESTDATA :
+		dd 0, 1, 2, 3
+	SSETESTDATAREP :
+		dd 9, 9, 9, 9
 
 ;	DATA	;
 
