@@ -76,7 +76,7 @@ TextLine.Render :	; textline in ebx
 		add ecx, edx
 		mov edx, [Graphics.SCREEN_WIDTH]
 		mov ebx, 0xFFFFFF
-		call RenderText	; instead of using TextHandler need to write own method to do this!
+		call RenderText
 		popa
 		add edx, 1
 		sub ecx, 1
@@ -97,24 +97,6 @@ pusha
 	call TextLine.Create
 	mov ebx, ecx
 	call TextLine.Render
-;	mov al, 'H'
-;	mov ebx, 0xFFFFFF
-;	mov ecx, [Graphics.SCREEN_MEMPOS]
-;	add ecx, 0x88
-;	mov edx, [Graphics.SCREEN_WIDTH]
-;	call RenderText
-;	mov al, 'e'
-;	add ecx, FONTWIDTH*4
-;	call RenderText
-;	mov al, 'l'
-;	add ecx, FONTWIDTH*4
-;	call RenderText
-;	mov al, 'l'
-;	add ecx, FONTWIDTH*4
-;	call RenderText
-;	mov al, 'o'
-;	add ecx, FONTWIDTH*4
-;	call RenderText
 	jmp $
 popa
 ret
