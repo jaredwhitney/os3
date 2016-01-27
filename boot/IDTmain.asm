@@ -1,5 +1,6 @@
 
 loadIDT :
+mov byte [INTERRUPT_DISABLE], 0xFF
 	lidt [IDT_INFO]
 	; need to init Programmable Interrupt Chip (PIC) before enabling interrupts
 	sti
@@ -79,11 +80,11 @@ setupPIC :
 IDTSTART :
 
 	_IDT0 :
-		dw (S2_CODE_LOC+_IRQ0-$$) & 0xFFFF	; INT 0
+		dw (S2_CODE_LOC+taskswapHandler-$$) & 0xFFFF	; INT 0
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (S2_CODE_LOC+_IRQ0-$$) >> 16
+		dw (S2_CODE_LOC+taskswapHandler-$$) >> 16
 
 		dw (S2_CODE_LOC+_IRQ1-$$) & 0xFFFF	; INT 1
 		dw 0x8
@@ -373,11 +374,11 @@ IDTSTART :
 		db 0b10001110
 		dw (S2_CODE_LOC+_HANDLEFUNC1-$$) >> 16
 		
-		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 31
+		dw (S2_CODE_LOC+THREADSETUP-$$) & 0xFFFF	; INT 31
 		dw 0x8
 		db 0x0
 		db 0b10001110
-		dw (S2_CODE_LOC+IDTHANDLER-$$) >> 16
+		dw (S2_CODE_LOC+THREADSETUP-$$) >> 16
 		
 		dw (S2_CODE_LOC+IDTHANDLER-$$) & 0xFFFF	; INT 32
 		dw 0x8

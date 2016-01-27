@@ -53,6 +53,8 @@ Kernel.init :
 	
 	;	INITIALIZE THE USB DRIVER	;
 		call USB.init
+		
+		call TaskSwapHandler.doTest
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
