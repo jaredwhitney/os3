@@ -6,6 +6,29 @@ Component_w		equ 16
 Component_h		equ 20
 Component_RESV	equ 24
 
+Component.Render :	; Component in ebx
+	pusha
+		mov eax, [ebx]
+		imul eax, 4
+		add eax, Component.functionPointers
+		call [eax]
+	popa
+	ret
+
+Component.killfunc :
+	mov eax, SysHaltScreen.KILL
+	mov ebx, Component.INVALID_COMPONENT_MESSAGE
+	mov ecx, 5
+	call SysHaltScreen.show
+	jmp $
+Component.INVALID_COMPONENT_MESSAGE :
+	db "[Dolphin] An attempt was made to render an invalid Component.", 0
+
+Component.functionPointers :
+	dd Component.killfunc, TextLine.Render, TextArea.Render
+Component.TYPE_TEXTLINE equ 0x1
+Component.TYPE_TEXTAREA equ 0x2
+
 Textline_type	equ 0
 Textline_image	equ 4
 Textline_x		equ 8
@@ -35,6 +58,16 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 		mov [ebx+Textline_w], eax
 		mov eax, [TextLine.Create.h]
 		mov [ebx+Textline_h], eax
+		mov eax, Component.TYPE_TEXTLINE
+		mov [ebx+Textline_type], eax
+		pusha
+			mov edx, ebx
+			mov eax, [ebx+Textline_w]
+			imul eax, [ebx+Textline_h]
+			mov ebx, eax
+			call ProgramManager.reserveMemory
+			mov [edx+Textline_image], ebx
+		popa
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -61,20 +94,28 @@ TextLine.Render :	; textline in ebx
 			sub edx, 1
 			mov ecx, edx
 		pop ebx
+				push ecx
+				push ebx
+					mov eax, [ebx+Textline_w]
+					xor edx, edx
+					mov ecx, FONTWIDTH*4
+					idiv ecx
+				pop ebx
+				pop ecx
+					cmp ecx, eax
+						jle TextLine.Render.dontcutshort
+					mov ecx, eax
+					TextLine.Render.dontcutshort :
 		xor edx, edx
 		TextLine.Render.loop :
 		pusha
 		mov eax, [ebx+Textline_text]
 		add eax, edx
 		mov al, [eax]
-		mov ecx, [Graphics.SCREEN_MEMPOS]
+		mov ecx, [ebx+Textline_image]
 		imul edx, 0x4*FONTWIDTH
 		add ecx, edx
-		add ecx, [ebx+Textline_x]
-		mov edx, [ebx+Textline_y]
-		imul edx, [Graphics.SCREEN_WIDTH]
-		add ecx, edx
-		mov edx, [Graphics.SCREEN_WIDTH]
+		mov edx, [ebx+Textline_w]
 		mov ebx, 0xFFFFFF
 		call RenderText
 		popa
@@ -88,20 +129,37 @@ TextLine.Render :	; textline in ebx
 
 TextLine.RenderTest :
 pusha
+	; create the component
 	mov byte [INTERRUPT_DISABLE], 0xFF
-	push dword TextLine.RenderTest.text
+	push dword 150
 	push dword 20*4
 	push dword 80
-	push dword 50
-	push dword 10
-	call TextLine.Create
-	mov ebx, ecx
-	call TextLine.Render
-	jmp $
+	push dword 700
+	push dword 200
+	call TextArea.Create
+	mov [TextLine.RenderTest.textarea], ecx
+	; fill it with the sample text
+	mov eax, TextLine.RenderTest.text
+	mov ebx, [TextLine.RenderTest.textarea]
+	call TextArea.SetText
+	call TextArea.AppendText
+	; render it
+	mov ebx, [TextLine.RenderTest.textarea]
+	call Component.Render
+	; copy the rendered image to the screen
+	mov ebx, [TextLine.RenderTest.textarea]
+	mov eax, [ebx+Component_image]
+	mov ecx, [ebx+Component_w]
+	mov edx, [ebx+Component_h]
+	mov ebx, [Graphics.SCREEN_MEMPOS]
+	call Image.copy
+	mov byte [INTERRUPT_DISABLE], 0x00
 popa
 ret
 TextLine.RenderTest.text :
-	db "This is a test.", 0
+	db "This is a test of some text that should be written to a text area with automatic line breaks and stuff.", 0
+TextLine.RenderTest.textarea :
+	dd 0x0
 
 RenderText :	; char in al, color in ebx, image in ecx, image width in edx
 	pusha
@@ -117,15 +175,17 @@ RenderText :	; char in al, color in ebx, image in ecx, image width in edx
 		RenderText.mainloop :
 		push ecx
 		push eax
-		mov eax, [eax]	; eax now contains row data
+		mov al, [eax]	; eax now contains row data
+		and eax, 0xFF
+		add ecx, FONTWIDTH*4
 		RenderText.widthLoop :
-		test eax, 0b1<<FONTWIDTH	; if the bit is not set, dont draw the pixel
+		test eax, 0b1	; if the bit is not set, dont draw the pixel
 			jz RenderText.noDraw
 		mov [ecx], ebx	; otherwise copy the color over
 		RenderText.noDraw :
-		add ecx, 4	; advance to the next pixel on screen
-		shl eax, 1	; advance to the next bit in the bitmap
-		test eax, 0b11111000	; if there is anything left to draw in the bitmap
+		sub ecx, 4	; advance to the next pixel on screen
+		shr eax, 1	; advance to the next bit in the bitmap
+		test eax, 0b11111	; if there is anything left to draw in the bitmap
 			jnz RenderText.widthLoop	; go ahead and draw it
 		pop eax
 		pop ecx
