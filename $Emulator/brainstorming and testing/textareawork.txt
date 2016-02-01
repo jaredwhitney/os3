@@ -1,0 +1,36 @@
+
+
+
+renderChar
+advance to next char
+advance pos in image
+if pos wrapped around
+	mov pos nextLineStart
+
+TextArea.Render :	; textarea in ebx
+pusha
+push ebx
+	mov ebx, [ebx+Textarea_text]
+	call String.getLength
+	sub edx, 1
+	mov ecx, edx
+pop ebx
+xor edx, edx
+TextArea.Render.loop :
+pusha
+mov eax, [ebx+Textarea_text]
+add eax, edx	; now [eax] = char
+mov al, [eax]	; al = char
+mov ecx, [ebx+Textarea_image]
+imul edx, 0x4*FONTWIDTH
+add ecx, edx	; NOPE NEED TO PRESERVE THIS VALUE BETWEEN RENDERS!
+mov edx, [ebx+Textarea_w]
+mov ebx, 0xFFFFFF
+call RenderText
+popa
+add edx, 1
+sub ecx, 1
+cmp ecx, 0
+	jg TextArea.Render.loop
+popa
+ret
