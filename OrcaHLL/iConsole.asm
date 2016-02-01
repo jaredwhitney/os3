@@ -486,7 +486,7 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.18_close
-call MinnowTest.RunTest
+call Minnow3.doFormatPartition	; INLINE ASSEMBLY
 iConsole.$loop_if.18_close :
 
 push ebx
@@ -547,6 +547,8 @@ iConsole.$loop_if.6.string_10_data :
 	db "partition: Detects and displays partition info.", 0
 iConsole.$loop_if.7.string_0_data :
 	db "clear", 0
+iConsole.$loop_if.6.string_12 :
+	dd iConsole.$loop_if.6.string_12_data
 iConsole.$loop_if.13.string_1_data :
 	db ":", 0
 iConsole.$loop_if.17.string_1 :
@@ -566,7 +568,7 @@ iConsole.$loop_if.6.string_4 :
 iConsole.$loop_if.13.string_2_data :
 	db ":", 0
 iConsole.$loop_if.18.string_0_data :
-	db "FSDEMO", 0
+	db "format", 0
 iConsole.$loop_if.12.string_0_data :
 	db "test", 0
 iConsole.$loop_if.6.string_7 :
@@ -629,6 +631,8 @@ iConsole.$loop_if.6.string_6_data :
 	db "memstat: Prints out the percentage of RAM in use.", 0
 iConsole.$loop_if.17.string_0 :
 	dd iConsole.$loop_if.17.string_0_data
+iConsole.$loop_if.18.string_0 :
+	dd iConsole.$loop_if.18.string_0_data
 iConsole.$loop_if.15.string_0 :
 	dd iConsole.$loop_if.15.string_0_data
 iConsole.$loop_if.16.string_0 :
@@ -636,7 +640,7 @@ iConsole.$loop_if.16.string_0 :
 iConsole.$loop_if.13.string_4 :
 	dd iConsole.$loop_if.13.string_4_data
 iConsole.$loop_if.6.string_12_data :
-	db "FSDEMO: Runs a filesystem demo.", 0
+	db "format: Formats the filesystem.", 0
 iConsole.$loop_if.11.string_1_data :
 	db "Usage: ", 0
 iConsole.$loop_if.8.string_0_data :
@@ -649,12 +653,8 @@ iConsole.$loop_if.6.string_9 :
 	dd iConsole.$loop_if.6.string_9_data
 iConsole.$loop_if.13.string_4_data :
 	db "-", 0
-iConsole.$loop_if.18.string_0 :
-	dd iConsole.$loop_if.18.string_0_data
 iConsole.$loop_if.5.string_0_data :
 	db "File type: ", 0
-iConsole.$loop_if.6.string_12 :
-	dd iConsole.$loop_if.6.string_12_data
 iConsole.$loop_if.6.string_3 :
 	dd iConsole.$loop_if.6.string_3_data
 iConsole.$loop_if.13.string_1 :

@@ -171,34 +171,12 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	call TextLine.RenderTest
-;	mov byte [Dolphin_WAIT_FLAG], 0xFF
-;	
-;	;mov ecx, [Graphics.SCREEN_MEMPOS]
-;	mov [rmATA.DMAread.dataBuffer], ecx
-;	mov eax, [os_imageDataBaseLBA]
-;	mov bx, 0x0
-;	mov edx, 1024/8*576/8*4
-;	call rmATA.DMAread;ToBuffer
-;	mov [console_testbuffer], ecx
-;	
-;	;mov ebx, ecx
-;	;call Dolphin.makeBG	; get first image so its displayed
-;	
-;	mov eax, 0x9	; need to standardize
-;	mov ebx, console.test.FRAME_SIZE/0x200
-;	call Guppy.malloc
-;	mov [rmATA.DMAread.dataBuffer], ebx
-;	mov eax, [os_imageDataBaseLBA]
-;	add eax, (1024/8*576/8*4)/0x200+1
-;	mov bx, 0
-;	mov edx, console.test.FRAME_SIZE
-;	
-;	console.test.loop :
-;	call rmATA.DMAreadToBuffer
-;	call console.test.proccessFrame
-;	add eax, console.test.FRAME_SIZE/0x200
-;	jmp console.test.loop
+	
+	call Minnow3.cprint
+	call Minnow3.gotoFirstUnallocatedBlock
+	mov ebx, ecx
+	call console.numOut
+	call console.newline
 	
 popa
 ret

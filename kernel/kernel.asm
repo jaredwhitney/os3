@@ -23,7 +23,7 @@ Kernel.init :
 	;	INITIALIZE THE AHCI DRIVER	;
 		call ATA_DETECT
 		
-		call Minnow.loadFS
+		call Minnow3.loadFS
 		;call AHCI.searchForDataBlock	; be really surprised if this works!
 		;mov eax, 0x1
 		;mov bx, 0x0
@@ -53,8 +53,6 @@ Kernel.init :
 	
 	;	INITIALIZE THE USB DRIVER	;
 		call USB.init
-		
-		call TaskSwapHandler.doTest
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock

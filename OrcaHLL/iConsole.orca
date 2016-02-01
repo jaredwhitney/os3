@@ -63,7 +63,7 @@ classdef iConsole
 					sys Console.PrintLine("tree: Displays all mounted files.")
 					sys Console.PrintLine("partition: Detects and displays partition info.")
 					sys Console.PrintLine("readfile: Prints out the contents of a text file.")
-					sys Console.PrintLine("FSDEMO: Runs a filesystem demo.")
+					sys Console.PrintLine("format: Formats the filesystem.")
 					
 				if command.Equals("clear")
 					sys Console.Clear()
@@ -119,8 +119,8 @@ classdef iConsole
 					sys Console.Print("File name: ")
 					sub = 0x1
 				
-				if command.Equals("FSDEMO")
-					MinnowTest.RunTest()
+				if command.Equals("format")
+					asm("call Minnow3.doFormatPartition")
 				
 				if command.Equals("VERIFY")
 					MinnowTools.ValidateFS()
