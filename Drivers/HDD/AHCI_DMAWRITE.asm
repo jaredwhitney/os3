@@ -11,6 +11,19 @@ AHCI.DMAwrite :	; HBA low = eax, HBA high = bx, length = edx, buffer = ecx
 		call AHCI.DMAread.waitForCompletion
 	popa
 	ret
+AHCI.DMAwriteNoAlloc :	; HBA low = eax, HBA high = bx, length = edx, buffer = ecx
+	pusha
+		mov [AHCI_DMAread_dataBuffer], ecx
+		call AHCI.DMAread.storeHBAvals
+		call AHCI.DMAwrite.getSomeValues
+		call AHCI.DMAwrite.buildFIS
+		call AHCI.DMAread.buildPRDTs
+		call AHCI.DMAread.findFreeSlot
+		call AHCI.DMAwrite.buildCommandHeader
+		call AHCI.DMAread.sendCommand
+		call AHCI.DMAread.waitForCompletion
+	popa
+	ret
 
 AHCI.DMAwrite.buildFIS :
 	pusha
@@ -69,6 +82,19 @@ AHCI.DMAwrite.allocateMemory :
 		call Guppy.malloc
 		mov [AHCI_DMAread_commandLoc], ebx
 		; no need to allocate a data buffer
+	popa
+	ret
+	
+AHCI.DMAwrite.getSomeValues :
+	pusha
+		mov eax, edx
+		mov [AHCI_DMAread_byteCount], eax
+		sub eax, 1
+		mov ecx, 40000000
+		xor edx, edx
+		idiv ecx
+		add eax, 1
+		mov [AHCI_DMAread_PRDTcount], eax
 	popa
 	ret
 	
