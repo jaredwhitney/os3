@@ -46,6 +46,14 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
 	pusha
+		Grouping.Remove.loop :
+		mov ecx, [ebx+Component_nextLinked]
+		cmp ecx, eax
+			je Grouping.Remove.foundBefore
+		mov ebx, ecx
+		jmp Grouping.Remove.loop
+		Grouping.Remove.foundBefore :
+		; ecx now contains the component before the one to be removed, eax contains the component to be removed
 	popa
 	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
@@ -56,6 +64,17 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx
 	push eax
 	push ebx
 	push ecx
+		xor edx, edx
+		Grouping.GetDepth.loop :
+		mov ecx, [ebx+Component_nextLinked]
+		cmp ecx, eax
+			je Grouping.GetDepth.ret
+		mov ebx, ecx
+		add edx, 1
+		cmp ebx, 0
+			jne Grouping.GetDepth.loop
+		mov edx, 0xFFFFFFFF	; Component does not exist in the Grouping
+	Grouping.GetDepth.ret :
 	pop ecx
 	pop ebx
 	pop eax
