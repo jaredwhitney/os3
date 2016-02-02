@@ -6,10 +6,11 @@ Textarea_w		equ 16
 Textarea_h		equ 20
 Textarea_text	equ 28
 Textarea_len	equ 32
-Textarea_isE	equ 36
+Textarea_scrolls	equ 36
 
-TextArea.Create :	; int buflen, int x, int y, int w, int h
+TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.retval]
+	pop dword [TextArea.Create.scrolls]
 	pop dword [TextArea.Create.h]
 	pop dword [TextArea.Create.w]
 	pop dword [TextArea.Create.y]
@@ -43,8 +44,9 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h
 			call ProgramManager.reserveMemory
 			mov [edx+Textarea_image], ebx
 		popa
+		mov eax, [TextArea.Create.scrolls]
+		mov [ebx+Textarea_scrolls], eax
 		mov dword [ebx+Textarea_type], Component.TYPE_TEXTAREA
-		mov byte [ebx+Textarea_isE], 0x00
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -61,6 +63,8 @@ TextArea.Create.w :
 TextArea.Create.h :
 	dd 0x0
 TextArea.Create.len :
+	dd 0x0
+TextArea.Create.scrolls :
 	dd 0x0
 TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOULD BE DRAWN OUTSIDE THE TEXTAREA]
 	pusha
@@ -156,6 +160,8 @@ TextArea.AppendText :	; text in eax, textarea in ebx
 	popa
 	ret
 TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra text from being rendered]
+	cmp dword [ebx+Textarea_scrolls], 0xFF
+		je TextArea.AppendCharScrolling
 	pusha
 		mov ecx, [ebx+Textarea_len]
 		push ebx
@@ -194,6 +200,7 @@ TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrol
 			call Image.copyLinear
 			popa
 			push ebx
+			sub edx, 1
 		TextArea.AppendCharScrolling.cont :
 		pop ebx
 		mov ecx, [ebx+Textarea_text]

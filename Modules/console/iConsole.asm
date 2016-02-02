@@ -172,11 +172,7 @@ ret
 console.test :	; command that can be used to test anything.
 pusha
 	
-	call Minnow3.cprint
-	call Minnow3.gotoFirstUnallocatedBlock
-	mov ebx, ecx
-	call console.numOut
-	call console.newline
+	call TextLine.RenderTest
 	
 popa
 ret
