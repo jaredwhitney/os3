@@ -4,7 +4,7 @@ Component_x		equ 8
 Component_y		equ 12
 Component_w		equ 16
 Component_h		equ 20
-Component_RESV	equ 24
+Component_nextLinked	equ 24
 
 Component.Render :	; Component in ebx
 	pusha
