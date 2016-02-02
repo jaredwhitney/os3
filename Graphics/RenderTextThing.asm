@@ -136,6 +136,7 @@ pusha
 	push dword 80
 	push dword 700
 	push dword 200
+	push dword TRUE
 	call TextArea.Create
 	mov [TextLine.RenderTest.textarea], ecx
 	; fill it with the sample text

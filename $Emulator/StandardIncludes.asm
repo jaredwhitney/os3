@@ -67,4 +67,6 @@ Catfish.notify:
 ret
 View.file:
 ret
+TRUE equ 0xFF
+FALSE equ 0x00
 WHITE equ 0xFF
