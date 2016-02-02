@@ -23,6 +23,8 @@ Grouping.Create :	; int x, int y, int w, int h
 		mov [ebx+Grouping_w], eax
 		mov eax, [Grouping.Create.h]
 		mov [ebx+Grouping_h], eax
+		mov eax, Component.TYPE_GROUPING
+		mov [ebx+Grouping_type], eax
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Grouping_w]
@@ -36,7 +38,16 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop eax
 	push dword [Grouping.Create.retval]
 	ret
-
+Grouping.Create.retval :
+	dd 0x0
+Grouping.Create.x :
+	dd 0x0
+Grouping.Create.y :
+	dd 0x0
+Grouping.Create.w :
+	dd 0x0
+Grouping.Create.h :
+	dd 0x0
 Grouping.Add :	; Component in eax, Grouping in ebx
 	pusha
 		mov ecx, [ebx+Component_nextLinked]	; get the head of the list
@@ -82,5 +93,52 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx
 Grouping.Render :	; Grouping in ebx
 	pusha
 		; use a bunch of Image.copyRegion calls to copy over all of the Component_image's
+		mov edx, ebx	; edx always points to Grouping
+		
+		Grouping.Render.loop :
+		
+			mov ebx, [ebx+Component_nextLinked]
+			cmp ebx, 0x0
+				je Grouping.Render.ret
+			
+			call Component.Render
+			
+			mov eax, [ebx+Component_y]
+			imul eax, [edx+Component_w]
+			add eax, [ebx+Component_x]
+			add eax, [edx+Component_image]
+			mov [Image.copyRegion.nbuf], eax
+			
+			mov eax, [ebx+Component_image]
+			mov [Image.copyRegion.obuf], eax
+			
+			; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegion.w]
+			mov eax, [edx+Component_w]
+			sub eax, [ebx+Component_x]
+				cmp eax, [ebx+Component_w]
+					jle Grouping.Render.nos0
+				mov eax, [ebx+Component_w]
+				Grouping.Render.nos0 :
+			mov [Image.copyRegion.w], eax
+			
+			; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegion.h]
+			mov eax, [edx+Component_h]
+			sub eax, [ebx+Component_y]
+				cmp eax, [ebx+Component_h]
+					jle Grouping.Render.nos1
+				mov eax, [ebx+Component_h]
+				Grouping.Render.nos1 :
+			mov [Image.copyRegion.h], eax
+			
+			mov eax, [ebx+Component_w]
+			mov [Image.copyRegion.ow], eax
+			mov eax, [edx+Component_w]
+			mov [Image.copyRegion.nw], eax
+			
+			call Image.copyRegion
+			
+			;jmp Grouping.Render.loop
+		
+	Grouping.Render.ret :
 	popa
 	ret

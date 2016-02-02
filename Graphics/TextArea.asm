@@ -152,7 +152,7 @@ TextArea.AppendText :	; text in eax, textarea in ebx
 		pop edx
 		TextArea.SetText.loop :
 		mov al, [edx]	; char
-		call TextArea.AppendCharScrolling
+		call TextArea.AppendChar
 		add edx, 1
 		sub ecx, 1
 		cmp ecx, 0

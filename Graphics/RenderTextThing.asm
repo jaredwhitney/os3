@@ -8,13 +8,23 @@ Component_nextLinked	equ 24
 
 Component.Render :	; Component in ebx
 	pusha
+			cmp byte [Component.DEBUG_ALL], 0xFF
+				jne Component.Render.noLayerColor
+			push ebx
+			mov eax, [ebx+Component_image]
+			mov edx, [ebx+Component_w]
+			imul edx, [ebx+Component_h]
+			mov ebx, [Component.Render.layerColor]
+			call Image.clear
+			xor dword [Component.Render.layerColor], 0x404000
+			pop ebx
+			Component.Render.noLayerColor :
 		mov eax, [ebx]
 		imul eax, 4
 		add eax, Component.functionPointers
 		call [eax]
 	popa
 	ret
-
 Component.killfunc :
 	mov eax, SysHaltScreen.KILL
 	mov ebx, Component.INVALID_COMPONENT_MESSAGE
@@ -23,11 +33,18 @@ Component.killfunc :
 	jmp $
 Component.INVALID_COMPONENT_MESSAGE :
 	db "[Dolphin] An attempt was made to render an invalid Component.", 0
+Component.DEBUG_ALL :
+	dd TRUE
+Component.Render.layerColor :
+	dd 0x400000
 
 Component.functionPointers :
-	dd Component.killfunc, TextLine.Render, TextArea.Render
-Component.TYPE_TEXTLINE equ 0x1
-Component.TYPE_TEXTAREA equ 0x2
+	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render
+Component.TYPE_TEXTLINE				equ 0x1
+Component.TYPE_TEXTAREA				equ 0x2
+Component.TYPE_IMAGE				equ 0x3
+Component.TYPE_IMAGE_SCALABLE		equ 0x4
+Component.TYPE_GROUPING				equ 0x5
 
 Textline_type	equ 0
 Textline_image	equ 4
@@ -144,11 +161,18 @@ pusha
 	mov ebx, [TextLine.RenderTest.textarea]
 	call TextArea.SetText
 	call TextArea.AppendText
-	; render it
-	mov ebx, [TextLine.RenderTest.textarea]
+	; create a grouping
+	push dword 500*4
+	push dword 500
+	push dword 1000*4
+	push dword 500
+	call Grouping.Create
+	mov ebx, ecx
+	mov eax, [TextLine.RenderTest.textarea]
+	call Grouping.Add
 	call Component.Render
 	; copy the rendered image to the screen
-	mov ebx, [TextLine.RenderTest.textarea]
+	;mov ebx, [TextLine.RenderTest.textarea]
 	mov eax, [ebx+Component_image]
 	mov ecx, [ebx+Component_w]
 	mov edx, [ebx+Component_h]

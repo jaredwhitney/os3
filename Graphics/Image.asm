@@ -50,6 +50,22 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop eax
 	push dword [Image.Create.retval]
 	ret
+Image.Create.retval :
+	dd 0x0
+Image.Create.x :
+	dd 0x0
+Image.Create.y :
+	dd 0x0
+Image.Create.w :
+	dd 0x0
+Image.Create.h :
+	dd 0x0
+Image.Create.sw :
+	dd 0x0
+Image.Create.sh :
+	dd 0x0
+Image.Create.source :
+	dd 0x0
 Image.Render :	; Image in ebx
 	pusha
 		mov eax, [ebx+Image_w]	; take min(Image_w, Image_sw)
@@ -128,7 +144,22 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 	pop eax
 	push dword [ImageScalable.Create.retval]
 	ret
-
+ImageScalable.Create.retval :
+	dd 0x0
+ImageScalable.Create.x :
+	dd 0x0
+ImageScalable.Create.y :
+	dd 0x0
+ImageScalable.Create.w :
+	dd 0x0
+ImageScalable.Create.h :
+	dd 0x0
+ImageScalable.Create.sw :
+	dd 0x0
+ImageScalable.Create.sh :
+	dd 0x0
+ImageScalable.Create.source :
+	dd 0x0
 ImageScalable.Render :	; ImageScalable in ebx
 	pusha
 		; Figure out how to nicely scale images!
