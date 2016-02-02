@@ -13,6 +13,8 @@
 %include "..\Graphics\TextHandler.asm"
 %include "..\Graphics\RenderTextThing.asm"
 %include "..\Graphics\TextArea.asm"
+%include "..\Graphics\Image.asm"
+%include "..\Graphics\Grouping.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
 %include "..\Drivers\PS2\PS_2.asm"
