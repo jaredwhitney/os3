@@ -21,6 +21,17 @@ pop ebx
 mov edx, 1
 ret
 
+String.getEffectiveLength :	; charwidth in eax, String in ebx, length out in edx FINISH WRITING THIS
+	pusha
+		mov bl, [ebx]
+		cmp bl, 0x0A
+			jne String.getEffectiveLength.noadd
+		xor edx, edx
+		mov ecx, eax
+		String.getEffectiveLength.noadd :
+	popa
+	ret
+
 String.fromHex :	; eax = buffer to store string in, ebx = hex number
 pusha
 	mov [String._buffer], eax
