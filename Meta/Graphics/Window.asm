@@ -116,30 +116,27 @@ ret
 
 Window.makeGlassSmart :
 pusha
-	mov bl, [Window.X_POS]
-	call Dolphin.getAttribWord
+		mov ecx, [Dolphin.activeWindow]
+		add ecx, Dolphin.windowStructs
+		mov ecx, [ecx]
+	mov ax, [ecx+Window_xpos]	; THESE CHANGES BROKE THIS :\
 	and eax, 0xFFFF
 	mov [Window.makeGlassSmart.x], eax
-	mov bl, [Window.LASTX_POS]
-	call Dolphin.getAttribWord
+	mov ax, [ecx+Window_lastxpos]
 	and eax, 0xFFFF
 	mov [Window.makeGlassSmart.xl], eax
-	mov bl, [Window.Y_POS]
-	call Dolphin.getAttribWord
+	mov ax, [ecx+Window_ypos]
 	and eax, 0xFFFF
 	mov [Window.makeGlassSmart.y], eax
-	mov bl, [Window.LASTY_POS]
-	call Dolphin.getAttribWord
+	mov ax, [ecx+Window_lastypos]
 	and eax, 0xFFFF
 	sub eax, 8
 	mov [Window.makeGlassSmart.yl], eax
-	mov bl, [Window.WIDTH]
-	call Dolphin.getAttribWord
+	mov ax, [ecx+Window_width]
 	and eax, 0xFFFF
 	sub eax, 8
 	mov [Window.makeGlassSmart.w], eax
-	mov bl, [Window.HEIGHT]
-	call Dolphin.getAttribWord
+	mov ax, [ecx+Window_height]
 	and eax, 0xFFFF
 	add eax, 8
 	mov [Window.makeGlassSmart.h], eax

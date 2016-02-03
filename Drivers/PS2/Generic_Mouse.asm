@@ -22,14 +22,19 @@ pusha
 	call Mouse.storeSubs
 	test al, MOUSE_LBTN_FLAG
 		jz Mouse.loop.notleft
-	mov ebx, MOUSE_LBTN_STR
+	mov ebx, MOUSE_LBTN
 	jmp Mouse.loop.go
 	Mouse.loop.notleft :
 	test al, MOUSE_RBTN_FLAG
 		jz Mouse.loop.ret
-	mov ebx, MOUSE_RBTN_STR
+	mov ebx, MOUSE_RBTN
 	Mouse.loop.go :
-	call console.println
+	;mov [Mouse.PRESS.type], ebx
+	;mov eax, [Mouse.x]
+	;mov [Mouse.PRESS.x], eax
+	;mov eax, [Mouse.y]
+	;mov [Mouse.PRESS.y], eax
+	call Dolphin.handleMouseClick
 Mouse.loop.ret :
 mov bl, [Mouse.datpart]
 cmp bl, 0x01
@@ -125,6 +130,17 @@ Mouse.drawOnScreen :
 pusha
 	mov eax, [Graphics.SCREEN_MEMPOS]
 	mov ebx, [Graphics.SCREEN_HEIGHT]
+		pusha
+		sub ebx, [Mouse.lasty]
+		imul ebx, [Graphics.SCREEN_WIDTH]
+		add eax, ebx
+		mov ecx, [Mouse.lastx]
+		imul ecx, 4
+		add eax, ecx
+				mov ebx, 1
+				mov ecx, 1
+				call Dolphin.redrawBackgroundRegion
+		popa
 	sub ebx, [Mouse.y]
 	imul ebx, [Graphics.SCREEN_WIDTH]
 	add eax, ebx
@@ -133,26 +149,10 @@ pusha
 	add eax, ecx
 	mov dword [eax], 0xFFFFFF
 	
-								pusha
 								mov ecx, [Mouse.x]
-								mov eax, [Mouse.lastx]
 								mov edx, [Mouse.y]
-								mov ebx, [Mouse.lasty]
-								cmp eax, ecx
-									jne Mouse.drawOnScreen.pchk1
-								cmp edx, ebx
-									je Mouse.drawOnScreen.nobother
-								Mouse.drawOnScreen.pchk1 :
-								mov eax, [Mouse.x]
-								imul eax, 4
-								mov ebx, [Graphics.SCREEN_HEIGHT]
-								sub ebx, [Mouse.y]
-								add ebx, 8	; DONT HARDCODE THIS AGH
-								call Dolphin.moveWindowAbsolute
-								Mouse.drawOnScreen.nobother :
 								mov [Mouse.lastx], ecx
 								mov [Mouse.lasty], edx
-								popa
 popa
 ret
 
@@ -173,7 +173,13 @@ Mouse.lastx :
 Mouse.lasty :
 	dd 0x0
 
-MOUSE_LBTN_STR :
-	db "[LEFT MOUSE]", 0x0
-MOUSE_RBTN_STR :
-	db "[RIGHT MOUSE]", 0x0
+MOUSE_LBTN :
+	dd "L_CK"
+MOUSE_RBTN :
+	dd "R_CK"
+Mouse.PRESS.type :
+	dd 0x0
+Mouse.PRESS.x :
+	dd 0x0
+Mouse.PRESS.y :
+	dd 0x0
