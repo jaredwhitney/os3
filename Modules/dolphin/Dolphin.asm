@@ -264,6 +264,38 @@ Dolphin.redrawBackgroundRegion.redrawImage :	; ebx:w, eax:nbuf, ecx:h
 	popa
 	ret
 
+Dolphin.handleMouseClick :
+	pusha
+		mov ecx, [Dolphin.currentWindow]
+		add ecx, Dolphin.windowStructs
+		mov ecx, [ecx]
+		mov eax, [Mouse.x]
+		imul eax, 4
+		mov ebx, [Graphics.SCREEN_HEIGHT]
+		sub ebx, [Mouse.y]
+		add ebx, 8
+		cmp eax, [ecx+Window_xpos]
+			jl Dolphin.handleMouseClick.goMove
+		mov edx, [ecx+Window_xpos]
+		add edx, [ecx+Window_width]
+		cmp eax, edx
+			jg Dolphin.handleMouseClick.goMove
+		;cmp ebx, [ecx+Window_ypos]
+		;	jl Dolphin.handleMouseClick.goMove
+		;mov edx, [ecx+Window_ypos]
+		;add edx, [ecx+Window_height]
+		;cmp ebx, edx
+		;	jg Dolphin.handleMouseClick.goMove
+		mov ebx, Dolphin.MOUSE_MSG
+		call console.println
+		jmp Dolphin.handleMouseClick.ret
+		Dolphin.handleMouseClick.goMove :
+		mov [ecx+Window_xpos], eax
+		mov [ecx+Window_ypos], ebx
+		;call Window.makeGlassSmart ; is broken atm
+	Dolphin.handleMouseClick.ret :
+	popa
+	ret
 
 Dolphin.SCREEN_BUFFER :
 	dd 0x0
@@ -328,3 +360,5 @@ Dolphin.UNDolphin.REG_MSG :
 	db "A window has been unregistered!", 0
 Dolphin.REG_MSG :
 	db "A window has been registered!", 0
+Dolphin.MOUSE_MSG :
+	db "Window was clicked!", 0

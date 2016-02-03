@@ -30,6 +30,10 @@ pusha
 	add bl, [Window.HEIGHT]
 	mov word [ebx], 0xC8
 	
+	mov ebx, [console.windowStructLoc]
+	mov word [ebx+Window_xpos], 300*4
+	mov word [ebx+Window_ypos], 80
+	
 	call console.createWindow
 	
 	;mov ah, 0xF	; yellow
