@@ -5,20 +5,21 @@ Component_y		equ 12
 Component_w		equ 16
 Component_h		equ 20
 Component_nextLinked	equ 24
+Component_upperRenderFlag	equ 28
 
 Component.Render :	; Component in ebx
 	pusha
-			cmp byte [Component.DEBUG_ALL], 0xFF
-				jne Component.Render.noLayerColor
-			push ebx
-			mov eax, [ebx+Component_image]
-			mov edx, [ebx+Component_w]
-			imul edx, [ebx+Component_h]
-			mov ebx, [Component.Render.layerColor]
-			call Image.clear
-			xor dword [Component.Render.layerColor], 0x404000
-			pop ebx
-			Component.Render.noLayerColor :
+	;		cmp byte [Component.DEBUG_ALL], 0xFF
+	;			jne Component.Render.noLayerColor
+	;		push ebx
+	;		mov eax, [ebx+Component_image]
+	;		mov edx, [ebx+Component_w]
+	;		imul edx, [ebx+Component_h]
+	;		mov ebx, [Component.Render.layerColor]
+	;		call Image.clear
+	;		xor dword [Component.Render.layerColor], 0x404000
+	;		pop ebx
+	;		Component.Render.noLayerColor :
 		mov eax, [ebx]
 		imul eax, 4
 		add eax, Component.functionPointers
@@ -46,13 +47,20 @@ Component.TYPE_IMAGE				equ 0x3
 Component.TYPE_IMAGE_SCALABLE		equ 0x4
 Component.TYPE_GROUPING				equ 0x5
 
+Component.RequestUpdate :	; Component in ebx
+pusha
+	mov ecx, [ebx+Component_upperRenderFlag]
+	mov dword [ecx], TRUE
+popa
+ret
+
 Textline_type	equ 0
 Textline_image	equ 4
 Textline_x		equ 8
 Textline_y		equ 12
 Textline_w		equ 16
 Textline_h		equ 20
-Textline_text	equ 28
+Textline_text	equ 32
 
 TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.retval]
@@ -63,7 +71,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.str]
 	push eax
 	push ebx
-		mov ebx, 32
+		mov ebx, 36
 		call ProgramManager.reserveMemory
 		mov eax, [TextLine.Create.str]
 		mov [ebx+Textline_text], eax

@@ -4,6 +4,7 @@ Grouping_x		equ 8
 Grouping_y		equ 12
 Grouping_w		equ 16
 Grouping_h		equ 20
+Grouping_renderFlag	equ 32
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -13,7 +14,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.x]
 	push eax
 	push ebx
-		mov ebx, 28
+		mov ebx, 36
 		call ProgramManager.reserveMemory
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
@@ -53,6 +54,10 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 		mov ecx, [ebx+Component_nextLinked]	; get the head of the list
 		mov [eax+Component_nextLinked], ecx	; new component points to the rest of the list
 		mov [ebx+Component_nextLinked], eax	; Grouping points to the new component
+		mov ecx, ebx
+		add ecx, Grouping_renderFlag
+		mov [eax+Component_upperRenderFlag], ecx
+		call Grouping.DoUpdate
 	popa
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
@@ -65,10 +70,13 @@ Grouping.Remove :	; Component in eax, Grouping in ebx
 		jmp Grouping.Remove.loop
 		Grouping.Remove.foundBefore :
 		; ecx now contains the component before the one to be removed, eax contains the component to be removed
+		
+		call Grouping.DoUpdate
 	popa
 	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
 	pusha
+	call Grouping.DoUpdate
 	popa
 	ret
 Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx
@@ -90,10 +98,18 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx
 	pop ebx
 	pop eax
 	ret
+Grouping.DoUpdate :	; Grouping in ebx
+pusha
+	mov dword [ebx+Grouping_renderFlag], TRUE
+popa
+ret
 Grouping.Render :	; Grouping in ebx
 	pusha
-		; use a bunch of Image.copyRegion calls to copy over all of the Component_image's
+	
 		mov edx, ebx	; edx always points to Grouping
+		
+		cmp dword [edx+Grouping_renderFlag], FALSE
+			je Grouping.Render.ret
 		
 		Grouping.Render.loop :
 		
@@ -138,7 +154,7 @@ Grouping.Render :	; Grouping in ebx
 			call Image.copyRegion
 			
 			;jmp Grouping.Render.loop
-		
+		mov dword [edx+Grouping_renderFlag], FALSE
 	Grouping.Render.ret :
 	popa
 	ret

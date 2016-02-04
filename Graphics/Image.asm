@@ -4,9 +4,9 @@ Image_x		equ 8
 Image_y		equ 12
 Image_w		equ 16
 Image_h		equ 20
-Image_source	equ 28
-Image_sw	equ 32
-Image_sh	equ 36
+Image_source	equ 32
+Image_sw	equ 36
+Image_sh	equ 40
 
 Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [Image.Create.retval]
@@ -19,7 +19,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [Image.Create.source]
 	push eax
 	push ebx
-		mov ebx, 32
+		mov ebx, 44
 		call ProgramManager.reserveMemory
 		mov eax, [Image.Create.source]
 		mov [ebx+Image_source], eax
@@ -98,9 +98,9 @@ Imagescalable_x		equ 8
 Imagescalable_y		equ 12
 Imagescalable_w		equ 16
 Imagescalable_h		equ 20
-Imagescalable_source	equ 28
-Imagescalable_sw	equ 32
-Imagescalable_sh	equ 36
+Imagescalable_source	equ 32
+Imagescalable_sw	equ 36
+Imagescalable_sh	equ 40
 
 ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [ImageScalable.Create.retval]
@@ -113,7 +113,7 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 	pop dword [ImageScalable.Create.source]
 	push eax
 	push ebx
-		mov ebx, 40
+		mov ebx, 44
 		call ProgramManager.reserveMemory
 		mov eax, [ImageScalable.Create.source]
 		mov [ebx+Imagescalable_source], eax
