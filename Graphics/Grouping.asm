@@ -142,3 +142,14 @@ Grouping.Render :	; Grouping in ebx
 	Grouping.Render.ret :
 	popa
 	ret
+Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
+	pusha
+		mov ecx, [eax+Window_windowbuffer]
+		mov [ebx+Grouping_image], ecx
+		xor ecx, ecx
+		mov cx, [eax+Window_width]
+		mov [ebx+Grouping_w], ecx
+		mov cx, [eax+Window_height]
+		mov [ebx+Grouping_h], ecx
+	popa
+	ret

@@ -162,22 +162,26 @@ pusha
 	call TextArea.SetText
 	call TextArea.AppendText
 	; create a grouping
-	push dword 500*4
-	push dword 500
-	push dword 1000*4
-	push dword 500
+	push dword 0;500*4
+	push dword 0;500
+	push dword 0;1000*4
+	push dword 0;500
 	call Grouping.Create
 	mov ebx, ecx
 	mov eax, [TextLine.RenderTest.textarea]
 	call Grouping.Add
-	call Component.Render
+		mov al, [console.winNum]
+		and eax, 0xFF
+		add eax, Dolphin.windowStructs
+		mov eax, [eax]
+	mov [eax+Window_linkedComponent], ebx
 	; copy the rendered image to the screen
 	;mov ebx, [TextLine.RenderTest.textarea]
-	mov eax, [ebx+Component_image]
-	mov ecx, [ebx+Component_w]
-	mov edx, [ebx+Component_h]
-	mov ebx, [Graphics.SCREEN_MEMPOS]
-	call Image.copy
+;	mov eax, [ebx+Component_image]
+;	mov ecx, [ebx+Component_w]
+;	mov edx, [ebx+Component_h]
+;	mov ebx, [Graphics.SCREEN_MEMPOS]
+;	call Image.copy
 	mov byte [INTERRUPT_DISABLE], 0x00
 popa
 ret

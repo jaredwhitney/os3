@@ -175,9 +175,10 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	
+	mov bl, [console.pnum]
+	call ProgramManager.setActive	; Make removable Later
 	call TextLine.RenderTest
-	
+	call ProgramManager.finalize
 popa
 ret
 ;console.test.FRAME_SIZE equ 0x10000
@@ -654,20 +655,18 @@ cmp dword [DisplayMode], MODE_TEXT
 pusha
 	xor ebx, ebx
 	mov bl, [console.winNum]
-	mov [Dolphin.currentWindow], ebx
-
 	call Window.forceFlush
 	
-	mov bl, [Window.BUFFER]	; -> eax
-	call Dolphin.getAttribDouble
+	mov edx, [Dolphin.currentWindow]
+	add edx, Dolphin.windowStructs
+	mov edx, [edx]
+	mov eax, [edx+Window_buffer]
 	;mov ebx, eax
 	;call String.getLength
 	mov ebx, [Graphics.SCREEN_SIZE];edx
 	call Buffer.clear
 
-		mov eax, 0
-		mov bl, [Window.BUFFERSIZE]	; <- ecx
-		call Dolphin.setAttribDouble
+		mov dword [edx+Window_buffersize], 0
 popa
 ret
 console.clearScreen.end :

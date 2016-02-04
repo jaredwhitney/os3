@@ -215,9 +215,17 @@ Dolphin.uUpdate :	; currentWindow is the window
 		pop ebx
 		call Dolphin.drawTextNew2
 		Dolphin.uUpdate.notText :
+		mov eax, [Dolphin.currentWindow]
+		add eax, Dolphin.windowStructs
+		mov eax, [eax]
+		cmp dword [eax+Window_linkedComponent], 0x0
+			je Dolphin.uUpdate.noComponents
+		mov ebx, [eax+Window_linkedComponent]
+		call Grouping.updateFitToHostWindow	; sync Grouping with Window (see below)
+		call Component.Render	; Window_linkedComponent will be a Grouping whose size is always kept in sync with the host Window and whose image is the same as the host Window, so no further calls should be needed
+		Dolphin.uUpdate.noComponents :
 	popa
 	ret
-
 
 Dolphin.updateWindows :
 	pusha

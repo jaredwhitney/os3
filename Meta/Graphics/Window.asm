@@ -112,6 +112,7 @@ Window.create.allocNewWindow :
 	add ebx, 8
 	mov byte [ebx], 0	; unused (winNum)
 	pop ebx
+	mov dword [ebx+Window_linkedComponent], 0		; linkedComponent
 ret
 
 Window.makeGlassSmart :
@@ -383,28 +384,27 @@ pop ecx
 pop edx
 ret
 
-Window.forceFlush :	; winnum in currentWindow
+Window.forceFlush :	; winnum in ebx
 pusha
 Window.forceFlush.wait :
 ;cmp byte [Dolphin_WAIT_FLAG], 0xFF
 ;	je Window.forceFlush.wait
 ;mov byte [Dolphin_WAIT_FLAG], 0xFF
-	mov bl, [Window.OLDBUFFER]
-	call Dolphin.getAttribDouble
+;	mov edx, [Dolphin.currentWindow]
+	mov edx, ebx
+	add edx, Dolphin.windowStructs
+	mov edx, [edx]
+	mov eax, [edx+Window_oldbuffer]
 	;mov ebx, eax
 	;call String.getLength
 	mov ebx, [Graphics.SCREEN_SIZE];edx
 	call Buffer.clear
-		mov bl, [Window.WIDTH]
-		call Dolphin.getAttribWord
-		mov ecx, eax
+		mov cx, [edx+Window_width]
 		and ecx, 0xFFFF
-		mov bl, [Window.HEIGHT]
-		call Dolphin.getAttribWord
+		mov ax, [edx+Window_height]
 		and eax, 0xFFFF
 		imul ecx, eax
-		mov bl, [Window.WINDOWBUFFER]
-		call Dolphin.getAttribDouble
+		mov eax, [edx+Window_windowbuffer]
 		mov ebx, ecx
 		call Buffer.clear
 ;mov byte [Dolphin_WAIT_FLAG], 0x0
@@ -464,3 +464,4 @@ Window_buffer equ 26
 Window_buffersize equ 30
 Window_oldbuffer equ 34
 Window_winnum equ 38
+Window_linkedComponent equ 43
