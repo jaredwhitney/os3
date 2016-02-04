@@ -196,25 +196,25 @@ Dolphin.compositeWindow :
 
 Dolphin.uUpdate :	; currentWindow is the window
 	pusha
-		mov bl, [Window.TYPE]
-		call Dolphin.getAttribByte
-		cmp al, 0x0
-			jne Dolphin.uUpdate.notText
-		mov bl, [Window.WIDTH]
-		call Dolphin.getAttribWord
-		mov cx, ax
-		mov bl, [Window.OLDBUFFER]
-		call Dolphin.getAttribDouble
-		mov edx, eax
-		mov bl, [Window.WINDOWBUFFER]
-		call Dolphin.getAttribDouble
-		mov ebx, eax
-		push ebx
-		mov bl, [Window.BUFFER]
-		call Dolphin.getAttribDouble
-		pop ebx
-		call Dolphin.drawTextNew2
-		Dolphin.uUpdate.notText :
+		;mov bl, [Window.TYPE]
+		;call Dolphin.getAttribByte
+		;cmp al, 0x0
+		;	jne Dolphin.uUpdate.notText
+		;mov bl, [Window.WIDTH]
+		;call Dolphin.getAttribWord
+		;mov cx, ax
+		;mov bl, [Window.OLDBUFFER]
+		;call Dolphin.getAttribDouble
+		;mov edx, eax
+		;mov bl, [Window.WINDOWBUFFER]
+		;call Dolphin.getAttribDouble
+		;mov ebx, eax
+		;push ebx
+		;mov bl, [Window.BUFFER]
+		;call Dolphin.getAttribDouble
+		;pop ebx
+		;call Dolphin.drawTextNew2
+		;Dolphin.uUpdate.notText :
 		mov eax, [Dolphin.currentWindow]
 		add eax, Dolphin.windowStructs
 		mov eax, [eax]

@@ -23,6 +23,14 @@ cmp ax, 0x0100
 		pusha
 		mov ebx, [_arg0]
 		call console.print
+				pusha
+				mov eax, ebx
+				mov ebx, [TextLine.RenderTest.textarea]
+				cmp ebx, 0
+					je _HANDLEFUNC1.0_nop
+					call TextArea.AppendText
+				_HANDLEFUNC1.0_nop :
+				popa
 		popa
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next0 :
@@ -33,6 +41,16 @@ cmp ax, 0x0101
 		pusha
 		mov ebx, [_arg0]
 		call console.println
+				pusha
+				mov eax, ebx
+				mov ebx, [TextLine.RenderTest.textarea]
+				cmp ebx, 0
+					je _HANDLEFUNC1.1_nop
+					call TextArea.AppendText
+					mov al, 0x0A
+					call TextArea.AppendChar
+				_HANDLEFUNC1.1_nop :
+				popa
 		popa
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next1 :
@@ -50,6 +68,14 @@ cmp ax, 0x0102
 cmp ax, 0x0103
 	jne _HANDLEFUNC1.next3
 		call console.newline
+				pusha
+				mov ebx, [TextLine.RenderTest.textarea]
+				cmp ebx, 0
+					je _HANDLEFUNC1.3_nop
+					mov al, 0x0A
+					call TextArea.AppendChar
+				_HANDLEFUNC1.3_nop :
+				popa
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.next3 :
 	
@@ -66,6 +92,14 @@ cmp ax, 0x0105
 		mov ah, 0xFF
 		mov al, [_arg0]
 		call console.cprint
+				pusha
+				mov ebx, [TextLine.RenderTest.textarea]
+				cmp ebx, 0
+					je _HANDLEFUNC1.c5_nop
+					call TextArea.AppendChar
+					call Component.RequestUpdate
+				_HANDLEFUNC1.c5_nop :
+				popa
 		pop ax
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.nextc5 :

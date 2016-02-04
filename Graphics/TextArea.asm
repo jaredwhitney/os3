@@ -4,9 +4,9 @@ Textarea_x		equ 8
 Textarea_y		equ 12
 Textarea_w		equ 16
 Textarea_h		equ 20
-Textarea_text	equ 28
-Textarea_len	equ 32
-Textarea_scrolls	equ 36
+Textarea_text	equ 32
+Textarea_len	equ 36
+Textarea_scrolls	equ 40
 
 TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.retval]
@@ -18,7 +18,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.len]
 	push eax
 	push ebx
-		mov ebx, 40
+		mov ebx, 44
 		call ProgramManager.reserveMemory
 		mov eax, [TextArea.Create.len]
 		mov [ebx+Textarea_len], eax
@@ -96,6 +96,12 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 		mov ebx, 0xFFFFFF
 		call RenderText
 		pop ebx
+		cmp al, 0x0A
+			jne TextArea.Render.noNewl
+			mov eax, [TextArea.Render.dest]
+			add eax, [ebx+Textarea_w]
+			mov [TextArea.Render.dest], eax
+		TextArea.Render.noNewl :
 		; figure out the best way to increment TextArea.Render.dest!
 		mov eax, [TextArea.Render.dest]
 		add eax, FONTWIDTH*4
@@ -157,6 +163,7 @@ TextArea.AppendText :	; text in eax, textarea in ebx
 		sub ecx, 1
 		cmp ecx, 0
 			jg TextArea.SetText.loop
+		call Component.RequestUpdate
 	popa
 	ret
 TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra text from being rendered]
@@ -195,9 +202,16 @@ TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrol
 			mov ecx, [ebx+Textarea_len]
 			sub ecx, 1
 			mov edx, 1
+			push ebx
 			mov ebx, eax
 			add eax, 1
 			call Image.copyLinear
+			pop ebx
+			mov eax, [ebx+Textarea_image]
+			mov edx, [ebx+Textarea_h]
+			imul edx, [ebx+Textarea_w]
+			mov ebx, 0x0
+			call Image.clear
 			popa
 			push ebx
 			sub edx, 1
