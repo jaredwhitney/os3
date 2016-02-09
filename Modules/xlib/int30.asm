@@ -92,14 +92,6 @@ cmp ax, 0x0105
 		mov ah, 0xFF
 		mov al, [_arg0]
 		call console.cprint
-				pusha
-				mov ebx, [TextLine.RenderTest.textarea]
-				cmp ebx, 0
-					je _HANDLEFUNC1.c5_nop
-					call TextArea.AppendChar
-					call Component.RequestUpdate
-				_HANDLEFUNC1.c5_nop :
-				popa
 		pop ax
 		jmp _HANDLEFUNC1.ret
 	_HANDLEFUNC1.nextc5 :

@@ -6,7 +6,7 @@
 %include "..\modules\dolphin\Update_Text.asm"
 
 %include "..\modules\console\iConsole.asm"
-%include "..\modules\video\Video.asm"
+;%include "..\modules\video\Video.asm"
 %include "..\modules\xlib\int30.asm"
 
 %include "..\Graphics\Image\Tools.asm"
@@ -34,7 +34,7 @@
 
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\Guppy.asm"
-%include "..\Tools\System\Minnow.asm"
+;%include "..\Tools\System\Minnow.asm"
 %include "..\Tools\System\Minnow3.asm"
 %include "..\Tools\System\Minnow2.asm"
 %include "..\Tools\System\GetValue.asm"

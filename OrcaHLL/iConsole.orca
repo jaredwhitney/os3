@@ -103,7 +103,7 @@ classdef iConsole
 					sys Console.Newline()
 					
 				if command.Equals("tree")
-					asm("call Minnow.ctree")
+					asm("call Minnow3.cprint")
 					
 				if command.Equals("restart")
 					asm("mov eax, SysHaltScreen.RESET")

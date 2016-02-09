@@ -175,7 +175,7 @@ TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra te
 			mov ebx, [ebx+Textarea_text]
 			call String.getLength
 			cmp edx, ecx
-				jl TextArea.AppendChar.cont
+				jl TextArea.AppendChar.cont	; should also check to see if coord would be out of bounds
 			pop ebx
 			popa
 			ret
@@ -191,10 +191,20 @@ TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrol
 	pusha
 		mov ecx, [ebx+Textarea_len]
 		push ebx
+		push ebx
 			mov ebx, [ebx+Textarea_text]
 			call String.getLength
+			pop ebx
 			cmp edx, ecx
-				jl TextArea.AppendCharScrolling.cont
+				jge TextArea.AppendCharScrolling.goRun 
+			;jmp TextArea.AppendCharScrolling.cont
+					pusha
+					call TextArea.getMaxUsablePos	;check to see if coord would be out of bounds
+					call TextArea.getNextCharPos
+					cmp edx, ecx
+					popa
+						jl TextArea.AppendCharScrolling.cont
+			TextArea.AppendCharScrolling.goRun :
 			pop ebx
 			; copy Buffer text+1 of length len-1 to Buffer text of length len-1
 			pusha
@@ -223,3 +233,79 @@ TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrol
 		mov [ecx], al
 	popa
 	ret
+TextArea.getMaxUsablePos :	; TextArea in ebx, returns in ecx
+		mov ecx, [ebx+Textarea_h]
+		sub ecx, FONTHEIGHT-1
+		imul ecx, [ebx+Textarea_w]
+		sub ecx, FONTWIDTH
+	ret
+TextArea.getNextCharPos :	; TextArea in ebx, returns in edx
+	pusha
+		push ebx
+			mov ebx, [ebx+Textarea_text]
+			call String.getLength
+			sub edx, 1
+			mov ecx, edx
+		pop ebx
+		;mov edx, [ebx+Textarea_image]
+		mov dword [TextArea.RenderProto.dest], 0;edx
+				mov edx, [TextArea.RenderProto.dest]
+				add edx, [ebx+Textarea_w]
+				mov [TextArea.RenderProto.nextFlip], edx
+						mov edx, [TextArea.RenderProto.dest]
+						mov eax, [ebx+Textarea_w]
+						imul eax, FONTHEIGHT+4
+						add edx, eax
+						mov [TextArea.RenderProto.flipTo], edx
+		xor edx, edx
+		TextArea.RenderProto.loop :
+		pusha
+		mov eax, [ebx+Textarea_text]
+		add eax, edx	; now [eax] = char
+		mov al, [eax]	; al = char
+		mov ecx, [TextArea.RenderProto.dest]
+		mov edx, [ebx+Textarea_w]
+		cmp al, 0x0A
+			jne TextArea.RenderProto.noNewl
+			mov eax, [TextArea.RenderProto.dest]
+			add eax, [ebx+Textarea_w]
+			mov [TextArea.RenderProto.dest], eax
+		TextArea.RenderProto.noNewl :
+		mov eax, [TextArea.RenderProto.dest]
+		add eax, FONTWIDTH*4
+		mov [TextArea.RenderProto.dest], eax
+		cmp eax, [TextArea.RenderProto.nextFlip]
+			jb TextArea.RenderProto.loop.noflip
+		call TextArea.RenderProto.calcFlips
+		TextArea.RenderProto.loop.noflip :
+		popa
+		add edx, 1
+		sub ecx, 1
+		cmp ecx, 0
+			jg TextArea.RenderProto.loop
+	popa
+	mov edx, [TextArea.RenderProto.dest]
+	;sub edx, [ebx+Textarea_image]
+	ret
+TextArea.RenderProto.calcFlips :
+	pusha
+		mov edx, [TextArea.RenderProto.flipTo]
+		mov [TextArea.RenderProto.dest], edx
+		mov edx, [TextArea.RenderProto.dest]
+		add edx, [ebx+Textarea_w]
+		mov [TextArea.RenderProto.nextFlip], edx
+		mov edx, [TextArea.RenderProto.dest]
+		mov eax, [ebx+Textarea_w]
+		imul eax, FONTHEIGHT+4
+		add edx, eax
+		mov [TextArea.RenderProto.flipTo], edx
+	popa
+	ret
+
+TextArea.RenderProto.dest :
+	dd 0x0
+TextArea.RenderProto.nextFlip :
+	dd 0x0
+TextArea.RenderProto.flipTo :
+	dd 0x0
+; Also make TextAreaScrollable (TextArea with scroll functions that modify which parts of the buffer are displayed at any given time)
