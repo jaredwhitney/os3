@@ -175,12 +175,24 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-	mov bl, [console.pnum]
-	call ProgramManager.setActive	; Make removable Later
+mov bl, [console.pnum]
+call ProgramManager.setActive	; Make removable Later
 	call TextLine.RenderTest
-	call ProgramManager.finalize
+;	push dword Minnow3.TABLE_HEADER_SIZE	;head
+;	push dword _NAME
+;	push dword _TYPE
+;	push dword _DATA
+;	push dword 26
+;	call Minnow3.makeFile
+;call ProgramManager.finalize
 popa
 ret
+_NAME :
+	db "File001", 0x0
+_TYPE :
+	db "text", 0x0
+_DATA :
+	db "This is some sample text.", 0
 ;console.test.FRAME_SIZE equ 0x10000
 ;console_testval:
 ;	dd 0x0
@@ -646,6 +658,16 @@ add ebx, 0x2
 		call Dolphin.setAttribDouble
 		pop eax
 ;call console.update
+
+				pusha
+				mov ebx, [TextLine.RenderTest.textarea]
+				cmp ebx, 0
+					je _HANDLEFUNC1.c5_nop
+					call TextArea.AppendChar
+					call Component.RequestUpdate
+				_HANDLEFUNC1.c5_nop :
+				popa
+
 popa
 ret
 

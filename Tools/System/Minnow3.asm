@@ -56,6 +56,8 @@ Minnow3.loadFS.mountFromPartition :
 		mov eax, [ecx+4]
 		mov [Minnow3.fs_ver], eax
 		mov eax, [ecx+8]
+		mov [Minnow3.mask_start], eax
+		mov eax, [ecx+12]
 		mov [Minnow3.data_start], eax
 		
 		mov ebx, Minnow3.loadFS.STR_SUCCESS
@@ -72,6 +74,12 @@ Minnow3.loadFS.mountFromPartition :
 		mov ebx, [Minnow3.dev_size]
 		call console.numOut
 		call console.newline
+		
+		; allocate other needed buffers
+		mov eax, 0x7
+		mov ebx, 1
+		call Guppy.malloc
+		mov [Minnow3.data1], ebx
 		
 	popa
 	ret
@@ -90,19 +98,30 @@ Minnow3.loadFS.deviceTooSmall :
 Minnow3.doFormatPartition :
 	pusha
 		mov eax, [Minnow3.data0]
-		mov edx, 0x200
-		mov ebx, 0x0
-		call Image.clear
+		mov ebx, 0x200
+		call Buffer.clear
 		
 		mov eax, [Minnow3.data0]
 		mov dword [eax], Minnow3_SIGNATURE
 		mov dword [eax+4], 0x00000001
 		mov ebx, [Minnow3.table_start]
-		add ebx, 0x493E0
-		mov dword [eax+8], ebx
+		add ebx, 0x493E0	; table size
+		mov [Minnow3.mask_start], ebx
+		mov dword [eax+8], ebx	; mask start
+			push eax
+			push ebx
+				mov eax, [Minnow3.dev_size]
+				xor edx, edx
+				mov ecx, 0x200*8
+				idiv ecx
+			pop ebx
+				add ebx, eax
+				mov [Minnow3.data_start], ebx
+			pop eax
+		mov dword [eax+12], ebx
 		
 		mov ebx, [Minnow3.data0]
-		add ebx, 12
+		add ebx, Minnow3.TABLE_HEADER_SIZE
 		mov dword [ebx+Mdesc_nextStruct], 0
 		mov dword [ebx+Mdesc_lastStruct], 0
 		mov dword [ebx+Mdesc_type], Mdesc.TYPE_DIRECTORY
@@ -121,16 +140,11 @@ Minnow3.doFormatPartition :
 		call AHCI.DMAwrite
 		
 		mov eax, [Minnow3.data0]
-		mov edx, 0x200
-		mov ebx, 0x0
-		call Image.clear
+		mov ebx, 0x200
+		call Buffer.clear
 		
 		mov eax, [Minnow3.table_start]
 		add eax, 1
-		push eax
-		add eax, 0x493E0
-		mov [Minnow3.data_start], eax
-		pop eax
 		Minnow3.doFormatPartition.clearLoop :
 		xor ebx, ebx
 		mov ecx, [Minnow3.data0]
@@ -147,7 +161,7 @@ Minnow3.doFormatPartition :
 			noprinty :
 		popa
 		cmp eax, [Minnow3.data_start]
-			jl Minnow3.doFormatPartition.clearLoop
+			jl Minnow3.doFormatPartition.clearLoop	; clears out table and mask
 		
 		call Minnow3.loadFS
 		
@@ -155,6 +169,8 @@ Minnow3.doFormatPartition :
 	ret
 
 Minnow3.data0 :
+	dd 0x0
+Minnow3.data1 :
 	dd 0x0
 Minnow3.dev_size :
 	dd 0x0
@@ -183,7 +199,7 @@ Minnow3.doFormatPartition.STR_ROOT :
 
 Minnow3.cprint :
 	pusha
-		mov ebx, 12
+		mov ebx, Minnow3.TABLE_HEADER_SIZE
 		call Minnow3.cprint.handlePart
 	Minnow3.cprint.ret :
 	popa
@@ -243,13 +259,15 @@ Minnow3.gotoFirstUnallocatedBlock :	; returns pos in ecx
 		mov ecx, [Minnow3.data0]
 		mov edx, 0x200
 		call AHCI.DMAreadToBuffer
-		add ecx, 12
+		mov ecx, [Minnow3.data0]
+		add ecx, Minnow3.TABLE_HEADER_SIZE
 		jmp Minnow3.gotoFirstUnallocatedBlock.startloop
 		Minnow3.gotoFirstUnallocatedBlock.mainloop :
 		xor ebx, ebx
 		mov ecx, [Minnow3.data0]
 		mov edx, 0x200
 		call AHCI.DMAreadToBuffer
+		mov ecx, [Minnow3.data0]
 		Minnow3.gotoFirstUnallocatedBlock.startloop :
 		pusha
 			Minnow3.gotoFirstUnallocatedBlock.searchSectorLoop :
@@ -267,6 +285,7 @@ Minnow3.gotoFirstUnallocatedBlock :	; returns pos in ecx
 			mov ebx, ecx
 			call String.getLength
 			add ecx, edx
+			add ecx, 1
 			jmp Minnow3.gotoFirstUnallocatedBlock.doneAdding
 			Minnow3.gotoFirstUnallocatedBlock.notDir :
 			; assume its a file
@@ -277,14 +296,8 @@ Minnow3.gotoFirstUnallocatedBlock :	; returns pos in ecx
 			call String.getLength
 			add ecx, edx
 			Minnow3.gotoFirstUnallocatedBlock.doneAdding :
-					pusha
-						mov ebx, ecx
-						sub ebx, [Minnow3.data0]
-						call console.numOut
-						call console.newline
-					popa
 			mov eax, ecx
-			sub eax, [Minnow3.table_start]
+			sub eax, [Minnow3.data0]
 			cmp eax, 0x200
 				jl Minnow3.gotoFirstUnallocatedBlock.searchSectorLoop
 		popa
@@ -303,10 +316,186 @@ Minnow3.gotoFirstUnallocatedBlock :	; returns pos in ecx
 Minnow3.gotoFirstUnallocatedBlock.current :
 	dd 0x0
 
+Minnow3.findChunkMatchingSize :	; chunk size in edx, returns chunk in ecx
+	push eax
+	push ebx
+	push edx
+	
+		mov [Minnow3.chunkMatchSize], edx
+		
+		mov eax, [Minnow3.mask_start]
+		xor ebx, ebx
+		mov ecx, [Minnow3.data0]
+		mov edx, 0x200
+		call AHCI.DMAreadToBuffer	; this section should be looped too; rn can only handle up to 2gb worth of mapping
+		
+		; ecx points to buffer
+		xor ebx, ebx
+		mov al, 0
+		Minnow3.findChunkMatchingSize.kgoloopagain :
+		mov edx, [ecx]
+		add ecx, 1
+		test edx, 0b1
+			je Minnow3.findChunkMatchingSize.knop
+		add ebx, 1
+		jmp Minnow3.findChunkMatchingSize.loopcont
+		Minnow3.findChunkMatchingSize.knop :
+		mov ebx, 0
+		Minnow3.findChunkMatchingSize.loopcont :
+		add al, 1
+		shr edx, 1
+		cmp ebx, [Minnow3.chunkMatchSize]
+			je Minnow3.foundMatchingChunk
+		cmp al, 8
+			je Minnow3.findChunkMatchingSize.kgoloopagain
+		Minnow3.foundMatchingChunk :
+		
+		and eax, 0xFF	; bit offs
+		add ecx, eax
+		sub ecx, [Minnow3.data0]	; bit offs + byte offs
+		add ecx, [Minnow3.data_start]
+		sub ecx, [Minnow3.chunkMatchSize]
+		
+	pop edx
+	pop ebx
+	pop eax
+	ret
+	
+Minnow3.mask_start :
+	dd 0x0
+Minnow3.chunkMatchSize :
+	dd 0x0
+	
+Minnow3.makeFile :	; blockptr head, String name, String type, Buffer data, int size [DO NOT USE UNTIL THE add table_starts HAVE BEEN ADDED, WILL ZERO OUT THE PARTITION TABLE :\]
+	pop dword [Minnow3.makeFile.retval]
+	pop dword [Minnow3.makeFile.size]
+	pop dword [Minnow3.makeFile.data]
+	pop dword [Minnow3.makeFile.type]
+	pop dword [Minnow3.makeFile.name]
+	pop dword [Minnow3.makeFile.head]
+	pusha
+		
+		call Minnow3.gotoFirstUnallocatedBlock
+		mov [Minnow3.makeFile.descptr], ecx
+		
+		mov eax, ecx
+		xor edx, edx
+		mov ecx, 0x200
+		idiv ecx
+		push edx
+		xor ebx, ebx
+		mov ecx, [Minnow3.data0]
+		mov edx, 0x200
+		call AHCI.DMAreadToBuffer
+		pop edx
+		add ecx, edx
+		mov [Minnow3.makeFile.desc], ecx
+		
+		mov eax, [Minnow3.makeFile.head]
+		xor edx, edx
+		mov ecx, 0x200
+		idiv ecx
+		push edx
+		xor ebx, ebx
+		mov ecx, [Minnow3.data1]
+		mov edx, 0x200
+		call AHCI.DMAreadToBuffer
+		pop edx
+		add ecx, edx
+		
+		mov ebx, [Minnow3.makeFile.desc]
+		mov eax, [ecx+Mdesc_nextStruct]
+		mov [ebx+Mdesc_nextStruct], eax
+		mov eax, [Minnow3.makeFile.descptr]
+		mov [ecx+Mdesc_nextStruct], eax
+		mov dword [ebx+Mdesc_type], Mdesc.TYPE_FILE
+		push eax
+		push ebx
+		push edx
+			mov eax, [Minnow3.makeFile.size]
+			sub eax, 1
+			xor edx, edx
+			mov ecx, 0x200
+			idiv ecx
+			add eax, 1
+			mov edx, eax
+			call Minnow3.findChunkMatchingSize
+		pop edx
+		pop ebx
+		pop eax
+		mov [ebx+Mdesc_pos], ecx
+		mov [ebx+Mdesc_size], edx
+		mov eax, [Minnow3.makeFile.head]
+		mov [ebx+Mdesc_upperBase], eax
+		
+		mov eax, [Minnow3.makeFile.name]
+		add ebx, File_name
+		call String.copy
+		call String.getLength
+		add ebx, edx
+		mov eax, [Minnow3.makeFile.type]
+		call String.copy
+		
+		; write head back to disk
+		mov eax, [Minnow3.makeFile.head]
+		xor edx, edx
+		mov ecx, 0x200
+		idiv ecx
+		xor ebx, ebx
+		mov ecx, [Minnow3.data1]
+		mov edx, 0x200
+		call AHCI.DMAwriteNoAlloc
+		
+		; write new mdesc to disk
+		mov eax, [Minnow3.makeFile.descptr]
+		xor edx, edx
+		mov ecx, 0x200
+		idiv ecx
+		push edx	; eax is the block that this stuff is going in
+			xor ebx, ebx
+			mov ecx, [Minnow3.data1]	; don't need data1 to hold the head anymore
+			mov edx, 0x300
+			call AHCI.DMAreadToBuffer
+		pop edx
+		add ecx, edx	; where the file block data should be copied
+		mov ebx, ecx
+		push eax
+		mov eax, [Minnow3.data0]	; the actual file block data
+		mov ecx, 0x200
+		mov edx, 1
+		call Image.copyLinear
+		pop eax
+		xor ebx, ebx
+		mov ecx, [Minnow3.data1]
+		mov edx, 0x300
+		call AHCI.DMAwriteNoAlloc
+		
+	popa
+	push dword [Minnow3.makeFile.retval]
+	ret
+Minnow3.makeFile.retval :
+	dd 0x0
+Minnow3.makeFile.size :
+	dd 0x0
+Minnow3.makeFile.data :
+	dd 0x0
+Minnow3.makeFile.type :
+	dd 0x0
+Minnow3.makeFile.name :
+	dd 0x0
+Minnow3.makeFile.head :
+	dd 0x0
+Minnow3.makeFile.desc :
+	dd 0x0
+Minnow3.makeFile.descptr :
+	dd 0x0
+
 Mdesc.TYPE_UNALLOCATED equ 0
 Mdesc.TYPE_FILE equ 1
 Mdesc.TYPE_DIRECTORY equ 2
 Mdesc.TYPE_BLOCK equ 3
+
+Minnow3.TABLE_HEADER_SIZE equ 16
 
 Mdesc_nextStruct equ 0
 Mdesc_lastStruct equ 4
@@ -316,3 +505,4 @@ Mdesc_size equ 16
 Mdesc_upperBase equ 20
 Directory_innerStruct equ 24
 Directory_name equ 28
+File_name equ 24

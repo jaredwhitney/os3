@@ -433,7 +433,7 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.14_close
-call Minnow.ctree	; INLINE ASSEMBLY
+call Minnow3.cprint	; INLINE ASSEMBLY
 iConsole.$loop_if.14_close :
 
 push ebx

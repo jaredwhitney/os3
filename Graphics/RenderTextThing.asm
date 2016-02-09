@@ -160,15 +160,15 @@ pusha
 	push dword 20*4
 	push dword 80
 	push dword 700
-	push dword 200
+	push dword 50
 	push dword TRUE
 	call TextArea.Create
 	mov [TextLine.RenderTest.textarea], ecx
 	; fill it with the sample text
-	mov eax, TextLine.RenderTest.text
-	mov ebx, [TextLine.RenderTest.textarea]
-	call TextArea.SetText
-	call TextArea.AppendText
+	;mov eax, TextLine.RenderTest.text
+	;mov ebx, [TextLine.RenderTest.textarea]
+	;call TextArea.SetText
+	;call TextArea.AppendText
 	; create a grouping
 	push dword 0;500*4
 	push dword 0;500
