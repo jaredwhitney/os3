@@ -224,7 +224,7 @@ Minnow3.cprint.handlePart :	; part loc in ebx
 		add ecx, edx	; add the remainder
 		
 		cmp dword [ecx+Mdesc_type], Mdesc.TYPE_UNALLOCATED
-			je Minnow3.cprint.handlePart.ret
+			je Minnow3.cprint.handlePart.aret
 		cmp dword [ecx+Mdesc_type], Mdesc.TYPE_FILE
 			jne Minnow3.cprint.handlePart.notFile
 		mov ebx, Minnow3.cprint.STR_FILE
@@ -245,11 +245,17 @@ Minnow3.cprint.handlePart :	; part loc in ebx
 	Minnow3.cprint.handlePart.ret :
 	popa
 	ret
+Minnow3.cprint.handlePart.aret :
+	mov ebx, Minnow3.cprint.STR_ENDOF
+	call console.println
+	jmp Minnow3.cprint.handlePart.ret
 Minnow3.cprint.STR_FILE :
 	db "[FILE] ", 0
 Minnow3.cprint.STR_DIR :
 	db "[DIR] ", 0
-	
+Minnow3.cprint.STR_ENDOF :
+	db "[UNALLOCATED] !", 0
+
 Minnow3.gotoFirstUnallocatedBlock :	; returns pos in ecx
 	push eax
 	push ebx
@@ -383,6 +389,7 @@ Minnow3.makeFile :	; blockptr head, String name, String type, Buffer data, int s
 		mov ecx, 0x200
 		idiv ecx
 		push edx
+		add eax, [Minnow3.table_start]
 		xor ebx, ebx
 		mov ecx, [Minnow3.data0]
 		mov edx, 0x200
@@ -392,10 +399,12 @@ Minnow3.makeFile :	; blockptr head, String name, String type, Buffer data, int s
 		mov [Minnow3.makeFile.desc], ecx
 		
 		mov eax, [Minnow3.makeFile.head]
+		add eax, Minnow3.TABLE_HEADER_SIZE
 		xor edx, edx
 		mov ecx, 0x200
 		idiv ecx
 		push edx
+		add eax, [Minnow3.table_start]
 		xor ebx, ebx
 		mov ecx, [Minnow3.data1]
 		mov edx, 0x200
@@ -441,20 +450,22 @@ Minnow3.makeFile :	; blockptr head, String name, String type, Buffer data, int s
 		xor edx, edx
 		mov ecx, 0x200
 		idiv ecx
+		add eax, [Minnow3.table_start]
 		xor ebx, ebx
 		mov ecx, [Minnow3.data1]
 		mov edx, 0x200
-		call AHCI.DMAwriteNoAlloc
+		call AHCI.DMAwrite
 		
 		; write new mdesc to disk
 		mov eax, [Minnow3.makeFile.descptr]
 		xor edx, edx
 		mov ecx, 0x200
 		idiv ecx
+		add eax, [Minnow3.table_start]
 		push edx	; eax is the block that this stuff is going in
 			xor ebx, ebx
 			mov ecx, [Minnow3.data1]	; don't need data1 to hold the head anymore
-			mov edx, 0x300
+			mov edx, 0x200;0x300
 			call AHCI.DMAreadToBuffer
 		pop edx
 		add ecx, edx	; where the file block data should be copied
@@ -467,7 +478,7 @@ Minnow3.makeFile :	; blockptr head, String name, String type, Buffer data, int s
 		pop eax
 		xor ebx, ebx
 		mov ecx, [Minnow3.data1]
-		mov edx, 0x300
+		mov edx, 0x200;0x300
 		call AHCI.DMAwriteNoAlloc
 		
 	popa

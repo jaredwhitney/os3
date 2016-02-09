@@ -177,13 +177,47 @@ console.test :	; command that can be used to test anything.
 pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
-	call TextLine.RenderTest
-;	push dword Minnow3.TABLE_HEADER_SIZE	;head
-;	push dword _NAME
-;	push dword _TYPE
-;	push dword _DATA
-;	push dword 26
-;	call Minnow3.makeFile
+;	call TextLine.RenderTest
+	mov eax, 0x2
+	mov ebx, 1
+	call Guppy.malloc
+	mov eax, ebx
+	push eax
+		mov ebx, 0x200
+		call Buffer.clear
+		mov byte [eax], 0x00
+		mov byte [eax+0x1BE+4], 0x7
+		mov dword [eax+0x1BE+8], 0x800
+		mov dword [eax+0x1BE+12], 0x1A00000
+		add eax, 16
+		mov byte [eax], 0x80
+		mov byte [eax+0x1BE+4], 0x7
+		mov dword [eax+0x1BE+8], 0x1A00800
+		mov dword [eax+0x1BE+12], 0x32000
+		add eax, 16
+		mov byte [eax], 0x00
+		mov byte [eax+0x1BE+4], 0x7
+		mov dword [eax+0x1BE+8], 0x1A32800
+		mov dword [eax+0x1BE+12], 0x2C52387C
+		add eax, 16
+		mov byte [eax], 0x00
+		mov byte [eax+0x1BE+4], 0x30
+		mov dword [eax+0x1BE+8], 0x2DF5607C
+		mov dword [eax+0x1BE+12], 0xC34F2CC
+	pop eax
+	mov ecx, eax
+	mov eax, 0x0
+	mov ebx, 0x0
+	mov edx, 0x200
+;	call AHCI.DMAwrite
+	
+	
+	push dword 0	;head
+	push dword _NAME
+	push dword _TYPE
+	push dword _DATA
+	push dword 26
+	call Minnow3.makeFile
 ;call ProgramManager.finalize
 popa
 ret
