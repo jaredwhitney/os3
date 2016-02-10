@@ -281,23 +281,40 @@ Dolphin.handleMouseClick :
 		imul eax, 4
 		mov ebx, [Graphics.SCREEN_HEIGHT]
 		sub ebx, [Mouse.y]
-		add ebx, 8
-		cmp eax, [ecx+Window_xpos]
+		cmp ax, [ecx+Window_xpos]
 			jl Dolphin.handleMouseClick.goMove
 		mov edx, [ecx+Window_xpos]
 		add edx, [ecx+Window_width]
-		cmp eax, edx
+		cmp ax, dx
 			jg Dolphin.handleMouseClick.goMove
-		;cmp ebx, [ecx+Window_ypos]
-		;	jl Dolphin.handleMouseClick.goMove
-		;mov edx, [ecx+Window_ypos]
-		;add edx, [ecx+Window_height]
-		;cmp ebx, edx
-		;	jg Dolphin.handleMouseClick.goMove
+		cmp bx, [ecx+Window_ypos]
+			jl Dolphin.handleMouseClick.goMove
+		mov edx, [ecx+Window_ypos]
+		add edx, [ecx+Window_height]
+		cmp bx, dx
+			jg Dolphin.handleMouseClick.goMove
 		mov ebx, Dolphin.MOUSE_MSG
-		call console.println
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+Window_ypos]
+		call console.numOut
+		call console.newline
 		jmp Dolphin.handleMouseClick.ret
 		Dolphin.handleMouseClick.goMove :
+		add ebx, 8	; account for the window title
+		mov edx, [Graphics.SCREEN_HEIGHT]
+		sub dx, [ecx+Window_height]
+		;add edx, 8
+		cmp ebx, edx
+			jle Dolphin.handleMouseClick.dontLockY
+		mov ebx, edx
+		Dolphin.handleMouseClick.dontLockY :
+		mov edx, [Graphics.SCREEN_WIDTH]
+		sub dx, [ecx+Window_width]
+		cmp eax, edx
+			jle Dolphin.handleMouseClick.dontLockX
+		mov eax, edx
+		Dolphin.handleMouseClick.dontLockX :
 		mov [ecx+Window_xpos], eax
 		mov [ecx+Window_ypos], ebx
 		;call Window.makeGlassSmart ; is broken atm
