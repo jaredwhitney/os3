@@ -5,6 +5,7 @@ Grouping_y		equ 12
 Grouping_w		equ 16
 Grouping_h		equ 20
 Grouping_renderFlag	equ 32
+; Grouping should have its own version of nextLinked so nested multiple groupings will be handled properly!
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -167,5 +168,46 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 		mov [ebx+Grouping_w], ecx
 		mov cx, [eax+Window_height]
 		mov [ebx+Grouping_h], ecx
+		mov cx, [eax+Window_xpos]
+		mov [ebx+Grouping_x], ecx
+		mov cx, [eax+Window_ypos]
+		mov [ebx+Grouping_y], ecx
 	popa
 	ret
+Grouping.passthroughMouseEvent :	; Grouping in ebx
+	pusha
+		mov ebx, GROUPING_CLICKED_STR
+		call console.println
+		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
+		; Does not work atm
+		Grouping.passthroughMouseEvent.nomatch :
+		mov ebx, [ebx+Component_nextLinked]
+		cmp ebx, 0x0
+			je Grouping.passthroughMouseEvent.ret
+		mov ecx, [Component.mouseEventX]
+		mov edx, [Component.mouseEventY]
+		cmp ecx, [ebx+Component_x]
+			jl Grouping.passthroughMouseEvent.nomatch
+		mov eax, [ebx+Component_x]
+		add eax, [ebx+Component_w]
+		cmp ecx, eax
+			jg Grouping.passthroughMouseEvent.nomatch
+		cmp ecx, [ebx+Component_y]
+			jl Grouping.passthroughMouseEvent.nomatch
+		mov eax, [ebx+Component_y]
+		add eax, [ebx+Component_h]
+		cmp ecx, eax
+			jg Grouping.passthroughMouseEvent.nomatch
+		push ebx
+			mov ebx, GROUPING_SUB_CLICKED_STR
+			call console.println
+		pop ebx
+		call Component.HandleMouseEvent
+	Grouping.passthroughMouseEvent.ret :
+	popa
+	ret
+GROUPING_CLICKED_STR :
+	db "A grouping was clicked!", 0
+GROUPING_SUB_CLICKED_STR :
+	db "A subcomponent of a grouping was clicked!", 0
+	

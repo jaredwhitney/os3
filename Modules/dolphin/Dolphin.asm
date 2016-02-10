@@ -293,12 +293,16 @@ Dolphin.handleMouseClick :
 		add edx, [ecx+Window_height]
 		cmp bx, dx
 			jg Dolphin.handleMouseClick.goMove
-		mov ebx, Dolphin.MOUSE_MSG
-		call console.numOut
-		call console.newline
-		mov ebx, [ecx+Window_ypos]
-		call console.numOut
-		call console.newline
+		;; HANDLE A MOUSE CLICK ON A WINDOW
+			mov ebx, [ecx+Window_linkedComponent]
+			cmp ebx, 0x0
+				je Dolphin.handleMouseClick.ret	; no component found
+			mov eax, [Mouse.x]
+			mov [Component.mouseEventX], eax
+			mov eax, [Mouse.y]
+			mov [Component.mouseEventY], eax
+			call Component.HandleMouseEvent
+		;; END HANDLING
 		jmp Dolphin.handleMouseClick.ret
 		Dolphin.handleMouseClick.goMove :
 		add ebx, 8	; account for the window title

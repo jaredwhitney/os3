@@ -33,7 +33,7 @@ Component.killfunc :
 	call SysHaltScreen.show
 	jmp $
 Component.INVALID_COMPONENT_MESSAGE :
-	db "[Dolphin] An attempt was made to render an invalid Component.", 0
+	db "[Dolphin] An attempt was made to access an invalid Component.", 0
 Component.DEBUG_ALL :
 	dd TRUE
 Component.Render.layerColor :
@@ -54,6 +54,35 @@ pusha
 popa
 ret
 
+Component.HandleMouseEvent :	; Component in ebx
+pusha
+	; Make the coordinates relative to the component
+	mov eax, [Component.mouseEventX]
+	sub eax, [ebx+Component_x]
+	mov [Component.mouseEventX], eax
+	mov eax, [Component.mouseEventY]
+	sub eax, [ebx+Component_y]
+	mov [Component.mouseEventY], eax
+	
+	; Call the proper function
+	mov eax, [ebx]
+	imul eax, 4
+	add eax, Component.mouseHandlerPointers
+	call [eax]
+popa
+ret
+Component.discardMouseEvent :
+	; discard the event
+ret
+Component.mouseHandlerPointers :
+	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent
+Component.mouseEventX :
+	dd 0x0
+Component.mouseEventY :
+	dd 0x0
+Component.mouseEventButton :
+	dd 0x0
+	
 Textline_type	equ 0
 Textline_image	equ 4
 Textline_x		equ 8
