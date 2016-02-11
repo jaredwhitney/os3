@@ -29,12 +29,13 @@ Component.Render.layerColor :
 	dd 0x400000
 
 Component.functionPointers :
-	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render
+	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render
 Component.TYPE_TEXTLINE				equ 0x1
 Component.TYPE_TEXTAREA				equ 0x2
 Component.TYPE_IMAGE				equ 0x3
 Component.TYPE_IMAGE_SCALABLE		equ 0x4
 Component.TYPE_GROUPING				equ 0x5
+Component.TYPE_BUTTON				equ 0x6
 
 Component.RequestUpdate :	; Component in ebx
 pusha
@@ -64,7 +65,7 @@ Component.discardMouseEvent :
 	; discard the event
 ret
 Component.mouseHandlerPointers :
-	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent
+	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent
 Component.mouseEventX :
 	dd 0x0
 Component.mouseEventY :
@@ -174,19 +175,16 @@ TextLine.RenderTest :
 pusha
 	; create the component
 	mov byte [INTERRUPT_DISABLE], 0xFF
-	push dword 150
+
+	push dword TextLine.RenderTest.text
+	push dword TextLine.RenderTest.isClicked
 	push dword 20*4
-	push dword 80
-	push dword 700
+	push dword 20
+	push dword 100*4
 	push dword 50
-	push dword TRUE
-	call TextArea.Create
-	mov [TextLine.RenderTest.textarea], ecx
-	; fill it with the sample text
-	;mov eax, TextLine.RenderTest.text
-	;mov ebx, [TextLine.RenderTest.textarea]
-	;call TextArea.SetText
-	;call TextArea.AppendText
+	call Button.Create
+	mov [TextLine.RenderTest.button], ecx
+	
 	; create a grouping
 	push dword 0;500*4
 	push dword 0;500
@@ -194,7 +192,7 @@ pusha
 	push dword 0;500
 	call Grouping.Create
 	mov ebx, ecx
-	mov eax, [TextLine.RenderTest.textarea]
+	mov eax, [TextLine.RenderTest.button]
 	call Grouping.Add
 		mov al, [console.winNum]
 		and eax, 0xFF
@@ -211,10 +209,28 @@ pusha
 	mov byte [INTERRUPT_DISABLE], 0x00
 popa
 ret
-TextLine.RenderTest.text :
-	db "This is a test of some text that should be written to a text area with automatic line breaks and stuff.", 0
-TextLine.RenderTest.textarea :
+TextLine.RenderTest.button :
 	dd 0x0
+TextLine.RenderTest.isClicked :
+pusha
+	mov ecx, TextLine.RenderTest.text
+	mov dl, [TextLine.RenderTest.flip]
+	cmp dl, 0xFF
+		jne TextLine.RenderTest.cont
+	mov ecx, TextLine.RenderTest.text2
+	TextLine.RenderTest.cont :
+	mov eax, ecx
+	call Button.SetText
+	xor dl, 0xFF
+	mov [TextLine.RenderTest.flip], dl
+popa
+ret
+TextLine.RenderTest.flip :
+	db 0xFF
+TextLine.RenderTest.text :
+	db "Test Button!", 0
+TextLine.RenderTest.text2 :
+	db "Hellow.", 0
 
 RenderText :	; char in al, color in ebx, image in ecx, image width in edx
 	pusha
