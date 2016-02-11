@@ -693,15 +693,6 @@ add ebx, 0x2
 		pop eax
 ;call console.update
 
-				pusha
-				mov ebx, [TextLine.RenderTest.textarea]
-				cmp ebx, 0
-					je _HANDLEFUNC1.c5_nop
-					call TextArea.AppendChar
-					call Component.RequestUpdate
-				_HANDLEFUNC1.c5_nop :
-				popa
-
 popa
 ret
 
