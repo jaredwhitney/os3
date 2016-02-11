@@ -9,17 +9,6 @@ Component_upperRenderFlag	equ 28
 
 Component.Render :	; Component in ebx
 	pusha
-	;		cmp byte [Component.DEBUG_ALL], 0xFF
-	;			jne Component.Render.noLayerColor
-	;		push ebx
-	;		mov eax, [ebx+Component_image]
-	;		mov edx, [ebx+Component_w]
-	;		imul edx, [ebx+Component_h]
-	;		mov ebx, [Component.Render.layerColor]
-	;		call Image.clear
-	;		xor dword [Component.Render.layerColor], 0x404000
-	;		pop ebx
-	;		Component.Render.noLayerColor :
 		mov eax, [ebx]
 		imul eax, 4
 		add eax, Component.functionPointers

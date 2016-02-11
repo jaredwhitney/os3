@@ -298,8 +298,10 @@ Dolphin.handleMouseClick :
 			cmp ebx, 0x0
 				je Dolphin.handleMouseClick.ret	; no component found
 			mov eax, [Mouse.x]
+			imul eax, 4
 			mov [Component.mouseEventX], eax
-			mov eax, [Mouse.y]
+			mov eax, [Graphics.SCREEN_HEIGHT]
+			sub eax, [Mouse.y]
 			mov [Component.mouseEventY], eax
 			call Component.HandleMouseEvent
 		;; END HANDLING
