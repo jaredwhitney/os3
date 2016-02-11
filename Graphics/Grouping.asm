@@ -118,6 +118,18 @@ Grouping.Render :	; Grouping in ebx
 			cmp ebx, 0x0
 				je Grouping.Render.ret
 			
+			cmp byte [Component.DEBUG_ALL], 0xFF
+				jne Component.Render.noLayerColor
+			pusha
+			mov eax, [ebx+Component_image]
+			mov edx, [ebx+Component_w]
+			imul edx, [ebx+Component_h]
+			mov ebx, [Component.Render.layerColor]
+			call Image.clear
+			xor dword [Component.Render.layerColor], 0x404000
+			popa
+			Component.Render.noLayerColor :
+			
 			call Component.Render
 			
 			mov eax, [ebx+Component_y]
@@ -176,10 +188,7 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
 	pusha
-		mov ebx, GROUPING_CLICKED_STR
-		call console.println
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
-		; Does not work atm
 		Grouping.passthroughMouseEvent.nomatch :
 		mov ebx, [ebx+Component_nextLinked]
 		cmp ebx, 0x0
@@ -188,15 +197,15 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		mov edx, [Component.mouseEventY]
 		cmp ecx, [ebx+Component_x]
 			jl Grouping.passthroughMouseEvent.nomatch
-		mov eax, [ebx+Component_x]
+		mov eax, [ebx+Component_x]	; is too strict for some reason
 		add eax, [ebx+Component_w]
 		cmp ecx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
-		cmp ecx, [ebx+Component_y]
+		cmp edx, [ebx+Component_y]
 			jl Grouping.passthroughMouseEvent.nomatch
-		mov eax, [ebx+Component_y]
+		mov eax, [ebx+Component_y]	; is too lenient for some reson
 		add eax, [ebx+Component_h]
-		cmp ecx, eax
+		cmp edx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
 		push ebx
 			mov ebx, GROUPING_SUB_CLICKED_STR
