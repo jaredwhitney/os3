@@ -177,121 +177,88 @@ console.test :	; command that can be used to test anything.
 pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
-	call TextLine.RenderTest
-;	mov eax, 0x2
-;	mov ebx, 1
-;	call Guppy.malloc
-;	mov eax, ebx
-;	push eax
-;		mov ebx, 0x200
-;		call Buffer.clear
-;		mov byte [eax], 0x00
-;		mov byte [eax+0x1BE+4], 0x7
-;		mov dword [eax+0x1BE+8], 0x800
-;		mov dword [eax+0x1BE+12], 0x1A00000
-;		add eax, 16
-;		mov byte [eax], 0x80
-;		mov byte [eax+0x1BE+4], 0x7
-;		mov dword [eax+0x1BE+8], 0x1A00800
-;		mov dword [eax+0x1BE+12], 0x32000
-;		add eax, 16
-;		mov byte [eax], 0x00
-;		mov byte [eax+0x1BE+4], 0x7
-;		mov dword [eax+0x1BE+8], 0x1A32800
-;		mov dword [eax+0x1BE+12], 0x2C52387C
-;		add eax, 16
-;		mov byte [eax], 0x00
-;		mov byte [eax+0x1BE+4], 0x30
-;		mov dword [eax+0x1BE+8], 0x2DF5607C
-;		mov dword [eax+0x1BE+12], 0xC34F2CC
-;	pop eax
-;	mov ecx, eax
-;	mov eax, 0x0
-;	mov ebx, 0x0
-;	mov edx, 0x200
-;	call AHCI.DMAwrite
+
+	mov byte [INTERRUPT_DISABLE], 0xFF
+
+	push dword WX
+	push dword WY
+	push dword WW+8*4
+	push dword WH+20+4+4
+	call Grouping.Create
+	mov [consoletest_window], ecx
 	
+	push dword 4*4
+	push dword 2
+	push dword WW
+	push dword 20
+	call Grouping.Create
+	mov [consoletest_titleBar], ecx
 	
-	;push dword 0	;head
-	;push dword _NAME
-	;push dword _TYPE
-	;push dword _DATA
-	;push dword 26
-	;call Minnow3.makeFile
-;call ProgramManager.finalize
+	mov ebx, [consoletest_window]
+	mov eax, [consoletest_titleBar]
+	call Grouping.Add
+
+	push dword 4*4
+	push dword 20+2+2
+	push dword WW
+	push dword WH
+	call Grouping.Create
+	mov [consoletest_mainGrouping], ecx
+	
+	mov ebx, [consoletest_window]
+	mov eax, [consoletest_mainGrouping]
+	call Grouping.Add
+	
+	push dword consoletest_uparrowstr
+	push dword console.checkColor_ret ; just return immediately
+	push dword WW-22*4
+	push dword 5
+	push dword 10*4
+	push dword 10
+	call Button.Create
+	mov eax, ecx
+	mov ebx, [consoletest_titleBar]
+	call Grouping.Add
+	
+	push dword consoletest_closestr
+	push dword console.checkColor_ret ; just return immediately
+	push dword WW-10*4
+	push dword 5
+	push dword 10*4
+	push dword 10
+	call Button.Create
+	mov eax, ecx
+	mov ebx, [consoletest_titleBar]
+	call Grouping.Add
+	
+	mov ebx, [consoletest_window]
+	call Component.Render
+	
+	mov eax, [ebx+Grouping_image]
+	mov ecx, [ebx+Grouping_w]
+	mov edx, [ebx+Grouping_h]
+	mov ebx, [Graphics.SCREEN_MEMPOS]
+	call Image.copy
+	
+	mov byte [INTERRUPT_DISABLE], 0x00
+	
+call ProgramManager.finalize
 popa
 ret
-_NAME :
-	db "File001", 0x0
-_TYPE :
-	db "text", 0x0
-_DATA :
-	db "This is some sample text.", 0
-;console.test.FRAME_SIZE equ 0x10000
-;console_testval:
-;	dd 0x0
-;console_testbuffer :
-;	dd 0x0
-;console.test.proccessFrame :
-;pusha
-;	mov ebx, console.test.FRAME_SIZE
-;	console.test.proccessFrame.loop :
-;	mov eax, [ecx]	; eax: DATA | POSH | POSM | POSL
-;	and eax, 0xFFFFFF	; here check eax, if less than last then ensure that 5000/FPS tics have passed (wait until they have if not) to lock the FPS to the desired value
-;		cmp eax, [console.test.proccessFrame.lastVal]
-;			jg console.test.proccessFrame.cont
-;			pusha	; draw the frame to the screen
-;					mov eax, [console_testbuffer]
-;					mov ebx, [Graphics.SCREEN_MEMPOS]
-;					mov ecx, 1024/8*4
-;					mov edx, 576/8
-;					call Image.copy
-;				mov eax, [Clock.tics]
-;				sub eax, [console.test.proccessFrame.startTime]
-;				cmp eax, 5000/30	; 5000/FPS
-;					jge console.test.proccessFrame.onTimeOrSlow
-;				mov ebx, 5000/30	; the time the frame should be shown for
-;				sub ebx, eax	; subtract the time that has passed
-;				mov eax, ebx
-;				;call System.sleep	; and sleep for the remainder [nope because this freezes it up a lot??]
-;				console.test.proccessFrame.onTimeOrSlow :
-;				mov eax, [Clock.tics]
-;				mov [console.test.proccessFrame.startTime], eax
-;			popa
-;		console.test.proccessFrame.cont :
-;		mov [console.test.proccessFrame.lastVal], eax
-;	mov edx, [console_testbuffer]
-;	add edx, eax
-;	mov eax, [ecx]
-;	shr eax, 24
-;	mov [edx], al
-;	add ecx, 4
-;	sub ebx, 4
-;	cmp ebx, 0
-;		jg console.test.proccessFrame.loop
-;popa
-;ret
-;console.test.proccessFrame.lastVal :
-;	dd 0x0
-;console.test.proccessFrame.startTime :
-;	dd 0x0
-;console.takeScreenshot :
-;	pusha
-;		mov eax, Console.test.FileName
-;		mov ebx, Console.test.FileType
-;		call Minnow.nameAndTypeToPointer
-;		cmp ecx, 0xFFFFFFFF
-;			je Console.test.nodel
-;		mov eax, ecx
-;		call Minnow.deleteFile
-;		Console.test.nodel :
-;		mov eax, Console.test.FileName
-;		mov ebx, Console.test.FileType
-;		mov ecx, [Graphics.SCREEN_MEMPOS]
-;		mov edx, [Graphics.SCREEN_SIZE]
-;		call Minnow.writeFile
-;	popa
-;	ret
+WX equ 80*4
+WY equ 80
+WW equ 500*4
+WH equ 300
+consoletest_mainGrouping :
+	dd 0x0
+consoletest_window :
+	dd 0x0
+consoletest_titleBar :
+	dd 0x0
+consoletest_uparrowstr :
+	db "M", 0
+consoletest_closestr :
+	db "X", 0
 	
 console.memstat :
 	mov ah, 0xFF

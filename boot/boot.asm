@@ -56,7 +56,7 @@ boot.ATAload :
 boot.ATAdata :
 	db 0x10	; packet size
 	db 0	; always 0
-	dw 126	; sectors to load
+	dw 128	; sectors to load
 	dw S2_CODE_LOC	; offs
 	dw 0x0	; seg
 	dd 0x1	; start LBA

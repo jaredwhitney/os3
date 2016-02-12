@@ -174,31 +174,31 @@ TextLine.Render :	; textline in ebx
 TextLine.RenderTest :
 pusha
 	; create the component
-	mov byte [INTERRUPT_DISABLE], 0xFF
+;	mov byte [INTERRUPT_DISABLE], 0xFF
 
-	push dword TextLine.RenderTest.text
-	push dword TextLine.RenderTest.isClicked
-	push dword 20*4
-	push dword 20
-	push dword 100*4
-	push dword 50
-	call Button.Create
-	mov [TextLine.RenderTest.button], ecx
+;	push dword TextLine.RenderTest.text
+;	push dword TextLine.RenderTest.isClicked
+;	push dword 20*4
+;	push dword 20
+;	push dword 100*4
+;	push dword 50
+;	call Button.Create
+;	mov [TextLine.RenderTest.button], ecx
 	
 	; create a grouping
-	push dword 0;500*4
-	push dword 0;500
-	push dword 0;1000*4
-	push dword 0;500
-	call Grouping.Create
-	mov ebx, ecx
-	mov eax, [TextLine.RenderTest.button]
-	call Grouping.Add
-		mov al, [console.winNum]
-		and eax, 0xFF
-		add eax, Dolphin.windowStructs
-		mov eax, [eax]
-	mov [eax+Window_linkedComponent], ebx
+;	push dword 0;500*4
+;	push dword 0;500
+;	push dword 0;1000*4
+;	push dword 0;500
+;	call Grouping.Create
+;	mov ebx, ecx
+;	mov eax, [TextLine.RenderTest.button]
+;	call Grouping.Add
+;		mov al, [console.winNum]
+;		and eax, 0xFF
+;		add eax, Dolphin.windowStructs
+;		mov eax, [eax]
+;	mov [eax+Window_linkedComponent], ebx
 	; copy the rendered image to the screen
 	;mov ebx, [TextLine.RenderTest.textarea]
 ;	mov eax, [ebx+Component_image]
@@ -206,7 +206,7 @@ pusha
 ;	mov edx, [ebx+Component_h]
 ;	mov ebx, [Graphics.SCREEN_MEMPOS]
 ;	call Image.copy
-	mov byte [INTERRUPT_DISABLE], 0x00
+;	mov byte [INTERRUPT_DISABLE], 0x00
 popa
 ret
 TextLine.RenderTest.button :

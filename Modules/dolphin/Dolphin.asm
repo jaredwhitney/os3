@@ -98,6 +98,19 @@ Dolphin.updateScreen :
 		mov bl, Manager.CONTROL_DOLPHIN
 		mov [os.mlloc], bl
 		
+					cmp dword [consoletest_window], 0x0
+						je Dolphin.doneDrawingWindows
+					
+						mov ebx, [consoletest_window]
+						call Component.Render
+						
+						mov eax, [ebx+Grouping_image]
+						mov ecx, [ebx+Grouping_w]
+						mov edx, [ebx+Grouping_h]
+						mov ebx, [Graphics.SCREEN_MEMPOS]
+						call Image.copy
+					jmp Dolphin.doneDrawingWindows
+		
 		; has active window changed? if so, every window with a lower depth than its previous depth should have their depth incremented by 1, the new active window should have its depthset to 0.
 		
 		mov eax, [Clock.tics]
