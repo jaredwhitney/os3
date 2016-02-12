@@ -166,7 +166,7 @@ Grouping.Render :	; Grouping in ebx
 			
 			call Image.copyRegion
 			
-			;jmp Grouping.Render.loop
+			jmp Grouping.Render.loop
 		mov dword [edx+Grouping_renderFlag], FALSE
 	Grouping.Render.ret :
 	popa
