@@ -1,5 +1,5 @@
 %include "..\boot\betterRealMode.asm"
-%include "..\boot\realMode.asm"
+;%include "..\boot\realMode.asm"
 
 %include "..\modules\dolphin\Dolphin.asm"
 %include "..\modules\dolphin\WindowTools.asm"
@@ -31,7 +31,7 @@
 
 %include "..\Drivers\PCI\Generic_ComponentInterface.asm"
 ;%include "..\Drivers\PCI\PCI_LookupTables.asm"
-%include "..\Drivers\USB\Generic_EHCI.asm"
+%include "..\Drivers\USB\EHCI.asm"
 
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\Guppy.asm"
