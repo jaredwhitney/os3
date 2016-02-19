@@ -178,67 +178,72 @@ pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
 
-	mov byte [INTERRUPT_DISABLE], 0xFF
+	call EHCI.printPortCount
+	
+	; mov byte [INTERRUPT_DISABLE], 0xFF
 
-	push dword WX
-	push dword WY
-	push dword WW+8*4
-	push dword WH+20+4+4
-	call Grouping.Create
-	mov [consoletest_window], ecx
+	; push dword WX
+	; push dword WY
+	; push dword WW+8*4
+	; push dword WH+20+4+4
+	; call Grouping.Create
+	; mov [consoletest_window], ecx
 	
-	push dword 4*4
-	push dword 2
-	push dword WW
-	push dword 20
-	call Grouping.Create
-	mov [consoletest_titleBar], ecx
+	; push dword 4*4
+	; push dword 2
+	; push dword WW
+	; push dword 20
+	; call Grouping.Create
+	; mov [consoletest_titleBar], ecx
 	
-	mov ebx, [consoletest_window]
-	mov eax, [consoletest_titleBar]
-	call Grouping.Add
+	; mov ebx, [consoletest_window]
+	; mov eax, [consoletest_titleBar]
+	; call Grouping.Add
 
-	push dword 4*4
-	push dword 20+2+2
-	push dword WW
-	push dword WH
-	call Grouping.Create
-	mov [consoletest_mainGrouping], ecx
+	; push dword 4*4
+	; push dword 20+2+2
+	; push dword WW
+	; push dword WH
+	; call Grouping.Create
+	; mov [consoletest_mainGrouping], ecx
 	
-	mov ebx, [consoletest_window]
-	mov eax, [consoletest_mainGrouping]
-	call Grouping.Add
+	; mov ebx, [consoletest_window]
+	; mov eax, [consoletest_mainGrouping]
+	; call Grouping.Add
 	
-	push dword consoletest_uparrowstr
-	push dword console.checkColor_ret ; just return immediately
-	push dword WW-22*4
-	push dword 5
-	push dword 10*4
-	push dword 10
-	call Button.Create
-	mov eax, ecx
-	mov ebx, [consoletest_titleBar]
-	call Grouping.Add
+	; push dword consoletest_uparrowstr
+	; push dword console.checkColor_ret ; just return immediately
+	; push dword WW-22*4
+	; push dword 5
+	; push dword 10*4
+	; push dword 10
+	; call Button.Create
+	; mov eax, ecx
+	; mov ebx, [consoletest_titleBar]
+	; call Grouping.Add
 	
-	push dword consoletest_closestr
-	push dword console.checkColor_ret ; just return immediately
-	push dword WW-10*4
-	push dword 5
-	push dword 10*4
-	push dword 10
-	call Button.Create
-	mov eax, ecx
-	mov ebx, [consoletest_titleBar]
-	call Grouping.Add
+	; push dword consoletest_closestr
+	; push dword console.checkColor_ret ; just return immediately
+	; push dword WW-10*4
+	; push dword 5
+	; push dword 10*4
+	; push dword 10
+	; call Button.Create
+	; mov eax, ecx
+	; mov ebx, [consoletest_titleBar]
+	; call Grouping.Add
 	
-	mov ebx, [consoletest_window]
-	call Component.Render
+	; mov ecx, [consoletest_window]
+	; mov ebx, [console.windowStructLoc]
+	; mov [ebx+Window_linkedComponent], ecx
 	
-	mov ecx, [consoletest_window]
-	mov ebx, [console.windowStructLoc]
-	mov [ebx+Window_linkedComponent], ecx
+	; mov eax, [ebx+Grouping_image]
+	; mov ecx, [ebx+Grouping_w]
+	; mov edx, [ebx+Grouping_h]
+	; mov ebx, [Graphics.SCREEN_MEMPOS]
+	; call Image.copy
 	
-	mov byte [INTERRUPT_DISABLE], 0x00
+	; mov byte [INTERRUPT_DISABLE], 0x00
 	
 call ProgramManager.finalize
 popa
