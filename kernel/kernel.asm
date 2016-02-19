@@ -52,7 +52,7 @@ Kernel.init :
 		call kernel.OrcaHLLsetup_memhack
 	
 	;	INITIALIZE THE USB DRIVER	;
-		call USB.init
+		call EHCI.findDevice
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
@@ -116,9 +116,10 @@ kernel.halt :
 		call debug.println
 	
 	;	JUMP TO REAL MODE TO FREEZE THE COMPUTER	;
-		call goRealMode
-	
+		;call goRealMode
+	cli
 	hlt
+	jmp $
 
 
 ;	MEMORY "HACK" TO INSURE THAT ORCAHLL PROGRAMS HAVE *SOME* MEMORY TO ALLOCATE	;
