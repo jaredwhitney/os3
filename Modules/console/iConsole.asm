@@ -234,19 +234,17 @@ call ProgramManager.setActive	; Make removable Later
 	mov ebx, [consoletest_window]
 	call Component.Render
 	
-	mov eax, [ebx+Grouping_image]
-	mov ecx, [ebx+Grouping_w]
-	mov edx, [ebx+Grouping_h]
-	mov ebx, [Graphics.SCREEN_MEMPOS]
-	call Image.copy
+	mov ecx, [consoletest_window]
+	mov ebx, [console.windowStructLoc]
+	mov [ebx+Window_linkedComponent], ecx
 	
 	mov byte [INTERRUPT_DISABLE], 0x00
 	
 call ProgramManager.finalize
 popa
 ret
-WX equ 80*4
-WY equ 80
+WX equ 0
+WY equ 0
 WW equ 500*4
 WH equ 300
 consoletest_mainGrouping :

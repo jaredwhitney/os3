@@ -200,6 +200,10 @@ enter_PM :
 	mov [0xb8000], al
 	cmp al, 0x4a
 	jne stop
+			
+		;	mov dword [s2hopbackcode], s2loadDataToLowMem
+		;	call os.hopToRealMode
+		;	call s2copyDataToHighMem
 	
 	call loadIDT
 	call ps2.init

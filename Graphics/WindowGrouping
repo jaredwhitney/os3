@@ -1,0 +1,85 @@
+WindowGrouping_x			equ 8
+WindowGrouping_y			equ 12
+WindowGrouping_w			equ 16
+WindowGrouping_h			equ 20
+WindowGrouping_mainGrouping	equ 40
+WindowGrouping_titleBar		equ 44
+WindowGrouping_nameString	equ 48
+WindowGrouping_sizeButton	equ 52
+WindowGrouping_closeButton	equ 56
+
+WindowGrouping.Create :	; String title, int x, int y, int w, int h
+	pop dword [WindowGrouping.Create.h]
+	pop dword [WindowGrouping.Create.w]
+	pop dword [WindowGrouping.Create.y]
+	pop dword [WindowGrouping.Create.x]
+	pop dword [WindowGrouping.Create.title]
+	pusha
+
+		mov eax, 0x7
+		mov ebx, ;?
+		call ProgramManager.reserveMemory
+		mov edx, ebx
+		
+			; THIS SHOULD ALL BE IN THE WindowGrouping main NOT ITS OWN GROUPING
+			push dword [WindowGrouping.Create.x]
+			push dword [WindowGrouping.Create.y]
+			mov eax, [WindowGrouping.Create.w]	; should allocate a screen-sized buffer
+			add eax, 8*4
+			push eax
+			mov eax, [WindowGrouping.Create.h]
+			add eax, 20+4+4
+			push eax
+			call Grouping.Create
+			mov [edx+WindowGrouping_window], ecx
+		
+		push dword 4*4
+		push dword 2
+		push dword [WindowGrouping.Create.w]	; buffer should be SCREEN_WIDTH wide
+		push dword 20
+		call Grouping.Create
+		mov [edx+WindowGrouping_titleBar], ecx
+		mov ebx, [edx+WindowGrouping_window]
+		mov eax, ecx
+		call Grouping.Add
+		
+		push dword WindowGrouping.upArrowStr
+		push dword console.checkColor.ret	; really? please don't use this in the future!
+		mov eax, [WindowGrouping.Create.w]
+		sub eax, 22*4
+		push eax
+		push dword 5
+		push dword 10*4
+		push dword 10
+		call Button.Create
+		mov eax, ecx
+		mov ebx, [edx+WindowGrouping_titleBar]
+		call Grouping.Add
+		
+		push dword WindowGrouping.closeStr
+		push dword console.checkColor.ret	; really? please don't use this in the future!
+		mov eax, [WindowGrouping.Create.w]
+		sub eax, 10*4
+		push eax
+		push dword 5
+		push dword 10*4
+		push dword 10
+		call Button.Create
+		mov eax, ecx
+		mov ebx, [edx+WindowGrouping_titleBar]
+		call Grouping.Add
+		
+		push dword 4*4
+		push dword 20+2+2
+		push dword [WindowGrouping.Create.w]	; should allocate a screen-sized buffer!
+		push dword [WindowGrouping.Create.h]
+		call Grouping.Create
+		
+	popa
+	ret
+
+WindowGrouping.Render :
+	pusha
+
+	popa
+	ret
