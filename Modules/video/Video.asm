@@ -263,7 +263,6 @@ Video.imagecopy.loop :
 		movdqu xmm6, [esi+0x60]
 		movdqu xmm7, [esi+0x70]
 		movntdq [edi], xmm0
-		movntdq [edi], xmm0
 		movntdq [edi+0x10], xmm1
 		movntdq [edi+0x20], xmm2
 		movntdq [edi+0x30], xmm3

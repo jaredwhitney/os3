@@ -5,7 +5,7 @@ Grouping_y		equ 12
 Grouping_w		equ 16
 Grouping_h		equ 20
 Grouping_renderFlag	equ 32
-; Grouping should have its own version of nextLinked so nested multiple groupings will be handled properly!
+Grouping_subcomponent	equ 36
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -15,7 +15,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.x]
 	push eax
 	push ebx
-		mov ebx, 36
+		mov ebx, 40
 		call ProgramManager.reserveMemory
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
@@ -52,9 +52,9 @@ Grouping.Create.h :
 	dd 0x0
 Grouping.Add :	; Component in eax, Grouping in ebx
 	pusha
-		mov ecx, [ebx+Component_nextLinked]	; get the head of the list
+		mov ecx, [ebx+Grouping_subcomponent]	; get the head of the list
 		mov [eax+Component_nextLinked], ecx	; new component points to the rest of the list
-		mov [ebx+Component_nextLinked], eax	; Grouping points to the new component
+		mov [ebx+Grouping_subcomponent], eax	; Grouping points to the new component
 		mov ecx, ebx
 		add ecx, Grouping_renderFlag
 		mov [eax+Component_upperRenderFlag], ecx
@@ -63,6 +63,9 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
 	pusha
+		mov ebx, [ebx+Grouping_subcomponent]
+		cmp ebx, eax
+			je Grouping.Remove.foundBefore
 		Grouping.Remove.loop :
 		mov ecx, [ebx+Component_nextLinked]
 		cmp ecx, eax
@@ -80,7 +83,7 @@ Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
 	call Grouping.DoUpdate
 	popa
 	ret
-Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx
+Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [NEEDS TO BE REWORKED TO WORK WITH subcomponent]
 	push eax
 	push ebx
 	push ecx
@@ -112,9 +115,10 @@ Grouping.Render :	; Grouping in ebx
 		cmp dword [edx+Grouping_renderFlag], FALSE
 			je Grouping.Render.ret
 		
+		mov ebx, [ebx+Grouping_subcomponent]
+		
 		Grouping.Render.loop :
 		
-			mov ebx, [ebx+Component_nextLinked]
 			cmp ebx, 0x0
 				je Grouping.Render.ret
 			
@@ -166,6 +170,7 @@ Grouping.Render :	; Grouping in ebx
 			
 			call Image.copyRegion
 			
+			mov ebx, [ebx+Component_nextLinked]
 			jmp Grouping.Render.loop
 		mov dword [edx+Grouping_renderFlag], FALSE
 	Grouping.Render.ret :
@@ -197,13 +202,13 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		mov edx, [Component.mouseEventY]
 		cmp ecx, [ebx+Component_x]
 			jl Grouping.passthroughMouseEvent.nomatch
-		mov eax, [ebx+Component_x]	; is too strict for some reason
+		mov eax, [ebx+Component_x]
 		add eax, [ebx+Component_w]
 		cmp ecx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
 		cmp edx, [ebx+Component_y]
 			jl Grouping.passthroughMouseEvent.nomatch
-		mov eax, [ebx+Component_y]	; is too lenient for some reson
+		mov eax, [ebx+Component_y]
 		add eax, [ebx+Component_h]
 		cmp edx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
