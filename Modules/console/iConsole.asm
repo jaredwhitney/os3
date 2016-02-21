@@ -178,8 +178,40 @@ pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
 
-	call EHCI.printPortCount
+	;call EHCI.printConnectedPorts
+	mov cx, 0x0033
+	call PCI_TABLES.lookupVendorString
+	mov ebx, ecx
+	mov ah, 0xFF
+	call console.println
+	mov cx, 0xE159
+	call PCI_TABLES.lookupVendorString
+	mov ebx, ecx
+	call console.println
+	mov cx, 0x8086
+	call PCI_TABLES.lookupVendorString
+	mov ebx, ecx
+	call console.println
+	mov cx, 0x8087
+	call PCI_TABLES.lookupVendorString
+	mov ebx, ecx
+	call console.println
 	
+;	mov ebx, PCI_VENDOR_LOOPKUP_TABLE
+;	mov ecx, 0x0
+;	asdfasfd:
+;	add ebx, 2
+;	call console.println
+;	mov eax, 0x80
+;	call System.sleep
+;	call String.getLength
+;	add ebx, edx
+;	add ecx, 1
+;	cmp word [ebx], 0xFFFF
+;		jne asdfasfd
+;	mov ebx, ecx
+;	call console.numOut
+;	call console.newline
 	; mov byte [INTERRUPT_DISABLE], 0xFF
 
 	; push dword WX
