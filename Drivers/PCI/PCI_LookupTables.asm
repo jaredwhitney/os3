@@ -3,18 +3,19 @@ push eax
 push ebx
 push edx
 	mov ebx, PCI_VENDOR_LOOPKUP_TABLE
-	
+	xchg cl, ch
 	PCI_TABLES.lookupVendorString.loop :
-	cmp [ebx], ecx
+	cmp word [ebx], cx
 		je PCI_TABLES.lookupVendorString.ret
 	cmp word [ebx], 0xFFFF
 		je PCI_TABLES.lookupVendorString.ret
-	add ebx, 1
+	add ebx, 2
 	call String.getLength
 	add ebx, edx
 	jmp PCI_TABLES.lookupVendorString.loop
 	PCI_TABLES.lookupVendorString.ret :
 	mov ecx, ebx
+	add ecx, 2
 pop edx
 pop ebx
 pop eax
@@ -31,1571 +32,1571 @@ pop eax
 
 ; The following is a modified and formatted derivitive of the list found at http://pcidatabase.com/vendors.php
 PCI_VENDOR_LOOPKUP_TABLE :
-db 0x0033, "Paradyne Corporation", 0
-db 0x003d, "Master", 0
-db 0x0070, "Hauppauge Computer Works Incorporated", 0
-db 0x0100, "USBPDO-8", 0
-db 0x0123, "General Dynamics", 0
-db 0x0315, "SK Electronics Corporation Limited", 0
-db 0x0402, "Acer Aspire One", 0
-db 0x046D, "Logitech Incorporated", 0
-db 0x0483, "UPEK", 0
-db 0x04A9, "Canon", 0
-db 0x04B3, "IBM", 0
-db 0x04D9, "Filco", 0
-db 0x04F2, "Chicony Electronics Co.", 0
-db 0x051D, "ACPI\VEN_INT&DEV_33A0", 0
-db 0x0529, "Aladdin E-Token", 0
-db 0x0553, "Aiptek USA", 0
-db 0x058f, "Alcor Micro Corporation", 0
-db 0x0590, "Omron Corporation", 0
-db 0x05ac, "Apple Incorporated", 0
-db 0x05E1, "D-MAX", 0
-db 0x064e, "SUYIN Corporation", 0
-db 0x067B, "Prolific Technology Incorporated", 0
-db 0x06FE, "Acresso Software Incorporated", 0
-db 0x0711, "SIIG, Incorporated", 0
-db 0x093a, "KYE Systems Corporation / Pixart Imaging", 0
-db 0x096E, "USB Rockey dongle from Feitain", 0
-db 0x0A5C, "Broadcom Corporation", 0
-db 0x0A89, "BREA Technologies Incorporated", 0
-db 0x0A92, "Egosys, Incorporated", 0
-db 0x0AC8, "ASUS", 0
-db 0x0b05, "Toshiba Bluetooth RFBUS, RFCOM, RFHID", 0
-db 0x0c45, "Microdia Limited", 0
-db 0x0cf3, "TP-Link", 0
-db 0x0D2E, "Feedback Instruments Limited", 0
-db 0x0D8C, "C-Media Electronics, Incorporated", 0
-db 0x0DF6, "Sitecom", 0
-db 0x0E11, "Compaq Computer Corporation", 0
-db 0x0E8D, "MediaTek Incorporated", 0
-db 0x1000, "LSI Logic", 0
-db 0x1001, "Kolter Electronic - Germany", 0
-db 0x1002, "Advanced Micro Devices, Incorporated", 0
-db 0x1003, "ULSI", 0
-db 0x1004, "VLSI Technology", 0
-db 0x1006, "Reply Group", 0
-db 0x1007, "Netframe Systems Incorporated", 0
-db 0x1008, "Epson", 0
-db 0x100A, "Ã‚as Limited de Phoenix del Âƒ de TecnologÃƒ", 0
-db 0x100B, "National Semiconductors", 0
-db 0x100C, "Tseng Labs", 0
-db 0x100D, "AST Research", 0
-db 0x100E, "Weitek", 0
-db 0x1010, "Video Logic Limited", 0
-db 0x1011, "Digital Equipment Corporation", 0
-db 0x1012, "Micronics Computers Incorporated", 0
-db 0x1013, "Cirrus Logic", 0
-db 0x1014, "International Business Machines Corporation", 0
-db 0x1016, "Fujitsu ICL Computers", 0
-db 0x1017, "Spea Software AG", 0
-db 0x1018, "Unisys Systems", 0
-db 0x1019, "Elitegroup Computer System", 0
-db 0x101A, "NCR Corporation", 0
-db 0x101B, "Vitesse Semiconductor", 0
-db 0x101E, "American Megatrends Incorporated", 0
-db 0x101F, "PictureTel Corporation", 0
-db 0x1020, "Hitachi Computer Electronics", 0
-db 0x1021, "Oki Electric Industry", 0
-db 0x1022, "Advanced Micro Devices", 0
-db 0x1023, "Trident Mirco", 0
-db 0x1025, "Acer Incorporated", 0
-db 0x1028, "Dell Incorporated", 0
-db 0x102A, "LSI Logic Headland Division", 0
-db 0x102B, "Matrox Electronic Systems Limited", 0
-db 0x102C, "Asiliant (Chips And Technologies)", 0
-db 0x102D, "Wyse Technology", 0
-db 0x102E, "Olivetti Advanced Technology", 0
-db 0x102F, "Toshiba America", 0
-db 0x1030, "TMC Research", 0
-db 0x1031, "Miro Computer Products AG", 0
-db 0x1033, "NEC Electronics", 0
-db 0x1034, "Burndy Corporation", 0
-db 0x1036, "Future Domain", 0
-db 0x1037, "Hitachi Micro Systems Incorporated", 0
-db 0x1038, "AMP Incorporated", 0
-db 0x1039, "Silicon Integrated Systems", 0
-db 0x103A, "Seiko Epson Corporation", 0
-db 0x103B, "Tatung Corporation Of America", 0
-db 0x103C, "Hewlett-Packard", 0
-db 0x103E, "Solliday Engineering", 0
-db 0x103F, "Logic Modeling", 0
-db 0x1041, "Computrend", 0
-db 0x1043, "Asustek Computer Incorporated", 0
-db 0x1044, "Distributed Processing Tech", 0
-db 0x1045, "OPTi Incorporated", 0
-db 0x1046, "IPC Corporation LTD", 0
-db 0x1047, "Genoa Systems Corporation", 0
-db 0x1048, "ELSA GmbH", 0
-db 0x1049, "Fountain Technology", 0
-db 0x104A, "STMicroelectronics", 0
-db 0x104B, "Mylex / Buslogic", 0
-db 0x104C, "Texas Instruments", 0
-db 0x104D, "Sony Corporation", 0
-db 0x104E, "Oak Technology", 0
-db 0x104F, "Co-Time Computer Limited", 0
-db 0x1050, "Winbond Electronics Corporation", 0
-db 0x1051, "Anigma Corporation", 0
-db 0x1053, "Young Micro Systems", 0
-db 0x1054, "Hitachi Limited", 0
-db 0x1055, "Standard Microsystems Corporation", 0
-db 0x1056, "ICL", 0
-db 0x1057, "Motorola", 0
-db 0x1058, "Electronics & Telecommunication Res", 0
-db 0x1059, "Kontron Canada", 0
-db 0x105A, "Promise Technology", 0
-db 0x105B, "Mobham chip", 0
-db 0x105C, "Wipro Infotech Limited", 0
-db 0x105D, "Number Nine Visual Technology", 0
-db 0x105E, "Vtech Engineering Canada Limited", 0
-db 0x105F, "Infotronic America Incorporated", 0
-db 0x1060, "United Microelectronics", 0
-db 0x1061, "8x8 Incorporated", 0
-db 0x1062, "Maspar Computer Corporation", 0
-db 0x1063, "Ocean Office Automation", 0
-db 0x1064, "Alcatel Cit", 0
-db 0x1065, "Texas Microsystems", 0
-db 0x1066, "Picopower Technology", 0
-db 0x1067, "Mitsubishi Electronics", 0
-db 0x1068, "Diversified Technology", 0
-db 0x106A, "Aten Research Incorporated", 0
-db 0x106B, "Apple Incorporated", 0
-db 0x106C, "Hyundai Electronics America", 0
-db 0x106D, "Sequent Computer Systems", 0
-db 0x106E, "DFI Incorporated", 0
-db 0x106F, "City Gate Development LTD", 0
-db 0x1070, "Daewoo Telecom Limited", 0
-db 0x1071, "Mitac", 0
-db 0x1072, "GIT Co. Limited", 0
-db 0x1073, "Yamaha Corporation", 0
-db 0x1074, "Nexgen Microsystems", 0
-db 0x1075, "Advanced Integration Research", 0
-db 0x1077, "QLogic Corporation", 0
-db 0x1078, "Cyrix Corporation", 0
-db 0x1079, "I-Bus", 0
-db 0x107A, "Networth controls", 0
-db 0x107B, "Gateway 2000", 0
-db 0x107C, "Goldstar Co. Limited", 0
-db 0x107D, "Leadtek Research", 0
-db 0x107E, "Testernec", 0
-db 0x107F, "Data Technology Corporation", 0
-db 0x1080, "Cypress Semiconductor", 0
-db 0x1081, "Radius Incorporated", 0
-db 0x1082, "EFA Corporation Of America", 0
-db 0x1083, "Forex Computer Corporation", 0
-db 0x1084, "Parador", 0
-db 0x1085, "Tulip Computers Int'l BV", 0
-db 0x1086, "J. Bond Computer Systems", 0
-db 0x1087, "Cache Computer", 0
-db 0x1088, "Microcomputer Systems (M) Son", 0
-db 0x1089, "Data General Corporation", 0
-db 0x108A, "SBS Operations", 0
-db 0x108C, "Oakleigh Systems Incorporated", 0
-db 0x108D, "Olicom", 0
-db 0x108E, "Sun Microsystems", 0
-db 0x108F, "Systemsoft Corporation", 0
-db 0x1090, "Encore Computer Corporation", 0
-db 0x1091, "Intergraph Corporation", 0
-db 0x1092, "Diamond Computer Systems", 0
-db 0x1093, "National Instruments", 0
-db 0x1094, "Apostolos", 0
-db 0x1095, "Silicon Image, Incorporated", 0
-db 0x1096, "Alacron", 0
-db 0x1097, "Appian Graphics", 0
-db 0x1098, "Quantum Designs Limited", 0
-db 0x1099, "Samsung Electronics Co. Limited", 0
-db 0x109A, "Packard Bell", 0
-db 0x109B, "Gemlight Computer Limited", 0
-db 0x109C, "Megachips Corporation", 0
-db 0x109D, "Zida Technologies Limited", 0
-db 0x109E, "Brooktree Corporation", 0
-db 0x109F, "Trigem Computer Incorporated", 0
-db 0x10A0, "Meidensha Corporation", 0
-db 0x10A1, "Juko Electronics Incorporated Limited", 0
-db 0x10A2, "Quantum Corporation", 0
-db 0x10A3, "Everex Systems Incorporated", 0
-db 0x10A4, "Globe Manufacturing Sales", 0
-db 0x10A5, "Racal Interlan", 0
-db 0x10A8, "Sierra Semiconductor", 0
-db 0x10A9, "Silicon Graphics", 0
-db 0x10AB, "Digicom", 0
-db 0x10AC, "Honeywell IASD", 0
-db 0x10AD, "Winbond Systems Labs", 0
-db 0x10AE, "Cornerstone Technology", 0
-db 0x10AF, "Micro Computer Systems Incorporated", 0
-db 0x10B0, "Gainward GmbH", 0
-db 0x10B1, "Cabletron Systems Incorporated", 0
-db 0x10B2, "Raytheon Company", 0
-db 0x10B3, "Databook Incorporated", 0
-db 0x10B4, "STB Systems", 0
-db 0x10B5, "PLX Technology Incorporated", 0
-db 0x10B6, "Madge Networks", 0
-db 0x10B7, "3Com Corporation", 0
-db 0x10B8, "Standard Microsystems Corporation", 0
-db 0x10B9, "Ali Corporation", 0
-db 0x10BA, "Mitsubishi Electronics Corporation", 0
-db 0x10BB, "Dapha Electronics Corporation", 0
-db 0x10BC, "Advanced Logic Research Incorporated", 0
-db 0x10BD, "Surecom Technology", 0
-db 0x10BE, "Tsenglabs International Corporation", 0
-db 0x10BF, "MOST Corporation", 0
-db 0x10C0, "Boca Research Incorporated", 0
-db 0x10C1, "ICM Corporation Limited", 0
-db 0x10C2, "Auspex Systems Incorporated", 0
-db 0x10C3, "Samsung Semiconductors", 0
-db 0x10C4, "Award Software Int'l Incorporated", 0
-db 0x10C5, "Xerox Corporation", 0
-db 0x10C6, "Rambus Incorporated", 0
-db 0x10C8, "Neomagic Corporation", 0
-db 0x10C9, "Dataexpert Corporation", 0
-db 0x10CA, "Fujitsu Siemens", 0
-db 0x10CB, "Omron Corporation", 0
-db 0x10CD, "Advanced System Products", 0
-db 0x10CF, "Fujitsu Limited", 0
-db 0x10D1, "Future+ Systems", 0
-db 0x10D2, "Molex Incorporated", 0
-db 0x10D3, "Jabil Circuit Incorporated", 0
-db 0x10D4, "Hualon Microelectronics", 0
-db 0x10D5, "Autologic Incorporated", 0
-db 0x10D6, "Wilson .co .ltd", 0
-db 0x10D7, "BCM Advanced Research", 0
-db 0x10D8, "Advanced Peripherals Labs", 0
-db 0x10D9, "Macronix International Co. Limited", 0
-db 0x10DB, "Rohm Research", 0
-db 0x10DC, "CERN-European Lab. for Particle Physics", 0
-db 0x10DD, "Evans & Sutherland", 0
-db 0x10DE, "NVIDIA", 0
-db 0x10DF, "Emulex Corporation", 0
-db 0x10E1, "Tekram Technology Corporation Limited", 0
-db 0x10E2, "Aptix Corporation", 0
-db 0x10E3, "Tundra Semiconductor Corporation", 0
-db 0x10E4, "Tandem Computers", 0
-db 0x10E5, "Micro Industries Corporation", 0
-db 0x10E6, "Gainbery Computer Products Incorporated", 0
-db 0x10E7, "Vadem", 0
-db 0x10E8, "Applied Micro Circuits Corporation", 0
-db 0x10E9, "Alps Electronic Corporation Limited", 0
-db 0x10EA, "Tvia, Incorporated", 0
-db 0x10EB, "Artist Graphics", 0
-db 0x10EC, "Realtek Semiconductor Corporation", 0
-db 0x10ED, "Ascii Corporation", 0
-db 0x10EE, "Xilinx Corporation", 0
-db 0x10EF, "Racore Computer Products", 0
-db 0x10F0, "Curtiss-Wright Controls Embedded Computing", 0
-db 0x10F1, "Tyan Computer", 0
-db 0x10F2, "Achme Computer Incorporated - GONE !!!!", 0
-db 0x10F3, "Alaris Incorporated", 0
-db 0x10F4, "S-Mos Systems", 0
-db 0x10F5, "NKK Corporation", 0
-db 0x10F6, "Creative Electronic Systems SA", 0
-db 0x10F7, "Matsushita Electric Industrial Corporation", 0
-db 0x10F8, "Altos India Limited", 0
-db 0x10F9, "PC Direct", 0
-db 0x10FA, "Truevision", 0
-db 0x10FB, "Thesys Microelectronic's", 0
-db 0x10FC, "I-O Data Device Incorporated", 0
-db 0x10FD, "Soyo Technology Corporation Limited", 0
-db 0x10FE, "Fast Electronic GmbH", 0
-db 0x10FF, "Ncube", 0
-db 0x1100, "Jazz Multimedia", 0
-db 0x1101, "Initio Corporation", 0
-db 0x1102, "Creative Technology LTD.", 0
-db 0x1103, "HighPoint Technologies, Incorporated", 0
-db 0x1104, "Rasterops", 0
-db 0x1105, "Sigma Designs Incorporated", 0
-db 0x1106, "VIA Technologies, Incorporated", 0
-db 0x1107, "Stratus Computer", 0
-db 0x1108, "Proteon Incorporated", 0
-db 0x1109, "Adaptec/Cogent Data Technologies", 0
-db 0x110A, "Siemens AG", 0
-db 0x110B, "Chromatic Research Incorporated", 0
-db 0x110C, "Mini-Max Technology Incorporated", 0
-db 0x110D, "ZNYX Corporation", 0
-db 0x110E, "CPU Technology", 0
-db 0x110F, "Ross Technology", 0
-db 0x1112, "Osicom Technologies Incorporated", 0
-db 0x1113, "Accton Technology Corporation", 0
-db 0x1114, "Atmel Corporation", 0
-db 0x1116, "Data Translation, Incorporated", 0
-db 0x1117, "Datacube Incorporated", 0
-db 0x1118, "Berg Electronics", 0
-db 0x1119, "ICP vortex Computersysteme GmbH", 0
-db 0x111A, "Efficent Networks", 0
-db 0x111C, "Tricord Systems Incorporated", 0
-db 0x111D, "Integrated Device Technology Incorporated", 0
-db 0x111F, "Precision Digital Images", 0
-db 0x1120, "EMC Corporation", 0
-db 0x1121, "Zilog", 0
-db 0x1123, "Excellent Design Incorporated", 0
-db 0x1124, "Leutron Vision AG", 0
-db 0x1125, "Eurocore/Vigra", 0
-db 0x1127, "FORE Systems", 0
-db 0x1129, "Firmworks", 0
-db 0x112A, "Hermes Electronics Co. Limited", 0
-db 0x112C, "Zenith Data Systems", 0
-db 0x112D, "Ravicad", 0
-db 0x112E, "Infomedia", 0
-db 0x1130, "Computervision", 0
-db 0x1131, "NXP Semiconductors N.V.", 0
-db 0x1132, "Mitel Corporation", 0
-db 0x1133, "Eicon Networks Corporation", 0
-db 0x1134, "Mercury Computer Systems Incorporated", 0
-db 0x1135, "Fuji Xerox Co Limited", 0
-db 0x1136, "Momentum Data Systems", 0
-db 0x1137, "Cisco Systems Incorporated", 0
-db 0x1138, "Ziatech Corporation", 0
-db 0x1139, "Dynamic Pictures Incorporated", 0
-db 0x113A, "FWB Incorporated", 0
-db 0x113B, "Network Computing Devices", 0
-db 0x113C, "Cyclone Microsystems Incorporated", 0
-db 0x113D, "Leading Edge Products Incorporated", 0
-db 0x113E, "Sanyo Electric Co", 0
-db 0x113F, "Equinox Systems", 0
-db 0x1140, "Intervoice Incorporated", 0
-db 0x1141, "Crest Microsystem Incorporated", 0
-db 0x1142, "Alliance Semiconductor", 0
-db 0x1143, "Netpower Incorporated", 0
-db 0x1144, "Cincinnati Milacron", 0
-db 0x1145, "Workbit Corporation", 0
-db 0x1146, "Force Computers", 0
-db 0x1147, "Interface Corporation", 0
-db 0x1148, "Marvell Semiconductor Germany GmbH", 0
-db 0x1149, "Win System Corporation", 0
-db 0x114A, "VMIC", 0
-db 0x114B, "Canopus corporation", 0
-db 0x114C, "Annabooks", 0
-db 0x114D, "IC Corporation", 0
-db 0x114E, "Nikon Systems Incorporated", 0
-db 0x114F, "Digi International", 0
-db 0x1150, "Thinking Machines Corporation", 0
-db 0x1151, "JAE Electronics Incorporated", 0
-db 0x1153, "Land Win Electronic Corporation", 0
-db 0x1154, "Melco Incorporated", 0
-db 0x1155, "Pine Technology Limited", 0
-db 0x1156, "Periscope Engineering", 0
-db 0x1157, "Avsys Corporation", 0
-db 0x1158, "Voarx R&D Incorporated", 0
-db 0x1159, "Mutech", 0
-db 0x115A, "Harlequin Limited", 0
-db 0x115B, "Parallax Graphics", 0
-db 0x115C, "Photron Limited", 0
-db 0x115D, "Xircom", 0
-db 0x115E, "Peer Protocols Incorporated", 0
-db 0x115F, "Maxtor Corporation", 0
-db 0x1160, "Megasoft Incorporated", 0
-db 0x1161, "PFU Limited", 0
-db 0x1162, "OA Laboratory Co Limited", 0
-db 0x1163, "mohamed alsherif", 0
-db 0x1164, "Advanced Peripherals Tech", 0
-db 0x1165, "Imagraph Corporation", 0
-db 0x1166, "Broadcom / ServerWorks", 0
-db 0x1167, "Mutoh Industries Incorporated", 0
-db 0x1168, "Thine Electronics Incorporated", 0
-db 0x1169, "Centre f/Dev. of Adv. Computing", 0
-db 0x116A, "Luminex Software, Incorporated", 0
-db 0x116B, "Connectware Incorporated", 0
-db 0x116C, "Intelligent Resources", 0
-db 0x116E, "Electronics for Imaging", 0
-db 0x1170, "Inventec Corporation", 0
-db 0x1172, "Altera Corporation", 0
-db 0x1173, "Adobe Systems", 0
-db 0x1174, "Bridgeport Machines", 0
-db 0x1175, "Mitron Computer Incorporated", 0
-db 0x1176, "SBE", 0
-db 0x1177, "Silicon Engineering", 0
-db 0x1178, "Alfa Incorporated", 0
-db 0x1179, "Toshiba corporation", 0
-db 0x117A, "A-Trend Technology", 0
-db 0x117B, "LG (Lucky Goldstar) Electronics Incorporated", 0
-db 0x117C, "Atto Technology", 0
-db 0x117D, "Becton & Dickinson", 0
-db 0x117E, "T/R Systems", 0
-db 0x117F, "Integrated Circuit Systems", 0
-db 0x1180, "RicohCompany,Limited", 0
-db 0x1183, "Fujikura Limited", 0
-db 0x1184, "Forks Incorporated", 0
-db 0x1185, "Dataworld", 0
-db 0x1186, "D-Link System Incorporated", 0
-db 0x1187, "Philips Healthcare", 0
-db 0x1188, "Shima Seiki Manufacturing Limited", 0
-db 0x1189, "Matsushita Electronics", 0
-db 0x118A, "Hilevel Technology", 0
-db 0x118B, "Hypertec Pty Limited", 0
-db 0x118C, "Corollary Incorporated", 0
-db 0x118D, "BitFlow Incorporated", 0
-db 0x118E, "Hermstedt AG", 0
-db 0x118F, "Green Logic", 0
-db 0x1190, "Tripace", 0
-db 0x1191, "Acard Technology Corporation", 0
-db 0x1192, "Densan Co. Limited", 0
-db 0x1194, "Toucan Technology", 0
-db 0x1195, "Ratoc System Incorporated", 0
-db 0x1196, "Hytec Electronics Limited", 0
-db 0x1197, "Gage Applied Technologies", 0
-db 0x1198, "Lambda Systems Incorporated", 0
-db 0x1199, "Attachmate Corporation", 0
-db 0x119A, "Mind/Share Incorporated", 0
-db 0x119B, "Omega Micro Incorporated", 0
-db 0x119C, "Information Technology Inst.", 0
-db 0x119D, "Bug Sapporo Japan", 0
-db 0x119E, "Fujitsu Microelectronics Limited", 0
-db 0x119F, "Bull Hn Information Systems", 0
-db 0x11A1, "Hamamatsu Photonics K.K.", 0
-db 0x11A2, "Sierra Research and Technology", 0
-db 0x11A3, "Deuretzbacher GmbH & Co. Eng. KG", 0
-db 0x11A4, "Barco", 0
-db 0x11A5, "MicroUnity Systems Engineering Incorporated", 0
-db 0x11A6, "Pure Data", 0
-db 0x11A7, "Power Computing Corporation", 0
-db 0x11A8, "Systech Corporation", 0
-db 0x11A9, "InnoSys Incorporated", 0
-db 0x11AA, "Actel", 0
-db 0x11AB, "Marvell Semiconductor", 0
-db 0x11AC, "Canon Information Systems", 0
-db 0x11AD, "Lite-On Technology Corporation", 0
-db 0x11AE, "Scitex Corporation Limited", 0
-db 0x11AF, "Avid Technology, Incorporated", 0
-db 0x11B0, "Quicklogic Corporation", 0
-db 0x11B1, "Apricot Computers", 0
-db 0x11B2, "Eastman Kodak", 0
-db 0x11B3, "Barr Systems Incorporated", 0
-db 0x11B4, "Leitch Technology International", 0
-db 0x11B5, "Radstone Technology Limited", 0
-db 0x11B6, "United Video Corporation", 0
-db 0x11B7, "Motorola", 0
-db 0x11B8, "Xpoint Technologies Incorporated", 0
-db 0x11B9, "Pathlight Technology Incorporated", 0
-db 0x11BA, "Videotron Corporation", 0
-db 0x11BB, "Pyramid Technology", 0
-db 0x11BC, "Network Peripherals Incorporated", 0
-db 0x11BD, "Pinnacle system", 0
-db 0x11BE, "International Microcircuits Incorporated", 0
-db 0x11BF, "Astrodesign Incorporated", 0
-db 0x11C1, "LSI Corporation", 0
-db 0x11C2, "Sand Microelectronics", 0
-db 0x11C4, "Document Technologies Ind.", 0
-db 0x11C5, "Shiva Corporationoratin", 0
-db 0x11C6, "Dainippon Screen Mfg. Co", 0
-db 0x11C7, "D.C.M. Data Systems", 0
-db 0x11C8, "Dolphin Interconnect Solutions", 0
-db 0x11C9, "MAGMA", 0
-db 0x11CA, "LSI Systems Incorporated", 0
-db 0x11CB, "Specialix International Limited", 0
-db 0x11CC, "Michels & Kleberhoff Computer GmbH", 0
-db 0x11CD, "HAL Computer Systems Incorporated", 0
-db 0x11CE, "Primary Rate Incorporated", 0
-db 0x11CF, "Pioneer Electronic Corporation", 0
-db 0x11D0, "BAE SYSTEMS - Manassas", 0
-db 0x11D1, "AuraVision Corporation", 0
-db 0x11D2, "Intercom Incorporated", 0
-db 0x11D3, "Trancell Systems Incorporated", 0
-db 0x11D4, "Analog Devices, Incorporated", 0
-db 0x11D5, "Tahoma Technology", 0
-db 0x11D6, "Tekelec Technologies", 0
-db 0x11D7, "TRENTON Technology, Incorporated", 0
-db 0x11D8, "Image Technologies Development", 0
-db 0x11D9, "Tec Corporation", 0
-db 0x11DA, "Novell", 0
-db 0x11DB, "Sega Enterprises Limited", 0
-db 0x11DC, "Questra Corporation", 0
-db 0x11DD, "Crosfield Electronics Limited", 0
-db 0x11DE, "Zoran Corporation", 0
-db 0x11E1, "Gec Plessey Semi Incorporated", 0
-db 0x11E2, "Samsung Information Systems America", 0
-db 0x11E3, "Quicklogic Corporation", 0
-db 0x11E4, "Second Wave Incorporated", 0
-db 0x11E5, "IIX Consulting", 0
-db 0x11E6, "Mitsui-Zosen System Research", 0
-db 0x11E8, "Digital Processing Systems Incorporated", 0
-db 0x11E9, "Highwater Designs Limited", 0
-db 0x11EA, "Elsag Bailey", 0
-db 0x11EB, "Formation, Incorporated", 0
-db 0x11EC, "Coreco Incorporated", 0
-db 0x11ED, "Mediamatics", 0
-db 0x11EE, "Dome Imaging Systems Incorporated", 0
-db 0x11EF, "Nicolet Technologies BV", 0
-db 0x11F0, "Triya", 0
-db 0x11F2, "Picture Tel Japan KK", 0
-db 0x11F3, "Keithley Instruments, Incorporated", 0
-db 0x11F4, "Kinetic Systems Corporation", 0
-db 0x11F5, "Computing Devices Intl", 0
-db 0x11F6, "Powermatic Data Systems Limited", 0
-db 0x11F7, "Scientific Atlanta", 0
-db 0x11F8, "PMC-Sierra Incorporated", 0
-db 0x11F9, "I-Cube Incorporated", 0
-db 0x11FA, "Kasan Electronics Co Limited", 0
-db 0x11FB, "Datel Incorporated", 0
-db 0x11FD, "High Street Consultants", 0
-db 0x11FE, "Comtrol Corporation", 0
-db 0x11FF, "Scion Corporation", 0
-db 0x1200, "CSS Corporation", 0
-db 0x1201, "Vista Controls Corporation", 0
-db 0x1202, "Network General Corporation", 0
-db 0x1203, "Bayer Corporation Agfa Div", 0
-db 0x1204, "Lattice Semiconductor Corporation", 0
-db 0x1205, "Array Corporation", 0
-db 0x1206, "Amdahl Corporation", 0
-db 0x1208, "Parsytec GmbH", 0
-db 0x1209, "Sci Systems Incorporated", 0
-db 0x120A, "Synaptel", 0
-db 0x120B, "Adaptive Solutions", 0
-db 0x120D, "Compression Labs Incorporated", 0
-db 0x120E, "Cyclades Corporation", 0
-db 0x120F, "Essential Communications", 0
-db 0x1210, "Hyperparallel Technologies", 0
-db 0x1211, "Braintech Incorporated", 0
-db 0x1213, "Applied Intelligent Systems Incorporated", 0
-db 0x1214, "Performance Technologies Incorporated", 0
-db 0x1215, "Interware Co Limited", 0
-db 0x1216, "Purup-Eskofot A/S", 0
-db 0x1217, "O2Micro Incorporated", 0
-db 0x1218, "Hybricon Corporation", 0
-db 0x1219, "First Virtual Corporation", 0
-db 0x121A, "3dfx Interactive Incorporated", 0
-db 0x121B, "Advanced Telecommunications Modules", 0
-db 0x121C, "Nippon Texa Co Limited", 0
-db 0x121D, "LiPPERT Embedded Computers GmbH", 0
-db 0x121E, "CSPI", 0
-db 0x121F, "Arcus Technology Incorporated", 0
-db 0x1220, "Ariel Corporation", 0
-db 0x1221, "Contec Microelectronics Europe BV", 0
-db 0x1222, "Ancor Communications Incorporated", 0
-db 0x1223, "Artesyn Embedded Technologies", 0
-db 0x1224, "Interactive Images", 0
-db 0x1225, "Power I/O Incorporated", 0
-db 0x1227, "Tech-Source", 0
-db 0x1228, "Norsk Elektro Optikk A/S", 0
-db 0x1229, "Data Kinesis Incorporated", 0
-db 0x122A, "Integrated Telecom", 0
-db 0x122B, "LG Industrial Systems Co. Limited", 0
-db 0x122C, "sci-worx GmbH", 0
-db 0x122D, "Aztech System Limited", 0
-db 0x122E, "Absolute Analysis", 0
-db 0x122F, "Andrew Corporation", 0
-db 0x1230, "Fishcamp Engineering", 0
-db 0x1231, "Woodward McCoach Incorporated", 0
-db 0x1233, "Bus-Tech Incorporated", 0
-db 0x1234, "Technical Corporation", 0
-db 0x1236, "Sigma Designs Incorporated", 0
-db 0x1237, "Alta Technology Corporation", 0
-db 0x1238, "Adtran", 0
-db 0x1239, "The 3DO Company", 0
-db 0x123A, "Visicom Laboratories Incorporated", 0
-db 0x123B, "Seeq Technology Incorporated", 0
-db 0x123C, "Century Systems Incorporated", 0
-db 0x123D, "Engineering Design Team Incorporated", 0
-db 0x123F, "C-Cube Microsystems", 0
-db 0x1240, "Marathon Technologies Corporation", 0
-db 0x1241, "DSC Communications", 0
-db 0x1242, "JNI Corporation", 0
-db 0x1243, "Delphax", 0
-db 0x1244, "AVM AUDIOVISUELLES MKTG & Computer GmbH", 0
-db 0x1245, "APD S.A.", 0
-db 0x1246, "Dipix Technologies Incorporated", 0
-db 0x1247, "Xylon Research Incorporated", 0
-db 0x1248, "Central Data Corporation", 0
-db 0x1249, "Samsung Electronics Co. Limited", 0
-db 0x124A, "AEG Electrocom GmbH", 0
-db 0x124C, "Solitron Technologies Incorporated", 0
-db 0x124D, "Stallion Technologies", 0
-db 0x124E, "Cylink", 0
-db 0x124F, "Infortrend Technology Incorporated", 0
-db 0x1250, "Hitachi Microcomputer System Limited", 0
-db 0x1251, "VLSI Solution OY", 0
-db 0x1253, "Guzik Technical Enterprises", 0
-db 0x1254, "Linear Systems Limited", 0
-db 0x1255, "Optibase Limited", 0
-db 0x1256, "Perceptive Solutions Incorporated", 0
-db 0x1257, "Vertex Networks Incorporated", 0
-db 0x1258, "Gilbarco Incorporated", 0
-db 0x1259, "Allied Telesyn International", 0
-db 0x125A, "ABB Power Systems", 0
-db 0x125B, "Asix Electronics Corporation", 0
-db 0x125C, "Aurora Technologies Incorporated", 0
-db 0x125D, "ESS Technology", 0
-db 0x125E, "Specialvideo Engineering SRL", 0
-db 0x125F, "Concurrent Technologies Incorporated", 0
-db 0x1260, "Intersil Corporation", 0
-db 0x1261, "Matsushita-Kotobuki Electronics Indu", 0
-db 0x1262, "ES Computer Co. Limited", 0
-db 0x1263, "Sonic Solutions", 0
-db 0x1264, "Aval Nagasaki Corporation", 0
-db 0x1265, "Casio Computer Co. Limited", 0
-db 0x1266, "Microdyne Corporation", 0
-db 0x1267, "S.A. Telecommunications", 0
-db 0x1268, "Tektronix", 0
-db 0x1269, "Thomson-CSF/TTM", 0
-db 0x126A, "Lexmark International Incorporated", 0
-db 0x126B, "Adax Incorporated", 0
-db 0x126C, "Nortel Networks Corporation", 0
-db 0x126D, "Splash Technology Incorporated", 0
-db 0x126E, "Sumitomo Metal Industries Limited", 0
-db 0x126F, "Silicon Motion", 0
-db 0x1270, "Olympus Optical Co. Limited", 0
-db 0x1271, "GW Instruments", 0
-db 0x1272, "themrtaish", 0
-db 0x1273, "Hughes Network Systems", 0
-db 0x1274, "Ensoniq", 0
-db 0x1275, "Network Appliance", 0
-db 0x1276, "Switched Network Technologies Incorporated", 0
-db 0x1277, "Comstream", 0
-db 0x1278, "Transtech Parallel Systems", 0
-db 0x1279, "Transmeta Corporation", 0
-db 0x127B, "Pixera Corporation", 0
-db 0x127C, "Crosspoint Solutions Incorporated", 0
-db 0x127D, "Vela Research LP", 0
-db 0x127E, "Winnov L.P.", 0
-db 0x127F, "Fujifilm", 0
-db 0x1280, "Photoscript Group Limited", 0
-db 0x1281, "Yokogawa Electronic Corporation", 0
-db 0x1282, "Davicom Semiconductor Incorporated", 0
-db 0x1283, "Waldo", 0
-db 0x1285, "Platform Technologies Incorporated", 0
-db 0x1286, "MAZeT GmbH", 0
-db 0x1287, "LuxSonor Incorporated", 0
-db 0x1288, "Timestep Corporation", 0
-db 0x1289, "AVC Technology Incorporated", 0
-db 0x128A, "Asante Technologies Incorporated", 0
-db 0x128B, "Transwitch Corporation", 0
-db 0x128C, "Retix Corporation", 0
-db 0x128D, "G2 Networks Incorporated", 0
-db 0x128F, "Tateno Dennou Incorporated", 0
-db 0x1290, "Sord Computer Corporation", 0
-db 0x1291, "NCS Computer Italia", 0
-db 0x1292, "Tritech Microelectronics Intl PTE", 0
-db 0x1293, "Media Reality Technology", 0
-db 0x1294, "Rhetorex Incorporated", 0
-db 0x1295, "Imagenation Corporation", 0
-db 0x1296, "Kofax Image Products", 0
-db 0x1297, "Shuttle Computer", 0
-db 0x1298, "Spellcaster Telecommunications Incorporated", 0
-db 0x1299, "Knowledge Technology Laboratories", 0
-db 0x129A, "Curtiss Wright Controls Electronic Systems", 0
-db 0x129B, "Image Access", 0
-db 0x129D, "CompCore Multimedia Incorporated", 0
-db 0x129E, "Victor Co. of Japan Limited", 0
-db 0x129F, "OEC Medical Systems Incorporated", 0
-db 0x12A0, "Allen Bradley Co.", 0
-db 0x12A1, "Simpact Incorporated", 0
-db 0x12A2, "NewGen Systems Corporation", 0
-db 0x12A3, "Lucent Technologies AMR", 0
-db 0x12A4, "NTT Electronics Corporation", 0
-db 0x12A5, "Vision Dynamics Limited", 0
-db 0x12A6, "Scalable Networks Incorporated", 0
-db 0x12A7, "AMO GmbH", 0
-db 0x12A8, "News Datacom", 0
-db 0x12A9, "Xiotech Corporation", 0
-db 0x12AA, "SDL Communications Incorporated", 0
-db 0x12AB, "Yuan Yuan Enterprise Co. Limited", 0
-db 0x12AC, "MeasureX Corporation", 0
-db 0x12AD, "MULTIDATA GmbH", 0
-db 0x12AE, "Alteon Networks Incorporated", 0
-db 0x12AF, "TDK USA Corporation", 0
-db 0x12B0, "Jorge Scientific Corporation", 0
-db 0x12B1, "GammaLink", 0
-db 0x12B2, "General Signal Networks", 0
-db 0x12B3, "Interface Corporation Limited", 0
-db 0x12B4, "Future Tel Incorporated", 0
-db 0x12B5, "Granite Systems Incorporated", 0
-db 0x12B7, "Acumen", 0
-db 0x12B8, "Korg", 0
-db 0x12B9, "3Com Corporation", 0
-db 0x12BA, "Bittware Incorporated", 0
-db 0x12BB, "Nippon Unisoft Corporation", 0
-db 0x12BC, "Array Microsystems", 0
-db 0x12BD, "Computerm Corporation", 0
-db 0x12BF, "Fujifilm Microdevices", 0
-db 0x12C0, "Infimed", 0
-db 0x12C1, "GMM Research Corporation", 0
-db 0x12C2, "Mentec Limited", 0
-db 0x12C3, "Holtek Microelectronics Incorporated", 0
-db 0x12C4, "Connect Tech Incorporated", 0
-db 0x12C5, "Picture Elements Incorporated", 0
-db 0x12C6, "Mitani Corporation", 0
-db 0x12C7, "Dialogic Corporation", 0
-db 0x12C8, "G Force Co. Limited", 0
-db 0x12C9, "Gigi Operations", 0
-db 0x12CA, "Integrated Computing Engines, Incorporated", 0
-db 0x12CB, "Antex Electronics Corporation", 0
-db 0x12CC, "Pluto Technologies International", 0
-db 0x12CD, "Aims Lab", 0
-db 0x12CE, "Netspeed Incorporated", 0
-db 0x12CF, "Prophet Systems Incorporated", 0
-db 0x12D0, "GDE Systems Incorporated", 0
-db 0x12D1, "Huawei Technologies Co., Limited", 0
-db 0x12D3, "Vingmed Sound A/S", 0
-db 0x12D4, "Ulticom, Incorporated", 0
-db 0x12D5, "Equator Technologies", 0
-db 0x12D6, "Analogic Corporation", 0
-db 0x12D7, "Biotronic SRL", 0
-db 0x12D8, "Pericom Semiconductor", 0
-db 0x12D9, "Aculab Plc.", 0
-db 0x12DA, "TrueTime", 0
-db 0x12DB, "Annapolis Micro Systems Incorporated", 0
-db 0x12DC, "Symicron Computer Communication Limited", 0
-db 0x12DD, "Management Graphics Incorporated", 0
-db 0x12DE, "Rainbow Technologies", 0
-db 0x12DF, "SBS Technologies Incorporated", 0
-db 0x12E0, "Chase Research PLC", 0
-db 0x12E1, "Nintendo Co. Limited", 0
-db 0x12E2, "Datum Incorporated Bancomm-Timing Division", 0
-db 0x12E3, "Imation Corporation - Medical Imaging Syst", 0
-db 0x12E4, "Brooktrout Technology Incorporated", 0
-db 0x12E6, "Cirel Systems", 0
-db 0x12E7, "Sebring Systems Incorporated", 0
-db 0x12E8, "CRISC Corporation", 0
-db 0x12E9, "GE Spacenet", 0
-db 0x12EB, "Aureal Semiconductor", 0
-db 0x12EC, "3A International Incorporated", 0
-db 0x12ED, "Optivision Incorporated", 0
-db 0x12EE, "Orange Micro, Incorporated", 0
-db 0x12EF, "Vienna Systems", 0
-db 0x12F0, "Pentek", 0
-db 0x12F1, "Sorenson Vision Incorporated", 0
-db 0x12F2, "Gammagraphx Incorporated", 0
-db 0x12F4, "Megatel", 0
-db 0x12F5, "Forks", 0
-db 0x12F7, "Cognex", 0
-db 0x12F8, "Electronic-Design GmbH", 0
-db 0x12F9, "FourFold Technologies", 0
-db 0x12FB, "Spectrum Signal Processing", 0
-db 0x12FC, "Capital Equipment Corporation", 0
-db 0x12FE, "esd Electronic System Design GmbH", 0
-db 0x1303, "Innovative Integration", 0
-db 0x1304, "Juniper Networks Incorporated", 0
-db 0x1307, "ComputerBoards", 0
-db 0x1308, "Jato Technologies Incorporated", 0
-db 0x130A, "Mitsubishi Electric Microcomputer", 0
-db 0x130B, "Colorgraphic Communications Corporation", 0
-db 0x130F, "Advanet Incorporated", 0
-db 0x1310, "Gespac", 0
-db 0x1312, "Microscan Systems Incorporated", 0
-db 0x1313, "Yaskawa Electric Co.", 0
-db 0x1316, "Teradyne Incorporated", 0
-db 0x1317, "ADMtek Incorporated", 0
-db 0x1318, "Packet Engines, Incorporated", 0
-db 0x1319, "Forte Media", 0
-db 0x131F, "SIIG", 0
-db 0x1325, "austriamicrosystems", 0
-db 0x1326, "Seachange International", 0
-db 0x1328, "CIFELLI SYSTEMS CORPORATION", 0
-db 0x1331, "RadiSys Corporation", 0
-db 0x1332, "Curtiss-Wright Controls Embedded Computing", 0
-db 0x1335, "Videomail Incorporated", 0
-db 0x133D, "Prisa Networks", 0
-db 0x133F, "SCM Microsystems", 0
-db 0x1342, "Promax Systems Incorporated", 0
-db 0x1344, "Micron Technology, Incorporated", 0
-db 0x1347, "Spectracom Corporation", 0
-db 0x134A, "DTC Technology Corporation", 0
-db 0x134B, "ARK Research Corporation", 0
-db 0x134C, "Chori Joho System Co. Limited", 0
-db 0x134D, "PCTEL Incorporated", 0
-db 0x135A, "Brain Boxes Limited", 0
-db 0x135B, "Giganet Incorporated", 0
-db 0x135C, "Quatech Incorporated", 0
-db 0x135D, "ABB Network Partner AB", 0
-db 0x135E, "Sealevel Systems Incorporated", 0
-db 0x135F, "I-Data International A-S", 0
-db 0x1360, "Meinberg Funkuhren GmbH & Co. KG", 0
-db 0x1361, "Soliton Systems K.K.", 0
-db 0x1363, "Phoenix Technologies Limited", 0
-db 0x1365, "Hypercope Corporation", 0
-db 0x1366, "Teijin Seiki Co. Limited", 0
-db 0x1367, "Hitachi Zosen Corporation", 0
-db 0x1368, "Skyware Corporation", 0
-db 0x1369, "Digigram", 0
-db 0x136B, "Kawasaki Steel Corporation", 0
-db 0x136C, "Adtek System Science Co Limited", 0
-db 0x1375, "Boeing - Sunnyvale", 0
-db 0x137A, "Mark Of The Unicorn Incorporated", 0
-db 0x137B, "PPT Vision", 0
-db 0x137C, "Iwatsu Electric Co Limited", 0
-db 0x137D, "Dynachip Corporation", 0
-db 0x137E, "Patriot Scientific Corporation", 0
-db 0x1380, "Sanritz Automation Co LTC", 0
-db 0x1381, "Brains Co. Limited", 0
-db 0x1382, "Marian - Electronic & Software", 0
-db 0x1384, "Stellar Semiconductor Incorporated", 0
-db 0x1385, "Netgear", 0
-db 0x1387, "Curtiss-Wright Controls Electronic Systems", 0
-db 0x1388, "Hitachi Information Technology Co Limited", 0
-db 0x1389, "Applicom International", 0
-db 0x138A, "Validity Sensors, Incorporated", 0
-db 0x138B, "Tokimec Incorporated", 0
-db 0x138E, "Basler GMBH", 0
-db 0x138F, "Patapsco Designs Incorporated", 0
-db 0x1390, "Concept Development Incorporated", 0
-db 0x1393, "Moxa Technologies Co Limited", 0
-db 0x1394, "Level One Communications", 0
-db 0x1395, "Ambicom Incorporated", 0
-db 0x1396, "Cipher Systems Incorporated", 0
-db 0x1397, "Cologne Chip Designs GmbH", 0
-db 0x1398, "Clarion Co. Limited", 0
-db 0x139A, "Alacritech Incorporated", 0
-db 0x139D, "Xstreams PLC/ EPL Limited", 0
-db 0x139E, "Echostar Data Networks", 0
-db 0x13A0, "Crystal Group Incorporated", 0
-db 0x13A1, "Kawasaki Heavy Industries Limited", 0
-db 0x13A3, "HI-FN Incorporated", 0
-db 0x13A4, "Rascom Incorporated", 0
-db 0x13A7, "amc330", 0
-db 0x13A8, "Exar Corporation", 0
-db 0x13A9, "Siemens Healthcare", 0
-db 0x13AA, "Nortel Networks - BWA Division", 0
-db 0x13AF, "T.Sqware", 0
-db 0x13B1, "Tamura Corporation", 0
-db 0x13B4, "Wellbean Co Incorporated", 0
-db 0x13B5, "ARM Limited", 0
-db 0x13B6, "DLoG Gesellschaft für elektronische Datentechnik mbH", 0
-db 0x13B8, "Nokia Telecommunications OY", 0
-db 0x13BD, "Sharp Corporation", 0
-db 0x13BF, "Sharewave Incorporated", 0
-db 0x13C0, "Microgate Corporation", 0
-db 0x13C1, "LSI", 0
-db 0x13C2, "Technotrend Systemtechnik GMBH", 0
-db 0x13C3, "Janz Computer AG", 0
-db 0x13C7, "Blue Chip Technology Limited", 0
-db 0x13CC, "Metheus Corporation", 0
-db 0x13CF, "Studio Audio & Video Limited", 0
-db 0x13D0, "B2C2 Incorporated", 0
-db 0x13D1, "AboCom Systems, Incorporated", 0
-db 0x13D4, "Graphics Microsystems Incorporated", 0
-db 0x13D6, "K.I. Technology Co Limited", 0
-db 0x13D7, "Toshiba Engineering Corporation", 0
-db 0x13D8, "Phobos Corporation", 0
-db 0x13D9, "Apex Incorporated", 0
-db 0x13DC, "Netboost Corporation", 0
-db 0x13DE, "ABB Robotics Products AB", 0
-db 0x13DF, "E-Tech Incorporated", 0
-db 0x13E0, "GVC Corporation", 0
-db 0x13E3, "Nest Incorporated", 0
-db 0x13E4, "Calculex Incorporated", 0
-db 0x13E5, "Telesoft Design Limited", 0
-db 0x13E9, "Intraserver Technology Incorporated", 0
-db 0x13EA, "Dallas Semiconductor", 0
-db 0x13F0, "IC Plus Corporation", 0
-db 0x13F1, "OCE - Industries S.A.", 0
-db 0x13F4, "Troika Networks Incorporated", 0
-db 0x13F6, "C-Media Electronics Incorporated", 0
-db 0x13F9, "NTT Advanced Technology Corporation", 0
-db 0x13FA, "Pentland Systems Limited", 0
-db 0x13FB, "Aydin Corporation", 0
-db 0x13FD, "Micro Science Incorporated", 0
-db 0x13FE, "Advantech Co., Limited", 0
-db 0x13FF, "Silicon Spice Incorporated", 0
-db 0x1400, "ArtX Incorporated", 0
-db 0x1402, "Meilhaus Electronic GmbH Germany", 0
-db 0x1404, "Fundamental Software Incorporated", 0
-db 0x1406, "Oce Print Logics Technologies S.A.", 0
-db 0x1407, "Lava Computer MFG Incorporated", 0
-db 0x1408, "Aloka Co. Limited", 0
-db 0x1409, "SUNIX Co., Limited", 0
-db 0x140A, "DSP Research Incorporated", 0
-db 0x140B, "Ramix Incorporated", 0
-db 0x140D, "Matsushita Electric Works Limited", 0
-db 0x140F, "Salient Systems Corporation", 0
-db 0x1412, "IC Ensemble, Incorporated", 0
-db 0x1413, "Addonics", 0
-db 0x1415, "Oxford Semiconductor Limited- now part of PLX Technology", 0
-db 0x1418, "Kyushu Electronics Systems Incorporated", 0
-db 0x1419, "Excel Switching Corporation", 0
-db 0x141B, "Zoom Telephonics Incorporated", 0
-db 0x141E, "Fanuc Co. Limited", 0
-db 0x141F, "Visiontech Limited", 0
-db 0x1420, "Psion Dacom PLC", 0
-db 0x1425, "Chelsio Communications", 0
-db 0x1428, "Edec Co Limited", 0
-db 0x1429, "Unex Technology Corporation", 0
-db 0x142A, "Kingmax Technology Incorporated", 0
-db 0x142B, "Radiolan", 0
-db 0x142C, "Minton Optic Industry Co Limited", 0
-db 0x142D, "Pixstream Incorporated", 0
-db 0x1430, "ITT Aerospace/Communications Division", 0
-db 0x1433, "Eltec Elektronik AG", 0
-db 0x1435, "RTD Embedded Technologies, Incorporated", 0
-db 0x1436, "CIS Technology Incorporated", 0
-db 0x1437, "Nissin IncorporatedCo", 0
-db 0x1438, "Atmel-Dream", 0
-db 0x143F, "Lightwell Co Limited- Zax Division", 0
-db 0x1441, "Agie SA.", 0
-db 0x1443, "Unibrain S.A.", 0
-db 0x1445, "Logical Co Limited", 0
-db 0x1446, "Graphin Co., LTD", 0
-db 0x1447, "Aim GMBH", 0
-db 0x1448, "Alesis Studio", 0
-db 0x144A, "ADLINK Technology Incorporated", 0
-db 0x144B, "Loronix Information Systems, Incorporated", 0
-db 0x144D, "sanyo", 0
-db 0x1450, "Octave Communications Ind.", 0
-db 0x1451, "SP3D Chip Design GMBH", 0
-db 0x1453, "Mycom Incorporated", 0
-db 0x1458, "Giga-Byte Technologies", 0
-db 0x145C, "Cryptek", 0
-db 0x145F, "Baldor Electric Company", 0
-db 0x1460, "Dynarc Incorporated", 0
-db 0x1462, "Micro-Star International Co Limited", 0
-db 0x1463, "Fast Corporation", 0
-db 0x1464, "Interactive Circuits & Systems Limited", 0
-db 0x1468, "Ambit Microsystems Corporation", 0
-db 0x1469, "Cleveland Motion Controls", 0
-db 0x146C, "Ruby Tech Corporation", 0
-db 0x146D, "Tachyon Incorporated", 0
-db 0x146E, "WMS Gaming", 0
-db 0x1471, "Integrated Telecom Express Incorporated", 0
-db 0x1473, "Zapex Technologies Incorporated", 0
-db 0x1474, "Doug Carson & Associates", 0
-db 0x1477, "Net Insight", 0
-db 0x1478, "Diatrend Corporation", 0
-db 0x147B, "Abit Computer Corporation", 0
-db 0x147F, "Nihon Unisys Limited", 0
-db 0x1482, "Isytec - Integrierte Systemtechnik Gmbh", 0
-db 0x1483, "Labway Coporation", 0
-db 0x1485, "Erma - Electronic GMBH", 0
-db 0x1489, "KYE Systems Corporation", 0
-db 0x148A, "Opto 22", 0
-db 0x148B, "Innomedialogic Incorporated", 0
-db 0x148C, "C.P. Technology Co. Limited", 0
-db 0x148D, "Digicom Systems Incorporated", 0
-db 0x148E, "OSI Plus Corporation", 0
-db 0x148F, "Plant Equipment Incorporated", 0
-db 0x1490, "TC Labs Pty Limited", 0
-db 0x1491, "Futronic", 0
-db 0x1493, "Maker Communications", 0
-db 0x1495, "Tokai Communications Industry Co. Limited", 0
-db 0x1496, "Joytech Computer Co. Limited", 0
-db 0x1497, "SMA Technologie AG", 0
-db 0x1498, "Tews Technologies", 0
-db 0x1499, "Micro-Technology Co Limited", 0
-db 0x149A, "Andor Technology Limited", 0
-db 0x149B, "Seiko Instruments Incorporated", 0
-db 0x149E, "Mapletree Networks Incorporated", 0
-db 0x149F, "Lectron Co Limited", 0
-db 0x14A0, "Softing AG", 0
-db 0x14A2, "Millennium Engineering Incorporated", 0
-db 0x14A4, "GVC/BCM Advanced Research", 0
-db 0x14A9, "Hivertec Incorporated", 0
-db 0x14AB, "Mentor Graphics Corporation", 0
-db 0x14B1, "Nextcom K.K.", 0
-db 0x14B3, "Xpeed Incorporated", 0
-db 0x14B4, "Philips Business Electronics B.V.", 0
-db 0x14B5, "Creamware GmbH", 0
-db 0x14B6, "Quantum Data Corporation", 0
-db 0x14B7, "Proxim Incorporated", 0
-db 0x14B9, "Aironet Wireless Communication", 0
-db 0x14BA, "Internix Incorporated", 0
-db 0x14BB, "Semtech Corporation", 0
-db 0x14BE, "L3 Communications", 0
-db 0x14C0, "Compal Electronics, Incorporated", 0
-db 0x14C1, "Myricom Incorporated", 0
-db 0x14C2, "DTK Computer", 0
-db 0x14C4, "Iwasaki Information Systems Co Limited", 0
-db 0x14C5, "ABB AB (Sweden)", 0
-db 0x14C6, "Data Race Incorporated", 0
-db 0x14C7, "Modular Technology Limited", 0
-db 0x14C8, "Turbocomm Tech Incorporated", 0
-db 0x14C9, "Odin Telesystems Incorporated", 0
-db 0x14CB, "Billionton Systems Incorporated/Cadmus Micro Incorporated", 0
-db 0x14CD, "Universal Scientific Ind.", 0
-db 0x14CF, "TEK Microsystems Incorporated", 0
-db 0x14D4, "Panacom Technology Corporation", 0
-db 0x14D5, "Nitsuko Corporation", 0
-db 0x14D6, "Accusys Incorporated", 0
-db 0x14D7, "Hirakawa Hewtech Corporation", 0
-db 0x14D8, "Hopf Elektronik GMBH", 0
-db 0x14D9, "Alpha Processor Incorporated", 0
-db 0x14DB, "Avlab Technology Incorporated", 0
-db 0x14DC, "Amplicon Liveline Limited", 0
-db 0x14DD, "Imodl Incorporated", 0
-db 0x14DE, "Applied Integration Corporation", 0
-db 0x14E3, "Amtelco", 0
-db 0x14E4, "Broadcom", 0
-db 0x14EA, "Planex Communications, Incorporated", 0
-db 0x14EB, "Seiko Epson Corporation", 0
-db 0x14EC, "Acqiris", 0
-db 0x14ED, "Datakinetics Limited", 0
-db 0x14EF, "Carry Computer Eng. Co Limited", 0
-db 0x14F1, "Conexant", 0
-db 0x14F2, "Mobility Electronics, Incorporated", 0
-db 0x14F4, "Tokyo Electronic Industry Co. Limited", 0
-db 0x14F5, "Sopac Limited", 0
-db 0x14F6, "Coyote Technologies LLC", 0
-db 0x14F7, "Wolf Technology Incorporated", 0
-db 0x14F8, "Audiocodes Incorporated", 0
-db 0x14F9, "AG Communications", 0
-db 0x14FB, "Transas Marine (UK) Limited", 0
-db 0x14FC, "Quadrics Limited", 0
-db 0x14FD, "Silex Technology Incorporated", 0
-db 0x14FE, "Archtek Telecom Corporation", 0
-db 0x14FF, "Twinhead International Corporation", 0
-db 0x1501, "Banksoft Canada Limited", 0
-db 0x1502, "Mitsubishi Electric Logistics Support Co", 0
-db 0x1503, "Kawasaki LSI USA Incorporated", 0
-db 0x1504, "Kaiser Electronics", 0
-db 0x1506, "Chameleon Systems Incorporated", 0
-db 0x1507, "Htec Limited", 0
-db 0x1509, "First International Computer Incorporated", 0
-db 0x150B, "Yamashita Systems Corporation", 0
-db 0x150C, "Kyopal Co Limited", 0
-db 0x150D, "Warpspped Incorporated", 0
-db 0x150E, "C-Port Corporation", 0
-db 0x150F, "Intec GMBH", 0
-db 0x1510, "Behavior Tech Computer Corporation", 0
-db 0x1511, "Centillium Technology Corporation", 0
-db 0x1512, "Rosun Technologies Incorporated", 0
-db 0x1513, "Raychem", 0
-db 0x1514, "TFL LAN Incorporated", 0
-db 0x1515, "ICS Advent", 0
-db 0x1516, "Myson Technology Incorporated", 0
-db 0x1517, "Echotek Corporation", 0
-db 0x1518, "Kontron Modular Computers GmbH (PEP Modular Computers GMBH)", 0
-db 0x1519, "Telefon Aktiebolaget LM Ericsson", 0
-db 0x151A, "Globetek Incorporated", 0
-db 0x151B, "Combox Limited", 0
-db 0x151C, "Digital Audio Labs Incorporated", 0
-db 0x151D, "Fujitsu Computer Products Of America", 0
-db 0x151E, "Matrix Corporation", 0
-db 0x151F, "Topic Semiconductor Corporation", 0
-db 0x1520, "Chaplet System Incorporated", 0
-db 0x1521, "Bell Corporation", 0
-db 0x1522, "Mainpine Limited", 0
-db 0x1523, "Music Semiconductors", 0
-db 0x1524, "ENE Technology Incorporated", 0
-db 0x1525, "Impact Technologies", 0
-db 0x1526, "ISS Incorporated", 0
-db 0x1527, "Solectron", 0
-db 0x1528, "Acksys", 0
-db 0x1529, "American Microsystems Incorporated", 0
-db 0x152A, "Quickturn Design Systems", 0
-db 0x152B, "Flytech Technology Co Limited", 0
-db 0x152C, "Macraigor Systems LLC", 0
-db 0x152D, "Quanta Computer Incorporated", 0
-db 0x152E, "Melec Incorporated", 0
-db 0x152F, "Philips - Crypto", 0
-db 0x1532, "Echelon Corporation", 0
-db 0x1533, "Baltimore", 0
-db 0x1534, "Road Corporation", 0
-db 0x1535, "Evergreen Technologies Incorporated", 0
-db 0x1537, "Datalex Communcations", 0
-db 0x1538, "Aralion Incorporated", 0
-db 0x1539, "Atelier Informatiques et Electronique Et", 0
-db 0x153A, "ONO Sokki", 0
-db 0x153B, "Terratec Electronic GMBH", 0
-db 0x153C, "Antal Electronic", 0
-db 0x153D, "Filanet Corporation", 0
-db 0x153E, "Techwell Incorporated", 0
-db 0x153F, "MIPS Technologies Incorporated", 0
-db 0x1540, "Provideo Multimedia Co Limited", 0
-db 0x1541, "Telocity Incorporated", 0
-db 0x1542, "Vivid Technology Incorporated", 0
-db 0x1543, "Silicon Laboratories", 0
-db 0x1544, "DCM Technologies Limited", 0
-db 0x1545, "VisionTek", 0
-db 0x1546, "IOI Technology Corporation", 0
-db 0x1547, "Mitutoyo Corporation", 0
-db 0x1548, "Jet Propulsion Laboratory", 0
-db 0x1549, "Interconnect Systems Solutions", 0
-db 0x154A, "Max Technologies Incorporated", 0
-db 0x154B, "Computex Co Limited", 0
-db 0x154C, "Visual Technology Incorporated", 0
-db 0x154D, "PAN International Industrial Corporation", 0
-db 0x154E, "Servotest Limited", 0
-db 0x154F, "Stratabeam Technology", 0
-db 0x1550, "Open Network Company Limited", 0
-db 0x1551, "Smart Electronic Development GMBH", 0
-db 0x1553, "Chicony Electronics Company Limited", 0
-db 0x1554, "Prolink Microsystems Corporation", 0
-db 0x1555, "Gesytec GmbH", 0
-db 0x1556, "PLDA", 0
-db 0x1557, "Mediastar Co. Limited", 0
-db 0x1558, "Clevo/Kapok Computer", 0
-db 0x1559, "SI Logic Limited", 0
-db 0x155A, "Innomedia Incorporated", 0
-db 0x155B, "Protac International Corporation", 0
-db 0x155C, "s", 0
-db 0x155D, "MAC System Company Limited", 0
-db 0x155E, "KUKA Roboter GmbH", 0
-db 0x155F, "Perle Systems Limited", 0
-db 0x1560, "Terayon Communications Systems", 0
-db 0x1561, "Viewgraphics Incorporated", 0
-db 0x1562, "Symbol Technologies, Incorporated", 0
-db 0x1563, "A-Trend Technology Company Limited", 0
-db 0x1564, "Yamakatsu Electronics Industry Company Limited", 0
-db 0x1565, "Biostar Microtech Intl Corporation", 0
-db 0x1566, "Ardent Technologies Incorporated", 0
-db 0x1567, "Jungsoft", 0
-db 0x1568, "DDK Electronics Incorporated", 0
-db 0x1569, "Palit Microsystems Incorporated", 0
-db 0x156A, "Avtec Systems Incorporated", 0
-db 0x156B, "S2io Incorporated", 0
-db 0x156C, "Vidac Electronics GMBH", 0
-db 0x156D, "Alpha-Top Corporation", 0
-db 0x156E, "Alfa Incorporated", 0
-db 0x156F, "M-Systems Flash Disk Pioneers Limited", 0
-db 0x1570, "Lecroy Corporation", 0
-db 0x1571, "Contemporary Controls", 0
-db 0x1572, "Otis Elevator Company", 0
-db 0x1573, "Lattice - Vantis", 0
-db 0x1574, "Fairchild Semiconductor", 0
-db 0x1575, "Voltaire Advanced Data Security Limited", 0
-db 0x1576, "Viewcast Com", 0
-db 0x1578, "Hitt", 0
-db 0x1579, "Dual Technology Corporation", 0
-db 0x157A, "Japan Elecronics Ind. Incorporated", 0
-db 0x157B, "Star Multimedia Corporation", 0
-db 0x157C, "Eurosoft (UK)", 0
-db 0x157D, "Gemflex Networks", 0
-db 0x157E, "Transition Networks", 0
-db 0x157F, "PX Instruments Technology Limited", 0
-db 0x1580, "Primex Aerospace Co.", 0
-db 0x1581, "SEH Computertechnik GMBH", 0
-db 0x1582, "Cytec Corporation", 0
-db 0x1583, "Inet Technologies Incorporated", 0
-db 0x1584, "Vetronix Corporation Engenharia Limited", 0
-db 0x1585, "Marconi Commerce Systems SRL", 0
-db 0x1586, "Lancast Incorporated", 0
-db 0x1587, "Konica Corporation", 0
-db 0x1588, "Solidum Systems Corporation", 0
-db 0x1589, "Atlantek Microsystems Pty Limited", 0
-db 0x158A, "Digalog Systems Incorporated", 0
-db 0x158B, "Allied Data Technologies", 0
-db 0x158C, "Hitachi Semiconductor & Devices Sales Co", 0
-db 0x158D, "Point Multimedia Systems", 0
-db 0x158E, "Lara Technology Incorporated", 0
-db 0x158F, "Ditect Coop", 0
-db 0x1590, "3pardata Incorporated", 0
-db 0x1591, "ARN", 0
-db 0x1592, "Syba Tech Limited", 0
-db 0x1593, "Bops Incorporated", 0
-db 0x1594, "Netgame Limited", 0
-db 0x1595, "Diva Systems Corporation", 0
-db 0x1596, "Folsom Research Incorporated", 0
-db 0x1597, "Memec Design Services", 0
-db 0x1598, "Granite Microsystems", 0
-db 0x1599, "Delta Electronics Incorporated", 0
-db 0x159A, "General Instrument", 0
-db 0x159B, "Faraday Technology Corporation", 0
-db 0x159C, "Stratus Computer Systems", 0
-db 0x159D, "Ningbo Harrison Electronics Co Limited", 0
-db 0x159E, "A-Max Technology Co Limited", 0
-db 0x159F, "Galea Network Security", 0
-db 0x15A0, "Compumaster SRL", 0
-db 0x15A1, "Geocast Network Systems Incorporated", 0
-db 0x15A2, "Catalyst Enterprises Incorporated", 0
-db 0x15A3, "Italtel", 0
-db 0x15A4, "X-Net OY", 0
-db 0x15A5, "Toyota MACS Incorporated", 0
-db 0x15A6, "Sunlight Ultrasound Technologies Limited", 0
-db 0x15A7, "SSE Telecom Incorporated", 0
-db 0x15A8, "Shanghai Communications Technologies Cen", 0
-db 0x15AA, "Moreton Bay", 0
-db 0x15AB, "Bluesteel Networks Incorporated", 0
-db 0x15AC, "North Atlantic Instruments", 0
-db 0x15AD, "VMware Incorporated", 0
-db 0x15AE, "Amersham Pharmacia Biotech", 0
-db 0x15B0, "Zoltrix International Limited", 0
-db 0x15B1, "Source Technology Incorporated", 0
-db 0x15B2, "Mosaid Technologies Incorporated", 0
-db 0x15B3, "Mellanox Technology", 0
-db 0x15B4, "CCI/Triad", 0
-db 0x15B5, "Cimetrics Incorporated", 0
-db 0x15B6, "Texas Memory Systems Incorporated", 0
-db 0x15B7, "Sandisk Corporation", 0
-db 0x15B8, "Addi-Data GMBH", 0
-db 0x15B9, "Maestro Digital Communications", 0
-db 0x15BA, "Impacct Technology Corporation", 0
-db 0x15BB, "Portwell Incorporated", 0
-db 0x15BC, "Agilent Technologies", 0
-db 0x15BD, "DFI Incorporated", 0
-db 0x15BE, "Sola Electronics", 0
-db 0x15BF, "High Tech Computer Corporation (HTC)", 0
-db 0x15C0, "BVM Limited", 0
-db 0x15C1, "Quantel", 0
-db 0x15C2, "Newer Technology Incorporated", 0
-db 0x15C3, "Taiwan Mycomp Co Limited", 0
-db 0x15C4, "EVSX Incorporated", 0
-db 0x15C5, "Procomp Informatics Limited", 0
-db 0x15C6, "Technical University Of Budapest", 0
-db 0x15C7, "Tateyama System Laboratory Co Limited", 0
-db 0x15C8, "Penta Media Co. Limited", 0
-db 0x15C9, "Serome Technology Incorporated", 0
-db 0x15CA, "Bitboys OY", 0
-db 0x15CB, "AG Electronics Limited", 0
-db 0x15CC, "Hotrail Incorporated", 0
-db 0x15CD, "Dreamtech Co Limited", 0
-db 0x15CE, "Genrad Incorporated", 0
-db 0x15CF, "Hilscher GMBH", 0
-db 0x15D1, "Infineon Technologies AG", 0
-db 0x15D2, "FIC (First International Computer Incorporated", 0
-db 0x15D3, "NDS Technologies Israel Limited", 0
-db 0x15D4, "Iwill Corporation", 0
-db 0x15D5, "Tatung Co.", 0
-db 0x15D6, "Entridia Corporation", 0
-db 0x15D7, "Rockwell-Collins Incorporated", 0
-db 0x15D8, "Cybernetics Technology Co Limited", 0
-db 0x15D9, "Super Micro Computer Incorporated", 0
-db 0x15DA, "Cyberfirm Incorporated", 0
-db 0x15DB, "Applied Computing Systems Incorporated", 0
-db 0x15DC, "Litronic Incorporated", 0
-db 0x15DD, "Sigmatel Incorporated", 0
-db 0x15DE, "Malleable Technologies Incorporated", 0
-db 0x15E0, "Cacheflow Incorporated", 0
-db 0x15E1, "Voice Technologies Group", 0
-db 0x15E2, "Quicknet Technologies Incorporated", 0
-db 0x15E3, "Networth Technologies Incorporated", 0
-db 0x15E4, "VSN Systemen BV", 0
-db 0x15E5, "Valley Technologies Incorporated", 0
-db 0x15E6, "Agere Incorporated", 0
-db 0x15E7, "GET Engineering Corporation", 0
-db 0x15E8, "National Datacomm Corporation", 0
-db 0x15E9, "Pacific Digital Corporation", 0
-db 0x15EA, "Tokyo Denshi Sekei K.K.", 0
-db 0x15EB, "Drsearch GMBH", 0
-db 0x15EC, "Beckhoff Automation GmbH", 0
-db 0x15ED, "Macrolink Incorporated", 0
-db 0x15EE, "IN Win Development Incorporated", 0
-db 0x15EF, "Intelligent Paradigm Incorporated", 0
-db 0x15F0, "B-Tree Systems Incorporated", 0
-db 0x15F1, "Times N Systems Incorporated", 0
-db 0x15F2, "SPOT Imaging Solutions a division of Diagnostic Instruments Incorporated", 0
-db 0x15F3, "Digitmedia Corporation", 0
-db 0x15F4, "Valuesoft", 0
-db 0x15F5, "Power Micro Research", 0
-db 0x15F6, "Extreme Packet Device Incorporated", 0
-db 0x15F7, "Banctec", 0
-db 0x15F8, "Koga Electronics Co", 0
-db 0x15F9, "Zenith Electronics Co", 0
-db 0x15FA, "Axzam Corporation", 0
-db 0x15FB, "Zilog Incorporated", 0
-db 0x15FC, "Techsan Electronics Co Limited", 0
-db 0x15FD, "N-Cubed.Net", 0
-db 0x15FE, "Kinpo Electronics Incorporated", 0
-db 0x15FF, "Fastpoint Technologies Incorporated", 0
-db 0x1600, "Northrop Grumman - Canada Limited", 0
-db 0x1601, "Tenta Technology", 0
-db 0x1602, "Prosys-TEC Incorporated", 0
-db 0x1603, "Nokia Wireless Business Communications", 0
-db 0x1604, "Central System Research Co Limited", 0
-db 0x1605, "Pairgain Technologies", 0
-db 0x1606, "Europop AG", 0
-db 0x1607, "Lava Semiconductor Manufacturing Incorporated", 0
-db 0x1608, "Automated Wagering International", 0
-db 0x1609, "Sciemetric Instruments Incorporated", 0
-db 0x160A, "Kollmorgen Servotronix", 0
-db 0x160B, "Onkyo Corporation", 0
-db 0x160C, "Oregon Micro Systems Incorporated", 0
-db 0x160D, "Aaeon Electronics Incorporated", 0
-db 0x160E, "CML Emergency Services", 0
-db 0x160F, "ITEC Co Limited", 0
-db 0x1610, "Tottori Sanyo Electric Co Limited", 0
-db 0x1611, "Bel Fuse Incorporated", 0
-db 0x1612, "Telesynergy Research Incorporated", 0
-db 0x1613, "System Craft Incorporated", 0
-db 0x1614, "Jace Tech Incorporated", 0
-db 0x1615, "Equus Computer Systems Incorporated", 0
-db 0x1616, "Iotech Incorporated", 0
-db 0x1617, "Rapidstream Incorporated", 0
-db 0x1618, "Esec SA", 0
-db 0x1619, "FarSite Communications Limited", 0
-db 0x161B, "Mobilian Israel Limited", 0
-db 0x161C, "Berkshire Products", 0
-db 0x161D, "Gatec", 0
-db 0x161E, "Kyoei Sangyo Co Limited", 0
-db 0x161F, "Arima Computer Corporation", 0
-db 0x1620, "Sigmacom Co Limited", 0
-db 0x1621, "Lynx Studio Technology Incorporated", 0
-db 0x1622, "Nokia Home Communications", 0
-db 0x1623, "KRF Tech Limited", 0
-db 0x1624, "CE Infosys GMBH", 0
-db 0x1625, "Warp Nine Engineering", 0
-db 0x1626, "TDK Semiconductor Corporation", 0
-db 0x1627, "BCom Electronics Incorporated", 0
-db 0x1629, "Kongsberg Spacetec a.s.", 0
-db 0x162A, "Sejin Computerland Company Limited", 0
-db 0x162B, "Shanghai Bell Company Limited", 0
-db 0x162C, "C&H Technologies Incorporated", 0
-db 0x162D, "Reprosoft Company Limited", 0
-db 0x162E, "Margi Systems Incorporated", 0
-db 0x162F, "Rohde & Schwarz GMBH & Co KG", 0
-db 0x1630, "Sky Computers Incorporated", 0
-db 0x1631, "NEC Computer International", 0
-db 0x1632, "Verisys Incorporated", 0
-db 0x1633, "Adac Corporation", 0
-db 0x1634, "Visionglobal Network Corporation", 0
-db 0x1635, "Decros / S.ICZ a.s.", 0
-db 0x1636, "Jean Company Limited", 0
-db 0x1637, "NSI", 0
-db 0x1638, "Eumitcom Technology Incorporated", 0
-db 0x163A, "Air Prime Incorporated", 0
-db 0x163B, "Glotrex Co Limited", 0
-db 0x163C, "intel", 0
-db 0x163D, "Heidelberg Digital LLC", 0
-db 0x163E, "3dpower", 0
-db 0x163F, "Renishaw PLC", 0
-db 0x1640, "Intelliworxx Incorporated", 0
-db 0x1641, "MKNet Corporation", 0
-db 0x1642, "Bitland", 0
-db 0x1643, "Hajime Industries Limited", 0
-db 0x1644, "Western Avionics Limited", 0
-db 0x1645, "Quick-Serv. Computer Co. Limited", 0
-db 0x1646, "Nippon Systemware Co Limited", 0
-db 0x1647, "Hertz Systemtechnik GMBH", 0
-db 0x1648, "MeltDown Systems LLC", 0
-db 0x1649, "Jupiter Systems", 0
-db 0x164A, "Aiwa Co. Limited", 0
-db 0x164C, "Department Of Defense", 0
-db 0x164D, "Ishoni Networks", 0
-db 0x164E, "Micrel Incorporated", 0
-db 0x164F, "Datavoice (Pty) Limited", 0
-db 0x1650, "Admore Technology Incorporated", 0
-db 0x1651, "Chaparral Network Storage", 0
-db 0x1652, "Spectrum Digital Incorporated", 0
-db 0x1653, "Nature Worldwide Technology Corporation", 0
-db 0x1654, "Sonicwall Incorporated", 0
-db 0x1655, "Dazzle Multimedia Incorporated", 0
-db 0x1656, "Insyde Software Corporation", 0
-db 0x1657, "Brocade Communications Systems", 0
-db 0x1658, "Med Associates Incorporated", 0
-db 0x1659, "Shiba Denshi Systems Incorporated", 0
-db 0x165A, "Epix Incorporated", 0
-db 0x165B, "Real-Time Digital Incorporated", 0
-db 0x165C, "Kondo Kagaku", 0
-db 0x165D, "Hsing Tech. Enterprise Co. Limited", 0
-db 0x165E, "Hyunju Computer Co. Limited", 0
-db 0x165F, "Comartsystem Korea", 0
-db 0x1660, "Network Security Technologies Incorporated (NetSec)", 0
-db 0x1661, "Worldspace Corporation", 0
-db 0x1662, "Int Labs", 0
-db 0x1663, "Elmec Incorporated Limited", 0
-db 0x1664, "Fastfame Technology Co. Limited", 0
-db 0x1665, "Edax Incorporated", 0
-db 0x1666, "Norpak Corporation", 0
-db 0x1667, "CoSystems Incorporated", 0
-db 0x1668, "Actiontec Electronics Incorporated", 0
-db 0x166A, "Komatsu Limited", 0
-db 0x166B, "Supernet Incorporated", 0
-db 0x166C, "Shade Limited", 0
-db 0x166D, "Sibyte Incorporated", 0
-db 0x166E, "Schneider Automation Incorporated", 0
-db 0x166F, "Televox Software Incorporated", 0
-db 0x1670, "Rearden Steel", 0
-db 0x1671, "Atan Technology Incorporated", 0
-db 0x1672, "Unitec Co. Limited", 0
-db 0x1673, "pctel", 0
-db 0x1675, "Square Wave Technology", 0
-db 0x1676, "Emachines Incorporated", 0
-db 0x1677, "Bernecker + Rainer", 0
-db 0x1678, "INH Semiconductor", 0
-db 0x1679, "Tokyo Electron Device Limited", 0
-db 0x167F, "iba AG", 0
-db 0x1680, "Dunti Corporation", 0
-db 0x1681, "Hercules", 0
-db 0x1682, "PINE Technology, Limited", 0
-db 0x1688, "CastleNet Technology Incorporated", 0
-db 0x168A, "Utimaco Safeware AG", 0
-db 0x168B, "Circut Assembly Corporation", 0
-db 0x168C, "Atheros Communications Incorporated", 0
-db 0x168D, "NMI Electronics Limited", 0
-db 0x168E, "Hyundai MultiCAV Computer Co. Limited", 0
-db 0x168F, "KDS Innotech Corporation", 0
-db 0x1690, "NetContinuum, Incorporated", 0
-db 0x1693, "FERMA", 0
-db 0x1695, "EPoX Computer Company Limited", 0
-db 0x16AE, "SafeNet Incorporated", 0
-db 0x16B3, "CNF Mobile Solutions", 0
-db 0x16B8, "Sonnet Technologies, Incorporated", 0
-db 0x16CA, "Cenatek Incorporated", 0
-db 0x16CB, "Minolta Co. Limited", 0
-db 0x16CC, "Inari Incorporated", 0
-db 0x16D0, "Systemax", 0
-db 0x16E0, "Third Millenium Test Solutions, Incorporated", 0
-db 0x16E5, "Intellon Corporation", 0
-db 0x16EC, "U.S. Robotics", 0
-db 0x16F0, "LaserLinc Incorporated", 0
-db 0x16F1, "Adicti Corporation", 0
-db 0x16F3, "Jetway Information Company Limited", 0
-db 0x16F6, "VideoTele.com Incorporated", 0
-db 0x1700, "Antara LLC", 0
-db 0x1701, "Interactive Computer Products Incorporated", 0
-db 0x1702, "Internet Machines Corporation", 0
-db 0x1703, "Desana Systems", 0
-db 0x1704, "Clearwater Networks", 0
-db 0x1705, "Digital First", 0
-db 0x1706, "Pacific Broadband Communications", 0
-db 0x1707, "Cogency Semiconductor Incorporated", 0
-db 0x1708, "Harris Corporation", 0
-db 0x1709, "Zarlink Semiconductor", 0
-db 0x170A, "Alpine Electronics Incorporated", 0
-db 0x170B, "NetOctave Incorporated", 0
-db 0x170C, "YottaYotta Incorporated", 0
-db 0x170D, "SensoMotoric Instruments GmbH", 0
-db 0x170E, "San Valley Systems, Incorporated", 0
-db 0x170F, "Cyberdyne Incorporated", 0
-db 0x1710, "Pelago Networks", 0
-db 0x1711, "MyName Technologies, Incorporated", 0
-db 0x1712, "NICE Systems Incorporated", 0
-db 0x1713, "TOPCON Corporation", 0
-db 0x1725, "Vitesse Semiconductor", 0
-db 0x1734, "Fujitsu-Siemens Computers GmbH", 0
-db 0x1737, "LinkSys", 0
-db 0x173B, "Altima Communications Incorporated", 0
-db 0x1743, "Peppercon AG", 0
-db 0x174B, "PC Partner Limited", 0
-db 0x1752, "Global Brands Manufacture Limited", 0
-db 0x1753, "TeraRecon Incorporated", 0
-db 0x1755, "Alchemy Semiconductor Incorporated", 0
-db 0x176A, "General Dynamics Canada", 0
-db 0x1775, "General Electric", 0
-db 0x1789, "Ennyah Technologies Corporation", 0
-db 0x1793, "Unitech Electronics Company Limited", 0
-db 0x17A1, "Tascorp", 0
-db 0x17A7, "Start Network Technology Company Limited", 0
-db 0x17AA, "Legend Limited (Beijing)", 0
-db 0x17AB, "Phillips Components", 0
-db 0x17AF, "Hightech Information Systems Limited", 0
-db 0x17BE, "Philips Semiconductors", 0
-db 0x17C0, "Wistron Corporation", 0
-db 0x17C4, "Movita", 0
-db 0x17CC, "NetChip", 0
-db 0x17cd, "Cadence Design Systems", 0
-db 0x17D5, "Neterion Incorporated", 0
-db 0x17db, "Cray Incorporated", 0
-db 0x17E9, "DH electronics GmbH / Sabrent", 0
-db 0x17EE, "Connect Components Limited", 0
-db 0x17F3, "RDC Semiconductor Company Limited", 0
-db 0x17FE, "INPROCOMM", 0
-db 0x1813, "Ambient Technologies Incorporated", 0
-db 0x1814, "Ralink Technology, Corporation", 0
-db 0x1815, "devolo AG", 0
-db 0x1820, "InfiniCon Systems, Incorporated", 0
-db 0x1824, "Avocent", 0
-db 0x1841, "Panda Platinum", 0
-db 0x1860, "Primagraphics Limited", 0
-db 0x186C, "Humusoft S.R.O", 0
-db 0x1887, "Elan Digital Systems Limited", 0
-db 0x1888, "Varisys Limited", 0
-db 0x188D, "Millogic Limited", 0
-db 0x1890, "Egenera, Incorporated", 0
-db 0x18BC, "Info-Tek Corporation", 0
-db 0x18C9, "ARVOO Engineering BV", 0
-db 0x18CA, "XGI Technology Incorporated", 0
-db 0x18F1, "Spectrum Systementwicklung Microelectronic GmbH", 0
-db 0x18F4, "Napatech A/S", 0
-db 0x18F7, "Commtech, Incorporated", 0
-db 0x18FB, "Resilience Corporation", 0
-db 0x1904, "Ritmo", 0
-db 0x1905, "WIS Technology, Incorporated", 0
-db 0x1910, "Seaway Networks", 0
-db 0x1912, "Renesas Electronics", 0
-db 0x1931, "Option NV", 0
-db 0x1941, "Stelar", 0
-db 0x1954, "One Stop Systems, Incorporated", 0
-db 0x1969, "Atheros Communications", 0
-db 0x1971, "AGEIA Technologies, Incorporated", 0
-db 0x197B, "JMicron Technology Corporation", 0
-db 0x198a, "Nallatech", 0
-db 0x1991, "Topstar Digital Technologies Co., Limited", 0
-db 0x19a2, "ServerEngines", 0
-db 0x19A8, "DAQDATA GmbH", 0
-db 0x19AC, "Kasten Chase Applied Research", 0
-db 0x19B6, "Mikrotik", 0
-db 0x19E2, "Vector Informatik GmbH", 0
-db 0x19E3, "DDRdrive LLC", 0
-db 0x1A08, "Linux Networx", 0
-db 0x1a41, "Tilera Corporation", 0
-db 0x1A42, "Imaginant", 0
-db 0x1B13, "Jaton Corporation USA", 0
-db 0x1B21, "Asustek - ASMedia Technology Incorporated", 0
-db 0x1B6F, "Etron", 0
-db 0x1B73, "Fresco Logic Incorporated", 0
-db 0x1B91, "Averna", 0
-db 0x1BAD, "ReFLEX CES", 0
-db 0x1C0F, "Monarch Innovative Technologies Private Limited", 0
-db 0x1C32, "Highland Technology Incorporated", 0
-db 0x1c39, "Thomson Video Networks", 0
-db 0x1DE1, "Tekram", 0
-db 0x1FCF, "Miranda Technologies Limited", 0
-db 0x2001, "Temporal Research Limited", 0
-db 0x2646, "Kingston Technology Company", 0
-db 0x270F, "ChainTek Computer Company Limited", 0
-db 0x2EC1, "Zenic Incorporated", 0
-db 0x3388, "Hint Corporation", 0
-db 0x3411, "Quantum Designs (H.K.) Incorporated", 0
-db 0x3513, "ARCOM Control Systems Limited", 0
-db 0x38EF, "4links", 0
-db 0x3D3D, "3Dlabs, Incorporated Limited", 0
-db 0x4005, "Avance Logic Incorporated", 0
-db 0x4144, "Alpha Data", 0
-db 0x416C, "Aladdin Knowledge Systems", 0
-db 0x4348, "wch.cn", 0
-db 0x4680, "UMAX Computer Corporation", 0
-db 0x4843, "Hercules Computer Technology", 0
-db 0x4943, "Growth Networks", 0
-db 0x4954, "Integral Technologies", 0
-db 0x4978, "Axil Computer Incorporated", 0
-db 0x4C48, "Lung Hwa Electronics", 0
-db 0x4C53, "SBS-OR Industrial Computers", 0
-db 0x4CA1, "Seanix Technology Incorporated", 0
-db 0x4D51, "Mediaq Incorporated", 0
-db 0x4D54, "Microtechnica Company Limited", 0
-db 0x4DDC, "ILC Data Device Corporation", 0
-db 0x4E80, "Samsung Windows Portable Devices", 0
-db 0x5053, "TBS/Voyetra Technologies", 0
-db 0x508A, "Samsung T10 MP3 Player", 0
-db 0x5136, "S S Technologies", 0
-db 0x5143, "Qualcomm Incorporated USA", 0
-db 0x5333, "S3 Graphics Company Limited", 0
-db 0x544C, "Teralogic Incorporated", 0
-db 0x5555, "Genroco Incorporated", 0
-db 0x5853, "Citrix Systems, Incorporated", 0
-db 0x6409, "Logitec Corporation", 0
-db 0x6666, "Decision Computer International Company", 0
-db 0x6945, "ASMedia Technology Incorporated", 0
-db 0x7604, "O.N. Electric Company Limited", 0
-db 0x7d10,	"D-Link Corporation", 0
-db 0x8080, "Xirlink, Incorporated", 0
-db 0x8086, "Intel Corporation", 0
-db 0x80EE, "Oracle Corporation - InnoTek Systemberatung GmbH", 0
-db 0x8866, "T-Square Design Incorporated", 0
-db 0x8888, "Silicon Magic", 0
-db 0x8E0E, "Computone Corporation", 0
-db 0x9004, "Adaptec Incorporated", 0
-db 0x9005, "Adaptec Incorporated", 0
-db 0x919A, "Gigapixel Corporation", 0
-db 0x9412, "Holtek", 0
-db 0x9699, "Omni Media Technology Incorporated", 0
-db 0x9710, "MosChip Semiconductor Technology", 0
-db 0x9902, "StarGen Incorporated", 0
-db 0xA0A0, "Aopen Incorporated", 0
-db 0xA0F1, "Unisys Corporation", 0
-db 0xA200, "NEC Corporation", 0
-db 0xA259, "Hewlett Packard", 0
-db 0xA304, "Sony", 0
-db 0xA727, "3com Corporation", 0
-db 0xAA42, "Abekas Incorporated", 0
-db 0xAC1E, "Digital Receiver Technology Incorporated", 0
-db 0xB1B3, "Shiva Europe Limited", 0
-db 0xB894, "Brown & Sharpe Mfg. Company", 0
-db 0xBEEF, "Mindstream Computing", 0
-db 0xC001, "TSI Telsys", 0
-db 0xC0A9, "Micron/Crucial Technology", 0
-db 0xC0DE, "Motorola", 0
-db 0xC0FE, "Motion Engineering Inc.", 0
-db 0xC622, "Hudson Soft Company Limited", 0
-db 0xCA50, "Varian Incorporated", 0
-db 0xCAFE, "Chrysalis-ITS", 0
-db 0xCCCC, "Catapult Communications", 0
-db 0xD4D4, "Curtiss-Wright Controls Embedded Computing", 0
-db 0xDC93, "Dawicontrol", 0
-db 0xDEAD, "Indigita Corporation", 0
-db 0xDEAF, "Middle Digital, Inc", 0
-db 0xE159, "Tiger Jet Network Inc", 0
-db 0xE4BF, "EKF Elektronik GMBH", 0
-db 0xEA01, "Eagle Technology", 0
-db 0xEABB, "Aashima Technology B.V.", 0
-db 0xEACE, "Endace Measurement Systems Limited", 0
-db 0xECC0, "Echo Digital Audio Corporation", 0
-db 0xEDD8, "ARK Logic Incorporated", 0
-db 0xF5F5, "F5 Networks Incorporated", 0
-db 0xFA57, "Interagon AS", 0
-db 0xFFFF, "-Unknown or Invalid Vendor ID-", 0
+db 0x00, 0x33, "Paradyne Corporation", 0
+db 0x00, 0x3d, "Master", 0
+db 0x00, 0x70, "Hauppauge Computer Works Incorporated", 0
+db 0x01, 0x00, "USBPDO-8", 0
+db 0x01, 0x23, "General Dynamics", 0
+db 0x03, 0x15, "SK Electronics Corporation Limited", 0
+db 0x04, 0x02, "Acer Aspire One", 0
+db 0x04, 0x6D, "Logitech Incorporated", 0
+db 0x04, 0x83, "UPEK", 0
+db 0x04, 0xA9, "Canon", 0
+db 0x04, 0xB3, "IBM", 0
+db 0x04, 0xD9, "Filco", 0
+db 0x04, 0xF2, "Chicony Electronics Co.", 0
+db 0x05, 0x1D, "ACPI\VEN_INT&DEV_33A0", 0
+db 0x05, 0x29, "Aladdin E-Token", 0
+db 0x05, 0x53, "Aiptek USA", 0
+db 0x05, 0x8f, "Alcor Micro Corporation", 0
+db 0x05, 0x90, "Omron Corporation", 0
+db 0x05, 0xac, "Apple Incorporated", 0
+db 0x05, 0xE1, "D-MAX", 0
+db 0x06, 0x4e, "SUYIN Corporation", 0
+db 0x06, 0x7B, "Prolific Technology Incorporated", 0
+db 0x06, 0xFE, "Acresso Software Incorporated", 0
+db 0x07, 0x11, "SIIG, Incorporated", 0
+db 0x09, 0x3a, "KYE Systems Corporation / Pixart Imaging", 0
+db 0x09, 0x6E, "USB Rockey dongle from Feitain", 0
+db 0x0A, 0x5C, "Broadcom Corporation", 0
+db 0x0A, 0x89, "BREA Technologies Incorporated", 0
+db 0x0A, 0x92, "Egosys, Incorporated", 0
+db 0x0A, 0xC8, "ASUS", 0
+db 0x0b, 0x05, "Toshiba Bluetooth RFBUS, RFCOM, RFHID", 0
+db 0x0c, 0x45, "Microdia Limited", 0
+db 0x0c, 0xf3, "TP-Link", 0
+db 0x0D, 0x2E, "Feedback Instruments Limited", 0
+db 0x0D, 0x8C, "C-Media Electronics, Incorporated", 0
+db 0x0D, 0xF6, "Sitecom", 0
+db 0x0E, 0x11, "Compaq Computer Corporation", 0
+db 0x0E, 0x8D, "MediaTek Incorporated", 0
+db 0x10, 0x00, "LSI Logic", 0
+db 0x10, 0x01, "Kolter Electronic - Germany", 0
+db 0x10, 0x02, "Advanced Micro Devices, Incorporated", 0
+db 0x10, 0x03, "ULSI", 0
+db 0x10, 0x04, "VLSI Technology", 0
+db 0x10, 0x06, "Reply Group", 0
+db 0x10, 0x07, "Netframe Systems Incorporated", 0
+db 0x10, 0x08, "Epson", 0
+db 0x10, 0x0A, "Ã‚as Limited de Phoenix del Âƒ de TecnologÃƒ", 0
+db 0x10, 0x0B, "National Semiconductors", 0
+db 0x10, 0x0C, "Tseng Labs", 0
+db 0x10, 0x0D, "AST Research", 0
+db 0x10, 0x0E, "Weitek", 0
+db 0x10, 0x10, "Video Logic Limited", 0
+db 0x10, 0x11, "Digital Equipment Corporation", 0
+db 0x10, 0x12, "Micronics Computers Incorporated", 0
+db 0x10, 0x13, "Cirrus Logic", 0
+db 0x10, 0x14, "International Business Machines Corporation", 0
+db 0x10, 0x16, "Fujitsu ICL Computers", 0
+db 0x10, 0x17, "Spea Software AG", 0
+db 0x10, 0x18, "Unisys Systems", 0
+db 0x10, 0x19, "Elitegroup Computer System", 0
+db 0x10, 0x1A, "NCR Corporation", 0
+db 0x10, 0x1B, "Vitesse Semiconductor", 0
+db 0x10, 0x1E, "American Megatrends Incorporated", 0
+db 0x10, 0x1F, "PictureTel Corporation", 0
+db 0x10, 0x20, "Hitachi Computer Electronics", 0
+db 0x10, 0x21, "Oki Electric Industry", 0
+db 0x10, 0x22, "Advanced Micro Devices", 0
+db 0x10, 0x23, "Trident Mirco", 0
+db 0x10, 0x25, "Acer Incorporated", 0
+db 0x10, 0x28, "Dell Incorporated", 0
+db 0x10, 0x2A, "LSI Logic Headland Division", 0
+db 0x10, 0x2B, "Matrox Electronic Systems Limited", 0
+db 0x10, 0x2C, "Asiliant (Chips And Technologies)", 0
+db 0x10, 0x2D, "Wyse Technology", 0
+db 0x10, 0x2E, "Olivetti Advanced Technology", 0
+db 0x10, 0x2F, "Toshiba America", 0
+db 0x10, 0x30, "TMC Research", 0
+db 0x10, 0x31, "Miro Computer Products AG", 0
+db 0x10, 0x33, "NEC Electronics", 0
+db 0x10, 0x34, "Burndy Corporation", 0
+db 0x10, 0x36, "Future Domain", 0
+db 0x10, 0x37, "Hitachi Micro Systems Incorporated", 0
+db 0x10, 0x38, "AMP Incorporated", 0
+db 0x10, 0x39, "Silicon Integrated Systems", 0
+db 0x10, 0x3A, "Seiko Epson Corporation", 0
+db 0x10, 0x3B, "Tatung Corporation Of America", 0
+db 0x10, 0x3C, "Hewlett-Packard", 0
+db 0x10, 0x3E, "Solliday Engineering", 0
+db 0x10, 0x3F, "Logic Modeling", 0
+db 0x10, 0x41, "Computrend", 0
+db 0x10, 0x43, "Asustek Computer Incorporated", 0
+db 0x10, 0x44, "Distributed Processing Tech", 0
+db 0x10, 0x45, "OPTi Incorporated", 0
+db 0x10, 0x46, "IPC Corporation LTD", 0
+db 0x10, 0x47, "Genoa Systems Corporation", 0
+db 0x10, 0x48, "ELSA GmbH", 0
+db 0x10, 0x49, "Fountain Technology", 0
+db 0x10, 0x4A, "STMicroelectronics", 0
+db 0x10, 0x4B, "Mylex / Buslogic", 0
+db 0x10, 0x4C, "Texas Instruments", 0
+db 0x10, 0x4D, "Sony Corporation", 0
+db 0x10, 0x4E, "Oak Technology", 0
+db 0x10, 0x4F, "Co-Time Computer Limited", 0
+db 0x10, 0x50, "Winbond Electronics Corporation", 0
+db 0x10, 0x51, "Anigma Corporation", 0
+db 0x10, 0x53, "Young Micro Systems", 0
+db 0x10, 0x54, "Hitachi Limited", 0
+db 0x10, 0x55, "Standard Microsystems Corporation", 0
+db 0x10, 0x56, "ICL", 0
+db 0x10, 0x57, "Motorola", 0
+db 0x10, 0x58, "Electronics & Telecommunication Res", 0
+db 0x10, 0x59, "Kontron Canada", 0
+db 0x10, 0x5A, "Promise Technology", 0
+db 0x10, 0x5B, "Mobham chip", 0
+db 0x10, 0x5C, "Wipro Infotech Limited", 0
+db 0x10, 0x5D, "Number Nine Visual Technology", 0
+db 0x10, 0x5E, "Vtech Engineering Canada Limited", 0
+db 0x10, 0x5F, "Infotronic America Incorporated", 0
+db 0x10, 0x60, "United Microelectronics", 0
+db 0x10, 0x61, "8x8 Incorporated", 0
+db 0x10, 0x62, "Maspar Computer Corporation", 0
+db 0x10, 0x63, "Ocean Office Automation", 0
+db 0x10, 0x64, "Alcatel Cit", 0
+db 0x10, 0x65, "Texas Microsystems", 0
+db 0x10, 0x66, "Picopower Technology", 0
+db 0x10, 0x67, "Mitsubishi Electronics", 0
+db 0x10, 0x68, "Diversified Technology", 0
+db 0x10, 0x6A, "Aten Research Incorporated", 0
+db 0x10, 0x6B, "Apple Incorporated", 0
+db 0x10, 0x6C, "Hyundai Electronics America", 0
+db 0x10, 0x6D, "Sequent Computer Systems", 0
+db 0x10, 0x6E, "DFI Incorporated", 0
+db 0x10, 0x6F, "City Gate Development LTD", 0
+db 0x10, 0x70, "Daewoo Telecom Limited", 0
+db 0x10, 0x71, "Mitac", 0
+db 0x10, 0x72, "GIT Co. Limited", 0
+db 0x10, 0x73, "Yamaha Corporation", 0
+db 0x10, 0x74, "Nexgen Microsystems", 0
+db 0x10, 0x75, "Advanced Integration Research", 0
+db 0x10, 0x77, "QLogic Corporation", 0
+db 0x10, 0x78, "Cyrix Corporation", 0
+db 0x10, 0x79, "I-Bus", 0
+db 0x10, 0x7A, "Networth controls", 0
+db 0x10, 0x7B, "Gateway 2000", 0
+db 0x10, 0x7C, "Goldstar Co. Limited", 0
+db 0x10, 0x7D, "Leadtek Research", 0
+db 0x10, 0x7E, "Testernec", 0
+db 0x10, 0x7F, "Data Technology Corporation", 0
+db 0x10, 0x80, "Cypress Semiconductor", 0
+db 0x10, 0x81, "Radius Incorporated", 0
+db 0x10, 0x82, "EFA Corporation Of America", 0
+db 0x10, 0x83, "Forex Computer Corporation", 0
+db 0x10, 0x84, "Parador", 0
+db 0x10, 0x85, "Tulip Computers Int'l BV", 0
+db 0x10, 0x86, "J. Bond Computer Systems", 0
+db 0x10, 0x87, "Cache Computer", 0
+db 0x10, 0x88, "Microcomputer Systems (M) Son", 0
+db 0x10, 0x89, "Data General Corporation", 0
+db 0x10, 0x8A, "SBS Operations", 0
+db 0x10, 0x8C, "Oakleigh Systems Incorporated", 0
+db 0x10, 0x8D, "Olicom", 0
+db 0x10, 0x8E, "Sun Microsystems", 0
+db 0x10, 0x8F, "Systemsoft Corporation", 0
+db 0x10, 0x90, "Encore Computer Corporation", 0
+db 0x10, 0x91, "Intergraph Corporation", 0
+db 0x10, 0x92, "Diamond Computer Systems", 0
+db 0x10, 0x93, "National Instruments", 0
+db 0x10, 0x94, "Apostolos", 0
+db 0x10, 0x95, "Silicon Image, Incorporated", 0
+db 0x10, 0x96, "Alacron", 0
+db 0x10, 0x97, "Appian Graphics", 0
+db 0x10, 0x98, "Quantum Designs Limited", 0
+db 0x10, 0x99, "Samsung Electronics Co. Limited", 0
+db 0x10, 0x9A, "Packard Bell", 0
+db 0x10, 0x9B, "Gemlight Computer Limited", 0
+db 0x10, 0x9C, "Megachips Corporation", 0
+db 0x10, 0x9D, "Zida Technologies Limited", 0
+db 0x10, 0x9E, "Brooktree Corporation", 0
+db 0x10, 0x9F, "Trigem Computer Incorporated", 0
+db 0x10, 0xA0, "Meidensha Corporation", 0
+db 0x10, 0xA1, "Juko Electronics Incorporated Limited", 0
+db 0x10, 0xA2, "Quantum Corporation", 0
+db 0x10, 0xA3, "Everex Systems Incorporated", 0
+db 0x10, 0xA4, "Globe Manufacturing Sales", 0
+db 0x10, 0xA5, "Racal Interlan", 0
+db 0x10, 0xA8, "Sierra Semiconductor", 0
+db 0x10, 0xA9, "Silicon Graphics", 0
+db 0x10, 0xAB, "Digicom", 0
+db 0x10, 0xAC, "Honeywell IASD", 0
+db 0x10, 0xAD, "Winbond Systems Labs", 0
+db 0x10, 0xAE, "Cornerstone Technology", 0
+db 0x10, 0xAF, "Micro Computer Systems Incorporated", 0
+db 0x10, 0xB0, "Gainward GmbH", 0
+db 0x10, 0xB1, "Cabletron Systems Incorporated", 0
+db 0x10, 0xB2, "Raytheon Company", 0
+db 0x10, 0xB3, "Databook Incorporated", 0
+db 0x10, 0xB4, "STB Systems", 0
+db 0x10, 0xB5, "PLX Technology Incorporated", 0
+db 0x10, 0xB6, "Madge Networks", 0
+db 0x10, 0xB7, "3Com Corporation", 0
+db 0x10, 0xB8, "Standard Microsystems Corporation", 0
+db 0x10, 0xB9, "Ali Corporation", 0
+db 0x10, 0xBA, "Mitsubishi Electronics Corporation", 0
+db 0x10, 0xBB, "Dapha Electronics Corporation", 0
+db 0x10, 0xBC, "Advanced Logic Research Incorporated", 0
+db 0x10, 0xBD, "Surecom Technology", 0
+db 0x10, 0xBE, "Tsenglabs International Corporation", 0
+db 0x10, 0xBF, "MOST Corporation", 0
+db 0x10, 0xC0, "Boca Research Incorporated", 0
+db 0x10, 0xC1, "ICM Corporation Limited", 0
+db 0x10, 0xC2, "Auspex Systems Incorporated", 0
+db 0x10, 0xC3, "Samsung Semiconductors", 0
+db 0x10, 0xC4, "Award Software Int'l Incorporated", 0
+db 0x10, 0xC5, "Xerox Corporation", 0
+db 0x10, 0xC6, "Rambus Incorporated", 0
+db 0x10, 0xC8, "Neomagic Corporation", 0
+db 0x10, 0xC9, "Dataexpert Corporation", 0
+db 0x10, 0xCA, "Fujitsu Siemens", 0
+db 0x10, 0xCB, "Omron Corporation", 0
+db 0x10, 0xCD, "Advanced System Products", 0
+db 0x10, 0xCF, "Fujitsu Limited", 0
+db 0x10, 0xD1, "Future+ Systems", 0
+db 0x10, 0xD2, "Molex Incorporated", 0
+db 0x10, 0xD3, "Jabil Circuit Incorporated", 0
+db 0x10, 0xD4, "Hualon Microelectronics", 0
+db 0x10, 0xD5, "Autologic Incorporated", 0
+db 0x10, 0xD6, "Wilson .co .ltd", 0
+db 0x10, 0xD7, "BCM Advanced Research", 0
+db 0x10, 0xD8, "Advanced Peripherals Labs", 0
+db 0x10, 0xD9, "Macronix International Co. Limited", 0
+db 0x10, 0xDB, "Rohm Research", 0
+db 0x10, 0xDC, "CERN-European Lab. for Particle Physics", 0
+db 0x10, 0xDD, "Evans & Sutherland", 0
+db 0x10, 0xDE, "NVIDIA", 0
+db 0x10, 0xDF, "Emulex Corporation", 0
+db 0x10, 0xE1, "Tekram Technology Corporation Limited", 0
+db 0x10, 0xE2, "Aptix Corporation", 0
+db 0x10, 0xE3, "Tundra Semiconductor Corporation", 0
+db 0x10, 0xE4, "Tandem Computers", 0
+db 0x10, 0xE5, "Micro Industries Corporation", 0
+db 0x10, 0xE6, "Gainbery Computer Products Incorporated", 0
+db 0x10, 0xE7, "Vadem", 0
+db 0x10, 0xE8, "Applied Micro Circuits Corporation", 0
+db 0x10, 0xE9, "Alps Electronic Corporation Limited", 0
+db 0x10, 0xEA, "Tvia, Incorporated", 0
+db 0x10, 0xEB, "Artist Graphics", 0
+db 0x10, 0xEC, "Realtek Semiconductor Corporation", 0
+db 0x10, 0xED, "Ascii Corporation", 0
+db 0x10, 0xEE, "Xilinx Corporation", 0
+db 0x10, 0xEF, "Racore Computer Products", 0
+db 0x10, 0xF0, "Curtiss-Wright Controls Embedded Computing", 0
+db 0x10, 0xF1, "Tyan Computer", 0
+db 0x10, 0xF2, "Achme Computer Incorporated - GONE !!!!", 0
+db 0x10, 0xF3, "Alaris Incorporated", 0
+db 0x10, 0xF4, "S-Mos Systems", 0
+db 0x10, 0xF5, "NKK Corporation", 0
+db 0x10, 0xF6, "Creative Electronic Systems SA", 0
+db 0x10, 0xF7, "Matsushita Electric Industrial Corporation", 0
+db 0x10, 0xF8, "Altos India Limited", 0
+db 0x10, 0xF9, "PC Direct", 0
+db 0x10, 0xFA, "Truevision", 0
+db 0x10, 0xFB, "Thesys Microelectronic's", 0
+db 0x10, 0xFC, "I-O Data Device Incorporated", 0
+db 0x10, 0xFD, "Soyo Technology Corporation Limited", 0
+db 0x10, 0xFE, "Fast Electronic GmbH", 0
+db 0x10, 0xFF, "Ncube", 0
+db 0x11, 0x00, "Jazz Multimedia", 0
+db 0x11, 0x01, "Initio Corporation", 0
+db 0x11, 0x02, "Creative Technology LTD.", 0
+db 0x11, 0x03, "HighPoint Technologies, Incorporated", 0
+db 0x11, 0x04, "Rasterops", 0
+db 0x11, 0x05, "Sigma Designs Incorporated", 0
+db 0x11, 0x06, "VIA Technologies, Incorporated", 0
+db 0x11, 0x07, "Stratus Computer", 0
+db 0x11, 0x08, "Proteon Incorporated", 0
+db 0x11, 0x09, "Adaptec/Cogent Data Technologies", 0
+db 0x11, 0x0A, "Siemens AG", 0
+db 0x11, 0x0B, "Chromatic Research Incorporated", 0
+db 0x11, 0x0C, "Mini-Max Technology Incorporated", 0
+db 0x11, 0x0D, "ZNYX Corporation", 0
+db 0x11, 0x0E, "CPU Technology", 0
+db 0x11, 0x0F, "Ross Technology", 0
+db 0x11, 0x12, "Osicom Technologies Incorporated", 0
+db 0x11, 0x13, "Accton Technology Corporation", 0
+db 0x11, 0x14, "Atmel Corporation", 0
+db 0x11, 0x16, "Data Translation, Incorporated", 0
+db 0x11, 0x17, "Datacube Incorporated", 0
+db 0x11, 0x18, "Berg Electronics", 0
+db 0x11, 0x19, "ICP vortex Computersysteme GmbH", 0
+db 0x11, 0x1A, "Efficent Networks", 0
+db 0x11, 0x1C, "Tricord Systems Incorporated", 0
+db 0x11, 0x1D, "Integrated Device Technology Incorporated", 0
+db 0x11, 0x1F, "Precision Digital Images", 0
+db 0x11, 0x20, "EMC Corporation", 0
+db 0x11, 0x21, "Zilog", 0
+db 0x11, 0x23, "Excellent Design Incorporated", 0
+db 0x11, 0x24, "Leutron Vision AG", 0
+db 0x11, 0x25, "Eurocore/Vigra", 0
+db 0x11, 0x27, "FORE Systems", 0
+db 0x11, 0x29, "Firmworks", 0
+db 0x11, 0x2A, "Hermes Electronics Co. Limited", 0
+db 0x11, 0x2C, "Zenith Data Systems", 0
+db 0x11, 0x2D, "Ravicad", 0
+db 0x11, 0x2E, "Infomedia", 0
+db 0x11, 0x30, "Computervision", 0
+db 0x11, 0x31, "NXP Semiconductors N.V.", 0
+db 0x11, 0x32, "Mitel Corporation", 0
+db 0x11, 0x33, "Eicon Networks Corporation", 0
+db 0x11, 0x34, "Mercury Computer Systems Incorporated", 0
+db 0x11, 0x35, "Fuji Xerox Co Limited", 0
+db 0x11, 0x36, "Momentum Data Systems", 0
+db 0x11, 0x37, "Cisco Systems Incorporated", 0
+db 0x11, 0x38, "Ziatech Corporation", 0
+db 0x11, 0x39, "Dynamic Pictures Incorporated", 0
+db 0x11, 0x3A, "FWB Incorporated", 0
+db 0x11, 0x3B, "Network Computing Devices", 0
+db 0x11, 0x3C, "Cyclone Microsystems Incorporated", 0
+db 0x11, 0x3D, "Leading Edge Products Incorporated", 0
+db 0x11, 0x3E, "Sanyo Electric Co", 0
+db 0x11, 0x3F, "Equinox Systems", 0
+db 0x11, 0x40, "Intervoice Incorporated", 0
+db 0x11, 0x41, "Crest Microsystem Incorporated", 0
+db 0x11, 0x42, "Alliance Semiconductor", 0
+db 0x11, 0x43, "Netpower Incorporated", 0
+db 0x11, 0x44, "Cincinnati Milacron", 0
+db 0x11, 0x45, "Workbit Corporation", 0
+db 0x11, 0x46, "Force Computers", 0
+db 0x11, 0x47, "Interface Corporation", 0
+db 0x11, 0x48, "Marvell Semiconductor Germany GmbH", 0
+db 0x11, 0x49, "Win System Corporation", 0
+db 0x11, 0x4A, "VMIC", 0
+db 0x11, 0x4B, "Canopus corporation", 0
+db 0x11, 0x4C, "Annabooks", 0
+db 0x11, 0x4D, "IC Corporation", 0
+db 0x11, 0x4E, "Nikon Systems Incorporated", 0
+db 0x11, 0x4F, "Digi International", 0
+db 0x11, 0x50, "Thinking Machines Corporation", 0
+db 0x11, 0x51, "JAE Electronics Incorporated", 0
+db 0x11, 0x53, "Land Win Electronic Corporation", 0
+db 0x11, 0x54, "Melco Incorporated", 0
+db 0x11, 0x55, "Pine Technology Limited", 0
+db 0x11, 0x56, "Periscope Engineering", 0
+db 0x11, 0x57, "Avsys Corporation", 0
+db 0x11, 0x58, "Voarx R&D Incorporated", 0
+db 0x11, 0x59, "Mutech", 0
+db 0x11, 0x5A, "Harlequin Limited", 0
+db 0x11, 0x5B, "Parallax Graphics", 0
+db 0x11, 0x5C, "Photron Limited", 0
+db 0x11, 0x5D, "Xircom", 0
+db 0x11, 0x5E, "Peer Protocols Incorporated", 0
+db 0x11, 0x5F, "Maxtor Corporation", 0
+db 0x11, 0x60, "Megasoft Incorporated", 0
+db 0x11, 0x61, "PFU Limited", 0
+db 0x11, 0x62, "OA Laboratory Co Limited", 0
+db 0x11, 0x63, "mohamed alsherif", 0
+db 0x11, 0x64, "Advanced Peripherals Tech", 0
+db 0x11, 0x65, "Imagraph Corporation", 0
+db 0x11, 0x66, "Broadcom / ServerWorks", 0
+db 0x11, 0x67, "Mutoh Industries Incorporated", 0
+db 0x11, 0x68, "Thine Electronics Incorporated", 0
+db 0x11, 0x69, "Centre f/Dev. of Adv. Computing", 0
+db 0x11, 0x6A, "Luminex Software, Incorporated", 0
+db 0x11, 0x6B, "Connectware Incorporated", 0
+db 0x11, 0x6C, "Intelligent Resources", 0
+db 0x11, 0x6E, "Electronics for Imaging", 0
+db 0x11, 0x70, "Inventec Corporation", 0
+db 0x11, 0x72, "Altera Corporation", 0
+db 0x11, 0x73, "Adobe Systems", 0
+db 0x11, 0x74, "Bridgeport Machines", 0
+db 0x11, 0x75, "Mitron Computer Incorporated", 0
+db 0x11, 0x76, "SBE", 0
+db 0x11, 0x77, "Silicon Engineering", 0
+db 0x11, 0x78, "Alfa Incorporated", 0
+db 0x11, 0x79, "Toshiba corporation", 0
+db 0x11, 0x7A, "A-Trend Technology", 0
+db 0x11, 0x7B, "LG (Lucky Goldstar) Electronics Incorporated", 0
+db 0x11, 0x7C, "Atto Technology", 0
+db 0x11, 0x7D, "Becton & Dickinson", 0
+db 0x11, 0x7E, "T/R Systems", 0
+db 0x11, 0x7F, "Integrated Circuit Systems", 0
+db 0x11, 0x80, "RicohCompany,Limited", 0
+db 0x11, 0x83, "Fujikura Limited", 0
+db 0x11, 0x84, "Forks Incorporated", 0
+db 0x11, 0x85, "Dataworld", 0
+db 0x11, 0x86, "D-Link System Incorporated", 0
+db 0x11, 0x87, "Philips Healthcare", 0
+db 0x11, 0x88, "Shima Seiki Manufacturing Limited", 0
+db 0x11, 0x89, "Matsushita Electronics", 0
+db 0x11, 0x8A, "Hilevel Technology", 0
+db 0x11, 0x8B, "Hypertec Pty Limited", 0
+db 0x11, 0x8C, "Corollary Incorporated", 0
+db 0x11, 0x8D, "BitFlow Incorporated", 0
+db 0x11, 0x8E, "Hermstedt AG", 0
+db 0x11, 0x8F, "Green Logic", 0
+db 0x11, 0x90, "Tripace", 0
+db 0x11, 0x91, "Acard Technology Corporation", 0
+db 0x11, 0x92, "Densan Co. Limited", 0
+db 0x11, 0x94, "Toucan Technology", 0
+db 0x11, 0x95, "Ratoc System Incorporated", 0
+db 0x11, 0x96, "Hytec Electronics Limited", 0
+db 0x11, 0x97, "Gage Applied Technologies", 0
+db 0x11, 0x98, "Lambda Systems Incorporated", 0
+db 0x11, 0x99, "Attachmate Corporation", 0
+db 0x11, 0x9A, "Mind/Share Incorporated", 0
+db 0x11, 0x9B, "Omega Micro Incorporated", 0
+db 0x11, 0x9C, "Information Technology Inst.", 0
+db 0x11, 0x9D, "Bug Sapporo Japan", 0
+db 0x11, 0x9E, "Fujitsu Microelectronics Limited", 0
+db 0x11, 0x9F, "Bull Hn Information Systems", 0
+db 0x11, 0xA1, "Hamamatsu Photonics K.K.", 0
+db 0x11, 0xA2, "Sierra Research and Technology", 0
+db 0x11, 0xA3, "Deuretzbacher GmbH & Co. Eng. KG", 0
+db 0x11, 0xA4, "Barco", 0
+db 0x11, 0xA5, "MicroUnity Systems Engineering Incorporated", 0
+db 0x11, 0xA6, "Pure Data", 0
+db 0x11, 0xA7, "Power Computing Corporation", 0
+db 0x11, 0xA8, "Systech Corporation", 0
+db 0x11, 0xA9, "InnoSys Incorporated", 0
+db 0x11, 0xAA, "Actel", 0
+db 0x11, 0xAB, "Marvell Semiconductor", 0
+db 0x11, 0xAC, "Canon Information Systems", 0
+db 0x11, 0xAD, "Lite-On Technology Corporation", 0
+db 0x11, 0xAE, "Scitex Corporation Limited", 0
+db 0x11, 0xAF, "Avid Technology, Incorporated", 0
+db 0x11, 0xB0, "Quicklogic Corporation", 0
+db 0x11, 0xB1, "Apricot Computers", 0
+db 0x11, 0xB2, "Eastman Kodak", 0
+db 0x11, 0xB3, "Barr Systems Incorporated", 0
+db 0x11, 0xB4, "Leitch Technology International", 0
+db 0x11, 0xB5, "Radstone Technology Limited", 0
+db 0x11, 0xB6, "United Video Corporation", 0
+db 0x11, 0xB7, "Motorola", 0
+db 0x11, 0xB8, "Xpoint Technologies Incorporated", 0
+db 0x11, 0xB9, "Pathlight Technology Incorporated", 0
+db 0x11, 0xBA, "Videotron Corporation", 0
+db 0x11, 0xBB, "Pyramid Technology", 0
+db 0x11, 0xBC, "Network Peripherals Incorporated", 0
+db 0x11, 0xBD, "Pinnacle system", 0
+db 0x11, 0xBE, "International Microcircuits Incorporated", 0
+db 0x11, 0xBF, "Astrodesign Incorporated", 0
+db 0x11, 0xC1, "LSI Corporation", 0
+db 0x11, 0xC2, "Sand Microelectronics", 0
+db 0x11, 0xC4, "Document Technologies Ind.", 0
+db 0x11, 0xC5, "Shiva Corporationoratin", 0
+db 0x11, 0xC6, "Dainippon Screen Mfg. Co", 0
+db 0x11, 0xC7, "D.C.M. Data Systems", 0
+db 0x11, 0xC8, "Dolphin Interconnect Solutions", 0
+db 0x11, 0xC9, "MAGMA", 0
+db 0x11, 0xCA, "LSI Systems Incorporated", 0
+db 0x11, 0xCB, "Specialix International Limited", 0
+db 0x11, 0xCC, "Michels & Kleberhoff Computer GmbH", 0
+db 0x11, 0xCD, "HAL Computer Systems Incorporated", 0
+db 0x11, 0xCE, "Primary Rate Incorporated", 0
+db 0x11, 0xCF, "Pioneer Electronic Corporation", 0
+db 0x11, 0xD0, "BAE SYSTEMS - Manassas", 0
+db 0x11, 0xD1, "AuraVision Corporation", 0
+db 0x11, 0xD2, "Intercom Incorporated", 0
+db 0x11, 0xD3, "Trancell Systems Incorporated", 0
+db 0x11, 0xD4, "Analog Devices, Incorporated", 0
+db 0x11, 0xD5, "Tahoma Technology", 0
+db 0x11, 0xD6, "Tekelec Technologies", 0
+db 0x11, 0xD7, "TRENTON Technology, Incorporated", 0
+db 0x11, 0xD8, "Image Technologies Development", 0
+db 0x11, 0xD9, "Tec Corporation", 0
+db 0x11, 0xDA, "Novell", 0
+db 0x11, 0xDB, "Sega Enterprises Limited", 0
+db 0x11, 0xDC, "Questra Corporation", 0
+db 0x11, 0xDD, "Crosfield Electronics Limited", 0
+db 0x11, 0xDE, "Zoran Corporation", 0
+db 0x11, 0xE1, "Gec Plessey Semi Incorporated", 0
+db 0x11, 0xE2, "Samsung Information Systems America", 0
+db 0x11, 0xE3, "Quicklogic Corporation", 0
+db 0x11, 0xE4, "Second Wave Incorporated", 0
+db 0x11, 0xE5, "IIX Consulting", 0
+db 0x11, 0xE6, "Mitsui-Zosen System Research", 0
+db 0x11, 0xE8, "Digital Processing Systems Incorporated", 0
+db 0x11, 0xE9, "Highwater Designs Limited", 0
+db 0x11, 0xEA, "Elsag Bailey", 0
+db 0x11, 0xEB, "Formation, Incorporated", 0
+db 0x11, 0xEC, "Coreco Incorporated", 0
+db 0x11, 0xED, "Mediamatics", 0
+db 0x11, 0xEE, "Dome Imaging Systems Incorporated", 0
+db 0x11, 0xEF, "Nicolet Technologies BV", 0
+db 0x11, 0xF0, "Triya", 0
+db 0x11, 0xF2, "Picture Tel Japan KK", 0
+db 0x11, 0xF3, "Keithley Instruments, Incorporated", 0
+db 0x11, 0xF4, "Kinetic Systems Corporation", 0
+db 0x11, 0xF5, "Computing Devices Intl", 0
+db 0x11, 0xF6, "Powermatic Data Systems Limited", 0
+db 0x11, 0xF7, "Scientific Atlanta", 0
+db 0x11, 0xF8, "PMC-Sierra Incorporated", 0
+db 0x11, 0xF9, "I-Cube Incorporated", 0
+db 0x11, 0xFA, "Kasan Electronics Co Limited", 0
+db 0x11, 0xFB, "Datel Incorporated", 0
+db 0x11, 0xFD, "High Street Consultants", 0
+db 0x11, 0xFE, "Comtrol Corporation", 0
+db 0x11, 0xFF, "Scion Corporation", 0
+db 0x12, 0x00, "CSS Corporation", 0
+db 0x12, 0x01, "Vista Controls Corporation", 0
+db 0x12, 0x02, "Network General Corporation", 0
+db 0x12, 0x03, "Bayer Corporation Agfa Div", 0
+db 0x12, 0x04, "Lattice Semiconductor Corporation", 0
+db 0x12, 0x05, "Array Corporation", 0
+db 0x12, 0x06, "Amdahl Corporation", 0
+db 0x12, 0x08, "Parsytec GmbH", 0
+db 0x12, 0x09, "Sci Systems Incorporated", 0
+db 0x12, 0x0A, "Synaptel", 0
+db 0x12, 0x0B, "Adaptive Solutions", 0
+db 0x12, 0x0D, "Compression Labs Incorporated", 0
+db 0x12, 0x0E, "Cyclades Corporation", 0
+db 0x12, 0x0F, "Essential Communications", 0
+db 0x12, 0x10, "Hyperparallel Technologies", 0
+db 0x12, 0x11, "Braintech Incorporated", 0
+db 0x12, 0x13, "Applied Intelligent Systems Incorporated", 0
+db 0x12, 0x14, "Performance Technologies Incorporated", 0
+db 0x12, 0x15, "Interware Co Limited", 0
+db 0x12, 0x16, "Purup-Eskofot A/S", 0
+db 0x12, 0x17, "O2Micro Incorporated", 0
+db 0x12, 0x18, "Hybricon Corporation", 0
+db 0x12, 0x19, "First Virtual Corporation", 0
+db 0x12, 0x1A, "3dfx Interactive Incorporated", 0
+db 0x12, 0x1B, "Advanced Telecommunications Modules", 0
+db 0x12, 0x1C, "Nippon Texa Co Limited", 0
+db 0x12, 0x1D, "LiPPERT Embedded Computers GmbH", 0
+db 0x12, 0x1E, "CSPI", 0
+db 0x12, 0x1F, "Arcus Technology Incorporated", 0
+db 0x12, 0x20, "Ariel Corporation", 0
+db 0x12, 0x21, "Contec Microelectronics Europe BV", 0
+db 0x12, 0x22, "Ancor Communications Incorporated", 0
+db 0x12, 0x23, "Artesyn Embedded Technologies", 0
+db 0x12, 0x24, "Interactive Images", 0
+db 0x12, 0x25, "Power I/O Incorporated", 0
+db 0x12, 0x27, "Tech-Source", 0
+db 0x12, 0x28, "Norsk Elektro Optikk A/S", 0
+db 0x12, 0x29, "Data Kinesis Incorporated", 0
+db 0x12, 0x2A, "Integrated Telecom", 0
+db 0x12, 0x2B, "LG Industrial Systems Co. Limited", 0
+db 0x12, 0x2C, "sci-worx GmbH", 0
+db 0x12, 0x2D, "Aztech System Limited", 0
+db 0x12, 0x2E, "Absolute Analysis", 0
+db 0x12, 0x2F, "Andrew Corporation", 0
+db 0x12, 0x30, "Fishcamp Engineering", 0
+db 0x12, 0x31, "Woodward McCoach Incorporated", 0
+db 0x12, 0x33, "Bus-Tech Incorporated", 0
+db 0x12, 0x34, "Technical Corporation", 0
+db 0x12, 0x36, "Sigma Designs Incorporated", 0
+db 0x12, 0x37, "Alta Technology Corporation", 0
+db 0x12, 0x38, "Adtran", 0
+db 0x12, 0x39, "The 3DO Company", 0
+db 0x12, 0x3A, "Visicom Laboratories Incorporated", 0
+db 0x12, 0x3B, "Seeq Technology Incorporated", 0
+db 0x12, 0x3C, "Century Systems Incorporated", 0
+db 0x12, 0x3D, "Engineering Design Team Incorporated", 0
+db 0x12, 0x3F, "C-Cube Microsystems", 0
+db 0x12, 0x40, "Marathon Technologies Corporation", 0
+db 0x12, 0x41, "DSC Communications", 0
+db 0x12, 0x42, "JNI Corporation", 0
+db 0x12, 0x43, "Delphax", 0
+db 0x12, 0x44, "AVM AUDIOVISUELLES MKTG & Computer GmbH", 0
+db 0x12, 0x45, "APD S.A.", 0
+db 0x12, 0x46, "Dipix Technologies Incorporated", 0
+db 0x12, 0x47, "Xylon Research Incorporated", 0
+db 0x12, 0x48, "Central Data Corporation", 0
+db 0x12, 0x49, "Samsung Electronics Co. Limited", 0
+db 0x12, 0x4A, "AEG Electrocom GmbH", 0
+db 0x12, 0x4C, "Solitron Technologies Incorporated", 0
+db 0x12, 0x4D, "Stallion Technologies", 0
+db 0x12, 0x4E, "Cylink", 0
+db 0x12, 0x4F, "Infortrend Technology Incorporated", 0
+db 0x12, 0x50, "Hitachi Microcomputer System Limited", 0
+db 0x12, 0x51, "VLSI Solution OY", 0
+db 0x12, 0x53, "Guzik Technical Enterprises", 0
+db 0x12, 0x54, "Linear Systems Limited", 0
+db 0x12, 0x55, "Optibase Limited", 0
+db 0x12, 0x56, "Perceptive Solutions Incorporated", 0
+db 0x12, 0x57, "Vertex Networks Incorporated", 0
+db 0x12, 0x58, "Gilbarco Incorporated", 0
+db 0x12, 0x59, "Allied Telesyn International", 0
+db 0x12, 0x5A, "ABB Power Systems", 0
+db 0x12, 0x5B, "Asix Electronics Corporation", 0
+db 0x12, 0x5C, "Aurora Technologies Incorporated", 0
+db 0x12, 0x5D, "ESS Technology", 0
+db 0x12, 0x5E, "Specialvideo Engineering SRL", 0
+db 0x12, 0x5F, "Concurrent Technologies Incorporated", 0
+db 0x12, 0x60, "Intersil Corporation", 0
+db 0x12, 0x61, "Matsushita-Kotobuki Electronics Indu", 0
+db 0x12, 0x62, "ES Computer Co. Limited", 0
+db 0x12, 0x63, "Sonic Solutions", 0
+db 0x12, 0x64, "Aval Nagasaki Corporation", 0
+db 0x12, 0x65, "Casio Computer Co. Limited", 0
+db 0x12, 0x66, "Microdyne Corporation", 0
+db 0x12, 0x67, "S.A. Telecommunications", 0
+db 0x12, 0x68, "Tektronix", 0
+db 0x12, 0x69, "Thomson-CSF/TTM", 0
+db 0x12, 0x6A, "Lexmark International Incorporated", 0
+db 0x12, 0x6B, "Adax Incorporated", 0
+db 0x12, 0x6C, "Nortel Networks Corporation", 0
+db 0x12, 0x6D, "Splash Technology Incorporated", 0
+db 0x12, 0x6E, "Sumitomo Metal Industries Limited", 0
+db 0x12, 0x6F, "Silicon Motion", 0
+db 0x12, 0x70, "Olympus Optical Co. Limited", 0
+db 0x12, 0x71, "GW Instruments", 0
+db 0x12, 0x72, "themrtaish", 0
+db 0x12, 0x73, "Hughes Network Systems", 0
+db 0x12, 0x74, "Ensoniq", 0
+db 0x12, 0x75, "Network Appliance", 0
+db 0x12, 0x76, "Switched Network Technologies Incorporated", 0
+db 0x12, 0x77, "Comstream", 0
+db 0x12, 0x78, "Transtech Parallel Systems", 0
+db 0x12, 0x79, "Transmeta Corporation", 0
+db 0x12, 0x7B, "Pixera Corporation", 0
+db 0x12, 0x7C, "Crosspoint Solutions Incorporated", 0
+db 0x12, 0x7D, "Vela Research LP", 0
+db 0x12, 0x7E, "Winnov L.P.", 0
+db 0x12, 0x7F, "Fujifilm", 0
+db 0x12, 0x80, "Photoscript Group Limited", 0
+db 0x12, 0x81, "Yokogawa Electronic Corporation", 0
+db 0x12, 0x82, "Davicom Semiconductor Incorporated", 0
+db 0x12, 0x83, "Waldo", 0
+db 0x12, 0x85, "Platform Technologies Incorporated", 0
+db 0x12, 0x86, "MAZeT GmbH", 0
+db 0x12, 0x87, "LuxSonor Incorporated", 0
+db 0x12, 0x88, "Timestep Corporation", 0
+db 0x12, 0x89, "AVC Technology Incorporated", 0
+db 0x12, 0x8A, "Asante Technologies Incorporated", 0
+db 0x12, 0x8B, "Transwitch Corporation", 0
+db 0x12, 0x8C, "Retix Corporation", 0
+db 0x12, 0x8D, "G2 Networks Incorporated", 0
+db 0x12, 0x8F, "Tateno Dennou Incorporated", 0
+db 0x12, 0x90, "Sord Computer Corporation", 0
+db 0x12, 0x91, "NCS Computer Italia", 0
+db 0x12, 0x92, "Tritech Microelectronics Intl PTE", 0
+db 0x12, 0x93, "Media Reality Technology", 0
+db 0x12, 0x94, "Rhetorex Incorporated", 0
+db 0x12, 0x95, "Imagenation Corporation", 0
+db 0x12, 0x96, "Kofax Image Products", 0
+db 0x12, 0x97, "Shuttle Computer", 0
+db 0x12, 0x98, "Spellcaster Telecommunications Incorporated", 0
+db 0x12, 0x99, "Knowledge Technology Laboratories", 0
+db 0x12, 0x9A, "Curtiss Wright Controls Electronic Systems", 0
+db 0x12, 0x9B, "Image Access", 0
+db 0x12, 0x9D, "CompCore Multimedia Incorporated", 0
+db 0x12, 0x9E, "Victor Co. of Japan Limited", 0
+db 0x12, 0x9F, "OEC Medical Systems Incorporated", 0
+db 0x12, 0xA0, "Allen Bradley Co.", 0
+db 0x12, 0xA1, "Simpact Incorporated", 0
+db 0x12, 0xA2, "NewGen Systems Corporation", 0
+db 0x12, 0xA3, "Lucent Technologies AMR", 0
+db 0x12, 0xA4, "NTT Electronics Corporation", 0
+db 0x12, 0xA5, "Vision Dynamics Limited", 0
+db 0x12, 0xA6, "Scalable Networks Incorporated", 0
+db 0x12, 0xA7, "AMO GmbH", 0
+db 0x12, 0xA8, "News Datacom", 0
+db 0x12, 0xA9, "Xiotech Corporation", 0
+db 0x12, 0xAA, "SDL Communications Incorporated", 0
+db 0x12, 0xAB, "Yuan Yuan Enterprise Co. Limited", 0
+db 0x12, 0xAC, "MeasureX Corporation", 0
+db 0x12, 0xAD, "MULTIDATA GmbH", 0
+db 0x12, 0xAE, "Alteon Networks Incorporated", 0
+db 0x12, 0xAF, "TDK USA Corporation", 0
+db 0x12, 0xB0, "Jorge Scientific Corporation", 0
+db 0x12, 0xB1, "GammaLink", 0
+db 0x12, 0xB2, "General Signal Networks", 0
+db 0x12, 0xB3, "Interface Corporation Limited", 0
+db 0x12, 0xB4, "Future Tel Incorporated", 0
+db 0x12, 0xB5, "Granite Systems Incorporated", 0
+db 0x12, 0xB7, "Acumen", 0
+db 0x12, 0xB8, "Korg", 0
+db 0x12, 0xB9, "3Com Corporation", 0
+db 0x12, 0xBA, "Bittware Incorporated", 0
+db 0x12, 0xBB, "Nippon Unisoft Corporation", 0
+db 0x12, 0xBC, "Array Microsystems", 0
+db 0x12, 0xBD, "Computerm Corporation", 0
+db 0x12, 0xBF, "Fujifilm Microdevices", 0
+db 0x12, 0xC0, "Infimed", 0
+db 0x12, 0xC1, "GMM Research Corporation", 0
+db 0x12, 0xC2, "Mentec Limited", 0
+db 0x12, 0xC3, "Holtek Microelectronics Incorporated", 0
+db 0x12, 0xC4, "Connect Tech Incorporated", 0
+db 0x12, 0xC5, "Picture Elements Incorporated", 0
+db 0x12, 0xC6, "Mitani Corporation", 0
+db 0x12, 0xC7, "Dialogic Corporation", 0
+db 0x12, 0xC8, "G Force Co. Limited", 0
+db 0x12, 0xC9, "Gigi Operations", 0
+db 0x12, 0xCA, "Integrated Computing Engines, Incorporated", 0
+db 0x12, 0xCB, "Antex Electronics Corporation", 0
+db 0x12, 0xCC, "Pluto Technologies International", 0
+db 0x12, 0xCD, "Aims Lab", 0
+db 0x12, 0xCE, "Netspeed Incorporated", 0
+db 0x12, 0xCF, "Prophet Systems Incorporated", 0
+db 0x12, 0xD0, "GDE Systems Incorporated", 0
+db 0x12, 0xD1, "Huawei Technologies Co., Limited", 0
+db 0x12, 0xD3, "Vingmed Sound A/S", 0
+db 0x12, 0xD4, "Ulticom, Incorporated", 0
+db 0x12, 0xD5, "Equator Technologies", 0
+db 0x12, 0xD6, "Analogic Corporation", 0
+db 0x12, 0xD7, "Biotronic SRL", 0
+db 0x12, 0xD8, "Pericom Semiconductor", 0
+db 0x12, 0xD9, "Aculab Plc.", 0
+db 0x12, 0xDA, "TrueTime", 0
+db 0x12, 0xDB, "Annapolis Micro Systems Incorporated", 0
+db 0x12, 0xDC, "Symicron Computer Communication Limited", 0
+db 0x12, 0xDD, "Management Graphics Incorporated", 0
+db 0x12, 0xDE, "Rainbow Technologies", 0
+db 0x12, 0xDF, "SBS Technologies Incorporated", 0
+db 0x12, 0xE0, "Chase Research PLC", 0
+db 0x12, 0xE1, "Nintendo Co. Limited", 0
+db 0x12, 0xE2, "Datum Incorporated Bancomm-Timing Division", 0
+db 0x12, 0xE3, "Imation Corporation - Medical Imaging Syst", 0
+db 0x12, 0xE4, "Brooktrout Technology Incorporated", 0
+db 0x12, 0xE6, "Cirel Systems", 0
+db 0x12, 0xE7, "Sebring Systems Incorporated", 0
+db 0x12, 0xE8, "CRISC Corporation", 0
+db 0x12, 0xE9, "GE Spacenet", 0
+db 0x12, 0xEB, "Aureal Semiconductor", 0
+db 0x12, 0xEC, "3A International Incorporated", 0
+db 0x12, 0xED, "Optivision Incorporated", 0
+db 0x12, 0xEE, "Orange Micro, Incorporated", 0
+db 0x12, 0xEF, "Vienna Systems", 0
+db 0x12, 0xF0, "Pentek", 0
+db 0x12, 0xF1, "Sorenson Vision Incorporated", 0
+db 0x12, 0xF2, "Gammagraphx Incorporated", 0
+db 0x12, 0xF4, "Megatel", 0
+db 0x12, 0xF5, "Forks", 0
+db 0x12, 0xF7, "Cognex", 0
+db 0x12, 0xF8, "Electronic-Design GmbH", 0
+db 0x12, 0xF9, "FourFold Technologies", 0
+db 0x12, 0xFB, "Spectrum Signal Processing", 0
+db 0x12, 0xFC, "Capital Equipment Corporation", 0
+db 0x12, 0xFE, "esd Electronic System Design GmbH", 0
+db 0x13, 0x03, "Innovative Integration", 0
+db 0x13, 0x04, "Juniper Networks Incorporated", 0
+db 0x13, 0x07, "ComputerBoards", 0
+db 0x13, 0x08, "Jato Technologies Incorporated", 0
+db 0x13, 0x0A, "Mitsubishi Electric Microcomputer", 0
+db 0x13, 0x0B, "Colorgraphic Communications Corporation", 0
+db 0x13, 0x0F, "Advanet Incorporated", 0
+db 0x13, 0x10, "Gespac", 0
+db 0x13, 0x12, "Microscan Systems Incorporated", 0
+db 0x13, 0x13, "Yaskawa Electric Co.", 0
+db 0x13, 0x16, "Teradyne Incorporated", 0
+db 0x13, 0x17, "ADMtek Incorporated", 0
+db 0x13, 0x18, "Packet Engines, Incorporated", 0
+db 0x13, 0x19, "Forte Media", 0
+db 0x13, 0x1F, "SIIG", 0
+db 0x13, 0x25, "austriamicrosystems", 0
+db 0x13, 0x26, "Seachange International", 0
+db 0x13, 0x28, "CIFELLI SYSTEMS CORPORATION", 0
+db 0x13, 0x31, "RadiSys Corporation", 0
+db 0x13, 0x32, "Curtiss-Wright Controls Embedded Computing", 0
+db 0x13, 0x35, "Videomail Incorporated", 0
+db 0x13, 0x3D, "Prisa Networks", 0
+db 0x13, 0x3F, "SCM Microsystems", 0
+db 0x13, 0x42, "Promax Systems Incorporated", 0
+db 0x13, 0x44, "Micron Technology, Incorporated", 0
+db 0x13, 0x47, "Spectracom Corporation", 0
+db 0x13, 0x4A, "DTC Technology Corporation", 0
+db 0x13, 0x4B, "ARK Research Corporation", 0
+db 0x13, 0x4C, "Chori Joho System Co. Limited", 0
+db 0x13, 0x4D, "PCTEL Incorporated", 0
+db 0x13, 0x5A, "Brain Boxes Limited", 0
+db 0x13, 0x5B, "Giganet Incorporated", 0
+db 0x13, 0x5C, "Quatech Incorporated", 0
+db 0x13, 0x5D, "ABB Network Partner AB", 0
+db 0x13, 0x5E, "Sealevel Systems Incorporated", 0
+db 0x13, 0x5F, "I-Data International A-S", 0
+db 0x13, 0x60, "Meinberg Funkuhren GmbH & Co. KG", 0
+db 0x13, 0x61, "Soliton Systems K.K.", 0
+db 0x13, 0x63, "Phoenix Technologies Limited", 0
+db 0x13, 0x65, "Hypercope Corporation", 0
+db 0x13, 0x66, "Teijin Seiki Co. Limited", 0
+db 0x13, 0x67, "Hitachi Zosen Corporation", 0
+db 0x13, 0x68, "Skyware Corporation", 0
+db 0x13, 0x69, "Digigram", 0
+db 0x13, 0x6B, "Kawasaki Steel Corporation", 0
+db 0x13, 0x6C, "Adtek System Science Co Limited", 0
+db 0x13, 0x75, "Boeing - Sunnyvale", 0
+db 0x13, 0x7A, "Mark Of The Unicorn Incorporated", 0
+db 0x13, 0x7B, "PPT Vision", 0
+db 0x13, 0x7C, "Iwatsu Electric Co Limited", 0
+db 0x13, 0x7D, "Dynachip Corporation", 0
+db 0x13, 0x7E, "Patriot Scientific Corporation", 0
+db 0x13, 0x80, "Sanritz Automation Co LTC", 0
+db 0x13, 0x81, "Brains Co. Limited", 0
+db 0x13, 0x82, "Marian - Electronic & Software", 0
+db 0x13, 0x84, "Stellar Semiconductor Incorporated", 0
+db 0x13, 0x85, "Netgear", 0
+db 0x13, 0x87, "Curtiss-Wright Controls Electronic Systems", 0
+db 0x13, 0x88, "Hitachi Information Technology Co Limited", 0
+db 0x13, 0x89, "Applicom International", 0
+db 0x13, 0x8A, "Validity Sensors, Incorporated", 0
+db 0x13, 0x8B, "Tokimec Incorporated", 0
+db 0x13, 0x8E, "Basler GMBH", 0
+db 0x13, 0x8F, "Patapsco Designs Incorporated", 0
+db 0x13, 0x90, "Concept Development Incorporated", 0
+db 0x13, 0x93, "Moxa Technologies Co Limited", 0
+db 0x13, 0x94, "Level One Communications", 0
+db 0x13, 0x95, "Ambicom Incorporated", 0
+db 0x13, 0x96, "Cipher Systems Incorporated", 0
+db 0x13, 0x97, "Cologne Chip Designs GmbH", 0
+db 0x13, 0x98, "Clarion Co. Limited", 0
+db 0x13, 0x9A, "Alacritech Incorporated", 0
+db 0x13, 0x9D, "Xstreams PLC/ EPL Limited", 0
+db 0x13, 0x9E, "Echostar Data Networks", 0
+db 0x13, 0xA0, "Crystal Group Incorporated", 0
+db 0x13, 0xA1, "Kawasaki Heavy Industries Limited", 0
+db 0x13, 0xA3, "HI-FN Incorporated", 0
+db 0x13, 0xA4, "Rascom Incorporated", 0
+db 0x13, 0xA7, "amc330", 0
+db 0x13, 0xA8, "Exar Corporation", 0
+db 0x13, 0xA9, "Siemens Healthcare", 0
+db 0x13, 0xAA, "Nortel Networks - BWA Division", 0
+db 0x13, 0xAF, "T.Sqware", 0
+db 0x13, 0xB1, "Tamura Corporation", 0
+db 0x13, 0xB4, "Wellbean Co Incorporated", 0
+db 0x13, 0xB5, "ARM Limited", 0
+db 0x13, 0xB6, "DLoG Gesellschaft für elektronische Datentechnik mbH", 0
+db 0x13, 0xB8, "Nokia Telecommunications OY", 0
+db 0x13, 0xBD, "Sharp Corporation", 0
+db 0x13, 0xBF, "Sharewave Incorporated", 0
+db 0x13, 0xC0, "Microgate Corporation", 0
+db 0x13, 0xC1, "LSI", 0
+db 0x13, 0xC2, "Technotrend Systemtechnik GMBH", 0
+db 0x13, 0xC3, "Janz Computer AG", 0
+db 0x13, 0xC7, "Blue Chip Technology Limited", 0
+db 0x13, 0xCC, "Metheus Corporation", 0
+db 0x13, 0xCF, "Studio Audio & Video Limited", 0
+db 0x13, 0xD0, "B2C2 Incorporated", 0
+db 0x13, 0xD1, "AboCom Systems, Incorporated", 0
+db 0x13, 0xD4, "Graphics Microsystems Incorporated", 0
+db 0x13, 0xD6, "K.I. Technology Co Limited", 0
+db 0x13, 0xD7, "Toshiba Engineering Corporation", 0
+db 0x13, 0xD8, "Phobos Corporation", 0
+db 0x13, 0xD9, "Apex Incorporated", 0
+db 0x13, 0xDC, "Netboost Corporation", 0
+db 0x13, 0xDE, "ABB Robotics Products AB", 0
+db 0x13, 0xDF, "E-Tech Incorporated", 0
+db 0x13, 0xE0, "GVC Corporation", 0
+db 0x13, 0xE3, "Nest Incorporated", 0
+db 0x13, 0xE4, "Calculex Incorporated", 0
+db 0x13, 0xE5, "Telesoft Design Limited", 0
+db 0x13, 0xE9, "Intraserver Technology Incorporated", 0
+db 0x13, 0xEA, "Dallas Semiconductor", 0
+db 0x13, 0xF0, "IC Plus Corporation", 0
+db 0x13, 0xF1, "OCE - Industries S.A.", 0
+db 0x13, 0xF4, "Troika Networks Incorporated", 0
+db 0x13, 0xF6, "C-Media Electronics Incorporated", 0
+db 0x13, 0xF9, "NTT Advanced Technology Corporation", 0
+db 0x13, 0xFA, "Pentland Systems Limited", 0
+db 0x13, 0xFB, "Aydin Corporation", 0
+db 0x13, 0xFD, "Micro Science Incorporated", 0
+db 0x13, 0xFE, "Advantech Co., Limited", 0
+db 0x13, 0xFF, "Silicon Spice Incorporated", 0
+db 0x14, 0x00, "ArtX Incorporated", 0
+db 0x14, 0x02, "Meilhaus Electronic GmbH Germany", 0
+db 0x14, 0x04, "Fundamental Software Incorporated", 0
+db 0x14, 0x06, "Oce Print Logics Technologies S.A.", 0
+db 0x14, 0x07, "Lava Computer MFG Incorporated", 0
+db 0x14, 0x08, "Aloka Co. Limited", 0
+db 0x14, 0x09, "SUNIX Co., Limited", 0
+db 0x14, 0x0A, "DSP Research Incorporated", 0
+db 0x14, 0x0B, "Ramix Incorporated", 0
+db 0x14, 0x0D, "Matsushita Electric Works Limited", 0
+db 0x14, 0x0F, "Salient Systems Corporation", 0
+db 0x14, 0x12, "IC Ensemble, Incorporated", 0
+db 0x14, 0x13, "Addonics", 0
+db 0x14, 0x15, "Oxford Semiconductor Limited- now part of PLX Technology", 0
+db 0x14, 0x18, "Kyushu Electronics Systems Incorporated", 0
+db 0x14, 0x19, "Excel Switching Corporation", 0
+db 0x14, 0x1B, "Zoom Telephonics Incorporated", 0
+db 0x14, 0x1E, "Fanuc Co. Limited", 0
+db 0x14, 0x1F, "Visiontech Limited", 0
+db 0x14, 0x20, "Psion Dacom PLC", 0
+db 0x14, 0x25, "Chelsio Communications", 0
+db 0x14, 0x28, "Edec Co Limited", 0
+db 0x14, 0x29, "Unex Technology Corporation", 0
+db 0x14, 0x2A, "Kingmax Technology Incorporated", 0
+db 0x14, 0x2B, "Radiolan", 0
+db 0x14, 0x2C, "Minton Optic Industry Co Limited", 0
+db 0x14, 0x2D, "Pixstream Incorporated", 0
+db 0x14, 0x30, "ITT Aerospace/Communications Division", 0
+db 0x14, 0x33, "Eltec Elektronik AG", 0
+db 0x14, 0x35, "RTD Embedded Technologies, Incorporated", 0
+db 0x14, 0x36, "CIS Technology Incorporated", 0
+db 0x14, 0x37, "Nissin IncorporatedCo", 0
+db 0x14, 0x38, "Atmel-Dream", 0
+db 0x14, 0x3F, "Lightwell Co Limited- Zax Division", 0
+db 0x14, 0x41, "Agie SA.", 0
+db 0x14, 0x43, "Unibrain S.A.", 0
+db 0x14, 0x45, "Logical Co Limited", 0
+db 0x14, 0x46, "Graphin Co., LTD", 0
+db 0x14, 0x47, "Aim GMBH", 0
+db 0x14, 0x48, "Alesis Studio", 0
+db 0x14, 0x4A, "ADLINK Technology Incorporated", 0
+db 0x14, 0x4B, "Loronix Information Systems, Incorporated", 0
+db 0x14, 0x4D, "sanyo", 0
+db 0x14, 0x50, "Octave Communications Ind.", 0
+db 0x14, 0x51, "SP3D Chip Design GMBH", 0
+db 0x14, 0x53, "Mycom Incorporated", 0
+db 0x14, 0x58, "Giga-Byte Technologies", 0
+db 0x14, 0x5C, "Cryptek", 0
+db 0x14, 0x5F, "Baldor Electric Company", 0
+db 0x14, 0x60, "Dynarc Incorporated", 0
+db 0x14, 0x62, "Micro-Star International Co Limited", 0
+db 0x14, 0x63, "Fast Corporation", 0
+db 0x14, 0x64, "Interactive Circuits & Systems Limited", 0
+db 0x14, 0x68, "Ambit Microsystems Corporation", 0
+db 0x14, 0x69, "Cleveland Motion Controls", 0
+db 0x14, 0x6C, "Ruby Tech Corporation", 0
+db 0x14, 0x6D, "Tachyon Incorporated", 0
+db 0x14, 0x6E, "WMS Gaming", 0
+db 0x14, 0x71, "Integrated Telecom Express Incorporated", 0
+db 0x14, 0x73, "Zapex Technologies Incorporated", 0
+db 0x14, 0x74, "Doug Carson & Associates", 0
+db 0x14, 0x77, "Net Insight", 0
+db 0x14, 0x78, "Diatrend Corporation", 0
+db 0x14, 0x7B, "Abit Computer Corporation", 0
+db 0x14, 0x7F, "Nihon Unisys Limited", 0
+db 0x14, 0x82, "Isytec - Integrierte Systemtechnik Gmbh", 0
+db 0x14, 0x83, "Labway Coporation", 0
+db 0x14, 0x85, "Erma - Electronic GMBH", 0
+db 0x14, 0x89, "KYE Systems Corporation", 0
+db 0x14, 0x8A, "Opto 22", 0
+db 0x14, 0x8B, "Innomedialogic Incorporated", 0
+db 0x14, 0x8C, "C.P. Technology Co. Limited", 0
+db 0x14, 0x8D, "Digicom Systems Incorporated", 0
+db 0x14, 0x8E, "OSI Plus Corporation", 0
+db 0x14, 0x8F, "Plant Equipment Incorporated", 0
+db 0x14, 0x90, "TC Labs Pty Limited", 0
+db 0x14, 0x91, "Futronic", 0
+db 0x14, 0x93, "Maker Communications", 0
+db 0x14, 0x95, "Tokai Communications Industry Co. Limited", 0
+db 0x14, 0x96, "Joytech Computer Co. Limited", 0
+db 0x14, 0x97, "SMA Technologie AG", 0
+db 0x14, 0x98, "Tews Technologies", 0
+db 0x14, 0x99, "Micro-Technology Co Limited", 0
+db 0x14, 0x9A, "Andor Technology Limited", 0
+db 0x14, 0x9B, "Seiko Instruments Incorporated", 0
+db 0x14, 0x9E, "Mapletree Networks Incorporated", 0
+db 0x14, 0x9F, "Lectron Co Limited", 0
+db 0x14, 0xA0, "Softing AG", 0
+db 0x14, 0xA2, "Millennium Engineering Incorporated", 0
+db 0x14, 0xA4, "GVC/BCM Advanced Research", 0
+db 0x14, 0xA9, "Hivertec Incorporated", 0
+db 0x14, 0xAB, "Mentor Graphics Corporation", 0
+db 0x14, 0xB1, "Nextcom K.K.", 0
+db 0x14, 0xB3, "Xpeed Incorporated", 0
+db 0x14, 0xB4, "Philips Business Electronics B.V.", 0
+db 0x14, 0xB5, "Creamware GmbH", 0
+db 0x14, 0xB6, "Quantum Data Corporation", 0
+db 0x14, 0xB7, "Proxim Incorporated", 0
+db 0x14, 0xB9, "Aironet Wireless Communication", 0
+db 0x14, 0xBA, "Internix Incorporated", 0
+db 0x14, 0xBB, "Semtech Corporation", 0
+db 0x14, 0xBE, "L3 Communications", 0
+db 0x14, 0xC0, "Compal Electronics, Incorporated", 0
+db 0x14, 0xC1, "Myricom Incorporated", 0
+db 0x14, 0xC2, "DTK Computer", 0
+db 0x14, 0xC4, "Iwasaki Information Systems Co Limited", 0
+db 0x14, 0xC5, "ABB AB (Sweden)", 0
+db 0x14, 0xC6, "Data Race Incorporated", 0
+db 0x14, 0xC7, "Modular Technology Limited", 0
+db 0x14, 0xC8, "Turbocomm Tech Incorporated", 0
+db 0x14, 0xC9, "Odin Telesystems Incorporated", 0
+db 0x14, 0xCB, "Billionton Systems Incorporated/Cadmus Micro Incorporated", 0
+db 0x14, 0xCD, "Universal Scientific Ind.", 0
+db 0x14, 0xCF, "TEK Microsystems Incorporated", 0
+db 0x14, 0xD4, "Panacom Technology Corporation", 0
+db 0x14, 0xD5, "Nitsuko Corporation", 0
+db 0x14, 0xD6, "Accusys Incorporated", 0
+db 0x14, 0xD7, "Hirakawa Hewtech Corporation", 0
+db 0x14, 0xD8, "Hopf Elektronik GMBH", 0
+db 0x14, 0xD9, "Alpha Processor Incorporated", 0
+db 0x14, 0xDB, "Avlab Technology Incorporated", 0
+db 0x14, 0xDC, "Amplicon Liveline Limited", 0
+db 0x14, 0xDD, "Imodl Incorporated", 0
+db 0x14, 0xDE, "Applied Integration Corporation", 0
+db 0x14, 0xE3, "Amtelco", 0
+db 0x14, 0xE4, "Broadcom", 0
+db 0x14, 0xEA, "Planex Communications, Incorporated", 0
+db 0x14, 0xEB, "Seiko Epson Corporation", 0
+db 0x14, 0xEC, "Acqiris", 0
+db 0x14, 0xED, "Datakinetics Limited", 0
+db 0x14, 0xEF, "Carry Computer Eng. Co Limited", 0
+db 0x14, 0xF1, "Conexant", 0
+db 0x14, 0xF2, "Mobility Electronics, Incorporated", 0
+db 0x14, 0xF4, "Tokyo Electronic Industry Co. Limited", 0
+db 0x14, 0xF5, "Sopac Limited", 0
+db 0x14, 0xF6, "Coyote Technologies LLC", 0
+db 0x14, 0xF7, "Wolf Technology Incorporated", 0
+db 0x14, 0xF8, "Audiocodes Incorporated", 0
+db 0x14, 0xF9, "AG Communications", 0
+db 0x14, 0xFB, "Transas Marine (UK) Limited", 0
+db 0x14, 0xFC, "Quadrics Limited", 0
+db 0x14, 0xFD, "Silex Technology Incorporated", 0
+db 0x14, 0xFE, "Archtek Telecom Corporation", 0
+db 0x14, 0xFF, "Twinhead International Corporation", 0
+db 0x15, 0x01, "Banksoft Canada Limited", 0
+db 0x15, 0x02, "Mitsubishi Electric Logistics Support Co", 0
+db 0x15, 0x03, "Kawasaki LSI USA Incorporated", 0
+db 0x15, 0x04, "Kaiser Electronics", 0
+db 0x15, 0x06, "Chameleon Systems Incorporated", 0
+db 0x15, 0x07, "Htec Limited", 0
+db 0x15, 0x09, "First International Computer Incorporated", 0
+db 0x15, 0x0B, "Yamashita Systems Corporation", 0
+db 0x15, 0x0C, "Kyopal Co Limited", 0
+db 0x15, 0x0D, "Warpspped Incorporated", 0
+db 0x15, 0x0E, "C-Port Corporation", 0
+db 0x15, 0x0F, "Intec GMBH", 0
+db 0x15, 0x10, "Behavior Tech Computer Corporation", 0
+db 0x15, 0x11, "Centillium Technology Corporation", 0
+db 0x15, 0x12, "Rosun Technologies Incorporated", 0
+db 0x15, 0x13, "Raychem", 0
+db 0x15, 0x14, "TFL LAN Incorporated", 0
+db 0x15, 0x15, "ICS Advent", 0
+db 0x15, 0x16, "Myson Technology Incorporated", 0
+db 0x15, 0x17, "Echotek Corporation", 0
+db 0x15, 0x18, "Kontron Modular Computers GmbH (PEP Modular Computers GMBH)", 0
+db 0x15, 0x19, "Telefon Aktiebolaget LM Ericsson", 0
+db 0x15, 0x1A, "Globetek Incorporated", 0
+db 0x15, 0x1B, "Combox Limited", 0
+db 0x15, 0x1C, "Digital Audio Labs Incorporated", 0
+db 0x15, 0x1D, "Fujitsu Computer Products Of America", 0
+db 0x15, 0x1E, "Matrix Corporation", 0
+db 0x15, 0x1F, "Topic Semiconductor Corporation", 0
+db 0x15, 0x20, "Chaplet System Incorporated", 0
+db 0x15, 0x21, "Bell Corporation", 0
+db 0x15, 0x22, "Mainpine Limited", 0
+db 0x15, 0x23, "Music Semiconductors", 0
+db 0x15, 0x24, "ENE Technology Incorporated", 0
+db 0x15, 0x25, "Impact Technologies", 0
+db 0x15, 0x26, "ISS Incorporated", 0
+db 0x15, 0x27, "Solectron", 0
+db 0x15, 0x28, "Acksys", 0
+db 0x15, 0x29, "American Microsystems Incorporated", 0
+db 0x15, 0x2A, "Quickturn Design Systems", 0
+db 0x15, 0x2B, "Flytech Technology Co Limited", 0
+db 0x15, 0x2C, "Macraigor Systems LLC", 0
+db 0x15, 0x2D, "Quanta Computer Incorporated", 0
+db 0x15, 0x2E, "Melec Incorporated", 0
+db 0x15, 0x2F, "Philips - Crypto", 0
+db 0x15, 0x32, "Echelon Corporation", 0
+db 0x15, 0x33, "Baltimore", 0
+db 0x15, 0x34, "Road Corporation", 0
+db 0x15, 0x35, "Evergreen Technologies Incorporated", 0
+db 0x15, 0x37, "Datalex Communcations", 0
+db 0x15, 0x38, "Aralion Incorporated", 0
+db 0x15, 0x39, "Atelier Informatiques et Electronique Et", 0
+db 0x15, 0x3A, "ONO Sokki", 0
+db 0x15, 0x3B, "Terratec Electronic GMBH", 0
+db 0x15, 0x3C, "Antal Electronic", 0
+db 0x15, 0x3D, "Filanet Corporation", 0
+db 0x15, 0x3E, "Techwell Incorporated", 0
+db 0x15, 0x3F, "MIPS Technologies Incorporated", 0
+db 0x15, 0x40, "Provideo Multimedia Co Limited", 0
+db 0x15, 0x41, "Telocity Incorporated", 0
+db 0x15, 0x42, "Vivid Technology Incorporated", 0
+db 0x15, 0x43, "Silicon Laboratories", 0
+db 0x15, 0x44, "DCM Technologies Limited", 0
+db 0x15, 0x45, "VisionTek", 0
+db 0x15, 0x46, "IOI Technology Corporation", 0
+db 0x15, 0x47, "Mitutoyo Corporation", 0
+db 0x15, 0x48, "Jet Propulsion Laboratory", 0
+db 0x15, 0x49, "Interconnect Systems Solutions", 0
+db 0x15, 0x4A, "Max Technologies Incorporated", 0
+db 0x15, 0x4B, "Computex Co Limited", 0
+db 0x15, 0x4C, "Visual Technology Incorporated", 0
+db 0x15, 0x4D, "PAN International Industrial Corporation", 0
+db 0x15, 0x4E, "Servotest Limited", 0
+db 0x15, 0x4F, "Stratabeam Technology", 0
+db 0x15, 0x50, "Open Network Company Limited", 0
+db 0x15, 0x51, "Smart Electronic Development GMBH", 0
+db 0x15, 0x53, "Chicony Electronics Company Limited", 0
+db 0x15, 0x54, "Prolink Microsystems Corporation", 0
+db 0x15, 0x55, "Gesytec GmbH", 0
+db 0x15, 0x56, "PLDA", 0
+db 0x15, 0x57, "Mediastar Co. Limited", 0
+db 0x15, 0x58, "Clevo/Kapok Computer", 0
+db 0x15, 0x59, "SI Logic Limited", 0
+db 0x15, 0x5A, "Innomedia Incorporated", 0
+db 0x15, 0x5B, "Protac International Corporation", 0
+db 0x15, 0x5C, "s", 0
+db 0x15, 0x5D, "MAC System Company Limited", 0
+db 0x15, 0x5E, "KUKA Roboter GmbH", 0
+db 0x15, 0x5F, "Perle Systems Limited", 0
+db 0x15, 0x60, "Terayon Communications Systems", 0
+db 0x15, 0x61, "Viewgraphics Incorporated", 0
+db 0x15, 0x62, "Symbol Technologies, Incorporated", 0
+db 0x15, 0x63, "A-Trend Technology Company Limited", 0
+db 0x15, 0x64, "Yamakatsu Electronics Industry Company Limited", 0
+db 0x15, 0x65, "Biostar Microtech Intl Corporation", 0
+db 0x15, 0x66, "Ardent Technologies Incorporated", 0
+db 0x15, 0x67, "Jungsoft", 0
+db 0x15, 0x68, "DDK Electronics Incorporated", 0
+db 0x15, 0x69, "Palit Microsystems Incorporated", 0
+db 0x15, 0x6A, "Avtec Systems Incorporated", 0
+db 0x15, 0x6B, "S2io Incorporated", 0
+db 0x15, 0x6C, "Vidac Electronics GMBH", 0
+db 0x15, 0x6D, "Alpha-Top Corporation", 0
+db 0x15, 0x6E, "Alfa Incorporated", 0
+db 0x15, 0x6F, "M-Systems Flash Disk Pioneers Limited", 0
+db 0x15, 0x70, "Lecroy Corporation", 0
+db 0x15, 0x71, "Contemporary Controls", 0
+db 0x15, 0x72, "Otis Elevator Company", 0
+db 0x15, 0x73, "Lattice - Vantis", 0
+db 0x15, 0x74, "Fairchild Semiconductor", 0
+db 0x15, 0x75, "Voltaire Advanced Data Security Limited", 0
+db 0x15, 0x76, "Viewcast Com", 0
+db 0x15, 0x78, "Hitt", 0
+db 0x15, 0x79, "Dual Technology Corporation", 0
+db 0x15, 0x7A, "Japan Elecronics Ind. Incorporated", 0
+db 0x15, 0x7B, "Star Multimedia Corporation", 0
+db 0x15, 0x7C, "Eurosoft (UK)", 0
+db 0x15, 0x7D, "Gemflex Networks", 0
+db 0x15, 0x7E, "Transition Networks", 0
+db 0x15, 0x7F, "PX Instruments Technology Limited", 0
+db 0x15, 0x80, "Primex Aerospace Co.", 0
+db 0x15, 0x81, "SEH Computertechnik GMBH", 0
+db 0x15, 0x82, "Cytec Corporation", 0
+db 0x15, 0x83, "Inet Technologies Incorporated", 0
+db 0x15, 0x84, "Vetronix Corporation Engenharia Limited", 0
+db 0x15, 0x85, "Marconi Commerce Systems SRL", 0
+db 0x15, 0x86, "Lancast Incorporated", 0
+db 0x15, 0x87, "Konica Corporation", 0
+db 0x15, 0x88, "Solidum Systems Corporation", 0
+db 0x15, 0x89, "Atlantek Microsystems Pty Limited", 0
+db 0x15, 0x8A, "Digalog Systems Incorporated", 0
+db 0x15, 0x8B, "Allied Data Technologies", 0
+db 0x15, 0x8C, "Hitachi Semiconductor & Devices Sales Co", 0
+db 0x15, 0x8D, "Point Multimedia Systems", 0
+db 0x15, 0x8E, "Lara Technology Incorporated", 0
+db 0x15, 0x8F, "Ditect Coop", 0
+db 0x15, 0x90, "3pardata Incorporated", 0
+db 0x15, 0x91, "ARN", 0
+db 0x15, 0x92, "Syba Tech Limited", 0
+db 0x15, 0x93, "Bops Incorporated", 0
+db 0x15, 0x94, "Netgame Limited", 0
+db 0x15, 0x95, "Diva Systems Corporation", 0
+db 0x15, 0x96, "Folsom Research Incorporated", 0
+db 0x15, 0x97, "Memec Design Services", 0
+db 0x15, 0x98, "Granite Microsystems", 0
+db 0x15, 0x99, "Delta Electronics Incorporated", 0
+db 0x15, 0x9A, "General Instrument", 0
+db 0x15, 0x9B, "Faraday Technology Corporation", 0
+db 0x15, 0x9C, "Stratus Computer Systems", 0
+db 0x15, 0x9D, "Ningbo Harrison Electronics Co Limited", 0
+db 0x15, 0x9E, "A-Max Technology Co Limited", 0
+db 0x15, 0x9F, "Galea Network Security", 0
+db 0x15, 0xA0, "Compumaster SRL", 0
+db 0x15, 0xA1, "Geocast Network Systems Incorporated", 0
+db 0x15, 0xA2, "Catalyst Enterprises Incorporated", 0
+db 0x15, 0xA3, "Italtel", 0
+db 0x15, 0xA4, "X-Net OY", 0
+db 0x15, 0xA5, "Toyota MACS Incorporated", 0
+db 0x15, 0xA6, "Sunlight Ultrasound Technologies Limited", 0
+db 0x15, 0xA7, "SSE Telecom Incorporated", 0
+db 0x15, 0xA8, "Shanghai Communications Technologies Cen", 0
+db 0x15, 0xAA, "Moreton Bay", 0
+db 0x15, 0xAB, "Bluesteel Networks Incorporated", 0
+db 0x15, 0xAC, "North Atlantic Instruments", 0
+db 0x15, 0xAD, "VMware Incorporated", 0
+db 0x15, 0xAE, "Amersham Pharmacia Biotech", 0
+db 0x15, 0xB0, "Zoltrix International Limited", 0
+db 0x15, 0xB1, "Source Technology Incorporated", 0
+db 0x15, 0xB2, "Mosaid Technologies Incorporated", 0
+db 0x15, 0xB3, "Mellanox Technology", 0
+db 0x15, 0xB4, "CCI/Triad", 0
+db 0x15, 0xB5, "Cimetrics Incorporated", 0
+db 0x15, 0xB6, "Texas Memory Systems Incorporated", 0
+db 0x15, 0xB7, "Sandisk Corporation", 0
+db 0x15, 0xB8, "Addi-Data GMBH", 0
+db 0x15, 0xB9, "Maestro Digital Communications", 0
+db 0x15, 0xBA, "Impacct Technology Corporation", 0
+db 0x15, 0xBB, "Portwell Incorporated", 0
+db 0x15, 0xBC, "Agilent Technologies", 0
+db 0x15, 0xBD, "DFI Incorporated", 0
+db 0x15, 0xBE, "Sola Electronics", 0
+db 0x15, 0xBF, "High Tech Computer Corporation (HTC)", 0
+db 0x15, 0xC0, "BVM Limited", 0
+db 0x15, 0xC1, "Quantel", 0
+db 0x15, 0xC2, "Newer Technology Incorporated", 0
+db 0x15, 0xC3, "Taiwan Mycomp Co Limited", 0
+db 0x15, 0xC4, "EVSX Incorporated", 0
+db 0x15, 0xC5, "Procomp Informatics Limited", 0
+db 0x15, 0xC6, "Technical University Of Budapest", 0
+db 0x15, 0xC7, "Tateyama System Laboratory Co Limited", 0
+db 0x15, 0xC8, "Penta Media Co. Limited", 0
+db 0x15, 0xC9, "Serome Technology Incorporated", 0
+db 0x15, 0xCA, "Bitboys OY", 0
+db 0x15, 0xCB, "AG Electronics Limited", 0
+db 0x15, 0xCC, "Hotrail Incorporated", 0
+db 0x15, 0xCD, "Dreamtech Co Limited", 0
+db 0x15, 0xCE, "Genrad Incorporated", 0
+db 0x15, 0xCF, "Hilscher GMBH", 0
+db 0x15, 0xD1, "Infineon Technologies AG", 0
+db 0x15, 0xD2, "FIC (First International Computer Incorporated", 0
+db 0x15, 0xD3, "NDS Technologies Israel Limited", 0
+db 0x15, 0xD4, "Iwill Corporation", 0
+db 0x15, 0xD5, "Tatung Co.", 0
+db 0x15, 0xD6, "Entridia Corporation", 0
+db 0x15, 0xD7, "Rockwell-Collins Incorporated", 0
+db 0x15, 0xD8, "Cybernetics Technology Co Limited", 0
+db 0x15, 0xD9, "Super Micro Computer Incorporated", 0
+db 0x15, 0xDA, "Cyberfirm Incorporated", 0
+db 0x15, 0xDB, "Applied Computing Systems Incorporated", 0
+db 0x15, 0xDC, "Litronic Incorporated", 0
+db 0x15, 0xDD, "Sigmatel Incorporated", 0
+db 0x15, 0xDE, "Malleable Technologies Incorporated", 0
+db 0x15, 0xE0, "Cacheflow Incorporated", 0
+db 0x15, 0xE1, "Voice Technologies Group", 0
+db 0x15, 0xE2, "Quicknet Technologies Incorporated", 0
+db 0x15, 0xE3, "Networth Technologies Incorporated", 0
+db 0x15, 0xE4, "VSN Systemen BV", 0
+db 0x15, 0xE5, "Valley Technologies Incorporated", 0
+db 0x15, 0xE6, "Agere Incorporated", 0
+db 0x15, 0xE7, "GET Engineering Corporation", 0
+db 0x15, 0xE8, "National Datacomm Corporation", 0
+db 0x15, 0xE9, "Pacific Digital Corporation", 0
+db 0x15, 0xEA, "Tokyo Denshi Sekei K.K.", 0
+db 0x15, 0xEB, "Drsearch GMBH", 0
+db 0x15, 0xEC, "Beckhoff Automation GmbH", 0
+db 0x15, 0xED, "Macrolink Incorporated", 0
+db 0x15, 0xEE, "IN Win Development Incorporated", 0
+db 0x15, 0xEF, "Intelligent Paradigm Incorporated", 0
+db 0x15, 0xF0, "B-Tree Systems Incorporated", 0
+db 0x15, 0xF1, "Times N Systems Incorporated", 0
+db 0x15, 0xF2, "SPOT Imaging Solutions a division of Diagnostic Instruments Incorporated", 0
+db 0x15, 0xF3, "Digitmedia Corporation", 0
+db 0x15, 0xF4, "Valuesoft", 0
+db 0x15, 0xF5, "Power Micro Research", 0
+db 0x15, 0xF6, "Extreme Packet Device Incorporated", 0
+db 0x15, 0xF7, "Banctec", 0
+db 0x15, 0xF8, "Koga Electronics Co", 0
+db 0x15, 0xF9, "Zenith Electronics Co", 0
+db 0x15, 0xFA, "Axzam Corporation", 0
+db 0x15, 0xFB, "Zilog Incorporated", 0
+db 0x15, 0xFC, "Techsan Electronics Co Limited", 0
+db 0x15, 0xFD, "N-Cubed.Net", 0
+db 0x15, 0xFE, "Kinpo Electronics Incorporated", 0
+db 0x15, 0xFF, "Fastpoint Technologies Incorporated", 0
+db 0x16, 0x00, "Northrop Grumman - Canada Limited", 0
+db 0x16, 0x01, "Tenta Technology", 0
+db 0x16, 0x02, "Prosys-TEC Incorporated", 0
+db 0x16, 0x03, "Nokia Wireless Business Communications", 0
+db 0x16, 0x04, "Central System Research Co Limited", 0
+db 0x16, 0x05, "Pairgain Technologies", 0
+db 0x16, 0x06, "Europop AG", 0
+db 0x16, 0x07, "Lava Semiconductor Manufacturing Incorporated", 0
+db 0x16, 0x08, "Automated Wagering International", 0
+db 0x16, 0x09, "Sciemetric Instruments Incorporated", 0
+db 0x16, 0x0A, "Kollmorgen Servotronix", 0
+db 0x16, 0x0B, "Onkyo Corporation", 0
+db 0x16, 0x0C, "Oregon Micro Systems Incorporated", 0
+db 0x16, 0x0D, "Aaeon Electronics Incorporated", 0
+db 0x16, 0x0E, "CML Emergency Services", 0
+db 0x16, 0x0F, "ITEC Co Limited", 0
+db 0x16, 0x10, "Tottori Sanyo Electric Co Limited", 0
+db 0x16, 0x11, "Bel Fuse Incorporated", 0
+db 0x16, 0x12, "Telesynergy Research Incorporated", 0
+db 0x16, 0x13, "System Craft Incorporated", 0
+db 0x16, 0x14, "Jace Tech Incorporated", 0
+db 0x16, 0x15, "Equus Computer Systems Incorporated", 0
+db 0x16, 0x16, "Iotech Incorporated", 0
+db 0x16, 0x17, "Rapidstream Incorporated", 0
+db 0x16, 0x18, "Esec SA", 0
+db 0x16, 0x19, "FarSite Communications Limited", 0
+db 0x16, 0x1B, "Mobilian Israel Limited", 0
+db 0x16, 0x1C, "Berkshire Products", 0
+db 0x16, 0x1D, "Gatec", 0
+db 0x16, 0x1E, "Kyoei Sangyo Co Limited", 0
+db 0x16, 0x1F, "Arima Computer Corporation", 0
+db 0x16, 0x20, "Sigmacom Co Limited", 0
+db 0x16, 0x21, "Lynx Studio Technology Incorporated", 0
+db 0x16, 0x22, "Nokia Home Communications", 0
+db 0x16, 0x23, "KRF Tech Limited", 0
+db 0x16, 0x24, "CE Infosys GMBH", 0
+db 0x16, 0x25, "Warp Nine Engineering", 0
+db 0x16, 0x26, "TDK Semiconductor Corporation", 0
+db 0x16, 0x27, "BCom Electronics Incorporated", 0
+db 0x16, 0x29, "Kongsberg Spacetec a.s.", 0
+db 0x16, 0x2A, "Sejin Computerland Company Limited", 0
+db 0x16, 0x2B, "Shanghai Bell Company Limited", 0
+db 0x16, 0x2C, "C&H Technologies Incorporated", 0
+db 0x16, 0x2D, "Reprosoft Company Limited", 0
+db 0x16, 0x2E, "Margi Systems Incorporated", 0
+db 0x16, 0x2F, "Rohde & Schwarz GMBH & Co KG", 0
+db 0x16, 0x30, "Sky Computers Incorporated", 0
+db 0x16, 0x31, "NEC Computer International", 0
+db 0x16, 0x32, "Verisys Incorporated", 0
+db 0x16, 0x33, "Adac Corporation", 0
+db 0x16, 0x34, "Visionglobal Network Corporation", 0
+db 0x16, 0x35, "Decros / S.ICZ a.s.", 0
+db 0x16, 0x36, "Jean Company Limited", 0
+db 0x16, 0x37, "NSI", 0
+db 0x16, 0x38, "Eumitcom Technology Incorporated", 0
+db 0x16, 0x3A, "Air Prime Incorporated", 0
+db 0x16, 0x3B, "Glotrex Co Limited", 0
+db 0x16, 0x3C, "intel", 0
+db 0x16, 0x3D, "Heidelberg Digital LLC", 0
+db 0x16, 0x3E, "3dpower", 0
+db 0x16, 0x3F, "Renishaw PLC", 0
+db 0x16, 0x40, "Intelliworxx Incorporated", 0
+db 0x16, 0x41, "MKNet Corporation", 0
+db 0x16, 0x42, "Bitland", 0
+db 0x16, 0x43, "Hajime Industries Limited", 0
+db 0x16, 0x44, "Western Avionics Limited", 0
+db 0x16, 0x45, "Quick-Serv. Computer Co. Limited", 0
+db 0x16, 0x46, "Nippon Systemware Co Limited", 0
+db 0x16, 0x47, "Hertz Systemtechnik GMBH", 0
+db 0x16, 0x48, "MeltDown Systems LLC", 0
+db 0x16, 0x49, "Jupiter Systems", 0
+db 0x16, 0x4A, "Aiwa Co. Limited", 0
+db 0x16, 0x4C, "Department Of Defense", 0
+db 0x16, 0x4D, "Ishoni Networks", 0
+db 0x16, 0x4E, "Micrel Incorporated", 0
+db 0x16, 0x4F, "Datavoice (Pty) Limited", 0
+db 0x16, 0x50, "Admore Technology Incorporated", 0
+db 0x16, 0x51, "Chaparral Network Storage", 0
+db 0x16, 0x52, "Spectrum Digital Incorporated", 0
+db 0x16, 0x53, "Nature Worldwide Technology Corporation", 0
+db 0x16, 0x54, "Sonicwall Incorporated", 0
+db 0x16, 0x55, "Dazzle Multimedia Incorporated", 0
+db 0x16, 0x56, "Insyde Software Corporation", 0
+db 0x16, 0x57, "Brocade Communications Systems", 0
+db 0x16, 0x58, "Med Associates Incorporated", 0
+db 0x16, 0x59, "Shiba Denshi Systems Incorporated", 0
+db 0x16, 0x5A, "Epix Incorporated", 0
+db 0x16, 0x5B, "Real-Time Digital Incorporated", 0
+db 0x16, 0x5C, "Kondo Kagaku", 0
+db 0x16, 0x5D, "Hsing Tech. Enterprise Co. Limited", 0
+db 0x16, 0x5E, "Hyunju Computer Co. Limited", 0
+db 0x16, 0x5F, "Comartsystem Korea", 0
+db 0x16, 0x60, "Network Security Technologies Incorporated (NetSec)", 0
+db 0x16, 0x61, "Worldspace Corporation", 0
+db 0x16, 0x62, "Int Labs", 0
+db 0x16, 0x63, "Elmec Incorporated Limited", 0
+db 0x16, 0x64, "Fastfame Technology Co. Limited", 0
+db 0x16, 0x65, "Edax Incorporated", 0
+db 0x16, 0x66, "Norpak Corporation", 0
+db 0x16, 0x67, "CoSystems Incorporated", 0
+db 0x16, 0x68, "Actiontec Electronics Incorporated", 0
+db 0x16, 0x6A, "Komatsu Limited", 0
+db 0x16, 0x6B, "Supernet Incorporated", 0
+db 0x16, 0x6C, "Shade Limited", 0
+db 0x16, 0x6D, "Sibyte Incorporated", 0
+db 0x16, 0x6E, "Schneider Automation Incorporated", 0
+db 0x16, 0x6F, "Televox Software Incorporated", 0
+db 0x16, 0x70, "Rearden Steel", 0
+db 0x16, 0x71, "Atan Technology Incorporated", 0
+db 0x16, 0x72, "Unitec Co. Limited", 0
+db 0x16, 0x73, "pctel", 0
+db 0x16, 0x75, "Square Wave Technology", 0
+db 0x16, 0x76, "Emachines Incorporated", 0
+db 0x16, 0x77, "Bernecker + Rainer", 0
+db 0x16, 0x78, "INH Semiconductor", 0
+db 0x16, 0x79, "Tokyo Electron Device Limited", 0
+db 0x16, 0x7F, "iba AG", 0
+db 0x16, 0x80, "Dunti Corporation", 0
+db 0x16, 0x81, "Hercules", 0
+db 0x16, 0x82, "PINE Technology, Limited", 0
+db 0x16, 0x88, "CastleNet Technology Incorporated", 0
+db 0x16, 0x8A, "Utimaco Safeware AG", 0
+db 0x16, 0x8B, "Circut Assembly Corporation", 0
+db 0x16, 0x8C, "Atheros Communications Incorporated", 0
+db 0x16, 0x8D, "NMI Electronics Limited", 0
+db 0x16, 0x8E, "Hyundai MultiCAV Computer Co. Limited", 0
+db 0x16, 0x8F, "KDS Innotech Corporation", 0
+db 0x16, 0x90, "NetContinuum, Incorporated", 0
+db 0x16, 0x93, "FERMA", 0
+db 0x16, 0x95, "EPoX Computer Company Limited", 0
+db 0x16, 0xAE, "SafeNet Incorporated", 0
+db 0x16, 0xB3, "CNF Mobile Solutions", 0
+db 0x16, 0xB8, "Sonnet Technologies, Incorporated", 0
+db 0x16, 0xCA, "Cenatek Incorporated", 0
+db 0x16, 0xCB, "Minolta Co. Limited", 0
+db 0x16, 0xCC, "Inari Incorporated", 0
+db 0x16, 0xD0, "Systemax", 0
+db 0x16, 0xE0, "Third Millenium Test Solutions, Incorporated", 0
+db 0x16, 0xE5, "Intellon Corporation", 0
+db 0x16, 0xEC, "U.S. Robotics", 0
+db 0x16, 0xF0, "LaserLinc Incorporated", 0
+db 0x16, 0xF1, "Adicti Corporation", 0
+db 0x16, 0xF3, "Jetway Information Company Limited", 0
+db 0x16, 0xF6, "VideoTele.com Incorporated", 0
+db 0x17, 0x00, "Antara LLC", 0
+db 0x17, 0x01, "Interactive Computer Products Incorporated", 0
+db 0x17, 0x02, "Internet Machines Corporation", 0
+db 0x17, 0x03, "Desana Systems", 0
+db 0x17, 0x04, "Clearwater Networks", 0
+db 0x17, 0x05, "Digital First", 0
+db 0x17, 0x06, "Pacific Broadband Communications", 0
+db 0x17, 0x07, "Cogency Semiconductor Incorporated", 0
+db 0x17, 0x08, "Harris Corporation", 0
+db 0x17, 0x09, "Zarlink Semiconductor", 0
+db 0x17, 0x0A, "Alpine Electronics Incorporated", 0
+db 0x17, 0x0B, "NetOctave Incorporated", 0
+db 0x17, 0x0C, "YottaYotta Incorporated", 0
+db 0x17, 0x0D, "SensoMotoric Instruments GmbH", 0
+db 0x17, 0x0E, "San Valley Systems, Incorporated", 0
+db 0x17, 0x0F, "Cyberdyne Incorporated", 0
+db 0x17, 0x10, "Pelago Networks", 0
+db 0x17, 0x11, "MyName Technologies, Incorporated", 0
+db 0x17, 0x12, "NICE Systems Incorporated", 0
+db 0x17, 0x13, "TOPCON Corporation", 0
+db 0x17, 0x25, "Vitesse Semiconductor", 0
+db 0x17, 0x34, "Fujitsu-Siemens Computers GmbH", 0
+db 0x17, 0x37, "LinkSys", 0
+db 0x17, 0x3B, "Altima Communications Incorporated", 0
+db 0x17, 0x43, "Peppercon AG", 0
+db 0x17, 0x4B, "PC Partner Limited", 0
+db 0x17, 0x52, "Global Brands Manufacture Limited", 0
+db 0x17, 0x53, "TeraRecon Incorporated", 0
+db 0x17, 0x55, "Alchemy Semiconductor Incorporated", 0
+db 0x17, 0x6A, "General Dynamics Canada", 0
+db 0x17, 0x75, "General Electric", 0
+db 0x17, 0x89, "Ennyah Technologies Corporation", 0
+db 0x17, 0x93, "Unitech Electronics Company Limited", 0
+db 0x17, 0xA1, "Tascorp", 0
+db 0x17, 0xA7, "Start Network Technology Company Limited", 0
+db 0x17, 0xAA, "Legend Limited (Beijing)", 0
+db 0x17, 0xAB, "Phillips Components", 0
+db 0x17, 0xAF, "Hightech Information Systems Limited", 0
+db 0x17, 0xBE, "Philips Semiconductors", 0
+db 0x17, 0xC0, "Wistron Corporation", 0
+db 0x17, 0xC4, "Movita", 0
+db 0x17, 0xCC, "NetChip", 0
+db 0x17, 0xCD, "Cadence Design Systems", 0
+db 0x17, 0xD5, "Neterion Incorporated", 0
+db 0x17, 0xDB, "Cray Incorporated", 0
+db 0x17, 0xE9, "DH electronics GmbH / Sabrent", 0
+db 0x17, 0xEE, "Connect Components Limited", 0
+db 0x17, 0xF3, "RDC Semiconductor Company Limited", 0
+db 0x17, 0xFE, "INPROCOMM", 0
+db 0x18, 0x13, "Ambient Technologies Incorporated", 0
+db 0x18, 0x14, "Ralink Technology, Corporation", 0
+db 0x18, 0x15, "devolo AG", 0
+db 0x18, 0x20, "InfiniCon Systems, Incorporated", 0
+db 0x18, 0x24, "Avocent", 0
+db 0x18, 0x41, "Panda Platinum", 0
+db 0x18, 0x60, "Primagraphics Limited", 0
+db 0x18, 0x6C, "Humusoft S.R.O", 0
+db 0x18, 0x87, "Elan Digital Systems Limited", 0
+db 0x18, 0x88, "Varisys Limited", 0
+db 0x18, 0x8D, "Millogic Limited", 0
+db 0x18, 0x90, "Egenera, Incorporated", 0
+db 0x18, 0xBC, "Info-Tek Corporation", 0
+db 0x18, 0xC9, "ARVOO Engineering BV", 0
+db 0x18, 0xCA, "XGI Technology Incorporated", 0
+db 0x18, 0xF1, "Spectrum Systementwicklung Microelectronic GmbH", 0
+db 0x18, 0xF4, "Napatech A/S", 0
+db 0x18, 0xF7, "Commtech, Incorporated", 0
+db 0x18, 0xFB, "Resilience Corporation", 0
+db 0x19, 0x04, "Ritmo", 0
+db 0x19, 0x05, "WIS Technology, Incorporated", 0
+db 0x19, 0x10, "Seaway Networks", 0
+db 0x19, 0x12, "Renesas Electronics", 0
+db 0x19, 0x31, "Option NV", 0
+db 0x19, 0x41, "Stelar", 0
+db 0x19, 0x54, "One Stop Systems, Incorporated", 0
+db 0x19, 0x69, "Atheros Communications", 0
+db 0x19, 0x71, "AGEIA Technologies, Incorporated", 0
+db 0x19, 0x7B, "JMicron Technology Corporation", 0
+db 0x19, 0x8A, "Nallatech", 0
+db 0x19, 0x91, "Topstar Digital Technologies Co., Limited", 0
+db 0x19, 0xA2, "ServerEngines", 0
+db 0x19, 0xA8, "DAQDATA GmbH", 0
+db 0x19, 0xAC, "Kasten Chase Applied Research", 0
+db 0x19, 0xB6, "Mikrotik", 0
+db 0x19, 0xE2, "Vector Informatik GmbH", 0
+db 0x19, 0xE3, "DDRdrive LLC", 0
+db 0x1A, 0x08, "Linux Networx", 0
+db 0x1A, 0x41, "Tilera Corporation", 0
+db 0x1A, 0x42, "Imaginant", 0
+db 0x1B, 0x13, "Jaton Corporation USA", 0
+db 0x1B, 0x21, "Asustek - ASMedia Technology Incorporated", 0
+db 0x1B, 0x6F, "Etron", 0
+db 0x1B, 0x73, "Fresco Logic Incorporated", 0
+db 0x1B, 0x91, "Averna", 0
+db 0x1B, 0xAD, "ReFLEX CES", 0
+db 0x1C, 0x0F, "Monarch Innovative Technologies Private Limited", 0
+db 0x1C, 0x32, "Highland Technology Incorporated", 0
+db 0x1C, 0x39, "Thomson Video Networks", 0
+db 0x1D, 0xE1, "Tekram", 0
+db 0x1F, 0xCF, "Miranda Technologies Limited", 0
+db 0x20, 0x01, "Temporal Research Limited", 0
+db 0x26, 0x46, "Kingston Technology Company", 0
+db 0x27, 0x0F, "ChainTek Computer Company Limited", 0
+db 0x2E, 0xC1, "Zenic Incorporated", 0
+db 0x33, 0x88, "Hint Corporation", 0
+db 0x34, 0x11, "Quantum Designs (H.K.) Incorporated", 0
+db 0x35, 0x13, "ARCOM Control Systems Limited", 0
+db 0x38, 0xEF, "4links", 0
+db 0x3D, 0x3D, "3Dlabs, Incorporated Limited", 0
+db 0x40, 0x05, "Avance Logic Incorporated", 0
+db 0x41, 0x44, "Alpha Data", 0
+db 0x41, 0x6C, "Aladdin Knowledge Systems", 0
+db 0x43, 0x48, "wch.cn", 0
+db 0x46, 0x80, "UMAX Computer Corporation", 0
+db 0x48, 0x43, "Hercules Computer Technology", 0
+db 0x49, 0x43, "Growth Networks", 0
+db 0x49, 0x54, "Integral Technologies", 0
+db 0x49, 0x78, "Axil Computer Incorporated", 0
+db 0x4C, 0x48, "Lung Hwa Electronics", 0
+db 0x4C, 0x53, "SBS-OR Industrial Computers", 0
+db 0x4C, 0xA1, "Seanix Technology Incorporated", 0
+db 0x4D, 0x51, "Mediaq Incorporated", 0
+db 0x4D, 0x54, "Microtechnica Company Limited", 0
+db 0x4D, 0xDC, "ILC Data Device Corporation", 0
+db 0x4E, 0x80, "Samsung Windows Portable Devices", 0
+db 0x50, 0x53, "TBS/Voyetra Technologies", 0
+db 0x50, 0x8A, "Samsung T10 MP3 Player", 0
+db 0x51, 0x36, "S S Technologies", 0
+db 0x51, 0x43, "Qualcomm Incorporated USA", 0
+db 0x53, 0x33, "S3 Graphics Company Limited", 0
+db 0x54, 0x4C, "Teralogic Incorporated", 0
+db 0x55, 0x55, "Genroco Incorporated", 0
+db 0x58, 0x53, "Citrix Systems, Incorporated", 0
+db 0x64, 0x09, "Logitec Corporation", 0
+db 0x66, 0x66, "Decision Computer International Company", 0
+db 0x69, 0x45, "ASMedia Technology Incorporated", 0
+db 0x76, 0x04, "O.N. Electric Company Limited", 0
+db 0x7d, 0x10,	"D-Link Corporation", 0
+db 0x80, 0x80, "Xirlink, Incorporated", 0
+db 0x80, 0x86, "Intel Corporation", 0
+db 0x80, 0xEE, "Oracle Corporation - InnoTek Systemberatung GmbH", 0
+db 0x88, 0x66, "T-Square Design Incorporated", 0
+db 0x88, 0x88, "Silicon Magic", 0
+db 0x8E, 0x0E, "Computone Corporation", 0
+db 0x90, 0x04, "Adaptec Incorporated", 0
+db 0x90, 0x05, "Adaptec Incorporated", 0
+db 0x91, 0x9A, "Gigapixel Corporation", 0
+db 0x94, 0x12, "Holtek", 0
+db 0x96, 0x99, "Omni Media Technology Incorporated", 0
+db 0x97, 0x10, "MosChip Semiconductor Technology", 0
+db 0x99, 0x02, "StarGen Incorporated", 0
+db 0xA0, 0xA0, "Aopen Incorporated", 0
+db 0xA0, 0xF1, "Unisys Corporation", 0
+db 0xA2, 0x00, "NEC Corporation", 0
+db 0xA2, 0x59, "Hewlett Packard", 0
+db 0xA3, 0x04, "Sony", 0
+db 0xA7, 0x27, "3com Corporation", 0
+db 0xAA, 0x42, "Abekas Incorporated", 0
+db 0xAC, 0x1E, "Digital Receiver Technology Incorporated", 0
+db 0xB1, 0xB3, "Shiva Europe Limited", 0
+db 0xB8, 0x94, "Brown & Sharpe Mfg. Company", 0
+db 0xBE, 0xEF, "Mindstream Computing", 0
+db 0xC0, 0x01, "TSI Telsys", 0
+db 0xC0, 0xA9, "Micron/Crucial Technology", 0
+db 0xC0, 0xDE, "Motorola", 0
+db 0xC0, 0xFE, "Motion Engineering Inc.", 0
+db 0xC6, 0x22, "Hudson Soft Company Limited", 0
+db 0xCA, 0x50, "Varian Incorporated", 0
+db 0xCA, 0xFE, "Chrysalis-ITS", 0
+db 0xCC, 0xCC, "Catapult Communications", 0
+db 0xD4, 0xD4, "Curtiss-Wright Controls Embedded Computing", 0
+db 0xDC, 0x93, "Dawicontrol", 0
+db 0xDE, 0xAD, "Indigita Corporation", 0
+db 0xDE, 0xAF, "Middle Digital, Inc", 0
+db 0xE1, 0x59, "Tiger Jet Network Inc", 0
+db 0xE4, 0xBF, "EKF Elektronik GMBH", 0
+db 0xEA, 0x01, "Eagle Technology", 0
+db 0xEA, 0xBB, "Aashima Technology B.V.", 0
+db 0xEA, 0xCE, "Endace Measurement Systems Limited", 0
+db 0xEC, 0xC0, "Echo Digital Audio Corporation", 0
+db 0xED, 0xD8, "ARK Logic Incorporated", 0
+db 0xF5, 0xF5, "F5 Networks Incorporated", 0
+db 0xFA, 0x57, "Interagon AS", 0
+db 0xFF, 0xFF, "-Unknown or Invalid Vendor ID-", 0

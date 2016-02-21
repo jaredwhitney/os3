@@ -1,5 +1,10 @@
 %include "..\boot\betterRealMode.asm"
+%include "..\boot\IDTmain.asm"
 ;%include "..\boot\realMode.asm"
+%include "..\Drivers\GFX\Generic_Display.asm"
+%include "..\Drivers\PS2\PS_2.asm"
+%include "..\Drivers\PS2\Generic_Mouse.asm"
+%include "..\Drivers\PS2\Generic_Keyboard.asm"
 
 %include "..\modules\dolphin\Dolphin.asm"
 %include "..\modules\dolphin\WindowTools.asm"
@@ -18,19 +23,12 @@
 %include "..\Graphics\Button.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
-%include "..\Drivers\PS2\PS_2.asm"
-%include "..\Drivers\PS2\Generic_Mouse.asm"
-%include "..\Drivers\PS2\Generic_Keyboard.asm"
-
 %include "..\Drivers\HDD\rmATA.asm"
 %include "..\Drivers\HDD\ATA_DETECT.asm"
 %include "..\Drivers\HDD\AHCI_COMMANDS.asm"
 %include "..\Drivers\HDD\AHCI_DMAWRITE.asm"
 
-%include "..\Drivers\GFX\Generic_Display.asm"
-
 %include "..\Drivers\PCI\Generic_ComponentInterface.asm"
-;%include "..\Drivers\PCI\PCI_LookupTables.asm"
 %include "..\Drivers\USB\EHCI.asm"
 
 %include "..\Tools\System\Time.asm"
@@ -57,13 +55,12 @@
 
 %include "..\debug\TextMode.asm"
 %include "..\debug\print.asm"	; depricated
-%include "..\boot\IDTmain.asm"
 
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"
 
-;%include "..\Debug\InfoPanel.asm"	; show numerical value in realtime in window
-;%include "..\Debug\HelloWorld.asm"	; text window test
+%include "..\Drivers\PCI\PCI_LookupTables.asm"
+
 Catfish.notify:
 ret
 View.file:

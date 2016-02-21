@@ -25,10 +25,6 @@
 
 	; Store the drive the computer booted from into dl
 	mov [boot_drive], dl
-
-	; Store that we are booting in real hardware (it will be overridden later if not running on a real computer)
-	mov ax, 0x0
-	mov [0x1000], ax
 	
 	; Load the kernel into RAM
 	mov dl, 0x80
@@ -51,12 +47,15 @@ boot.ATAload :
 		mov dl, 0x80
 		int 0x13
 			jc sload_error
+		mov ax, [boot.ATAdata.sectorsRead]
+		mov [0x1000], ax
 	popa
 	ret
 boot.ATAdata :
 	db 0x10	; packet size
 	db 0	; always 0
-	dw 128	; sectors to load
+	boot.ATAdata.sectorsRead :
+		dw 128	; sectors to load
 	dw S2_CODE_LOC	; offs
 	dw 0x0	; seg
 	dd 0x1	; start LBA

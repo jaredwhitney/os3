@@ -1,10 +1,63 @@
+KERNEL_SIZE equ (((KERNEL_END-KERNEL_START)-1)/0x200)+1
+
 [bits 32]
 
 ;	BEGIN EXECUTING THE KERNEL	;
 Kernel.init :
-		
+	
+	
 	;	PREVENT WINDOWS FROM BEING DRAWN	;
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
+	
+	; Load the rest of the kernel ;
+		mov ax, [0x1000]
+		and eax, 0xFFFF
+		mov edx, KERNEL_SIZE
+		sub edx, eax ; edx contains the number of sectors that need to be loaded
+		add edx, 1
+		;add eax, 2	; eax contains the sector to begin loading from
+		push eax
+		mov ecx, S2_CODE_LOC
+		imul eax, 0x200
+		add ecx, eax
+		pop eax	; ecx contains the place to begin writing the data to
+		sub ecx, 0x200	; should work
+		;;
+		mov dword [kernel.sloadcount2], eax
+		mov dword [kernel.sloadcount], ecx
+		;;
+		mov dword [os_RealMode_functionPointer], kernel.loadFunc
+		Kernel.init.loadLoop :
+		mov [k_lF.low], eax
+		pusha
+		call os.hopToRealMode
+		popa
+			mov esi, 0x7c00
+			mov edi, ecx
+			push ax
+			xor ax, ax
+			mov es, ax
+			pop ax
+			push ecx
+			mov ecx, 0x200
+					;			mov eax, [esi]
+					;			mov dword [kernel.sloadcount2], eax
+					;			mov eax, [edi]
+					;			mov dword [kernel.sloadcount], eax
+					ahstoia :
+					mov ebx, [esi]
+					mov [edi], ebx
+					add esi, 4
+					add edi, 4
+					sub ecx, 4
+					cmp ecx, 0x0
+						jg ahstoia
+			pop ecx
+		add eax, 1
+		sub edx, 1
+		add ecx, 0x200
+		cmp edx, 0x0
+			jg Kernel.init.loadLoop
 	
 		call SSE.enable
 	
@@ -19,6 +72,13 @@ Kernel.init :
 	
 	;	DISPLAY TEXT MODE WELCOME MESSAGE IF NEEDED	;
 		call kernel.checkRunTextModeInit
+	
+		mov ebx, [kernel.sloadcount]
+		call console.numOut
+		call console.newline
+		mov ebx, [kernel.sloadcount2]
+		call console.numOut
+		call console.newline
 	
 	;	INITIALIZE THE AHCI DRIVER	;
 		call ATA_DETECT
@@ -52,7 +112,7 @@ Kernel.init :
 		call kernel.OrcaHLLsetup_memhack
 	
 	;	INITIALIZE THE USB DRIVER	;
-		call EHCI.findDevice
+		;call EHCI.findDevice
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
@@ -78,7 +138,18 @@ Kernel.init :
 		;	REPEAT	;
 			jmp kernel.loop
 
-
+[bits 16]
+kernel.loadFunc :
+		mov eax, [k_lF.low]
+		mov bx, [k_lF.high]
+		call realMode.ATAload
+	ret
+k_lF.low :
+	dd 0x0
+k_lF.high :
+	dd 0x0
+[bits 32]
+			
 ;	RUN INSTALLED MODULES	;
 kernel.runModules :
 
@@ -157,14 +228,13 @@ kernel.OrcaHLLsetup_memhack :
 
 	kernel.HALT_MESSAGE :
 		db "The operating system is now halted.", 0
+	kernel.sloadcount :
+		dd 0x0
+	kernel.sloadcount2 :
+		dd 0x0
 	
 	os.mlloc :
 		db 0x0
-	
-	
-;	INCLUDES	;
-
-	%include "../$Emulator/StandardIncludes.asm"
 	
 	
 ;	PRINT TEXT MODE GREETING IF NEEDED	;
@@ -234,10 +304,16 @@ kernel.textInit :
 	TEXTMODE_INIT :
 		db "Booted into debug (text) mode.", 0
 
+;	INCLUDES	;
+
+	%include "../$Emulator/StandardIncludes.asm"
+		
 os_imageDataBaseLBA :
 	dd ($-$$)/0x200+2	; 1 additional because the bootloader is LBA 0
 
 times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the code to the nearest sector
+
+KERNEL_END :
 
 ; External files to include
 ;incbin "C:\Users\Jared\Documents\Java\FrameGrabber\output\VIDEO.simplevideo"
