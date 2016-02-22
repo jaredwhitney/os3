@@ -1,0 +1,6 @@
+window Grouping (wx, wy, ww+8*4, wh+20+4+4)
+titleBar Grouping (4*4, 2, ww, 20)
+title TextLine (0, 0, ww-24*4, 20)
+maxButton Button (ww-22*4, 5, 10, 10)
+closeButton Button (ww-10*4, 5, 10, 10)
+mainGrouping Grouping (4*4, 2+20+4, ww, wh)
