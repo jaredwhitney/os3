@@ -228,7 +228,7 @@ Minnow3.cprint.handlePart : ; part loc in ebx
 	Minnow3.cprint.handlePart.aret :
 		mov ebx, Minnow3.cprint.STR_ENDOF
 		call console.println
-	jmp Minnow3.cprint.handlePart.ret
+		jmp Minnow3.cprint.handlePart.ret
 
 Minnow3.cprint.STR_FILE :
 	db "[FILE] ", 0
@@ -300,7 +300,7 @@ Minnow3.gotoFirstUnallocatedBlock : ; returns pos in ecx
 		popa
 		mov ecx, [Minnow3.gotoFirstUnallocatedBlock.current]
 		sub ecx, [Minnow3.data0]
-	jmp Minnow3.gotoFirstUnallocatedBlock.ret
+		jmp Minnow3.gotoFirstUnallocatedBlock.ret
 
 Minnow3.gotoFirstUnallocatedBlock.current :
 	dd 0x0
