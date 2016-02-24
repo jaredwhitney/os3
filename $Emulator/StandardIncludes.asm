@@ -7,6 +7,7 @@
 %include "..\Drivers\PS2\Generic_Keyboard.asm"
 
 %include "..\modules\dolphin\Dolphin.asm"
+%include "..\modules\dolphin2\Dolphin2.asm"
 %include "..\modules\dolphin\WindowTools.asm"
 %include "..\modules\dolphin\Update_Text.asm"
 
@@ -21,6 +22,7 @@
 %include "..\Graphics\Image.asm"
 %include "..\Graphics\Grouping.asm"
 %include "..\Graphics\Button.asm"
+%include "..\Graphics\WindowGrouping.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
 %include "..\Drivers\HDD\rmATA.asm"
@@ -59,7 +61,7 @@
 %include "..\Meta\Graphics\Window.asm"
 %include "..\Meta\Buffer.asm"
 
-%include "..\Drivers\PCI\PCI_LookupTables.asm"
+;%include "..\Drivers\PCI\PCI_LookupTables.asm"
 
 Catfish.notify:
 ret

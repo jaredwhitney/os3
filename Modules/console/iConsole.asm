@@ -178,122 +178,50 @@ pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
 
-	;call EHCI.printConnectedPorts
-	mov cx, 0x0033
-	call PCI_TABLES.lookupVendorString
+	mov byte [INTERRUPT_DISABLE], 0xFF
+	
+	call Dolphin2.createCompositorGrouping
+	
+	push consoletest_title
+	push dword 80*4
+	push dword 80
+	push dword 300*4
+	push dword 100
+	call Dolphin2.makeWindow
+	mov edx, ecx
+	
+	push dword 500
+	push dword 0
+	push dword 0
+	push dword 300*4
+	push dword 100
+	push dword FALSE
+	call TextArea.Create
+	mov eax, consoletest_text
 	mov ebx, ecx
-	mov ah, 0xFF
-	call console.println
-	mov cx, 0xE159
-	call PCI_TABLES.lookupVendorString
-	mov ebx, ecx
-	call console.println
-	mov cx, 0x8086
-	call PCI_TABLES.lookupVendorString
-	mov ebx, ecx
-	call console.println
-	mov cx, 0x8087
-	call PCI_TABLES.lookupVendorString
-	mov ebx, ecx
-	call console.println
+	call TextArea.SetText
 	
-;	mov ebx, PCI_VENDOR_LOOPKUP_TABLE
-;	mov ecx, 0x0
-;	asdfasfd:
-;	add ebx, 2
-;	call console.println
-;	mov eax, 0x80
-;	call System.sleep
-;	call String.getLength
-;	add ebx, edx
-;	add ecx, 1
-;	cmp word [ebx], 0xFFFF
-;		jne asdfasfd
-;	mov ebx, ecx
-;	call console.numOut
-;	call console.newline
-	; mov byte [INTERRUPT_DISABLE], 0xFF
-
-	; push dword WX
-	; push dword WY
-	; push dword WW+8*4
-	; push dword WH+20+4+4
-	; call Grouping.Create
-	; mov [consoletest_window], ecx
+	mov ebx, edx
+	mov eax, ecx
+	call Grouping.Add
 	
-	; push dword 4*4
-	; push dword 2
-	; push dword WW
-	; push dword 20
-	; call Grouping.Create
-	; mov [consoletest_titleBar], ecx
+	call Dolphin2.renderScreen
 	
-	; mov ebx, [consoletest_window]
-	; mov eax, [consoletest_titleBar]
-	; call Grouping.Add
-
-	; push dword 4*4
-	; push dword 20+2+2
-	; push dword WW
-	; push dword WH
-	; call Grouping.Create
-	; mov [consoletest_mainGrouping], ecx
+	mov eax, [Dolphin2.compositorGrouping]
+	mov ebx, [eax+Grouping_subcomponent]
+	call console.numOut
+	mov ebx, [ebx+Grouping_subcomponent]
+	call console.numOut
 	
-	; mov ebx, [consoletest_window]
-	; mov eax, [consoletest_mainGrouping]
-	; call Grouping.Add
-	
-	; push dword consoletest_uparrowstr
-	; push dword console.checkColor_ret ; just return immediately
-	; push dword WW-22*4
-	; push dword 5
-	; push dword 10*4
-	; push dword 10
-	; call Button.Create
-	; mov eax, ecx
-	; mov ebx, [consoletest_titleBar]
-	; call Grouping.Add
-	
-	; push dword consoletest_closestr
-	; push dword console.checkColor_ret ; just return immediately
-	; push dword WW-10*4
-	; push dword 5
-	; push dword 10*4
-	; push dword 10
-	; call Button.Create
-	; mov eax, ecx
-	; mov ebx, [consoletest_titleBar]
-	; call Grouping.Add
-	
-	; mov ecx, [consoletest_window]
-	; mov ebx, [console.windowStructLoc]
-	; mov [ebx+Window_linkedComponent], ecx
-	
-	; mov eax, [ebx+Grouping_image]
-	; mov ecx, [ebx+Grouping_w]
-	; mov edx, [ebx+Grouping_h]
-	; mov ebx, [Graphics.SCREEN_MEMPOS]
-	; call Image.copy
-	
-	; mov byte [INTERRUPT_DISABLE], 0x00
+	mov byte [INTERRUPT_DISABLE], 0x00
 	
 call ProgramManager.finalize
 popa
 ret
-WX equ 0
-WY equ 0
-WW equ 500*4
-WH equ 300
-consoletest_mainGrouping :
-	dd 0x0
-consoletest_window :
-	dd 0x0
-consoletest_titleBar :
-	dd 0x0
-consoletest_uparrowstr :
-	db "M", 0
-consoletest_closestr :
-	db "X", 0
+consoletest_title :
+	db "Window Test", 0
+consoletest_text :
+	db "This is some sample text that should be displayed in the test window.", 0
 	
 console.memstat :
 	mov ah, 0xFF

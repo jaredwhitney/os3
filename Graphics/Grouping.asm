@@ -6,6 +6,7 @@ Grouping_w		equ 16
 Grouping_h		equ 20
 Grouping_renderFlag	equ 32
 Grouping_subcomponent	equ 36
+Grouping_backingColor	equ 40
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -15,7 +16,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.x]
 	push eax
 	push ebx
-		mov ebx, 40
+		mov ebx, 44
 		call ProgramManager.reserveMemory
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
@@ -114,6 +115,18 @@ Grouping.Render :	; Grouping in ebx
 		
 		cmp dword [edx+Grouping_renderFlag], FALSE
 			je Grouping.Render.ret
+			
+			test dword [edx+Grouping_backingColor], 0xFF000000
+				jz Component.Render.noLayerColor
+			pusha
+			mov eax, [ebx+Component_image]
+			mov ecx, [ebx+Component_w]
+			imul ecx, [ebx+Component_h]
+			mov ebx, [edx+Grouping_backingColor]
+			mov edx, ecx
+			call Image.clear
+			popa
+			Component.Render.noLayerColor :
 		
 		mov ebx, [ebx+Grouping_subcomponent]
 		
@@ -121,18 +134,6 @@ Grouping.Render :	; Grouping in ebx
 		
 			cmp ebx, 0x0
 				je Grouping.Render.ret
-			
-			cmp byte [Component.DEBUG_ALL], 0xFF
-				jne Component.Render.noLayerColor
-			pusha
-			mov eax, [ebx+Component_image]
-			mov edx, [ebx+Component_w]
-			imul edx, [ebx+Component_h]
-			mov ebx, [Component.Render.layerColor]
-			call Image.clear
-			xor dword [Component.Render.layerColor], 0x404000
-			popa
-			Component.Render.noLayerColor :
 			
 			call Component.Render
 			

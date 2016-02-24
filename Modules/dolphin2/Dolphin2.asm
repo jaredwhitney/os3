@@ -28,8 +28,14 @@ Dolphin2.renderScreen :
 	popa
 	ret
 	
-Dolphin2.registerWindow :	; String title, int x, int y, int w, int h
+Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns WindowGrouping in ecx
+		pop dword [Dolphin2.makeWindow.ret]
 		call WindowGrouping.Create
+	;		pop dword [0x1000]
+	;		pop dword [0x1000]
+	;		pop dword [0x1000]
+	;		pop dword [0x1000]
+	;		pop dword [0x1000]
 		push eax
 		push ebx
 			mov eax, ecx
@@ -37,7 +43,11 @@ Dolphin2.registerWindow :	; String title, int x, int y, int w, int h
 			call Grouping.Add
 		pop ebx
 		pop eax
+		mov ecx, [ecx+WindowGrouping_mainGrouping]
+		push dword [Dolphin2.makeWindow.ret]
 	ret
 
 Dolphin2.compositorGrouping :
+	dd 0x0
+Dolphin2.makeWindow.ret :
 	dd 0x0
