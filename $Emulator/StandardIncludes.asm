@@ -31,7 +31,6 @@
 %include "..\Drivers\HDD\AHCI_DMAWRITE.asm"
 
 %include "..\Drivers\PCI\Generic_ComponentInterface.asm"
-%include "..\Drivers\USB\EHCI.asm"
 
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\Guppy.asm"
@@ -62,6 +61,8 @@
 %include "..\Meta\Buffer.asm"
 
 ;%include "..\Drivers\PCI\PCI_LookupTables.asm"
+
+%include "..\Drivers\USB\EHCI.asm"
 
 Catfish.notify:
 ret
