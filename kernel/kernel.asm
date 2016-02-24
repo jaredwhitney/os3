@@ -112,7 +112,7 @@ Kernel.init :
 		call kernel.OrcaHLLsetup_memhack
 	
 	;	INITIALIZE THE USB DRIVER	;
-		;call EHCI.findDevice
+		call EHCI.findDevice
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
