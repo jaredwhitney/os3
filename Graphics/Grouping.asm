@@ -119,9 +119,9 @@ Grouping.Render :	; Grouping in ebx
 			test dword [edx+Grouping_backingColor], 0xFF000000
 				jz Component.Render.noLayerColor
 			pusha
-			mov eax, [ebx+Component_image]
-			mov ecx, [ebx+Component_w]
-			imul ecx, [ebx+Component_h]
+			mov eax, [edx+Component_image]
+			mov ecx, [edx+Component_w]
+			imul ecx, [edx+Component_h]
 			mov ebx, [edx+Grouping_backingColor]
 			mov edx, ecx
 			call Image.clear

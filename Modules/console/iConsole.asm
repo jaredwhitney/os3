@@ -12,6 +12,7 @@ pusha
 	;	je console.init.novesa
 	call Window.getSectorSize	; <- eax
 	add eax, 0x1
+	add eax, 4050	; no idea
 	mov ebx, eax
 	console.init.novesa :
 	call ProgramManager.requestMemory
@@ -190,20 +191,20 @@ call ProgramManager.setActive	; Make removable Later
 	call Dolphin2.makeWindow
 	mov edx, ecx
 	
-	push dword 500
-	push dword 0
-	push dword 0
-	push dword 300*4
-	push dword 100
-	push dword FALSE
-	call TextArea.Create
-	mov eax, consoletest_text
-	mov ebx, ecx
-	call TextArea.SetText
-	
-	mov ebx, edx
-	mov eax, ecx
-	call Grouping.Add
+;	push dword 500
+;	push dword 0
+;	push dword 0
+;	push dword 300*4
+;	push dword 100
+;	push dword FALSE
+;	call TextArea.Create
+;	mov eax, consoletest_text
+;	mov ebx, ecx
+;	call TextArea.SetText
+;	
+;	mov ebx, edx
+;	mov eax, ecx
+;	call Grouping.Add
 	
 	call Dolphin2.renderScreen
 	
