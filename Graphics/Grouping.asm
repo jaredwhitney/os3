@@ -122,7 +122,7 @@ Grouping.Render :	; Grouping in ebx
 			mov eax, [edx+Component_image]
 			mov ecx, [edx+Component_w]
 			imul ecx, [edx+Component_h]
-			mov ebx, [edx+Grouping_backingColor]
+			mov ebx, 0xFF0000;[edx+Grouping_backingColor]
 			mov edx, ecx
 			call Image.clear
 			popa
