@@ -2,7 +2,7 @@ WindowGrouping_x			equ 8
 WindowGrouping_y			equ 12
 WindowGrouping_w			equ 16
 WindowGrouping_h			equ 20
-WindowGrouping_mainGrouping	equ 40
+WindowGrouping_mainGrouping	equ 44
 WindowGrouping_titleBar		equ 48
 WindowGrouping_nameString	equ 52
 WindowGrouping_sizeButton	equ 56
@@ -23,7 +23,14 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov ebx, 64
 		call ProgramManager.reserveMemory
 		mov edx, ebx
-		
+			
+			pusha
+			mov eax, edx
+			mov edx, 64
+			mov ebx, 0x00000000
+			call Image.clear
+			popa
+			
 			; THIS SHOULD ALL BE IN THE WindowGrouping main NOT ITS OWN GROUPING
 			mov eax, [WindowGrouping.Create.x]
 			mov [edx+Grouping_x], eax
@@ -48,7 +55,6 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 			mov al, 0x7
 			call Guppy.malloc
 			mov [edx+Grouping_image], ebx
-		;mov dword [edx+Grouping_backingColor], 0xFF0C000C
 		
 		push dword 4*4
 		push dword 2
@@ -113,7 +119,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov [ecx+Grouping_h], eax
 		mov [edx+WindowGrouping_mainGrouping], ecx
 		
-		mov dword [edx+Component_type], Component.TYPE_GROUPING
+		mov dword [edx], Component.TYPE_GROUPING
 		
 		mov ecx, edx
 		

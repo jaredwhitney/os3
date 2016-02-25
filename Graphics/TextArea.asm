@@ -93,7 +93,7 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 		mov ecx, [TextArea.Render.dest]
 		mov edx, [ebx+Textarea_w]
 		push ebx
-		mov ebx, 0xFFFFFF
+		mov ebx, 0xFFFFFFFF
 		call RenderText
 		pop ebx
 		cmp al, 0x0A
