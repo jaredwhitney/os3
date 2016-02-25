@@ -43,7 +43,7 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 			call Grouping.Add
 		pop ebx
 		pop eax
-		mov ecx, [ecx+WindowGrouping_mainGrouping]
+		;mov ecx, [ecx+WindowGrouping_mainGrouping]
 		push dword [Dolphin2.makeWindow.ret]
 	ret
 

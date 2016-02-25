@@ -48,7 +48,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 			mov al, 0x7
 			call Guppy.malloc
 			mov [edx+Grouping_image], ebx
-		mov dword [edx+Grouping_backingColor], 0x00FFFFFF
+		;mov dword [edx+Grouping_backingColor], 0xFF0C000C
 		
 		push dword 4*4
 		push dword 2
@@ -56,6 +56,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		push dword 20
 		call Grouping.Create
 		mov [edx+WindowGrouping_titleBar], ecx
+		mov dword [ecx+Grouping_backingColor], 0xFF0C000C
 		mov ebx, edx
 		mov eax, ecx
 		call Grouping.Add

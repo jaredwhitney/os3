@@ -71,15 +71,14 @@ Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 Image.clear :	; eax = source, edx = size, ebx = color
 	pusha
 	mov ecx, edx
-	sub ecx, 2
 	mov edx, 0x0
-						or ebx, CHANGE_MASK
+	;					or ebx, CHANGE_MASK
 	Image.clear_loop :
 	mov [eax], ebx
 	add eax, 4
 	add edx, 4
 	cmp edx, ecx
-	jle Image.clear_loop
+		jle Image.clear_loop
 	popa
 	ret
 
