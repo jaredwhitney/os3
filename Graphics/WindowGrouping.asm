@@ -62,7 +62,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		push dword 20
 		call Grouping.Create
 		mov [edx+WindowGrouping_titleBar], ecx
-		mov dword [ecx+Grouping_backingColor], 0xFF0C000C
+		mov dword [ecx+Grouping_backingColor], 0xFF201080
 		mov ebx, edx
 		mov eax, ecx
 		call Grouping.Add
@@ -81,6 +81,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
+		mov dword [ecx+Grouping_backingColor], 0xFF180878
 		
 		push dword WindowGrouping.closeStr
 		push dword console.checkColor_ret	; really? please don't use this in the future!
@@ -94,6 +95,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
+		mov dword [ecx+Grouping_backingColor], 0xFFE00000
 		
 		push dword [WindowGrouping.Create.title]
 		push dword 0
@@ -118,8 +120,10 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, [WindowGrouping.Create.h]
 		mov [ecx+Grouping_h], eax
 		mov [edx+WindowGrouping_mainGrouping], ecx
+		mov dword [ecx+Grouping_backingColor], 0x80000000
 		
-		mov dword [edx], Component.TYPE_GROUPING
+		mov dword [edx+Component_type], Component.TYPE_GROUPING
+		mov dword [edx+Grouping_backingColor], 0xFF00FF00
 		
 		mov ecx, edx
 		

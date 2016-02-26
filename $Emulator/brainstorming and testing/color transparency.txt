@@ -1,0 +1,6 @@
+Ro, Rn, 200
+
+Ro, Rn 78%
+Red = (Rn-Ro)*78/100+Ro
+
+and so forth

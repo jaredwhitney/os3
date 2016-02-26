@@ -160,7 +160,7 @@ TextLine.Render :	; textline in ebx
 		imul edx, 0x4*FONTWIDTH
 		add ecx, edx
 		mov edx, [ebx+Textline_w]
-		mov ebx, 0xFFFFFF
+		mov ebx, 0xFFFFFFFF
 		call RenderText
 		popa
 		add edx, 1

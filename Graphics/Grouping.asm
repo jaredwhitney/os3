@@ -122,7 +122,7 @@ Grouping.Render :	; Grouping in ebx
 			mov eax, [edx+Component_image]
 			mov ecx, [edx+Component_w]
 			imul ecx, [edx+Component_h]
-			mov ebx, 0xFF0000;[edx+Grouping_backingColor]
+			mov ebx, [edx+Grouping_backingColor]
 			mov edx, ecx
 			call Image.clear
 			popa
@@ -141,35 +141,35 @@ Grouping.Render :	; Grouping in ebx
 			imul eax, [edx+Component_w]
 			add eax, [ebx+Component_x]
 			add eax, [edx+Component_image]
-			mov [Image.copyRegion.nbuf], eax
+			mov [Image.copyRegionWithTransparency.nbuf], eax
 			
 			mov eax, [ebx+Component_image]
-			mov [Image.copyRegion.obuf], eax
+			mov [Image.copyRegionWithTransparency.obuf], eax
 			
-			; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegion.w]
+			; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegionWithTransparency.w]
 			mov eax, [edx+Component_w]
 			sub eax, [ebx+Component_x]
 				cmp eax, [ebx+Component_w]
 					jle Grouping.Render.nos0
 				mov eax, [ebx+Component_w]
 				Grouping.Render.nos0 :
-			mov [Image.copyRegion.w], eax
+			mov [Image.copyRegionWithTransparency.w], eax
 			
-			; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegion.h]
+			; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegionWithTransparency.h]
 			mov eax, [edx+Component_h]
 			sub eax, [ebx+Component_y]
 				cmp eax, [ebx+Component_h]
 					jle Grouping.Render.nos1
 				mov eax, [ebx+Component_h]
 				Grouping.Render.nos1 :
-			mov [Image.copyRegion.h], eax
+			mov [Image.copyRegionWithTransparency.h], eax
 			
 			mov eax, [ebx+Component_w]
-			mov [Image.copyRegion.ow], eax
+			mov [Image.copyRegionWithTransparency.ow], eax
 			mov eax, [edx+Component_w]
-			mov [Image.copyRegion.nw], eax
+			mov [Image.copyRegionWithTransparency.nw], eax
 			
-			call Image.copyRegion
+			call Image.copyRegionWithTransparency
 			
 			mov ebx, [ebx+Component_nextLinked]
 			jmp Grouping.Render.loop
