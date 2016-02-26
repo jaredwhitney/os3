@@ -117,7 +117,7 @@ Button.Render :	; Button in ebx
 		imul edx, 0x4*FONTWIDTH
 		add ecx, edx
 		mov edx, [ebx+Button_w]
-		mov ebx, 0xFFFFFF
+		mov ebx, 0xFFFFFFFF
 		call RenderText
 		popa
 		add edx, 1

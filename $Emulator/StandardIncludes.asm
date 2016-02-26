@@ -16,6 +16,7 @@
 %include "..\modules\xlib\int30.asm"
 
 %include "..\Graphics\Image\Tools.asm"
+%include "..\Graphics\Image\TransparencyUtils.asm"
 %include "..\Graphics\TextHandler.asm"
 %include "..\Graphics\RenderTextThing.asm"
 %include "..\Graphics\TextArea.asm"
