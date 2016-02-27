@@ -63,10 +63,10 @@ Color.fuse :	; overlapping color in ecx, color being written over in edx... retu
 		mov [Color.fuse.ret], edx
 			je Color.fuse.goret
 			
-		mov al, [Color.fuse.newalpha]
-		add al, 0xFF
-		add al, 1
-		mov [Color.fuse.newalpha], al
+		; mov al, [Color.fuse.newalpha]
+		; add al, 0xFF
+		; add al, 1
+		; mov [Color.fuse.newalpha], al
 		
 		mov eax, ecx
 		shr eax, 24
@@ -88,7 +88,7 @@ Color.fuse :	; overlapping color in ecx, color being written over in edx... retu
 		mov eax, ecx
 		mov ecx, 100
 		idiv ecx
-		add edx, eax
+		add ebx, eax
 		pop eax
 		mov [Color.fuse.retblue], dl
 		
