@@ -12,7 +12,7 @@
 %include "..\modules\dolphin\Update_Text.asm"
 
 %include "..\modules\console\iConsole.asm"
-;%include "..\modules\video\Video.asm"
+%include "..\modules\video\Video.asm"
 %include "..\modules\xlib\int30.asm"
 
 %include "..\Graphics\Image\Tools.asm"

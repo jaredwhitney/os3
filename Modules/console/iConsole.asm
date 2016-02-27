@@ -212,8 +212,8 @@ call ProgramManager.setActive	; Make removable Later
 	call Dolphin2.renderScreen
 	mov al, '!'
 	call TextArea.AppendChar
-	mov eax, 500
-	call System.sleep
+	;mov eax, 500
+	;call System.sleep
 	jmp GoDoLoop
 	
 	mov eax, [Dolphin2.compositorGrouping]

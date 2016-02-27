@@ -12,8 +12,22 @@ Dolphin2.createCompositorGrouping :
 		mov [ecx+Component_w], eax
 		mov eax, [Graphics.SCREEN_HEIGHT]
 		mov [ecx+Component_h], eax
-		mov eax, [Graphics.SCREEN_MEMPOS]
-		mov [ecx+Component_image], eax
+		
+		push ecx
+		mov eax, [Graphics.SCREEN_SIZE]
+		sub eax, 1
+		xor edx, edx
+		mov ecx, 0x1000
+		idiv ecx
+		add eax, 1
+		mov ebx, eax
+		mov al, 8
+		call Guppy.malloc
+		mov [Dolphin2.flipBuffer], ebx
+		pop ecx
+		mov [ecx+Component_image], ebx
+		
+		mov dword [ecx+Grouping_backingColor], 0xFF000040
 		
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
@@ -23,8 +37,23 @@ Dolphin2.createCompositorGrouping :
 
 Dolphin2.renderScreen :
 	pusha
+	
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.Render
+		
+		mov ebx, [ebx+Grouping_subcomponent]
+		mov ecx, [Mouse.x]
+		imul ecx, 4
+		mov [ebx+Component_x], ecx
+		mov ecx, [Graphics.SCREEN_HEIGHT]
+		sub ecx, [Mouse.y]
+		mov [ebx+Component_y], ecx
+		
+		mov eax, [Dolphin2.flipBuffer]
+		mov ebx, [Graphics.SCREEN_MEMPOS]
+		mov ecx, [Graphics.SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_HEIGHT]
+		call Video.imagecopy
 	popa
 	ret
 	
@@ -50,4 +79,6 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 Dolphin2.compositorGrouping :
 	dd 0x0
 Dolphin2.makeWindow.ret :
+	dd 0x0
+Dolphin2.flipBuffer :
 	dd 0x0

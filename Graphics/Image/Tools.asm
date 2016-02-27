@@ -55,32 +55,100 @@ Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 	
 Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height
 	pusha
-	imul ecx, edx
-	Image.copyLinear_loop :
-	mov edx, [eax]
-	;						or eax, CHANGE_MASK
-	mov [ebx], edx
-	add eax, 4
-	add ebx, 4
-	sub ecx, 4
-	cmp ecx, 0x0
-	jge Image.copyLinear_loop
+		mov ecx, ebx
+		imul edx, ecx
+		push eax
+		push ecx
+		mov eax, edx
+		xor edx, edx
+		mov ecx, 0x80
+		idiv ecx
+		mov ebx, eax
+		pop ecx
+		pop eax
+		Image.copyLinear_loop :
+			movdqu xmm0, [ecx]
+			movdqu xmm1, [ecx+0x10]
+			movdqu xmm2, [ecx+0x20]
+			movdqu xmm3, [ecx+0x30]
+			movdqu xmm4, [ecx+0x40]
+			movdqu xmm5, [ecx+0x50]
+			movdqu xmm6, [ecx+0x60]
+			movdqu xmm7, [ecx+0x70]
+			movdqu [eax], xmm0
+			movdqu [eax+0x10], xmm1
+			movdqu [eax+0x20], xmm2
+			movdqu [eax+0x30], xmm3
+			movdqu [eax+0x40], xmm4
+			movdqu [eax+0x50], xmm5
+			movdqu [eax+0x60], xmm6
+			movdqu [eax+0x70], xmm7
+			add eax, 0x80
+			dec ebx
+			cmp ebx, 0
+				jg Image.copyLinear_loop
+		Image.copyLinear_loop2 :
+			cmp edx, 0
+				jle Image.copyLinear_ret
+			mov [eax], ecx
+			add eax, 4
+			sub edx, 4
+			jmp Image.copyLinear_loop2
+	Image.copyLinear_ret :
 	popa
 	ret
 	
 Image.clear :	; eax = source, edx = size, ebx = color
 	pusha
-	mov ecx, edx
-	mov edx, 0x0
-	;					or ebx, CHANGE_MASK
-	Image.clear_loop :
-	mov [eax], ebx
-	add eax, 4
-	add edx, 4
-	cmp edx, ecx
-		jle Image.clear_loop
+		mov ecx, ebx
+		mov [Image.clear.color+0x0], ecx
+		mov [Image.clear.color+0x4], ecx
+		mov [Image.clear.color+0x8], ecx
+		mov [Image.clear.color+0xC], ecx
+		movdqu xmm0, [Image.clear.color]
+		push eax
+		push ecx
+		mov eax, edx
+		xor edx, edx
+		mov ecx, 0x100
+		idiv ecx
+		mov ebx, eax
+		pop ecx
+		pop eax
+		Image.clear_loop :
+			movdqu [eax], xmm0
+			movdqu [eax+0x10], xmm0
+			movdqu [eax+0x20], xmm0
+			movdqu [eax+0x30], xmm0
+			movdqu [eax+0x40], xmm0
+			movdqu [eax+0x50], xmm0
+			movdqu [eax+0x60], xmm0
+			movdqu [eax+0x70], xmm0
+			movdqu [eax+0x80], xmm0
+			movdqu [eax+0x90], xmm0
+			movdqu [eax+0xA0], xmm0
+			movdqu [eax+0xB0], xmm0
+			movdqu [eax+0xC0], xmm0
+			movdqu [eax+0xD0], xmm0
+			movdqu [eax+0xE0], xmm0
+			movdqu [eax+0xF0], xmm0
+			add eax, 0x100
+			dec ebx
+			cmp ebx, 0
+				jg Image.clear_loop
+		Image.clear_loop2 :
+			cmp edx, 0
+				jle Image.clear_ret
+			mov [eax], ecx
+			add eax, 4
+			sub edx, 4
+			jmp Image.clear_loop2
+	Image.clear_ret :
 	popa
 	ret
+
+Image.clear.color :
+	times 2 dq 0
 
 Image.clearRegion :	; eax = ulcoord, ebx = width, ecx = height, edx = color
 pusha
