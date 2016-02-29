@@ -1,0 +1,16 @@
+if mouse up to down record tics and send mousePressed
+if mouse down and moved and tics > k and not dragging send mouseDragged and set dragging
+if mouse moved and dragging send mousePulled
+if mouse moved and up send mouseMoved
+if mouse down to up and tics < k send mouseClicked and send mouseReleased
+if mouse down to up and tics > k send mouseReleased
+
+; stored in dword[Mouse.PRESS.type]
+; bit 0 = button (0 = button 1, 1 = button 2)
+; mouse codes:
+mousePressed equ 0x4
+mouseDragged equ 0x6
+mousePulled equ 0x8
+mouseMoved equ 0xC
+mouseClicked equ 0x10
+mouseReleased equ 0x12
