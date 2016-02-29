@@ -29,13 +29,14 @@ Component.Render.layerColor :
 	dd 0x400000
 
 Component.functionPointers :
-	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render
+	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render, GroupingScrollable.Render
 Component.TYPE_TEXTLINE				equ 0x1
 Component.TYPE_TEXTAREA				equ 0x2
 Component.TYPE_IMAGE				equ 0x3
 Component.TYPE_IMAGE_SCALABLE		equ 0x4
 Component.TYPE_GROUPING				equ 0x5
 Component.TYPE_BUTTON				equ 0x6
+Component.TYPE_SCROLLPANEL			equ 0x7
 
 Component.RequestUpdate :	; Component in ebx
 pusha
@@ -65,7 +66,7 @@ Component.discardMouseEvent :
 	; discard the event
 ret
 Component.mouseHandlerPointers :
-	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent
+	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent
 Component.mouseEventX :
 	dd 0x0
 Component.mouseEventY :

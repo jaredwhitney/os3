@@ -117,7 +117,7 @@ Grouping.Render :	; Grouping in ebx
 			je Grouping.Render.ret
 			
 			test dword [edx+Grouping_backingColor], 0xFF000000
-				jz Component.Render.noLayerColor
+				jz Grouping.Render.noLayerColor
 			pusha
 			mov eax, [edx+Component_image]
 			mov ecx, [edx+Component_w]
@@ -126,7 +126,7 @@ Grouping.Render :	; Grouping in ebx
 			mov edx, ecx
 			call Image.clear
 			popa
-			Component.Render.noLayerColor :
+			Grouping.Render.noLayerColor :
 		
 		mov ebx, [ebx+Grouping_subcomponent]
 		
