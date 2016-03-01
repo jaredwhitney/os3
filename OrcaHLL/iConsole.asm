@@ -39,7 +39,6 @@ mov ax, 0x0100
 int 0x30
 mov ecx, 0x0
 mov [iConsole.$global.sub], cl
-call MinnowTest._init
 pop edx
 pop ebx
 pop eax
@@ -78,12 +77,12 @@ xor ecx, ecx
 mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-jne iConsole.$comp_20.true
+jne iConsole.$comp_16.true
 mov cl, 0x0
-jmp iConsole.$comp_20.done
-iConsole.$comp_20.true :
+jmp iConsole.$comp_16.done
+iConsole.$comp_16.true :
 mov cl, 0xFF
-iConsole.$comp_20.done :
+iConsole.$comp_16.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.1_close
@@ -95,12 +94,12 @@ xor ecx, ecx
 mov cl, [Key.$global.KEY_SHIFT]
 cmp edx, ecx
 pop edx
-jne iConsole.$comp_21.true
+jne iConsole.$comp_17.true
 mov cl, 0x0
-jmp iConsole.$comp_21.done
-iConsole.$comp_21.true :
+jmp iConsole.$comp_17.done
+iConsole.$comp_17.true :
 mov cl, 0xFF
-iConsole.$comp_21.done :
+iConsole.$comp_17.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.2_close
@@ -128,12 +127,12 @@ xor ecx, ecx
 mov cl, [Key.$global.ENTER]
 cmp edx, ecx
 pop edx
-je iConsole.$comp_25.true
+je iConsole.$comp_21.true
 mov cl, 0x0
-jmp iConsole.$comp_25.done
-iConsole.$comp_25.true :
+jmp iConsole.$comp_21.done
+iConsole.$comp_21.true :
 mov cl, 0xFF
-iConsole.$comp_25.done :
+iConsole.$comp_21.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.3_close
@@ -146,12 +145,12 @@ mov edx, ecx
 mov ecx, 0x2
 cmp edx, ecx
 pop edx
-je iConsole.$comp_28.true
+je iConsole.$comp_24.true
 mov cl, 0x0
-jmp iConsole.$comp_28.done
-iConsole.$comp_28.true :
+jmp iConsole.$comp_24.done
+iConsole.$comp_24.true :
 mov cl, 0xFF
-iConsole.$comp_28.done :
+iConsole.$comp_24.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.4_close
@@ -176,12 +175,12 @@ mov edx, ecx
 mov ecx, 0x1
 cmp edx, ecx
 pop edx
-je iConsole.$comp_41.true
+je iConsole.$comp_37.true
 mov cl, 0x0
-jmp iConsole.$comp_41.done
-iConsole.$comp_41.true :
+jmp iConsole.$comp_37.done
+iConsole.$comp_37.true :
 mov cl, 0xFF
-iConsole.$comp_41.done :
+iConsole.$comp_37.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.5_close
@@ -497,7 +496,7 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.19_close
-call MinnowTools.ValidateFS
+call Minnow3.dumpChunks	; INLINE ASSEMBLY
 iConsole.$loop_if.19_close :
 
 push edx
@@ -507,12 +506,12 @@ mov edx, ecx
 mov ecx, 0x0
 cmp edx, ecx
 pop edx
-je iConsole.$comp_121.true
+je iConsole.$comp_117.true
 mov cl, 0x0
-jmp iConsole.$comp_121.done
-iConsole.$comp_121.true :
+jmp iConsole.$comp_117.done
+iConsole.$comp_117.true :
 mov cl, 0xFF
-iConsole.$comp_121.done :
+iConsole.$comp_117.done :
 
 cmp cl, 0xFF
 	jne iConsole.$loop_if.20_close
@@ -563,6 +562,8 @@ iConsole.$loop_if.15.string_0_data :
 	db "restart", 0
 iConsole.$loop_if.6.string_1 :
 	dd iConsole.$loop_if.6.string_1_data
+iConsole.$loop_if.19.string_0 :
+	dd iConsole.$loop_if.19.string_0_data
 iConsole.$loop_if.6.string_4 :
 	dd iConsole.$loop_if.6.string_4_data
 iConsole.$loop_if.13.string_2_data :
@@ -608,7 +609,7 @@ iConsole.$loop_if.8.string_0 :
 iConsole.$loop_if.10.string_0 :
 	dd iConsole.$loop_if.10.string_0_data
 iConsole.$loop_if.19.string_0_data :
-	db "VERIFY", 0
+	db "debug", 0
 iConsole.$loop_if.9.string_0_data :
 	db "fullscreen", 0
 iConsole.$loop_if.6.string_3_data :
@@ -689,8 +690,6 @@ iConsole.$loop_if.6.string_2 :
 	dd iConsole.$loop_if.6.string_2_data
 iConsole.$loop_if.6.string_8 :
 	dd iConsole.$loop_if.6.string_8_data
-iConsole.$loop_if.19.string_0 :
-	dd iConsole.$loop_if.19.string_0_data
 iConsole._loop.returnVal:
 	dd 0x0
 
@@ -864,7 +863,7 @@ push edx
 mov ecx, 0
 mov [String.Append.$local.q], ecx
 push ebx
-mov ebx, String.Append.$local.s
+mov ebx, ebx
 mov ecx, [String.Append.$local.q]
 push ecx
 call String.GetChar
@@ -889,6 +888,7 @@ cmp cl, 0xFF
 	jne String.$loop_while.0_end
 mov ecx, [ebx]
 add ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
+sub ecx, 1	; INLINE ASSEMBLY
 mov dl, [String.Append.$local.ch]	; INLINE ASSEMBLY
 mov [ecx], dl	; INLINE ASSEMBLY
 push edx	; Math start
@@ -899,7 +899,7 @@ add ecx, edx
 pop edx	; Math end
 mov [String.Append.$local.q], ecx
 push ebx
-mov ebx, String.Append.$local.s
+mov ebx, ebx
 mov ecx, [String.Append.$local.q]
 push ecx
 call String.GetChar
@@ -908,7 +908,8 @@ mov [String.Append.$local.ch], cl
 	jmp String.$loop_while.0_open
 String.$loop_while.0_end :
 mov ecx, [ebx]
-add ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
+mov ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
+sub ecx, 1	; INLINE ASSEMBLY
 mov byte [ecx], 0x0	; INLINE ASSEMBLY
 pop edx
 pop ebx
@@ -1103,12 +1104,12 @@ mov edx, ecx
 mov ecx, [String.RawToWhite.$local.length]
 cmp edx, ecx
 pop edx
-jl String.$comp_43.true
+jl String.$comp_45.true
 mov cl, 0x0
-jmp String.$comp_43.done
-String.$comp_43.true :
+jmp String.$comp_45.done
+String.$comp_45.true :
 mov cl, 0xFF
-String.$comp_43.done :
+String.$comp_45.done :
 
 cmp cl, 0xFF
 	je String.$loop_for.0_open
@@ -1158,12 +1159,12 @@ mov edx, ecx
 mov ecx, 0
 cmp edx, ecx
 pop edx
-jne String.$comp_48.true
+jne String.$comp_50.true
 mov cl, 0x0
-jmp String.$comp_48.done
-String.$comp_48.true :
+jmp String.$comp_50.done
+String.$comp_50.true :
 mov cl, 0xFF
-String.$comp_48.done :
+String.$comp_50.done :
 
 cmp cl, 0xFF
 	jne String.$loop_while.1_end
@@ -1219,12 +1220,12 @@ call String.GetLength
 pop ebx
 cmp edx, ecx
 pop edx
-jne String.$comp_55.true
+jne String.$comp_57.true
 mov cl, 0x0
-jmp String.$comp_55.done
-String.$comp_55.true :
+jmp String.$comp_57.done
+String.$comp_57.true :
 mov cl, 0xFF
-String.$comp_55.done :
+String.$comp_57.done :
 
 cmp cl, 0xFF
 	jne String.$loop_if.0_close
@@ -1255,12 +1256,12 @@ call String.GetChar
 pop ebx
 cmp edx, ecx
 pop edx
-jne String.$comp_58.true
+jne String.$comp_60.true
 mov cl, 0x0
-jmp String.$comp_58.done
-String.$comp_58.true :
+jmp String.$comp_60.done
+String.$comp_60.true :
 mov cl, 0xFF
-String.$comp_58.done :
+String.$comp_60.done :
 
 cmp cl, 0xFF
 	jne String.$loop_if.1_close
@@ -1285,12 +1286,12 @@ mov edx, ecx
 mov ecx, [String.Equals.$local.finish]
 cmp edx, ecx
 pop edx
-jl String.$comp_60.true
+jl String.$comp_62.true
 mov cl, 0x0
-jmp String.$comp_60.done
-String.$comp_60.true :
+jmp String.$comp_62.done
+String.$comp_62.true :
 mov cl, 0xFF
-String.$comp_60.done :
+String.$comp_62.done :
 
 cmp cl, 0xFF
 	je String.$loop_for.1_open
@@ -1355,732 +1356,6 @@ Char.$global.NUL :
 Char.$global.NEWLINE :
 	db 0x0A
 Char.$FILE_END :
-
-
-; *** LIB IMPORT 'MinnowTest' ***
-[bits 32]
-dd MinnowTest.$FILE_END - MinnowTest.$FILE_START
-db "OrcaHLL Class", 0
-db "MinnowTest", 0
-MinnowTest.$FILE_START :
-
-MinnowTest.$global.nameToDelete :
-	dd 0x0
-MinnowTest.$global.type :
-	dd 0x0
-MinnowTest.$global.fileContents :
-	dd 0x0
-MinnowTest.$global.nameToUse :
-	dd 0x0
-MinnowTest.$global.name1 :
-	dd 0x0
-MinnowTest.$global.name0 :
-	dd 0x0
-MinnowTest.$global.switch :
-	db 0x0
-MinnowTest._init: 
-pop dword [MinnowTest._init.returnVal]
-push eax
-push ebx
-push edx
-mov ecx, 20
-push ecx
-mov ax, 0x0502
-int 0x30
-mov [MinnowTest.$global.nameToUse], ecx
-mov ecx, 20
-push ecx
-mov ax, 0x0502
-int 0x30
-mov [MinnowTest.$global.nameToDelete], ecx
-mov ecx, [MinnowTest._init.string_0]
-mov [MinnowTest.$global.name0], ecx
-mov ecx, [MinnowTest._init.string_1]
-mov [MinnowTest.$global.name1], ecx
-mov ecx, [MinnowTest._init.string_2]
-mov [MinnowTest.$global.type], ecx
-mov ecx, [MinnowTest._init.string_3]
-mov [MinnowTest.$global.fileContents], ecx
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTest._init.returnVal]
-ret
-	;Vars:
-MinnowTest._init.string_3 :
-	dd MinnowTest._init.string_3_data
-MinnowTest._init.string_0_data :
-	db "Write Test", 0
-MinnowTest._init.string_0 :
-	dd MinnowTest._init.string_0_data
-MinnowTest._init.string_1_data :
-	db "Filesystem Test", 0
-MinnowTest._init.string_2_data :
-	db "Text", 0
-MinnowTest._init.string_3_data :
-	db "This is some test text that has been written to the filesystem with the new Minnow.WriteFile() command!", 0
-MinnowTest._init.string_1 :
-	dd MinnowTest._init.string_1_data
-MinnowTest._init.string_2 :
-	dd MinnowTest._init.string_2_data
-MinnowTest._init.returnVal:
-	dd 0x0
-
-
-MinnowTest.RunTest: 
-pop dword [MinnowTest.RunTest.returnVal]
-push eax
-push ebx
-push edx
-push ebx
-mov ebx, MinnowTest.$global.nameToUse
-mov ecx, 0
-push ecx
-mov ecx, 0
-push ecx
-call String.SetChar
-pop ebx
-push ebx
-mov ebx, MinnowTest.$global.nameToDelete
-mov ecx, 0
-push ecx
-mov ecx, 0
-push ecx
-call String.SetChar
-pop ebx
-mov ecx, [MinnowTest.$global.name1]
-push ecx
-mov ecx, [MinnowTest.$global.type]
-push ecx
-call Minnow.CheckExists
-cmp cl, 0xFF
-	jne MinnowTest.$loop_if.0_close
-push ebx
-mov ebx, MinnowTest.$global.nameToUse
-mov ecx, [MinnowTest.$global.name0]
-push ecx
-call String.Append
-pop ebx
-push ebx
-mov ebx, MinnowTest.$global.nameToDelete
-mov ecx, [MinnowTest.$global.name1]
-push ecx
-call String.Append
-pop ebx
-MinnowTest.$loop_if.0_close :
-
-mov ecx, [MinnowTest.$global.name0]
-push ecx
-mov ecx, [MinnowTest.$global.type]
-push ecx
-call Minnow.CheckExists
-cmp cl, 0xFF
-	jne MinnowTest.$loop_if.1_close
-push ebx
-mov ebx, MinnowTest.$global.nameToUse
-mov ecx, [MinnowTest.$global.name1]
-push ecx
-call String.Append
-pop ebx
-push ebx
-mov ebx, MinnowTest.$global.nameToDelete
-mov ecx, [MinnowTest.$global.name0]
-push ecx
-call String.Append
-pop ebx
-MinnowTest.$loop_if.1_close :
-
-mov ecx, [MinnowTest.$global.nameToDelete]
-push ecx
-mov ecx, [MinnowTest.$global.type]
-push ecx
-call Minnow.DeleteFile
-mov ecx, [MinnowTest.$global.nameToUse]
-push ecx
-mov ecx, [MinnowTest.$global.type]
-push ecx
-mov ecx, [MinnowTest.$global.fileContents]
-push ecx
-push ebx
-mov ebx, MinnowTest.$global.fileContents
-call String.GetLength
-pop ebx
-push ecx
-call Minnow.WriteFile
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTest.RunTest.returnVal]
-ret
-	;Vars:
-MinnowTest.RunTest.returnVal:
-	dd 0x0
-
-
-MinnowTest.$FILE_END :
-
-
-; *** LIB IMPORT 'MinnowTools' ***
-[bits 32]
-dd MinnowTools.$FILE_END - MinnowTools.$FILE_START
-db "OrcaHLL Class", 0
-db "MinnowTools", 0
-MinnowTools.$FILE_START :
-
-MinnowTools.$global.lastBlocks :
-	dd 0x0
-MinnowTools.$global.dat :
-	dd 0x0
-MinnowTools.ValidateFS: 
-pop dword [MinnowTools.ValidateFS.returnVal]
-push eax
-push ebx
-push edx
-mov ecx, 0
-push ecx
-call Minnow.ReadBlock
-mov [MinnowTools.$global.dat], ecx
-push ebx
-mov ebx, MinnowTools.$global.dat
-mov ecx, 4
-push ecx
-call Buffer.ReadInt
-pop ebx
-mov [MinnowTools.$global.lastBlocks], ecx
-call MinnowTools.ValidateFS_Loop
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTools.ValidateFS.returnVal]
-ret
-	;Vars:
-MinnowTools.ValidateFS.returnVal:
-	dd 0x0
-
-
-MinnowTools.ValidateFS_Loop: 
-pop dword [MinnowTools.ValidateFS_Loop.returnVal]
-push eax
-push ebx
-push edx
-ValidateFS_Loop.__START :	; INLINE ASSEMBLY
-push ebx
-mov ebx, MinnowTools.$global.dat
-mov ecx, 0
-push ecx
-call Buffer.ReadInt
-pop ebx
-mov [MinnowTools.ValidateFS_Loop.$local.ptr], ecx
-push ebx
-mov ebx, MinnowTools.$global.dat
-mov ecx, 4
-push ecx
-call Buffer.ReadInt
-pop ebx
-mov [MinnowTools.ValidateFS_Loop.$local.blocks], ecx
-push edx
-mov ecx, [MinnowTools.$global.lastBlocks]
-mov edx, ecx
-mov ecx, 0
-cmp edx, ecx
-pop edx
-jne MinnowTools.$comp_11.true
-mov cl, 0x0
-jmp MinnowTools.$comp_11.done
-MinnowTools.$comp_11.true :
-mov cl, 0xFF
-MinnowTools.$comp_11.done :
-
-cmp cl, 0xFF
-	jne MinnowTools.$loop_if.0_close
-push edx
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.blocks]
-mov edx, ecx
-mov ecx, [MinnowTools.$global.lastBlocks]
-cmp edx, ecx
-pop edx
-jne MinnowTools.$comp_12.true
-mov cl, 0x0
-jmp MinnowTools.$comp_12.done
-MinnowTools.$comp_12.true :
-mov cl, 0xFF
-MinnowTools.$comp_12.done :
-
-cmp cl, 0xFF
-	jne MinnowTools.$loop_if.1_close
-mov ecx, [MinnowTools.$loop_if.1.string_0]
-push ecx
-mov ax, 0x0101
-int 0x30
-mov ecx, 0
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTools.ValidateFS_Loop.returnVal]
-ret
-MinnowTools.$loop_if.1_close :
-
-MinnowTools.$loop_if.0_close :
-
-push edx
-mov ecx, [MinnowTools.$global.lastBlocks]
-mov edx, ecx
-mov ecx, 0
-cmp edx, ecx
-pop edx
-je MinnowTools.$comp_15.true
-mov cl, 0x0
-jmp MinnowTools.$comp_15.done
-MinnowTools.$comp_15.true :
-mov cl, 0xFF
-MinnowTools.$comp_15.done :
-
-cmp cl, 0xFF
-	jne MinnowTools.$loop_if.2_close
-mov ecx, [MinnowTools.$loop_if.2.string_0]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.ptr]
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ax, 0x0103
-int 0x30
-mov ecx, [MinnowTools.$loop_if.2.string_1]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.blocks]
-push ecx
-mov ax, 0x0102
-int 0x30
-mov ax, 0x0103
-int 0x30
-push edx	; Math start
-mov ecx, 8
-mov edx, ecx
-mov ecx, [MinnowTools.$global.dat]
-add ecx, edx
-pop edx	; Math end
-mov [MinnowTools.$loop_if.2.$local.name], ecx
-push edx	; Math start
-push ebx
-mov ebx, MinnowTools.$loop_if.2.$local.name
-call String.GetLength
-pop ebx
-mov edx, ecx
-mov ecx, [MinnowTools.$loop_if.2.$local.name]
-add ecx, edx
-pop edx	; Math end
-mov [MinnowTools.$loop_if.2.$local.type], ecx
-mov ecx, [MinnowTools.$loop_if.2.string_2]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ecx, [MinnowTools.$loop_if.2.$local.name]
-push ecx
-mov ax, 0x0101
-int 0x30
-mov ecx, [MinnowTools.$loop_if.2.string_3]
-push ecx
-mov ax, 0x0100
-int 0x30
-mov ecx, [MinnowTools.$loop_if.2.$local.type]
-push ecx
-mov ax, 0x0101
-int 0x30
-MinnowTools.$loop_if.2_close :
-
-push edx
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.ptr]
-mov edx, ecx
-mov ecx, 0
-cmp edx, ecx
-pop edx
-je MinnowTools.$comp_28.true
-mov cl, 0x0
-jmp MinnowTools.$comp_28.done
-MinnowTools.$comp_28.true :
-mov cl, 0xFF
-MinnowTools.$comp_28.done :
-
-cmp cl, 0xFF
-	jne MinnowTools.$loop_if.3_close
-push edx
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.blocks]
-mov edx, ecx
-mov ecx, 0
-cmp edx, ecx
-pop edx
-jne MinnowTools.$comp_29.true
-mov cl, 0x0
-jmp MinnowTools.$comp_29.done
-MinnowTools.$comp_29.true :
-mov cl, 0xFF
-MinnowTools.$comp_29.done :
-
-cmp cl, 0xFF
-	jne MinnowTools.$loop_if.4_close
-mov ecx, [MinnowTools.$loop_if.4.string_0]
-push ecx
-mov ax, 0x0101
-int 0x30
-mov ecx, 0
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTools.ValidateFS_Loop.returnVal]
-ret
-MinnowTools.$loop_if.4_close :
-
-mov ecx, [MinnowTools.$loop_if.3.string_0]
-push ecx
-mov ax, 0x0101
-int 0x30
-mov ecx, 0xFF
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTools.ValidateFS_Loop.returnVal]
-ret
-MinnowTools.$loop_if.3_close :
-
-mov ecx, [MinnowTools.ValidateFS_Loop.$local.blocks]
-mov [MinnowTools.$global.lastBlocks], ecx
-mov ecx, [MinnowTools.$global.dat]
-push ecx
-call Minnow.ReadBlock
-mov [MinnowTools.$global.dat], ecx
-jmp ValidateFS_Loop.__START	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [MinnowTools.ValidateFS_Loop.returnVal]
-ret
-	;Vars:
-MinnowTools.ValidateFS_Loop.$local.blocks :
-	dd 0x0
-MinnowTools.ValidateFS_Loop.$local.ptr :
-	dd 0x0
-MinnowTools.$loop_if.3.string_0_data :
-	db "[End Filesystem]", 0
-MinnowTools.$loop_if.2.string_2_data :
-	db "Name: ", 0
-MinnowTools.$loop_if.2.string_0_data :
-	db "Ptr: ", 0
-MinnowTools.$loop_if.2.$local.type :
-	dd 0x0
-MinnowTools.$loop_if.2.string_1_data :
-	db "Blocks: ", 0
-MinnowTools.$loop_if.3.string_0 :
-	dd MinnowTools.$loop_if.3.string_0_data
-MinnowTools.$loop_if.2.string_2 :
-	dd MinnowTools.$loop_if.2.string_2_data
-MinnowTools.$loop_if.2.string_1 :
-	dd MinnowTools.$loop_if.2.string_1_data
-MinnowTools.$loop_if.2.string_3_data :
-	db "Type: ", 0
-MinnowTools.$loop_if.2.string_3 :
-	dd MinnowTools.$loop_if.2.string_3_data
-MinnowTools.$loop_if.2.string_0 :
-	dd MinnowTools.$loop_if.2.string_0_data
-MinnowTools.$loop_if.2.$local.name :
-	dd 0x0
-MinnowTools.$loop_if.1.string_0 :
-	dd MinnowTools.$loop_if.1.string_0_data
-MinnowTools.$loop_if.4.string_0 :
-	dd MinnowTools.$loop_if.4.string_0_data
-MinnowTools.$loop_if.4.string_0_data :
-	db "Quitting on invalid block!", 0
-MinnowTools.$loop_if.1.string_0_data :
-	db "Quitting on invalid block!", 0
-MinnowTools.ValidateFS_Loop.returnVal:
-	dd 0x0
-
-
-MinnowTools.$FILE_END :
-; *** LIB IMPORT 'Buffer' ***
-[bits 32]
-dd Buffer.$FILE_END - Buffer.$FILE_START
-db "OrcaHLL Class", 0
-db "Buffer", 0
-Buffer.$FILE_START :
-
-Buffer.Create: 
-pop dword [Buffer.Create.returnVal]
-pop ecx
-mov [Buffer.Create.$local.size], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Buffer.Create.$local.size]
-push ecx
-mov ax, 0x0502
-int 0x30
-mov [Buffer.Create.$local.ret], ecx
-mov ecx, [Buffer.Create.$local.ret]
-pop edx
-pop ebx
-pop eax
-push dword [Buffer.Create.returnVal]
-ret
-	;Vars:
-Buffer.Create.$local.ret :
-	dd 0x0
-Buffer.Create.$local.size :
-	dd 0x0
-Buffer.Create.returnVal:
-	dd 0x0
-
-
-Buffer.ReadByte: 
-pop dword [Buffer.ReadByte.returnVal]
-pop ecx
-mov [Buffer.ReadByte.$local.offs], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Buffer.ReadByte.$local.offs]
-add ebx, ecx	; INLINE ASSEMBLY
-xor ecx, ecx	; INLINE ASSEMBLY
-mov cl, [ebx]	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Buffer.ReadByte.returnVal]
-ret
-	;Vars:
-Buffer.ReadByte.$local.offs :
-	dd 0x0
-Buffer.ReadByte.returnVal:
-	dd 0x0
-
-
-Buffer.ReadIntSmall: 
-pop dword [Buffer.ReadIntSmall.returnVal]
-pop ecx
-mov [Buffer.ReadIntSmall.$local.offs], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Buffer.ReadIntSmall.$local.offs]
-add ebx, ecx	; INLINE ASSEMBLY
-xor ecx, ecx	; INLINE ASSEMBLY
-mov cx, [ebx]	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Buffer.ReadIntSmall.returnVal]
-ret
-	;Vars:
-Buffer.ReadIntSmall.$local.offs :
-	dd 0x0
-Buffer.ReadIntSmall.returnVal:
-	dd 0x0
-
-
-Buffer.ReadInt: 
-pop dword [Buffer.ReadInt.returnVal]
-pop ecx
-mov [Buffer.ReadInt.$local.offs], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Buffer.ReadInt.$local.offs]
-add ebx, ecx	; INLINE ASSEMBLY
-mov ecx, [ebx]	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Buffer.ReadInt.returnVal]
-ret
-	;Vars:
-Buffer.ReadInt.$local.offs :
-	dd 0x0
-Buffer.ReadInt.returnVal:
-	dd 0x0
-
-
-Buffer.$FILE_END :
-
-
-
-
-; *** LIB IMPORT 'Minnow' ***
-[bits 32]
-dd Minnow.$FILE_END - Minnow.$FILE_START
-db "OrcaHLL Class", 0
-db "Minnow", 0
-Minnow.$FILE_START :
-
-Minnow.ReadFileBlock: 
-pop dword [Minnow.ReadFileBlock.returnVal]
-pop ecx
-mov [Minnow.ReadFileBlock.$local.block], ecx
-pop ecx
-mov [Minnow.ReadFileBlock.$local.fileType], ecx
-pop ecx
-mov [Minnow.ReadFileBlock.$local.fileName], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Minnow.ReadFileBlock.$local.fileName]
-mov eax, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.ReadFileBlock.$local.fileType]
-mov ebx, ecx	; INLINE ASSEMBLY
-call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
-mov eax, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.ReadFileBlock.$local.block]
-mov ebx, ecx	; INLINE ASSEMBLY
-call Minnow.readFileBlock	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.ReadFileBlock.returnVal]
-ret
-	;Vars:
-Minnow.ReadFileBlock.$local.fileName :
-	dd 0x0
-Minnow.ReadFileBlock.$local.block :
-	dd 0x0
-Minnow.ReadFileBlock.$local.fileType :
-	dd 0x0
-Minnow.ReadFileBlock.returnVal:
-	dd 0x0
-
-
-Minnow.WriteFile: 
-pop dword [Minnow.WriteFile.returnVal]
-pop ecx
-mov [Minnow.WriteFile.$local.bufferSize], ecx
-pop ecx
-mov [Minnow.WriteFile.$local.buffer], ecx
-pop ecx
-mov [Minnow.WriteFile.$local.fileType], ecx
-pop ecx
-mov [Minnow.WriteFile.$local.fileName], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Minnow.WriteFile.$local.fileName]
-mov eax, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.WriteFile.$local.fileType]
-mov ebx, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.WriteFile.$local.bufferSize]
-mov edx, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.WriteFile.$local.buffer]
-call Minnow.writeFile	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.WriteFile.returnVal]
-ret
-	;Vars:
-Minnow.WriteFile.$local.fileName :
-	dd 0x0
-Minnow.WriteFile.$local.buffer :
-	dd 0x0
-Minnow.WriteFile.$local.fileType :
-	dd 0x0
-Minnow.WriteFile.$local.bufferSize :
-	dd 0x0
-Minnow.WriteFile.returnVal:
-	dd 0x0
-
-
-Minnow.CheckExists: 
-pop dword [Minnow.CheckExists.returnVal]
-pop ecx
-mov [Minnow.CheckExists.$local.fileType], ecx
-pop ecx
-mov [Minnow.CheckExists.$local.fileName], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Minnow.CheckExists.$local.fileName]
-mov eax, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.CheckExists.$local.fileType]
-mov ebx, ecx	; INLINE ASSEMBLY
-call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
-cmp cl, 0xFF
-	jne Minnow.$loop_if.0_close
-mov ecx, 0x0
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.CheckExists.returnVal]
-ret
-Minnow.$loop_if.0_close :
-
-mov ecx, 0xFF
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.CheckExists.returnVal]
-ret
-	;Vars:
-Minnow.CheckExists.$local.fileName :
-	dd 0x0
-Minnow.CheckExists.$local.fileType :
-	dd 0x0
-Minnow.CheckExists.returnVal:
-	dd 0x0
-
-
-Minnow.DeleteFile: 
-pop dword [Minnow.DeleteFile.returnVal]
-pop ecx
-mov [Minnow.DeleteFile.$local.fileType], ecx
-pop ecx
-mov [Minnow.DeleteFile.$local.fileName], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Minnow.DeleteFile.$local.fileName]
-mov eax, ecx	; INLINE ASSEMBLY
-mov ecx, [Minnow.DeleteFile.$local.fileType]
-mov ebx, ecx	; INLINE ASSEMBLY
-call Minnow.nameAndTypeToPointer	; INLINE ASSEMBLY
-mov eax, ecx	; INLINE ASSEMBLY
-call Minnow.deleteFile	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.DeleteFile.returnVal]
-ret
-	;Vars:
-Minnow.DeleteFile.$local.fileName :
-	dd 0x0
-Minnow.DeleteFile.$local.fileType :
-	dd 0x0
-Minnow.DeleteFile.returnVal:
-	dd 0x0
-
-
-Minnow.ReadBlock: 
-pop dword [Minnow.ReadBlock.returnVal]
-pop ecx
-mov [Minnow.ReadBlock.$local.block], ecx
-push eax
-push ebx
-push edx
-mov ecx, [Minnow.ReadBlock.$local.block]
-mov eax, ecx	; INLINE ASSEMBLY
-call Minnow.getBuffer	; INLINE ASSEMBLY
-pop edx
-pop ebx
-pop eax
-push dword [Minnow.ReadBlock.returnVal]
-ret
-	;Vars:
-Minnow.ReadBlock.$local.block :
-	dd 0x0
-Minnow.ReadBlock.returnVal:
-	dd 0x0
-
-
-Minnow.$FILE_END :
 
 
 

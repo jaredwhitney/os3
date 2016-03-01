@@ -179,51 +179,60 @@ pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
 
-	mov byte [INTERRUPT_DISABLE], 0xFF
-	
-	call Dolphin2.createCompositorGrouping
-	
-	push consoletest_title
-	push dword 80*4
-	push dword 80
-	push dword 300*4
-	push dword 100
-	call Dolphin2.makeWindow
-	mov edx, ecx
-	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
-	
-	push dword 500
-	push dword 0
-	push dword 0
-	push dword 300*4
-	push dword 100
-	push dword FALSE
-	call TextArea.Create
-	mov eax, consoletest_text
-	mov ebx, ecx
-	call TextArea.SetText
-	
-	mov ebx, edx
-	mov eax, ecx
-	call Grouping.Add
-	
-	mov ebx, eax
-	GoDoLoop :
-	call Dolphin2.renderScreen
-	mov al, '!'
-	call TextArea.AppendChar
-	;mov eax, 500
-	;call System.sleep
-	jmp GoDoLoop
-	
-	mov eax, [Dolphin2.compositorGrouping]
-	mov ebx, [eax+Grouping_subcomponent]
-	call console.numOut
-	mov ebx, [ebx+Grouping_subcomponent]
-	call console.numOut
-	
-	mov byte [INTERRUPT_DISABLE], 0x00
-	
+;	mov byte [INTERRUPT_DISABLE], 0xFF
+;	
+;	call Dolphin2.createCompositorGrouping
+;	
+;	push consoletest_title
+;	push dword 80*4
+;	push dword 80
+;	push dword 300*4
+;	push dword 100
+;	call Dolphin2.makeWindow
+;	mov edx, ecx
+;	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
+;	
+;	push dword 500
+;	push dword 0
+;	push dword 0
+;	push dword 300*4
+;	push dword 100
+;	push dword FALSE
+;	call TextArea.Create
+;	mov eax, consoletest_text
+;	mov ebx, ecx
+;	call TextArea.SetText
+;	
+;	mov ebx, edx
+;	mov eax, ecx
+;	call Grouping.Add
+;	
+;	mov ebx, eax
+;	GoDoLoop :
+;	call Dolphin2.renderScreen
+;	mov al, '!'
+;	call TextArea.AppendChar
+;	;mov eax, 500
+;	;call System.sleep
+;	jmp GoDoLoop
+;	
+;	mov eax, [Dolphin2.compositorGrouping]
+;	mov ebx, [eax+Grouping_subcomponent]
+;	call console.numOut
+;	mov ebx, [ebx+Grouping_subcomponent]
+;	call console.numOut
+;	
+;	mov byte [INTERRUPT_DISABLE], 0x00
+;	
+push dword 0x0
+push dword consoletest_title
+push dword consoletest_type
+push dword consoletest_text
+mov ebx, consoletest_text
+call String.getLength
+push edx
+call Minnow3.makeFile
+
 call ProgramManager.finalize
 popa
 ret
@@ -231,6 +240,8 @@ consoletest_title :
 	db "Window Test", 0
 consoletest_text :
 	db "This is some sample text that should be displayed in the test window.", 0
+consoletest_type :
+	db "Text", 0
 	
 console.memstat :
 	mov ah, 0xFF

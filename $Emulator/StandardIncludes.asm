@@ -24,6 +24,7 @@
 %include "..\Graphics\Grouping.asm"
 %include "..\Graphics\Button.asm"
 %include "..\Graphics\WindowGrouping.asm"
+%include "..\Graphics\GroupingScrollable.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
 %include "..\Drivers\HDD\rmATA.asm"
