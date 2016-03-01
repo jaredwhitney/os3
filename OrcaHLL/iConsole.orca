@@ -2,9 +2,6 @@ import "Window"
 import "String"
 import "KeyCodes"
 import "CharCodes"
-import "MinnowTest"	; this actually works :) [but ONLY if there are no double imports :\]
-import "MinnowTools"
-import "Minnow"
 classdef iConsole
 	Window window
 	Window win
@@ -18,7 +15,6 @@ classdef iConsole
 		fstorstr = sys Program.Ealloc(80)
 		sys Console.Print("Console: ")
 		sub = 0x0
-		MinnowTest._init()
 		
 	func _loop (void : null)
 		if sys Keyboard.HasEvent(window)
@@ -122,8 +118,8 @@ classdef iConsole
 				if command.Equals("format")
 					asm("call Minnow3.doFormatPartition")
 				
-				if command.Equals("VERIFY")
-					MinnowTools.ValidateFS()
+				if command.Equals("debug")
+					asm("call Minnow3.dumpChunks")
 				
 				if sub == 0x0
 					sys Console.Print("Console: ")

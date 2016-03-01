@@ -45,6 +45,17 @@ GroupingScrollable.Create :	; int x, int y, int w, int h
 	pop ebx
 	pop eax
 	ret
+GroupingScrollable.Create.retval :
+	dd 0x0
+GroupingScrollable.Create.h :
+	dd 0x0
+GroupingScrollable.Create.w :
+	dd 0x0
+GroupingScrollable.Create.x :
+	dd 0x0
+GroupingScrollable.Create.y :
+	dd 0x0
+
 GroupingScrollable.Add :
 	call Grouping.Add
 	ret
@@ -79,7 +90,7 @@ GroupingScrollable.Render :	; GroupingScrollable in ebx, basically Grouping.Rend
 			mov eax, [ebx+Component_y]
 			add eax, [edx+GroupingScrollable_yoffs]
 			imul eax, [edx+Component_w]
-			add eax, [ebx+Componenet_x]
+			add eax, [ebx+Component_x]
 			add eax, [edx+GroupingScrollable_xoffs]
 			add eax, [edx+Component_image]
 			mov [Image.copyRegionWithTransparency.nbuf], eax

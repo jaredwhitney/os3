@@ -322,6 +322,7 @@ Minnow3.findChunkMatchingSize : ; chunk size in edx, returns chunk in ecx
 		Minnow3.findChunkMatchingSize.kgoloopagain :
 			mov edx, [ecx]
 			add ecx, 1
+			Minnow3.findChunkMatchingSize.innerLoop :
 			test edx, 0b1
 				je Minnow3.findChunkMatchingSize.knop
 			add ebx, 1
@@ -335,12 +336,14 @@ Minnow3.findChunkMatchingSize : ; chunk size in edx, returns chunk in ecx
 				je Minnow3.foundMatchingChunk
 			cmp al, 8
 				je Minnow3.findChunkMatchingSize.kgoloopagain
+			jmp Minnow3.findChunkMatchingSize.innerLoop
 		Minnow3.foundMatchingChunk :
 		and eax, 0xFF	; bit offs
-		add ecx, eax
-		sub ecx, [Minnow3.data0] ; bit offs + byte offs
+		sub ecx, [Minnow3.data0]
 		add ecx, [Minnow3.data_start]
 		sub ecx, [Minnow3.chunkMatchSize]
+		imul ecx, 8
+		add ecx, eax
 	pop edx
 	pop ebx
 	pop eax
@@ -351,6 +354,79 @@ Minnow3.mask_start :
 Minnow3.chunkMatchSize :
 	dd 0x0
 
+Minnow3.dumpChunks :
+	pusha
+		mov eax, Minnow3.TABLE_HEADER_SIZE
+		xor edx, edx
+		mov ecx, 0x200
+		idiv ecx
+		push edx
+			add eax, [Minnow3.table_start]
+			xor ebx, ebx
+			mov ecx, [Minnow3.data0]
+			mov edx, 0x200
+			call AHCI.DMAreadToBuffer
+		pop edx
+		add ecx, edx
+		
+		mov ebx, [ecx]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+4]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+8]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+12]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+16]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+20]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+24]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+28]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+32]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+36]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+40]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+44]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+48]
+		call console.numOut
+		call console.newline
+		
+		mov ebx, [ecx+52]
+		call console.numOut
+		call console.newline
+		
+	popa
+	ret
 
 Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int size [DO NOT USE UNTIL THE add table_starts HAVE BEEN ADDED, WILL ZERO OUT THE PARTITION TABLE :\]
 	pop dword [Minnow3.makeFile.retval]
@@ -443,12 +519,12 @@ Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int s
 		pop edx
 		add ecx, edx	; where the file block data should be copied
 		mov ebx, ecx
-		push eax
-			mov eax, [Minnow3.data0] ; the actual file block data
-			mov ecx, 0x200
-			mov edx, 1
-			call Image.copyLinear
-		pop eax
+					push eax		; this part overwrites data that it shouldn't !
+						mov eax, [Minnow3.data0] ; the actual file block data
+						mov ecx, 0x2
+						mov edx, 1
+						;call Image.copyLinear
+					pop eax
 		xor ebx, ebx
 		mov ecx, [Minnow3.data1]
 		mov edx, 0x200;0x300
