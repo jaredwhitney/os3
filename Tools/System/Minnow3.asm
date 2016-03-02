@@ -368,7 +368,7 @@ Minnow3.dumpChunks :
 			call AHCI.DMAreadToBuffer
 		pop edx
 		add ecx, edx
-		
+	
 		mov ebx, [ecx]
 		call console.numOut
 		call console.newline
@@ -424,6 +424,29 @@ Minnow3.dumpChunks :
 		mov ebx, [ecx+52]
 		call console.numOut
 		call console.newline
+		call console.newline
+
+		mov ebx, [ecx+0x42]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x46]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x4C]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x50]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x54]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x58]
+		call console.numOut
+		call console.newline
+		mov ebx, [ecx+0x5C]
+		call console.numOut
+		call console.newline
 		
 	popa
 	ret
@@ -437,6 +460,7 @@ Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int s
 	pop dword [Minnow3.makeFile.head]
 	pusha
 		call Minnow3.gotoFirstUnallocatedBlock
+		add ecx, Minnow3.TABLE_HEADER_SIZE
 		mov [Minnow3.makeFile.descptr], ecx
 		mov eax, ecx
 		xor edx, edx
@@ -469,7 +493,6 @@ Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int s
 		mov [ebx+Mdesc_nextStruct], eax
 		mov eax, [Minnow3.makeFile.descptr]
 		mov [ecx+Mdesc_nextStruct], eax
-		mov dword [ebx+Mdesc_type], Mdesc.TYPE_FILE
 		push eax
 		push ebx
 		push edx
@@ -488,6 +511,7 @@ Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int s
 		mov [ebx+Mdesc_size], edx
 		mov eax, [Minnow3.makeFile.head]
 		mov [ebx+Mdesc_upperBase], eax
+		mov dword [ebx+Mdesc_type], Mdesc.TYPE_FILE;0xFF00CC00
 		mov eax, [Minnow3.makeFile.name]
 		add ebx, File_name
 		call String.copy
@@ -517,18 +541,24 @@ Minnow3.makeFile : ; blockptr head, String name, String type, Buffer data, int s
 			mov edx, 0x200;0x300
 			call AHCI.DMAreadToBuffer
 		pop edx
-		add ecx, edx	; where the file block data should be copied
-		mov ebx, ecx
+		mov ecx, [Minnow3.data1]
+		add ecx, edx
+		mov ebx, ecx	; where the file block data should be copied
 					push eax		; this part overwrites data that it shouldn't !
-						mov eax, [Minnow3.data0] ; the actual file block data
-						mov ecx, 0x2
-						mov edx, 1
-						;call Image.copyLinear
+						mov esi, [Minnow3.makeFile.desc] ; the actual file block data
+						mov edi, ebx
+						mov ecx, 0x200
+							asdiqUW :
+							mov edx, [esi]
+							mov [edi], edx
+							sub ecx, 1
+							cmp ecx, 0x0
+								jg asdiqUW
 					pop eax
 		xor ebx, ebx
 		mov ecx, [Minnow3.data1]
 		mov edx, 0x200;0x300
-		call AHCI.DMAwriteNoAlloc
+		call AHCI.DMAwrite;NoAlloc
 	popa
 	push dword [Minnow3.makeFile.retval]
 	ret
