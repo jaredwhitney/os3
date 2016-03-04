@@ -112,13 +112,20 @@ Kernel.init :
 		call kernel.OrcaHLLsetup_memhack
 	
 	;	INITIALIZE THE USB DRIVER	;
-		call EHCI.findDevice
+	;	call EHCI.findDevice
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
 	
 	;	ACTUALLY LOCK IT	;
 		call Manager.handleLock
+		
+	;mov [rmATA.DMAread.dataBuffer], ecx
+		mov eax, [os_imageDataBaseLBA]	; lba low
+		mov bx, 0x0	; lba high
+		mov edx, 100*100*4	; sectorcount
+		call rmATA.DMAread;ToBuffer
+		;mov [console_testbuffer], ecx	; original image is in [console_testbuffer]
 		
 	;	ALLOW WINDOWS TO BE DRAWN	;
 		mov byte [Dolphin_WAIT_FLAG], 0x00
@@ -307,14 +314,14 @@ kernel.textInit :
 ;	INCLUDES	;
 
 	%include "../$Emulator/StandardIncludes.asm"
-		
-os_imageDataBaseLBA :
-	dd ($-$$)/0x200+2	; 1 additional because the bootloader is LBA 0
-
+	
 times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the code to the nearest sector
 
 KERNEL_END :
 
 ; External files to include
-;incbin "C:\Users\Jared\Documents\Java\FrameGrabber\output\VIDEO.simplevideo"
-;times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector
+os_imageDataBaseLBA :
+	dd ($-$$)/0x200+2	; 1 additional because the bootloader is LBA 0
+incbin "..\_not os code\image\TEAMBLDR.vesa.dsp"
+
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector

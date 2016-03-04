@@ -179,19 +179,19 @@ pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
 
-;	mov byte [INTERRUPT_DISABLE], 0xFF
-;	
-;	call Dolphin2.createCompositorGrouping
-;	
-;	push consoletest_title
-;	push dword 80*4
-;	push dword 80
-;	push dword 300*4
-;	push dword 100
-;	call Dolphin2.makeWindow
-;	mov edx, ecx
-;	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
-;	
+	mov byte [INTERRUPT_DISABLE], 0xFF
+	
+	call Dolphin2.createCompositorGrouping
+	
+	push consoletest_title
+	push dword 80*4
+	push dword 80
+	push dword 300*4
+	push dword 100
+	call Dolphin2.makeWindow
+	mov edx, ecx
+	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
+	
 ;	push dword 500
 ;	push dword 0
 ;	push dword 0
@@ -202,36 +202,53 @@ call ProgramManager.setActive	; Make removable Later
 ;	mov eax, consoletest_text
 ;	mov ebx, ecx
 ;	call TextArea.SetText
-;	
-;	mov ebx, edx
-;	mov eax, ecx
-;	call Grouping.Add
-;	
+
+;	mov ebx, [Graphics.SCREEN_MEMPOS]
+;	mov eax, 0x3000
+;	mov ecx, [Graphics.SCREEN_WIDTH]
+;	mov edx, [Graphics.SCREEN_HEIGHT]
+;	call Image.copyLinear
+;	cli
+;	hlt
+	
+	push dword 0x3000;os_imagething
+	push dword 100
+	push dword 100
+	push dword 0
+	push dword 0
+	push dword 300*4
+	push dword 100
+	call Image.Create
+	
+	mov ebx, edx
+	mov eax, ecx
+	call Grouping.Add
+	
 ;	mov ebx, eax
-;	GoDoLoop :
-;	call Dolphin2.renderScreen
+	GoDoLoop :
+	call Dolphin2.renderScreen
 ;	mov al, '!'
 ;	call TextArea.AppendChar
-;	;mov eax, 500
-;	;call System.sleep
-;	jmp GoDoLoop
-;	
-;	mov eax, [Dolphin2.compositorGrouping]
-;	mov ebx, [eax+Grouping_subcomponent]
-;	call console.numOut
-;	mov ebx, [ebx+Grouping_subcomponent]
-;	call console.numOut
-;	
-;	mov byte [INTERRUPT_DISABLE], 0x00
-;	
-push dword 0x0
-push dword consoletest_title
-push dword consoletest_type
-push dword consoletest_text
-mov ebx, consoletest_text
-call String.getLength
-push edx
-call Minnow3.makeFile
+	;mov eax, 500
+	;call System.sleep
+	jmp GoDoLoop
+	
+	mov eax, [Dolphin2.compositorGrouping]
+	mov ebx, [eax+Grouping_subcomponent]
+	call console.numOut
+	mov ebx, [ebx+Grouping_subcomponent]
+	call console.numOut
+	
+	mov byte [INTERRUPT_DISABLE], 0x00
+	
+;push dword 0x0
+;push dword consoletest_title
+;push dword consoletest_type
+;push dword consoletest_text
+;mov ebx, consoletest_text
+;call String.getLength
+;push edx
+;call Minnow3.makeFile
 
 call ProgramManager.finalize
 popa
