@@ -88,7 +88,7 @@ Image.Render :	; Image in ebx
 		mov [Image.copyRegion.obuf], eax
 		mov eax, [ebx+Image_image]
 		mov [Image.copyRegion.nbuf], eax
-		call Image.copyLinear
+		call Image.copyRegion
 	popa
 	ret
 
