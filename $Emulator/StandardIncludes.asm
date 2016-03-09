@@ -27,6 +27,12 @@
 %include "..\Graphics\GroupingScrollable.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
+;  3GXlib Includes  ;
+	%include "..\Graphics\3GXlib\L3gxImage.asm"
+	%include "..\Graphics\3GXlib\DrawRect.asm"
+	%include "..\Graphics\3GXlib\ClearImage.asm"
+	%include "..\Graphics\3GXlib\DrawImage.asm"
+
 %include "..\Drivers\HDD\rmATA.asm"
 %include "..\Drivers\HDD\ATA_DETECT.asm"
 %include "..\Drivers\HDD\AHCI_COMMANDS.asm"
