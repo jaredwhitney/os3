@@ -1,7 +1,7 @@
 L3gx.clearImage :	; L3gxImage image, int color
 	pop dword [clearImage.retval]
-	pop dword [clearImage.image]
 	pop dword [clearImage.color]
+	pop dword [clearImage.image]
 	pusha
 		mov ebx, [clearImage.image]
 		mov eax, [ebx+L3gxImage_data]
@@ -53,6 +53,7 @@ L3gx.clearImage :	; L3gxImage image, int color
 			jmp clearImage_loop2
 	clearImage_ret :
 	popa
+	push dword [clearImage.retval]
 	ret
 clearImage.retval :
 	dd 0x0

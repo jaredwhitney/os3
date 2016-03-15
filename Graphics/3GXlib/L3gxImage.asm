@@ -6,8 +6,8 @@ L3gxImage_$CLASSSIZE	equ 0xC
 
 L3gxImage.Create :	; int width, int height
 	pop dword [L3gxImage.Create.retval]
-	pop dword [L3gxImage.Create.height]
 	pop dword [L3gxImage.Create.width]
+	pop dword [L3gxImage.Create.height]
 	push eax
 	push ebx
 		mov al, 7
@@ -46,3 +46,16 @@ L3gxImage.FromBuffer :	; eax = data, ebx = width, ecx = height
 	pop eax
 	pop edx
 	ret
+	
+L3gxImage.FakeFromComponent :	; ebx = component
+		mov ecx, [ebx+Component_image]
+		mov [L3gxImage.fakedImageData+L3gxImage_data], ecx
+		mov ecx, [ebx+Component_w]
+		shr ecx, 2	; div by 4 so its in pixels and not bytes
+		mov [L3gxImage.fakedImageData+L3gxImage_w], ecx
+		mov ecx, [ebx+Component_h]
+		mov [L3gxImage.fakedImageData+L3gxImage_h], ecx
+		mov ecx, L3gxImage.fakedImageData
+	ret
+L3gxImage.fakedImageData :
+	times 3 dd 0x0

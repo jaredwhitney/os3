@@ -211,18 +211,18 @@ call ProgramManager.setActive	; Make removable Later
 ;	cli
 ;	hlt
 	
-	push dword 0x3000;os_imagething
-	push dword 100
-	push dword 100
-	push dword 0
-	push dword 0
-	push dword 300*4
-	push dword 100
-	call Image.Create
-	
-	mov ebx, edx
-	mov eax, ecx
-	call Grouping.Add
+;	push dword 0x3000;os_imagething
+;	push dword 100
+;	push dword 100
+;	push dword 0
+;	push dword 0
+;	push dword 300*4
+;	push dword 100
+;	call Image.Create
+;	
+;	mov ebx, edx
+;	mov eax, ecx
+;	call Grouping.Add
 	
 ;	mov ebx, eax
 	GoDoLoop :

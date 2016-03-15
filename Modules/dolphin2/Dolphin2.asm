@@ -39,7 +39,28 @@ Dolphin2.renderScreen :
 	pusha
 	
 		mov ebx, [Dolphin2.compositorGrouping]
-		call Component.Render
+		;call Component.Render
+		call L3gxImage.FakeFromComponent
+		
+		push ecx
+		push 0xFF000000
+		call L3gx.clearImage
+		
+		push ecx
+		push 100
+		push 100
+		push 50
+		push 50
+		push 0xFFFF00FF
+		call L3gx.lineRect
+		
+		push ecx
+		push 100
+		push 200
+		push 50
+		push 100
+		push 0xFF00FF00
+		call L3gx.fillRect
 		
 		mov ebx, [ebx+Grouping_subcomponent]
 		mov ecx, [Mouse.x]
