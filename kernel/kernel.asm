@@ -121,10 +121,10 @@ Kernel.init :
 		call Manager.handleLock
 		
 	;mov [rmATA.DMAread.dataBuffer], ecx
-		mov eax, [os_imageDataBaseLBA]	; lba low
-		mov bx, 0x0	; lba high
-		mov edx, 100*100*4	; sectorcount
-		call rmATA.DMAread;ToBuffer
+	;	mov eax, [os_imageDataBaseLBA]	; lba low
+	;	mov bx, 0x0	; lba high
+	;	mov edx, 100*100*4	; sectorcount
+	;	call rmATA.DMAread;ToBuffer
 		;mov [console_testbuffer], ecx	; original image is in [console_testbuffer]
 		
 	;	ALLOW WINDOWS TO BE DRAWN	;
