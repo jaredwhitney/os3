@@ -20,7 +20,7 @@ GroupingScrollable.Create :	; int x, int y, int w, int h
 	push edx
 		
 		mov eax, 0x7
-		mov ebx, 64
+		mov ebx, 52
 		call ProgramManager.reserveMemory
 		mov edx, ebx
 		
@@ -44,6 +44,7 @@ GroupingScrollable.Create :	; int x, int y, int w, int h
 	pop edx
 	pop ebx
 	pop eax
+	push dword [GroupingScrollable.Create.retval]
 	ret
 GroupingScrollable.Create.retval :
 	dd 0x0
