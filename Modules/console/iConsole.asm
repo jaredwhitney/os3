@@ -192,16 +192,36 @@ call ProgramManager.setActive	; Make removable Later
 	mov edx, ecx
 	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
 	
-;	push dword 500
-;	push dword 0
-;	push dword 0
-;	push dword 300*4
-;	push dword 100
-;	push dword FALSE
-;	call TextArea.Create
-;	mov eax, consoletest_text
-;	mov ebx, ecx
-;	call TextArea.SetText
+	push dword 0
+	push dword 0
+	push dword 300*4
+	push dword 100
+	call SelectionPanel.Create
+	mov eax, ecx
+	mov ebx, edx
+	call Grouping.Add
+	mov dword [ecx+Grouping_backingColor], 0xFFC01010
+	mov ebx, ecx
+	
+	push dword consoletest_type
+	push dword screen.wipe
+	push dword 10*4
+	push dword 10
+	push dword 10*4
+	push dword 10
+	call Button.Create
+	mov eax, ecx
+	call SelectionPanel.Add
+	
+	push dword consoletest_type
+	push dword screen.wipe
+	push dword 25*4
+	push dword 10
+	push dword 10*4
+	push dword 10
+	call Button.Create
+	mov eax, ecx
+	call SelectionPanel.Add
 
 ;	mov ebx, [Graphics.SCREEN_MEMPOS]
 ;	mov eax, 0x3000

@@ -39,42 +39,24 @@ Dolphin2.renderScreen :
 	pusha
 	
 		mov ebx, [Dolphin2.compositorGrouping]
-		;call Component.Render
-		call L3gxImage.FakeFromComponent
+		call Component.Render
 		
-		push ecx
-		push 0xFF000000
-		call L3gx.clearImage
-		
-		push ecx
-		push 100
-		push 100
-		push 50
-		push 50
-		push 0xFFFF00FF
-		call L3gx.lineRect
-		
-		push ecx
-		push 100
-		push 200
-		push 50
-		push 100
-		push 0xFF00FF00
-		call L3gx.fillRect
-		
-		mov ebx, [ebx+Grouping_subcomponent]
-		mov ecx, [Mouse.x]
-		imul ecx, 4
-		mov [ebx+Component_x], ecx
-		mov ecx, [Graphics.SCREEN_HEIGHT]
-		sub ecx, [Mouse.y]
-		mov [ebx+Component_y], ecx
+	;	mov ebx, [ebx+Grouping_subcomponent]
+	;	mov ecx, [Mouse.x]
+	;	imul ecx, 4
+	;	mov [ebx+Component_x], ecx
+	;	mov ecx, [Graphics.SCREEN_HEIGHT]
+	;	sub ecx, [Mouse.y]
+	;	mov [ebx+Component_y], ecx
 		
 		mov eax, [Dolphin2.flipBuffer]
 		mov ebx, [Graphics.SCREEN_MEMPOS]
 		mov ecx, [Graphics.SCREEN_WIDTH]
 		mov edx, [Graphics.SCREEN_HEIGHT]
 		call Video.imagecopy
+		
+		call Mouse.drawOnScreen
+		
 	popa
 	ret
 	
@@ -97,6 +79,20 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 		push dword [Dolphin2.makeWindow.ret]
 	ret
 
+Dolphin2.handleMouseClick :
+	pusha
+			mov eax, [Mouse.x]
+			imul eax, 4
+			mov [Component.mouseEventX], eax
+			mov eax, [Graphics.SCREEN_HEIGHT]
+			sub eax, [Mouse.y]
+			mov [Component.mouseEventY], eax
+			call Component.HandleMouseEvent
+		mov ebx, [Dolphin2.compositorGrouping]
+		call Component.HandleMouseEvent
+	popa
+	ret
+	
 Dolphin2.compositorGrouping :
 	dd 0x0
 Dolphin2.makeWindow.ret :
