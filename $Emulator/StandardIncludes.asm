@@ -25,6 +25,7 @@
 %include "..\Graphics\Button.asm"
 %include "..\Graphics\WindowGrouping.asm"
 %include "..\Graphics\GroupingScrollable.asm"
+%include "..\Graphics\SelectionPanel.asm"
 %include "..\Graphics\Font\SysDefault.asm"
 
 ;  3GXlib Includes  ;

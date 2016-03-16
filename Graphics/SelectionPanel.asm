@@ -27,7 +27,7 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 		mov [edx+Component_w], eax
 		mov eax, [SelectionPanel.Create.h]
 		mov [edx+Component_h], eax
-		
+		mov dword [edx+Component_type], Component.TYPE_SELECTPANEL
 		pusha
 			mov eax, [ebx+Component_w]
 			imul eax, [ebx+Component_h]
@@ -150,8 +150,41 @@ SelectionPanel.Render :
 	popa
 	ret
 	
-SelectionPanel.HandleMouseEvent :
+SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 	pusha
-	
+	popa
+	ret
+		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found set it as the selected Component
+		push ebx
+		mov ebx, [ebx+Grouping_subcomponent]
+		jmp SelectionPanel.HandleMouseEvent.beginLoop
+		SelectionPanel.HandleMouseEvent.nomatch :
+		mov ebx, [ebx+Component_nextLinked]
+		SelectionPanel.HandleMouseEvent.beginLoop :
+		cmp ebx, 0x0
+			je SelectionPanel.HandleMouseEvent.ret
+		mov ecx, [Component.mouseEventX]
+		mov edx, [Component.mouseEventY]
+		cmp ecx, [ebx+Component_x]
+			jl SelectionPanel.HandleMouseEvent.nomatch
+		mov eax, [ebx+Component_x]
+		add eax, [ebx+Component_w]
+		cmp ecx, eax
+			jg SelectionPanel.HandleMouseEvent.nomatch
+		cmp edx, [ebx+Component_y]
+			jl SelectionPanel.HandleMouseEvent.nomatch
+		mov eax, [ebx+Component_y]
+		add eax, [ebx+Component_h]
+		cmp edx, eax
+			jg SelectionPanel.HandleMouseEvent.nomatch
+		pop ecx
+		mov [ecx+SelectionPanel_selectedComponent], ebx
+		mov ebx, ecx
+		call Component.RequestUpdate
+		mov dword [ebx+SelectionPanel_backingColor], 0xFF020202
+		popa
+		ret
+	SelectionPanel.HandleMouseEvent.ret :
+	pop ecx
 	popa
 	ret

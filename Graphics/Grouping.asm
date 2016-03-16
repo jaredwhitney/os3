@@ -194,9 +194,15 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
 	pusha
+		;mov dword [ebx+Grouping_backingColor], 0xFF00FF00
+			;	popa
+			;	ret
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
+		mov ebx, [ebx+Grouping_subcomponent]
+		jmp Grouping.passthroughMouseEvent.beginLoop
 		Grouping.passthroughMouseEvent.nomatch :
 		mov ebx, [ebx+Component_nextLinked]
+		Grouping.passthroughMouseEvent.beginLoop :
 		cmp ebx, 0x0
 			je Grouping.passthroughMouseEvent.ret
 		mov ecx, [Component.mouseEventX]

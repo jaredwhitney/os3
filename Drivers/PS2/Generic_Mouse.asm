@@ -34,7 +34,7 @@ pusha
 	;mov [Mouse.PRESS.x], eax
 	;mov eax, [Mouse.y]
 	;mov [Mouse.PRESS.y], eax
-	call Dolphin.handleMouseClick
+	call Dolphin2.handleMouseClick
 Mouse.loop.ret :
 mov bl, [Mouse.datpart]
 cmp bl, 0x01
