@@ -683,7 +683,7 @@ add ebx, 0x2
 popa
 ret
 
-console.clearScreen :
+console.clearScreen :	; something about this corrupts subComponents...
 cmp dword [DisplayMode], MODE_TEXT
 	je TextMode.clearScreen
 pusha
@@ -710,80 +710,6 @@ console.setColor :
 mov [console.vgacolor], bl
 ret
 
-console.getLine :	; Fixed.
-pusha
-		push bx
-		mov bl, [Window.BUFFERSIZE]	; -> eax
-		call Dolphin.getAttribDouble
-		push eax
-		mov bl, [Window.BUFFER]	; -> edx
-		call Dolphin.getAttribDouble
-		mov edx, eax
-		pop eax
-		pop bx
-add eax, edx
-mov ecx, 0x0
-add eax, 0x2
-gldloop :
-sub eax, 0x2
-mov bx, [eax]
-cmp bl, 0x0a
-jne gldloopnoadd
-add ecx, 0x1
-gldloopnoadd :
-cmp eax, edx
-jg gldloop
-mov eax, ecx	; eax now contains the line number!
-
-		push eax
-		push bx
-		mov bl, [Window.BUFFER]	; -> edx
-		call Dolphin.getAttribDouble
-		mov edx, eax
-		pop bx
-		pop eax
-	mov ecx, 0x0
-	gldloop2 :
-	mov bx, [edx]
-	cmp bl, 0x0a
-	jne gldloop2noadd
-	add ecx, 1
-	gldloop2noadd :
-	add edx, 2
-	cmp ecx, eax
-	jl gldloop2
-	cmp eax, 0x0
-	jne gldloop2nofix
-	sub edx, 2
-	gldloop2nofix :
-mov eax, edx
-; eax now contains the beginning of the line
-
-mov ebx, eax
-
-mov edx, console.line
-glrloop :
-mov al, [ebx]
-cmp al, 0x0
-je glrloopDone
-mov [edx], al
-add ebx, 2
-add edx, 1
-jmp glrloop
-glrloopDone :
-;sub edx, 1
-mov al, 0x0
-mov [edx], al
-mov eax, console.line
-mov [retval], eax
-	add eax, 9
-	mov ebx, console.lastLine
-	call String.copy
-popa
-ret
-
-%include "../Modules/console/build.asm"
-
 console.vgacolor :
 	db 0xC
 console.color :
@@ -797,12 +723,6 @@ dd 0x0
 
 console.cstor :
 db 0x0
-
-console.line :
-times 14 dd 0x0
-
-console.lastLine :
-times 14 dd 0x0
 
 console.winNum :
 db 0x0
