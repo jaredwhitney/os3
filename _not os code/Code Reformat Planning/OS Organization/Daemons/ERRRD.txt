@@ -1,0 +1,25 @@
+Error Reporting Daemon	[ERRRD]
+-----------------------------------------------
+
+Abstract:
+
+	The Error Reporting Daemon [code: ERRRD] is responsible for ensuring the responsiveness of all daemons and system services. It is expected to determine when a daemon or system service has halted or crashed, determine (if possible) the cause of the error, report the crash to the user (if applicable), attempt fixes (if applicable), and restart the specified daemon or system service.
+
+Operation:
+
+	The ERRRD is expected to determine whether or not a Daemon is functional by first sending a Ping Message (see Daemon Specification). If the Daemon does not respond with a valid Ping Response Message within the Daemon's specified maximum response time, the ERRRD may begin to recover the Daemon. Additionally, the ERRRD is expected to attempt recovery of the MSGS before interrupting any other System Service or Daemon if the MSGS becomes unresponsive.
+
+	The ERRRD is additionally expected to detect unresponsive system services, however the implementation of this is outside the scope of this specification.
+
+	Once the ERRRD has determined a Daemon or System Service unreponsive, it is required to perform the following sequence:
+		[Optional] Attempt to determine the root cause of the error by some means.
+		[Optional] Alert the user that the Daemon or System Service has become unresponsive and is being restarted.
+		[Optional] Attempt to resolve whichever problem caused the unreponsiveness by some means.
+		[Required] Restart the unresponsive Daemon or System Service.
+
+Dependencies:
+
+	An ERRRD implementation requires, AT A MINIMUM, the following:
+		System Services: MSGS
+	An ERRRD implementation requires, AT A MAXIMUM, the following:
+		System Services: MSGS, TRMS, WCMS, UFSS, LNCHD, NOTID
