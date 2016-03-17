@@ -84,7 +84,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov dword [ecx+Grouping_backingColor], 0xFF180878
 		
 		push dword WindowGrouping.closeStr
-		push dword console.checkColor_ret	; really? please don't use this in the future!
+		push dword WindowGrouping.closeCallback
 		mov eax, [WindowGrouping.Create.w]
 		sub eax, 10*4
 		push eax
@@ -132,6 +132,16 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop eax
 	push dword [WindowGrouping.Create.retval]
 	ret
+	
+WindowGrouping.closeCallback :	; WindowGrouping in ebx
+	pusha
+		mov byte [INTERRUPT_DISABLE], 0x0	; temporary
+		;mov eax, ebx
+		;mov ebx, [Dolphin2.compositorGrouping]
+		;call Grouping.Remove
+	popa
+	ret
+
 WindowGrouping.Create.retval :
 	dd 0x0
 WindowGrouping.Create.h :

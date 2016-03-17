@@ -87,7 +87,6 @@ Dolphin2.handleMouseClick :
 			mov eax, [Graphics.SCREEN_HEIGHT]
 			sub eax, [Mouse.y]
 			mov [Component.mouseEventY], eax
-			call Component.HandleMouseEvent
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.HandleMouseEvent
 	popa

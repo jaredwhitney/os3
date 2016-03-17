@@ -55,9 +55,8 @@ pusha
 	mov eax, [Component.mouseEventY]
 	sub eax, [ebx+Component_y]
 	mov [Component.mouseEventY], eax
-	
 	; Call the proper function
-	mov eax, [ebx]
+	mov eax, [ebx+Component_type]
 	imul eax, 4
 	add eax, Component.mouseHandlerPointers
 	call [eax]

@@ -35,6 +35,7 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 			call ProgramManager.reserveMemory
 			mov [edx+GroupingScrollable_image], ebx
 		popa
+		call Component.RequestUpdate
 		mov ecx, ebx
 		
 	pop edx
@@ -131,7 +132,9 @@ SelectionPanel.Render :
 			call L3gxImage.FakeFromComponent
 			pop ebx
 			push ecx	; Image
-			push dword [ebx+Component_x]	; x
+			mov ecx, [ebx+Component_x]
+			shr ecx, 2	; div by 4
+			push ecx	; x
 			push dword [ebx+Component_y]	; y
 			mov ecx, [ebx+Component_w]
 			shr ecx, 2	; div by 4
@@ -152,8 +155,6 @@ SelectionPanel.Render :
 	
 SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 	pusha
-	popa
-	ret
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found set it as the selected Component
 		push ebx
 		mov ebx, [ebx+Grouping_subcomponent]
