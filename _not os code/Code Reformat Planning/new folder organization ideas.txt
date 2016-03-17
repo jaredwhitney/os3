@@ -1,0 +1,60 @@
+sys\
+	betterRealMode.asm
+	Guppy.asm
+	HaltScreen.asm
+	Paging.asm
+	TextMode.asm
+	interrupt\
+		IDTmain.asm
+		int30.asm
+		GetValue.asm
+
+util\
+	img\
+		Tools.asm
+		TransparencyUtils.asm
+		TextHandler.asm
+	string\
+		General.asm
+		EqualityTests.asm
+	number\
+		BCDconversions.asm
+
+fonts\
+	SysDefault.asm
+
+hddrv\
+	BIOS\
+		rmATA.asm
+	PS2\
+		PS_2.asm
+	AHCI\
+		ATA_DETECT.asm
+		AHCI_COMMANDS.asm
+		AHCI_DMAWRITE.asm
+	PCI\
+		Generic_ComponentInterface.asm
+	RTC\
+		Time.asm
+	EHCI\
+		EHCI.asm
+	VGA\
+		Generic_Display.asm	; parts of it
+	VESA\
+		Generic_Display.asm	; parts of it
+
+hdabs\
+	
+
+sysrv\
+	Minnow3\
+		Minnow3.asm
+
+sfabs\
+	
+
+daemon\
+	
+
+user\
+	

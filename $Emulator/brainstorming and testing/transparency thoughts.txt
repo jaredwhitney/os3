@@ -1,0 +1,5 @@
+if upper has transparency at that spot: redraw self there
+else who cares? either non-changed or completely overwritten
+
+ala each grouping checks every pixel before drawing bg and if alpha == 0 or 255 then ignore it... but that's actually rather hard to do :\
+could "fake" and just use the last renderings of everthing but then still need to perform costly region testing...

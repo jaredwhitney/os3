@@ -1,0 +1,40 @@
+Notification Daemon	[NOTID]
+-----------------------------------------------
+
+
+Abstract:
+
+	The Notification Daemon [code: NOTID] is responsible for handling the presentation to the user of information which proccesses wish to bring the the user's attention. It is expected to display this information to the user in such a way that it is easily accessible by the user, but does not lock up any vital system services, while doing so.
+
+
+Operation:
+
+	When a proccess wishes to display a notification to a user, they will send the NOTID a Message with the following format:
+
+		From:	[unspecified]
+		To:	NOTID
+		Intent:	Notification
+
+	The Message's data will contain any number of Keys in the specifying the information to be displayed in the notification as shown below. All Keys will be in the order in which they are meant to be presented to the user (actual implementation left to the NOTID).
+	
+		Key
+			Name: Title
+			Data: MSGS.SecureDataPointer[String] title
+		Key
+			Name: Text
+			Data: MSGS.SecureDataPointer[String] text
+		Key
+			Name: Image
+			Data: MSGS.SecureDataPointer[RawImage] image
+		Key
+			Name: FilesystemImage
+			Data: MSGS.SecureDataPointer[String] imagePath
+	
+	Additionally, a NOTID implementation is expected to respond to any universally required Daemon Messages (see Daemon Specification).
+
+Dependencies:
+
+	A NOTID implementation requires, AT A MINUMUM, the following:
+		Software Services: MSGS, TRMS|WCMS
+	A NOTID implementation requres, AT A MAXIMUM, the following:
+		Software Services: AMES, KBDS, MSGS, UFSS, TRMS, WCMS

@@ -1,0 +1,40 @@
+Hardware Drivers for:
+	PS/2
+	AHCI
+	EHCI
+	UHCI
+	OHCI
+	Graphics Card Interfaces
+	Ethernet Interface
+	Network Device Interfaces
+
+Hardware Abstraction Drivers for:	; essentially worry very much if any of these ever errors!
+	Mouses				[MA]		Provides hardware agnostic mouse information to services.
+	Keyboards			[KA]		Provides hardware agnostic keyboard information to services.
+	Displays			[DA]		Provides hardware agnostic access of display devices to services.
+	Data Storage			[SA]		Provides hardware agnostic access of data storage devices to services.
+	Networking Devices		[NA]		Provides hardware agnostic access of networking devices to services.
+
+Software Services:			; attempt to restart the service if it errors
+	Advanced Mouse Event Service	[AMES]		Provides mouse events to proccesses.
+	Keyboard Service		[KBDS]		Provides keyboard events to proccesses.
+	Window Compositor Service	[WCMS]		Provides Windowing utilities.
+	System Terminal Service		[TRMS]		Provides console input/output services to proccesses.
+	Messaging Service		[MSGS]		Provides the ability to send messages between proccesses.
+	Minnow Filesystem Service	[MFSS]		Provides Minnow Filesystem utilities.
+	FAT(32?) Filesystem Service	[FATS]		Provides FAT(32?) filesystem utilities.
+
+Software Abstraction Services:		; attempt to restart the service if it errors
+	Unified Filesystem Service	[UFSS]		Provides format agnostic filesystem access to proccesses.
+
+Daemons:
+	Notification Daemon		[NOTID]		Handles the display of desktop notifications.
+	Launcher Daemon			[LNCHD]		Handles the creation and termination of proccesses.
+	Error Reporter Daemon		[ERRRD]		Handles the identification and reporting of any failing services or daemons to the user.
+
+
+All hardware drivers are required to include, at a minimum, access to data in a format which its respective hardware abstraction driver[s] support.
+All hardware abstraction drivers are required to include, at a minimum, access to all data in the manner described in their respective specifications. 
+All services are required to include, at a minimum, access to all data in the manner described for each service's specification.
+All software abstraction drivers are required to include, at a minimum, access to all data in the manner described in their respective specifications.
+Daemons may follow any format as long as the are able to meet, at a minimum, the requirements listed in their specifications.
