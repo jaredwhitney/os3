@@ -207,18 +207,18 @@ call ProgramManager.setActive	; Make removable Later
 	push dword screen.wipe
 	push dword 10*4
 	push dword 10
-	push dword 10*4
-	push dword 10
+	push dword 30*4
+	push dword 30
 	call Button.Create
 	mov eax, ecx
 	call SelectionPanel.Add
 	
 	push dword consoletest_type
 	push dword screen.wipe
-	push dword 25*4
+	push dword 50*4
 	push dword 10
-	push dword 10*4
-	push dword 10
+	push dword 30*4
+	push dword 30
 	call Button.Create
 	mov eax, ecx
 	call SelectionPanel.Add

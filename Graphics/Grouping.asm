@@ -36,6 +36,7 @@ Grouping.Create :	; int x, int y, int w, int h
 			call ProgramManager.reserveMemory
 			mov [edx+Grouping_image], ebx
 		popa
+		call Component.RequestUpdate
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -75,6 +76,8 @@ Grouping.Remove :	; Component in eax, Grouping in ebx
 		jmp Grouping.Remove.loop
 		Grouping.Remove.foundBefore :
 		; ecx now contains the component before the one to be removed, eax contains the component to be removed
+		mov eax, [eax+Component_nextLinked]
+		mov [ecx+Component_nextLinked], eax
 		
 		call Grouping.DoUpdate
 	popa
@@ -194,9 +197,8 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
 	pusha
+	
 		;mov dword [ebx+Grouping_backingColor], 0xFF00FF00
-			;	popa
-			;	ret
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
 		mov ebx, [ebx+Grouping_subcomponent]
 		jmp Grouping.passthroughMouseEvent.beginLoop
