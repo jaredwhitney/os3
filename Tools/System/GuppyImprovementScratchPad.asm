@@ -101,6 +101,13 @@ ret
 ;		... do things with the window here then when done
 ;		dealloc win
 ;
-;	[Also a Window is a bad example to use because it most likely wouldn't be deallocated so quickly but it demonstrates the point]
+;	[Also a Window is a bad example to use because it most likely wouldn't be deallocated so quickly but it demonstrates the point (and Window would probably need a helper function to delete its buffers as well)]
 ;
 ; Only thing then is to make reserveMemoryNew smarter so that it actually makes use of the new "holes" that appear in memory (as atm deallocating marks the memory as free but reserveMemoryNew is still using the old allocation system which doesn't take the table into account)
+;
+;
+;
+; For taking care of memory allocation its possible to use 2 bits for every dword (00 = unallocated, 01 and 10 and 11 are all allocated [cycle between them so region boundries remain intact])
+;
+;
+
