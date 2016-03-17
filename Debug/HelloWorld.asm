@@ -1,3 +1,5 @@
+; THIS WINDOW TEST SHOULD BE KEPT UPDATED TO THE MOST RECENT STABLE VERSION OF DOLPHIN. (In the future, it should remain compatible with the most recent WCMS specification.)
+
 HelloWorld.init :
 pusha
 	call HelloWorld.initProgram
@@ -44,6 +46,6 @@ HelloWorld.windowNumber :
 HelloWorld.programNumber :
 	db 0x0
 HelloWorld.windowTitle :
-	db "Memory Viewer", 0x0
+	db "Window Test", endstring
 HelloWorld.welcomeMessage :
-	db "Hello World!", newline, "This is a simple program.", endstring
+	db "Hello World!", newline, "This is a test window.", endstring
