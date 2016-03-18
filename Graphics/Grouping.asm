@@ -209,6 +209,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 			je Grouping.passthroughMouseEvent.ret
 		mov ecx, [Component.mouseEventX]
 		mov edx, [Component.mouseEventY]
+		
 		cmp ecx, [ebx+Component_x]
 			jl Grouping.passthroughMouseEvent.nomatch
 		mov eax, [ebx+Component_x]
@@ -222,6 +223,32 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		cmp edx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
 		push ebx
+				pusha
+					push ebx
+					mov ebx, [Component.mouseEventX]
+					call console.numOut
+					call console.newline
+					mov ebx, [Component.mouseEventY]
+					call console.numOut
+					call console.newline
+					pop ebx
+					mov edx, ebx
+					mov ebx, [edx+Component_x]
+					call console.numOut
+					call console.newline
+					add ebx, [edx+Component_w]
+					call console.numOut
+					call console.newline
+					mov ebx, [edx+Component_y]
+					call console.numOut
+					call console.newline
+					add ebx, [edx+Component_h]
+					call console.numOut
+					call console.newline
+					call Dolphin.updateWindows
+					mov byte [INTERRUPT_DISABLE], 0x0
+				popa
+			mov ah, 0xFF
 			mov ebx, GROUPING_SUB_CLICKED_STR
 			call console.println
 		pop ebx

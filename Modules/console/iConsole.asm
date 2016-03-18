@@ -196,32 +196,37 @@ call ProgramManager.setActive	; Make removable Later
 	push dword 0
 	push dword 300*4
 	push dword 100
-	call SelectionPanel.Create
+	call Grouping.Create
 	mov eax, ecx
 	mov ebx, edx
 	call Grouping.Add
 	mov dword [ecx+Grouping_backingColor], 0xFFC01010
 	mov ebx, ecx
 	
-	push dword consoletest_type
-	push dword screen.wipe
-	push dword 10*4
-	push dword 10
-	push dword 30*4
-	push dword 30
-	call Button.Create
-	mov eax, ecx
-	call SelectionPanel.Add
+		push dword 4*4
+		push dword 2
+		push dword [Graphics.SCREEN_WIDTH]	; buffer should be SCREEN_WIDTH wide
+		push dword 20
+		call Grouping.Create
+		mov dword [ecx+Grouping_backingColor], 0xFF201080
+		mov ebx, edx
+		mov eax, ecx
+		call Grouping.Add
+		mov ebx, ecx
 	
-	push dword consoletest_type
-	push dword screen.wipe
-	push dword 50*4
-	push dword 10
-	push dword 30*4
-	push dword 30
-	call Button.Create
-	mov eax, ecx
-	call SelectionPanel.Add
+		push dword WindowGrouping.closeStr
+		push dword WindowGrouping.closeCallback
+		mov eax, [WindowGrouping.Create.w]
+		sub eax, 10*4
+		push eax
+		push dword 5
+		push dword 10*4
+		push dword 15
+		call Button.Create
+		mov eax, ecx
+		;mov ebx, [edx+WindowGrouping_titleBar]
+		call Grouping.Add
+		mov dword [ecx+Button_backingColor], 0xFFE00000
 
 ;	mov ebx, [Graphics.SCREEN_MEMPOS]
 ;	mov eax, 0x3000
