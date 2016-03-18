@@ -81,7 +81,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
-		mov dword [ecx+Grouping_backingColor], 0xFF180878
+		mov dword [ecx+Button_backingColor], 0xFF180878
 		
 		push dword WindowGrouping.closeStr
 		push dword WindowGrouping.closeCallback
@@ -95,7 +95,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
-		mov dword [ecx+Grouping_backingColor], 0xFFE00000
+		mov dword [ecx+Button_backingColor], 0xFFE00000
 		
 		push dword [WindowGrouping.Create.title]
 		push dword 0

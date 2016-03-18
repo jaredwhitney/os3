@@ -1,11 +1,12 @@
-Button_type		equ 0
-Button_image	equ 4
-Button_x		equ 8
-Button_y		equ 12
-Button_w		equ 16
-Button_h		equ 20
-Button_text		equ 32
-Button_onClick	equ 36
+Button_type			equ 0
+Button_image		equ 4
+Button_x			equ 8
+Button_y			equ 12
+Button_w			equ 16
+Button_h			equ 20
+Button_text			equ 32
+Button_onClick		equ 36
+Button_backingColor	equ 40
 
 Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	pop dword [Button.Create.retval]
@@ -17,7 +18,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	pop dword [Button.Create.text]
 	push eax
 	push ebx
-		mov ebx, 40
+		mov ebx, 44
 		call ProgramManager.reserveMemory
 		mov eax, [Button.Create.text]
 		mov [ebx+Button_text], eax
@@ -70,6 +71,20 @@ Button.SetText : 	; Text in eax, Button in ebx
 	
 Button.Render :	; Button in ebx
 	pusha
+	
+			mov edx, ebx
+			test dword [edx+Button_backingColor], 0xFF000000
+				jz Button.Render.noLayerColor
+			pusha
+			mov eax, [edx+Component_image]
+			mov ecx, [edx+Component_w]
+			imul ecx, [edx+Component_h]
+			mov ebx, [edx+Button_backingColor]
+			mov edx, ecx
+			call Image.clear
+			popa
+			Button.Render.noLayerColor :
+	
 		push ebx
 			mov ebx, [ebx+Button_text]
 			call String.getLength
