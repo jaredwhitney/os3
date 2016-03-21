@@ -100,7 +100,9 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		push dword [WindowGrouping.Create.title]
 		push dword 0
 		push dword 20/2-FONTHEIGHT/2
-		push dword [WindowGrouping.Create.w]
+		mov eax, [WindowGrouping.Create.w]
+		sub eax, 22*4+2*4	; dont let it overlap the buttons
+		push eax
 		push dword 20
 		call TextLine.Create
 		mov eax, ecx
@@ -122,7 +124,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov [edx+WindowGrouping_mainGrouping], ecx
 		mov dword [ecx+Grouping_backingColor], 0xFFB02020
 		
-		mov dword [edx+Component_type], Component.TYPE_GROUPING
+		mov dword [edx+Component_type], Component.TYPE_WINDOW
 		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
 		
 		mov ecx, edx
@@ -133,12 +135,19 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push dword [WindowGrouping.Create.retval]
 	ret
 	
-WindowGrouping.closeCallback :	; WindowGrouping in ebx
+WindowGrouping.closeCallback :	; Button in ebx
 	pusha
-		mov byte [INTERRUPT_DISABLE], 0x0	; temporary
-		;mov eax, ebx
-		;mov ebx, [Dolphin2.compositorGrouping]
-		;call Grouping.Remove
+		mov eax, ebx
+		WindowGrouping.closeCallback.findWindowLoop :
+		mov eax, [ebx+Component_upperRenderFlag]
+		sub eax, Grouping_renderFlag
+		cmp dword [eax+Component_type], Component.TYPE_WINDOW
+			je WindowGrouping.closeCallback.foundWindow
+		mov ebx, eax
+		jmp WindowGrouping.closeCallback.findWindowLoop
+		WindowGrouping.closeCallback.foundWindow :
+		mov ebx, [Dolphin2.compositorGrouping]
+		call Grouping.Remove
 	popa
 	ret
 
