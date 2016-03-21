@@ -65,21 +65,32 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
 	pusha
-		mov ebx, [ebx+Grouping_subcomponent]
-		cmp ebx, eax
-			je Grouping.Remove.foundBefore
+		mov ecx, [ebx+Grouping_subcomponent]
+		cmp ecx, 0x0
+			je Grouping.Remove.ret
+		cmp ecx, eax
+			je Grouping.Remove.foundSub
+		mov ebx, ecx
 		Grouping.Remove.loop :
 		mov ecx, [ebx+Component_nextLinked]
+		cmp ecx, 0x0
+			je Grouping.Remove.ret
 		cmp ecx, eax
 			je Grouping.Remove.foundBefore
 		mov ebx, ecx
 		jmp Grouping.Remove.loop
 		Grouping.Remove.foundBefore :
-		; ecx now contains the component before the one to be removed, eax contains the component to be removed
+		; ebx now contains the component before the one to be removed, eax contains the component to be removed
 		mov eax, [eax+Component_nextLinked]
-		mov [ecx+Component_nextLinked], eax
-		
+		mov [ebx+Component_nextLinked], eax
 		call Grouping.DoUpdate
+		jmp Grouping.Remove.ret
+		Grouping.Remove.foundSub :
+		; ebx now contains the Grouping, eax contains the component to be removed
+		mov eax, [eax+Component_nextLinked]
+		mov [ebx+Grouping_subcomponent], eax
+		call Grouping.DoUpdate
+	Grouping.Remove.ret :
 	popa
 	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
@@ -222,36 +233,11 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		add eax, [ebx+Component_h]
 		cmp edx, eax
 			jg Grouping.passthroughMouseEvent.nomatch
-		push ebx
-				pusha
-					push ebx
-					mov ebx, [Component.mouseEventX]
-					call console.numOut
-					call console.newline
-					mov ebx, [Component.mouseEventY]
-					call console.numOut
-					call console.newline
-					pop ebx
-					mov edx, ebx
-					mov ebx, [edx+Component_x]
-					call console.numOut
-					call console.newline
-					add ebx, [edx+Component_w]
-					call console.numOut
-					call console.newline
-					mov ebx, [edx+Component_y]
-					call console.numOut
-					call console.newline
-					add ebx, [edx+Component_h]
-					call console.numOut
-					call console.newline
-					call Dolphin.updateWindows
-					mov byte [INTERRUPT_DISABLE], 0x0
-				popa
-			mov ah, 0xFF
-			mov ebx, GROUPING_SUB_CLICKED_STR
-			call console.println
-		pop ebx
+	;	push ebx
+	;		mov ah, 0xFF
+	;		mov ebx, GROUPING_SUB_CLICKED_STR
+	;		call console.println
+	;	pop ebx
 		call Component.HandleMouseEvent
 	Grouping.passthroughMouseEvent.ret :
 	popa

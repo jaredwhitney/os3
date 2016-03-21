@@ -1,10 +1,10 @@
-Component_type	equ 0
-Component_image	equ 4
-Component_x		equ 8
-Component_y		equ 12
-Component_w		equ 16
-Component_h		equ 20
-Component_nextLinked	equ 24
+Component_type				equ 0
+Component_image				equ 4
+Component_x					equ 8
+Component_y					equ 12
+Component_w					equ 16
+Component_h					equ 20
+Component_nextLinked		equ 24
 Component_upperRenderFlag	equ 28
 
 Component.Render :	; Component in ebx
@@ -29,7 +29,7 @@ Component.Render.layerColor :
 	dd 0x400000
 
 Component.functionPointers :
-	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render, GroupingScrollable.Render, SelectionPanel.Render
+	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render, GroupingScrollable.Render, SelectionPanel.Render, Grouping.Render
 Component.TYPE_TEXTLINE				equ 0x1
 Component.TYPE_TEXTAREA				equ 0x2
 Component.TYPE_IMAGE				equ 0x3
@@ -38,6 +38,7 @@ Component.TYPE_GROUPING				equ 0x5
 Component.TYPE_BUTTON				equ 0x6
 Component.TYPE_SCROLLPANEL			equ 0x7
 Component.TYPE_SELECTPANEL			equ 0x8
+Component.TYPE_WINDOW				equ 0x9
 
 Component.RequestUpdate :	; Component in ebx
 pusha
@@ -66,7 +67,7 @@ Component.discardMouseEvent :
 	; discard the event
 ret
 Component.mouseHandlerPointers :
-	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent, SelectionPanel.HandleMouseEvent
+	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent, SelectionPanel.HandleMouseEvent, Grouping.passthroughMouseEvent
 Component.mouseEventX :
 	dd 0x0
 Component.mouseEventY :
