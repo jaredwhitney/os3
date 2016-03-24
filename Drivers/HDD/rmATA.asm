@@ -70,9 +70,18 @@ rmATA.DMAread.readData :
 		mov eax, 0x7c00
 		mov ecx, 0x200
 		push edx
-		mov edx, 1
-		call Image.copyLinear	; could really use a buffer copy func at some point
+		pusha
+		sadfasf :
+		mov edx, [eax]
+		mov [ebx], edx
+		sub ecx, 4
+		add eax, 4
+		add ebx, 4
+		cmp ecx, 0x0
+			jg sadfasf
+		popa
 		pop edx
+		
 		add ebx, 0x200
 		mov ecx, [rmATA.DMAread.HBA_low]
 		add ecx, 1

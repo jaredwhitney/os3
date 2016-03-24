@@ -53,7 +53,7 @@ Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 	popa
 	ret
 	
-Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height
+Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height [IS BROKEN!!!]
 	pusha
 		mov ecx, ebx
 		imul edx, ecx

@@ -321,7 +321,7 @@ KERNEL_END :
 
 ; External files to include
 os_imageDataBaseLBA :
-	dd ($-$$)/0x200+2	; 1 additional because the bootloader is LBA 0
-incbin "..\_not os code\image\TEAMBLDR.vesa.dsp"
+	dd ($-$$)/0x200+1	; 1 additional because the bootloader is LBA 0
+incbin "..\_not os code\Convenience\VGA\bgex.vesa.dsp"
 
 times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector
