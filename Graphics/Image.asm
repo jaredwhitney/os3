@@ -17,6 +17,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [Image.Create.sh]
 	pop dword [Image.Create.sw]
 	pop dword [Image.Create.source]
+	push edx
 	push eax
 	push ebx
 		mov ebx, 44
@@ -48,6 +49,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 		mov ecx, ebx
 	pop ebx
 	pop eax
+	pop edx
 	push dword [Image.Create.retval]
 	ret
 Image.Create.retval :
@@ -73,18 +75,18 @@ Image.Render :	; Image in ebx
 				jle Image.Render.nos0
 			mov eax, [ebx+Image_sw]
 			Image.Render.nos0 :
-		mov [Image.copyRegion.w], eax
+		mov dword [Image.copyRegion.w], 1024;eax
 		mov eax, [ebx+Image_w]
-		mov [Image.copyRegion.nw], eax
+		mov dword [Image.copyRegion.nw],1024;eax
 		mov eax, [ebx+Image_sw]
-		mov [Image.copyRegion.ow], eax
+		mov dword [Image.copyRegion.ow], 1024;eax
 		mov eax, [ebx+Image_h]	; take min(Image_h, Image_sh)
 			cmp eax, [ebx+Image_sh]
 				jle Image.Render.nos1
 			mov eax, [ebx+Image_sh]
 			Image.Render.nos1 :
-		mov [Image.copyRegion.h], eax
-		mov eax, [ebx+Image_source]
+		mov dword [Image.copyRegion.h], 768;eax
+		mov eax, [Dolphin2.bgimg];[ebx+Image_source]
 		mov [Image.copyRegion.obuf], eax
 		mov eax, [ebx+Image_image]
 		mov [Image.copyRegion.nbuf], eax

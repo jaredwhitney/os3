@@ -8,7 +8,7 @@ public static void main(String[] args) throws Exception
 {
 BufferedImage img = ImageIO.read(new File(args[0]));
 int WIDTH = 1024;
-int HEIGHT = 603;
+int HEIGHT = 768;
 File output = new File(args[0].split("\\Q.\\E")[0] + ".vesa.dsp");
 output.createNewFile();
 FileOutputStream out = new FileOutputStream(output);

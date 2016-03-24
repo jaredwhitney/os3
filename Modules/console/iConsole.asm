@@ -181,6 +181,13 @@ call ProgramManager.setActive	; Make removable Later
 
 	mov byte [INTERRUPT_DISABLE], 0xFF
 	
+	mov eax, [os_imageDataBaseLBA]
+	xor ebx, ebx
+	mov edx, 1024*4*768
+	call rmATA.DMAread
+	mov [Dolphin2.bgimg], ecx
+
+	
 	call Dolphin2.createCompositorGrouping
 	
 	push consoletest_title
@@ -220,27 +227,6 @@ call ProgramManager.setActive	; Make removable Later
 		call Button.Create
 		mov eax, ecx
 		call SelectionPanel.Add
-
-;	mov ebx, [Graphics.SCREEN_MEMPOS]
-;	mov eax, 0x3000
-;	mov ecx, [Graphics.SCREEN_WIDTH]
-;	mov edx, [Graphics.SCREEN_HEIGHT]
-;	call Image.copyLinear
-;	cli
-;	hlt
-	
-;	push dword 0x3000;os_imagething
-;	push dword 100
-;	push dword 100
-;	push dword 0
-;	push dword 0
-;	push dword 300*4
-;	push dword 100
-;	call Image.Create
-;	
-;	mov ebx, edx
-;	mov eax, ecx
-;	call Grouping.Add
 	
 ;	mov ebx, eax
 	GoDoLoop :

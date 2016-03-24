@@ -32,6 +32,18 @@ Dolphin2.createCompositorGrouping :
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
 		
+		push dword [Dolphin2.bgimg]
+		push dword 1024
+		push dword 768
+		push dword 0
+		push dword 0
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
+		call Image.Create
+		mov eax, ecx
+		mov ebx, [Dolphin2.compositorGrouping]
+		call Grouping.Add
+		
 	popa
 	ret
 
@@ -97,4 +109,6 @@ Dolphin2.compositorGrouping :
 Dolphin2.makeWindow.ret :
 	dd 0x0
 Dolphin2.flipBuffer :
+	dd 0x0
+Dolphin2.bgimg :
 	dd 0x0
