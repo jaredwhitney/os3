@@ -498,6 +498,7 @@ _IRQ0 :
 		mov eax, [Clock.tics]
 		add eax, 1
 		mov [Clock.tics], eax
+		call Dolphin2.drawMouse
 		; timer code goes here!
 		cmp byte [INTERRUPT_DISABLE], 0x0
 			jne _IRQ0.ret

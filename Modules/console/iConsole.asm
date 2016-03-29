@@ -209,6 +209,18 @@ call ProgramManager.setActive	; Make removable Later
 		call Grouping.Add
 		mov dword [ecx+Grouping_backingColor], 0xFFC01010
 		mov ebx, ecx
+
+		push dword [Dolphin2.bgimg]
+		push dword 1024*4
+		push dword 768
+		push dword 0
+		push dword 0
+		push dword 300*4
+		push dword 100
+		call Image.Create
+		mov eax, ecx
+		call SelectionPanel.Add
+
 		push dword consoletest_type
 		push dword screen.wipe
 		push dword 10*4
@@ -218,6 +230,7 @@ call ProgramManager.setActive	; Make removable Later
 		call Button.Create
 		mov eax, ecx
 		call SelectionPanel.Add
+
 		push dword consoletest_type
 		push dword screen.wipe
 		push dword 50*4
@@ -227,7 +240,9 @@ call ProgramManager.setActive	; Make removable Later
 		call Button.Create
 		mov eax, ecx
 		call SelectionPanel.Add
-	
+		
+		call Dolphin2.showLoginScreen
+		
 ;	mov ebx, eax
 	GoDoLoop :
 	call Dolphin2.renderScreen

@@ -32,18 +32,6 @@ Dolphin2.createCompositorGrouping :
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
 		
-		push dword [Dolphin2.bgimg]
-		push dword 1024
-		push dword 768
-		push dword 0
-		push dword 0
-		push dword [Graphics.SCREEN_WIDTH]
-		push dword [Graphics.SCREEN_HEIGHT]
-		call Image.Create
-		mov eax, ecx
-		mov ebx, [Dolphin2.compositorGrouping]
-		call Grouping.Add
-		
 	popa
 	ret
 
@@ -67,8 +55,36 @@ Dolphin2.renderScreen :
 		mov edx, [Graphics.SCREEN_HEIGHT]
 		call Video.imagecopy
 		
-		call Mouse.drawOnScreen
-		
+	popa
+	ret
+	
+Dolphin2.drawMouse :
+	pusha
+		mov eax, [Graphics.SCREEN_MEMPOS]
+		mov ebx, [Graphics.SCREEN_HEIGHT]
+		pusha
+		sub ebx, [Mouse.lasty]
+		imul ebx, [Graphics.SCREEN_WIDTH]
+		add eax, ebx
+		mov ecx, [Mouse.lastx]
+		imul ecx, 4
+		add eax, ecx
+		mov ebx, 1
+		mov ecx, 1
+		call Dolphin.redrawBackgroundRegion
+		popa
+		sub ebx, [Mouse.y]
+		imul ebx, [Graphics.SCREEN_WIDTH]
+		add eax, ebx
+		mov ecx, [Mouse.x]
+		imul ecx, 4
+		add eax, ecx
+		mov dword [eax], 0xFFFFFF
+
+		mov ecx, [Mouse.x]
+		mov edx, [Mouse.y]
+		mov [Mouse.lastx], ecx
+		mov [Mouse.lasty], edx
 	popa
 	ret
 	
@@ -104,6 +120,28 @@ Dolphin2.handleMouseClick :
 	popa
 	ret
 	
+Dolphin2.showLoginScreen :
+	pusha
+		push dword Dolphin2.STR_LOGIN_SCREEN
+		push dword 0
+		push dword 0
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
+		call Dolphin2.makeWindow
+		mov ebx, ecx
+		push dword [Dolphin2.bgimg]
+		push dword 1024*4
+		push dword 768
+		push dword 0
+		push dword 0
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
+		call Image.Create
+		mov eax, ecx
+		call Grouping.Add
+	popa
+	ret
+	
 Dolphin2.compositorGrouping :
 	dd 0x0
 Dolphin2.makeWindow.ret :
@@ -112,3 +150,5 @@ Dolphin2.flipBuffer :
 	dd 0x0
 Dolphin2.bgimg :
 	dd 0x0
+Dolphin2.STR_LOGIN_SCREEN :
+	db "Os3 Login", 0

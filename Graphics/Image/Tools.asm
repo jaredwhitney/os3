@@ -196,6 +196,7 @@ Image.copyRegion :
 			mov edx, [Image.copyRegion.w]
 			Image.copyRegion.loop2 :
 				mov ecx, [eax]
+				or ecx, 0xFF000000	; full transparency
 				mov [ebx], ecx
 				add eax, 4
 				add ebx, 4

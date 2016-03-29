@@ -143,52 +143,68 @@ Grouping.Render :	; Grouping in ebx
 			Grouping.Render.noLayerColor :
 		
 		mov ebx, [ebx+Grouping_subcomponent]
+		xor eax, eax
 		
 		Grouping.Render.loop :
-		
+			
 			cmp ebx, 0x0
-				je Grouping.Render.ret
+				je Grouping.Render.doRender
 			
-			call Component.Render
-			
-			mov eax, [ebx+Component_y]
-			imul eax, [edx+Component_w]
-			add eax, [ebx+Component_x]
-			add eax, [edx+Component_image]
-			mov [Image.copyRegionWithTransparency.nbuf], eax
-			
-			mov eax, [ebx+Component_image]
-			mov [Image.copyRegionWithTransparency.obuf], eax
-			
-			; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegionWithTransparency.w]
-			mov eax, [edx+Component_w]
-			sub eax, [ebx+Component_x]
-				cmp eax, [ebx+Component_w]
-					jle Grouping.Render.nos0
-				mov eax, [ebx+Component_w]
-				Grouping.Render.nos0 :
-			mov [Image.copyRegionWithTransparency.w], eax
-			
-			; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegionWithTransparency.h]
-			mov eax, [edx+Component_h]
-			sub eax, [ebx+Component_y]
-				cmp eax, [ebx+Component_h]
-					jle Grouping.Render.nos1
-				mov eax, [ebx+Component_h]
-				Grouping.Render.nos1 :
-			mov [Image.copyRegionWithTransparency.h], eax
-			
-			mov eax, [ebx+Component_w]
-			mov [Image.copyRegionWithTransparency.ow], eax
-			mov eax, [edx+Component_w]
-			mov [Image.copyRegionWithTransparency.nw], eax
-			
-			call Image.copyRegionWithTransparency
+			push ebx
+			add eax, 1
 			
 			mov ebx, [ebx+Component_nextLinked]
 			jmp Grouping.Render.loop
+			
+			Grouping.Render.doRender :
+			cmp eax, 0x0
+				jle Grouping.Render.ret
+			pop ebx
+			call Grouping.RenderSub
+			sub eax, 1
+			jmp Grouping.Render.doRender
+			
 		mov dword [edx+Grouping_renderFlag], FALSE
 	Grouping.Render.ret :
+	popa
+	ret
+Grouping.RenderSub :
+	pusha
+		call Component.Render
+			
+		mov eax, [ebx+Component_y]
+		imul eax, [edx+Component_w]
+		add eax, [ebx+Component_x]
+		add eax, [edx+Component_image]
+		mov [Image.copyRegionWithTransparency.nbuf], eax
+		
+		mov eax, [ebx+Component_image]
+		mov [Image.copyRegionWithTransparency.obuf], eax
+		
+		; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegionWithTransparency.w]
+		mov eax, [edx+Component_w]
+		sub eax, [ebx+Component_x]
+			cmp eax, [ebx+Component_w]
+				jle Grouping.Render.nos0
+			mov eax, [ebx+Component_w]
+			Grouping.Render.nos0 :
+		mov [Image.copyRegionWithTransparency.w], eax
+		
+		; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegionWithTransparency.h]
+		mov eax, [edx+Component_h]
+		sub eax, [ebx+Component_y]
+			cmp eax, [ebx+Component_h]
+				jle Grouping.Render.nos1
+			mov eax, [ebx+Component_h]
+			Grouping.Render.nos1 :
+		mov [Image.copyRegionWithTransparency.h], eax
+		
+		mov eax, [ebx+Component_w]
+		mov [Image.copyRegionWithTransparency.ow], eax
+		mov eax, [edx+Component_w]
+		mov [Image.copyRegionWithTransparency.nw], eax
+		
+		call Image.copyRegionWithTransparency
 	popa
 	ret
 Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
