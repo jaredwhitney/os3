@@ -210,14 +210,13 @@ call ProgramManager.setActive	; Make removable Later
 		mov dword [ecx+Grouping_backingColor], 0xFFC01010
 		mov ebx, ecx
 
-		push dword [Dolphin2.bgimg]
-		push dword 1024*4
-		push dword 768
+		push dword 100
 		push dword 0
 		push dword 0
 		push dword 300*4
 		push dword 100
-		call Image.Create
+		push dword FALSE
+		call TextArea.Create
 		mov eax, ecx
 		call SelectionPanel.Add
 

@@ -63,6 +63,7 @@ pusha
 	call [eax]
 popa
 ret
+Component.discardKeyboardEvent :
 Component.discardMouseEvent :
 	; discard the event
 ret
@@ -74,6 +75,26 @@ Component.mouseEventY :
 	dd 0x0
 Component.mouseEventButton :
 	dd 0x0
+Component.HandleKeyboardEvent :	; Component in ebx
+pusha
+	cmp byte [Component.keyChar], 0x0
+		je Component.HandleKeyboardEvent.ret
+	mov ecx, [ebx+Component_type]
+	cmp ecx, 2
+		jne awerqawerqwer
+	cli
+	hlt
+	awerqawerqwer :
+	imul ecx, 4
+	add ecx, Component.keyHandlerPointers
+	call [ecx]
+Component.HandleKeyboardEvent.ret :
+popa
+ret
+Component.keyHandlerPointers :
+	dd Component.killfunc, Component.discardKeyboardEvent, TextArea.onKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent
+Component.keyChar :
+	db 0x0
 	
 Textline_type	equ 0
 Textline_image	equ 4

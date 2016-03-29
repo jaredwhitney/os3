@@ -202,6 +202,7 @@ SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 			jg SelectionPanel.HandleMouseEvent.nomatch
 		pop ecx
 		mov [ecx+SelectionPanel_selectedComponent], ebx
+		mov [Dolphin2.focusedComponent], ebx
 		mov ebx, ecx
 		call Component.RequestUpdate
 		mov dword [ebx+SelectionPanel_backingColor], 0xFF020202

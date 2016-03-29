@@ -308,4 +308,30 @@ TextArea.RenderProto.nextFlip :
 	dd 0x0
 TextArea.RenderProto.flipTo :
 	dd 0x0
+
+TextArea.onKeyboardEvent :
+	pusha
+		call SysHaltScreen.show
+		mov al, [Component.keyChar]
+		cmp al, 0xff
+			je TextArea.onKeyboardEvent.handleBackspace
+		call TextArea.AppendChar
+		call Component.RequestUpdate
+	popa
+	ret
+TextArea.onKeyboardEvent.handleBackspace :
+		push ebx
+		mov ebx, [ebx+Textarea_text]
+		call String.getLength
+		cmp edx, 1
+			jle TextArea.onKeyboardEvent.handleBackspace.ret
+		add ebx, edx
+		sub ebx, 1
+		mov byte [ebx], 0
+		TextArea.onKeyboardEvent.handleBackspace.ret :
+		pop ebx
+		call Component.RequestUpdate
+	popa
+	ret
+
 ; Also make TextAreaScrollable (TextArea with scroll functions that modify which parts of the buffer are displayed at any given time)
