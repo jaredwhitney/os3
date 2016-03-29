@@ -70,23 +70,24 @@ Image.Create.source :
 	dd 0x0
 Image.Render :	; Image in ebx
 	pusha
+			
 		mov eax, [ebx+Image_w]	; take min(Image_w, Image_sw)
 			cmp eax, [ebx+Image_sw]	
 				jle Image.Render.nos0
 			mov eax, [ebx+Image_sw]
 			Image.Render.nos0 :
-		mov dword [Image.copyRegion.w], 1024;eax
+		mov dword [Image.copyRegion.w], eax
 		mov eax, [ebx+Image_w]
-		mov dword [Image.copyRegion.nw],1024;eax
+		mov dword [Image.copyRegion.nw], eax
 		mov eax, [ebx+Image_sw]
-		mov dword [Image.copyRegion.ow], 1024;eax
+		mov dword [Image.copyRegion.ow], eax
 		mov eax, [ebx+Image_h]	; take min(Image_h, Image_sh)
 			cmp eax, [ebx+Image_sh]
 				jle Image.Render.nos1
 			mov eax, [ebx+Image_sh]
 			Image.Render.nos1 :
-		mov dword [Image.copyRegion.h], 768;eax
-		mov eax, [Dolphin2.bgimg];[ebx+Image_source]
+		mov dword [Image.copyRegion.h], eax
+		mov eax, [Dolphin2.bgimg]
 		mov [Image.copyRegion.obuf], eax
 		mov eax, [ebx+Image_image]
 		mov [Image.copyRegion.nbuf], eax

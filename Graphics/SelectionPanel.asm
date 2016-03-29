@@ -83,73 +83,95 @@ SelectionPanel.Render :
 		SelectionPanel.Render.noLayerColor :
 		
 		mov ebx, [ebx+SelectionPanel_subcomponent]
+		xor eax, eax
 		
 		SelectionPanel.Render.loop :
 		
 			cmp ebx, 0x0
-				je SelectionPanel.Render.ret
+				je SelectionPanel.Render.doRender
 			
-			call Component.Render
-			
-			mov eax, [ebx+Component_y]
-			imul eax, [edx+Component_w]
-			add eax, [ebx+Component_x]
-			add eax, [edx+Component_image]
-			mov [Image.copyRegionWithTransparency.nbuf], eax
-			
-			mov eax, [ebx+Component_image]
-			mov [Image.copyRegionWithTransparency.obuf], eax
-			
-			mov eax, [edx+Component_w]
-			sub eax, [ebx+Component_x]
-				cmp eax, [ebx+Component_w]
-					jle SelectionPanel.Render.nos0
-				mov eax, [ebx+Component_w]
-				SelectionPanel.Render.nos0 :
-			mov [Image.copyRegionWithTransparency.w], eax
-			
-			mov eax, [edx+Component_h]
-			sub eax, [ebx+Component_y]
-				cmp eax, [ebx+Component_h]
-					jle SelectionPanel.Render.nos1
-				mov eax, [ebx+Component_h]
-				SelectionPanel.Render.nos1 :
-			mov [Image.copyRegionWithTransparency.h], eax
-			
-			mov eax, [ebx+Component_w]
-			mov [Image.copyRegionWithTransparency.ow], eax
-			mov eax, [edx+Component_w]
-			mov [Image.copyRegionWithTransparency.nw], eax
-			
-			call Image.copyRegionWithTransparency
-			
-			;; Outline the currently selected Component
-			cmp ebx, [edx+SelectionPanel_selectedComponent]
-				jne SelectionPanel.Render.nos2
-			pusha
 			push ebx
-			mov ebx, edx
-			call L3gxImage.FakeFromComponent
-			pop ebx
-			push ecx	; Image
-			mov ecx, [ebx+Component_x]
-			shr ecx, 2	; div by 4
-			push ecx	; x
-			push dword [ebx+Component_y]	; y
-			mov ecx, [ebx+Component_w]
-			shr ecx, 2	; div by 4
-			push ecx	; w
-			push dword [ebx+Component_h]	; h
-			push dword 0xFF00FF00	; Color (GREEN)
-			call L3gx.lineRect
-			popa
-			SelectionPanel.Render.nos2 :
-			;;
+			add eax, 1
 			
 			mov ebx, [ebx+Component_nextLinked]
 			jmp SelectionPanel.Render.loop
+			
+			SelectionPanel.Render.doRender :
+			cmp eax, 0x0
+				jle SelectionPanel.Render.ret
+			pop ebx
+			call SelectionPanel.RenderSub
+			sub eax, 1
+			jmp SelectionPanel.Render.doRender
+			
 		mov dword [edx+SelectionPanel_renderFlag], FALSE
 	SelectionPanel.Render.ret :
+	popa
+	ret
+SelectionPanel.RenderSub :
+	pusha
+		call Component.Render
+			
+		mov eax, [ebx+Component_y]
+		imul eax, [edx+Component_w]
+		add eax, [ebx+Component_x]
+		add eax, [edx+Component_image]
+		mov [Image.copyRegionWithTransparency.nbuf], eax
+		
+		mov eax, [ebx+Component_image]
+		mov [Image.copyRegionWithTransparency.obuf], eax
+		
+		mov eax, [edx+Component_w]
+		sub eax, [ebx+Component_x]
+			cmp eax, [ebx+Component_w]
+				jle SelectionPanel.Render.nos0
+			mov eax, [ebx+Component_w]
+			SelectionPanel.Render.nos0 :
+		mov [Image.copyRegionWithTransparency.w], eax
+		
+		mov eax, [edx+Component_h]
+		sub eax, [ebx+Component_y]
+			cmp eax, [ebx+Component_h]
+				jle SelectionPanel.Render.nos1
+			mov eax, [ebx+Component_h]
+			SelectionPanel.Render.nos1 :
+		mov [Image.copyRegionWithTransparency.h], eax
+		
+		mov eax, [ebx+Component_w]
+		mov [Image.copyRegionWithTransparency.ow], eax
+		mov eax, [edx+Component_w]
+		mov [Image.copyRegionWithTransparency.nw], eax
+		
+		call Image.copyRegionWithTransparency
+		
+		;; Outline the currently selected Component
+		cmp ebx, [edx+SelectionPanel_selectedComponent]
+			jne SelectionPanel.Render.nos2
+		pusha
+		push ebx
+		mov ebx, edx
+		call L3gxImage.FakeFromComponent
+		pop ebx
+		push ecx	; Image
+		mov ecx, [ebx+Component_x]
+		shr ecx, 2	; div by 4
+		add ecx, 1
+		push ecx	; x
+		mov ecx, [ebx+Component_y]
+		add ecx, 1
+		push dword ecx	; y
+		mov ecx, [ebx+Component_w]
+		shr ecx, 2	; div by 4
+		sub ecx, 2
+		push ecx	; w
+		mov ecx, [ebx+Component_h]
+		sub ecx, 2
+		push dword ecx	; h
+		push dword 0xFF00FF00	; Color (GREEN)
+		call L3gx.lineRect
+		popa
+		SelectionPanel.Render.nos2 :
+		;;
 	popa
 	ret
 	
