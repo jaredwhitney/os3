@@ -32,6 +32,8 @@ Dolphin2.createCompositorGrouping :
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
 		
+		mov dword [Dolphin2.started], 0xFF
+		
 	popa
 	ret
 
@@ -85,6 +87,13 @@ Dolphin2.drawMouse :
 		mov edx, [Mouse.y]
 		mov [Mouse.lastx], ecx
 		mov [Mouse.lasty], edx
+	popa
+	ret
+
+Dolphin2.HandleKeyboardEvent :
+	pusha
+		mov ebx, [Dolphin2.focusedComponent]
+		call Component.HandleKeyboardEvent
 	popa
 	ret
 	
@@ -149,6 +158,10 @@ Dolphin2.makeWindow.ret :
 Dolphin2.flipBuffer :
 	dd 0x0
 Dolphin2.bgimg :
+	dd 0x0
+Dolphin2.focusedComponent :
+	dd 0x0
+Dolphin2.started :
 	dd 0x0
 Dolphin2.STR_LOGIN_SCREEN :
 	db "Os3 Login", 0

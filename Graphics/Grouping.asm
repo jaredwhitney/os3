@@ -254,6 +254,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 	;		mov ebx, GROUPING_SUB_CLICKED_STR
 	;		call console.println
 	;	pop ebx
+		mov [Dolphin2.focusedComponent], ebx
 		call Component.HandleMouseEvent
 	Grouping.passthroughMouseEvent.ret :
 	popa
