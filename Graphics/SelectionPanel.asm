@@ -205,7 +205,6 @@ SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 		mov [Dolphin2.focusedComponent], ebx
 		mov ebx, ecx
 		call Component.RequestUpdate
-		mov dword [ebx+SelectionPanel_backingColor], 0xFF020202
 		popa
 		ret
 	SelectionPanel.HandleMouseEvent.ret :

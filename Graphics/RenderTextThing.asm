@@ -80,11 +80,6 @@ pusha
 	cmp byte [Component.keyChar], 0x0
 		je Component.HandleKeyboardEvent.ret
 	mov ecx, [ebx+Component_type]
-	cmp ecx, 2
-		jne awerqawerqwer
-	cli
-	hlt
-	awerqawerqwer :
 	imul ecx, 4
 	add ecx, Component.keyHandlerPointers
 	call [ecx]

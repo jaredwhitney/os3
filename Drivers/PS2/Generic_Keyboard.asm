@@ -87,7 +87,7 @@ Keyboard.poll :
 			mov ebx, [Dolphin2.started]
 			cmp ebx, 0x0
 				je qwerfasdf
-			mov ebx, [Dolphin2.compositorGrouping]
+			mov ebx, [Dolphin2.focusedComponent]
 			call Component.HandleKeyboardEvent
 			qwerfasdf :
 			pop ebx
