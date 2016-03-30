@@ -148,6 +148,77 @@ Dolphin2.showLoginScreen :
 		call Image.Create
 		mov eax, ecx
 		call Grouping.Add
+		push dword 200*4
+		push dword 80
+		push dword (1024-200)*4
+		push dword 200
+		call Grouping.Create
+		mov dword [ecx+Grouping_backingColor], 0xFFC01010
+		mov eax, ecx
+		call Grouping.Add
+		mov ebx, ecx
+		push dword Dolphin2.STR_LOGIN
+		push dword 512*4-(9/2*FONTWIDTH*4)-200*4
+		push dword 100-80
+		push dword 9*FONTWIDTH*4
+		push dword FONTHEIGHT
+		call TextLine.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+		push dword Dolphin2.STR_PASSWORD
+		push dword 512*4-(5*FONTWIDTH*4)-10*FONTWIDTH*4-200*4
+		push dword 100+FONTHEIGHT+5-80
+		push dword FONTWIDTH*4*10
+		push dword FONTHEIGHT
+		call TextLine.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+		push dword 20
+		push dword 512*4+(5*FONTWIDTH*4)-10*FONTWIDTH*4-200*4
+		push dword 100+FONTHEIGHT+5-80
+		push dword 20*FONTWIDTH*4
+		push dword FONTHEIGHT
+		push dword FALSE
+		call TextArea.Create
+		mov eax, ecx
+		call Grouping.Add
+		mov [Dolphin2.passEntryBox], ecx
+		
+		push dword Dolphin2.STR_GOBUTTON
+		push dword Dolphin2.checkPass
+		push dword 512*4-20*4/2-200*4
+		push dword 100+FONTHEIGHT*2+10-80
+		push dword 20*4
+		push dword 10
+		call Button.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+	popa
+	ret
+Dolphin2.STR_PASSWORD :
+	db "Password: ", 0
+Dolphin2.STR_LOGIN :
+	db "Os3 Login", 0
+Dolphin2.STR_GOBUTTON :
+	db "Go", 0
+Dolphin2.STR_PASS :
+	db "password", 0
+Dolphin2.passEntryBox :
+	dd 0x0
+Dolphin2.checkPass :
+	pusha
+		mov eax, [Dolphin2.passEntryBox]
+		mov eax, [eax+Textarea_text]
+		mov ebx, Dolphin2.STR_PASS
+		call os.seq
+		cmp al, FALSE
+			je Dolphin2.checkPass.ret
+		mov ebx, [Dolphin2.passEntryBox]
+		call WindowGrouping.closeCallback
+		Dolphin2.checkPass.ret :
 	popa
 	ret
 	
