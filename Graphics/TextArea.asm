@@ -68,6 +68,15 @@ TextArea.Create.scrolls :
 	dd 0x0
 TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOULD BE DRAWN OUTSIDE THE TEXTAREA]
 	pusha
+			push ebx
+				mov edx, ebx
+				mov eax, [edx+Component_image]
+				mov ecx, [edx+Component_w]
+				imul ecx, [edx+Component_h]
+				mov ebx, 0x00000000
+				mov edx, ecx
+				call Image.clear
+			pop ebx
 		push ebx
 			mov ebx, [ebx+Textarea_text]
 			call String.getLength
@@ -311,7 +320,6 @@ TextArea.RenderProto.flipTo :
 
 TextArea.onKeyboardEvent :
 	pusha
-		call SysHaltScreen.show
 		mov al, [Component.keyChar]
 		cmp al, 0xff
 			je TextArea.onKeyboardEvent.handleBackspace
@@ -326,7 +334,7 @@ TextArea.onKeyboardEvent.handleBackspace :
 		cmp edx, 1
 			jle TextArea.onKeyboardEvent.handleBackspace.ret
 		add ebx, edx
-		sub ebx, 1
+		sub ebx, 2
 		mov byte [ebx], 0
 		TextArea.onKeyboardEvent.handleBackspace.ret :
 		pop ebx

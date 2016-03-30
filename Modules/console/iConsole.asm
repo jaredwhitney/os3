@@ -197,7 +197,7 @@ call ProgramManager.setActive	; Make removable Later
 	push dword 100
 	call Dolphin2.makeWindow
 	mov edx, ecx
-	;mov dword [edx+Grouping_backingColor], 0xFF00FF00
+	;mov dword [edx+Grouping_backingColor], 0xFF202000
 	
 		push dword 0
 		push dword 0
@@ -213,8 +213,8 @@ call ProgramManager.setActive	; Make removable Later
 		push dword 100
 		push dword 0
 		push dword 0
-		push dword 300*4
-		push dword 100
+		push dword 200*4
+		push dword 80
 		push dword FALSE
 		call TextArea.Create
 		mov eax, ecx
