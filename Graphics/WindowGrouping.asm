@@ -122,10 +122,10 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, [WindowGrouping.Create.h]
 		mov [ecx+Grouping_h], eax
 		mov [edx+WindowGrouping_mainGrouping], ecx
-		mov dword [ecx+Grouping_backingColor], 0xFFB02020
+		mov dword [ecx+Grouping_backingColor], 0x00B02020
 		
 		mov dword [edx+Component_type], Component.TYPE_WINDOW
-		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
+		mov dword [edx+Grouping_backingColor], 0x00FFFFFF
 		
 		mov ecx, edx
 		

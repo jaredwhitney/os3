@@ -25,6 +25,7 @@ Dolphin2.createCompositorGrouping :
 		call Guppy.malloc
 		mov [Dolphin2.flipBuffer], ebx
 		pop ecx
+				mov ebx, [Graphics.SCREEN_MEMPOS]
 		mov [ecx+Component_image], ebx
 		
 		mov dword [ecx+Grouping_backingColor], 0xFF000040
@@ -51,11 +52,11 @@ Dolphin2.renderScreen :
 	;	sub ecx, [Mouse.y]
 	;	mov [ebx+Component_y], ecx
 		
-		mov eax, [Dolphin2.flipBuffer]
-		mov ebx, [Graphics.SCREEN_MEMPOS]
-		mov ecx, [Graphics.SCREEN_WIDTH]
-		mov edx, [Graphics.SCREEN_HEIGHT]
-		call Video.imagecopy
+	;	mov eax, [Dolphin2.flipBuffer]
+	;	mov ebx, [Graphics.SCREEN_MEMPOS]
+	;	mov ecx, [Graphics.SCREEN_WIDTH]
+	;	mov edx, [Graphics.SCREEN_HEIGHT]
+	;	call Video.imagecopy
 		
 	popa
 	ret
@@ -146,6 +147,7 @@ Dolphin2.showLoginScreen :
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
 		call Image.Create
+		mov dword [ecx+Image_autoUpdate], FALSE
 		mov eax, ecx
 		call Grouping.Add
 		push dword 200*4

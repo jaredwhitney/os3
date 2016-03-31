@@ -7,6 +7,7 @@ Image_h		equ 20
 Image_source	equ 32
 Image_sw	equ 36
 Image_sh	equ 40
+Image_autoUpdate	equ 44
 
 Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [Image.Create.retval]
@@ -20,7 +21,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	push edx
 	push eax
 	push ebx
-		mov ebx, 44
+		mov ebx, 48
 		call ProgramManager.reserveMemory
 		mov eax, [Image.Create.source]
 		mov [ebx+Image_source], eax
@@ -46,6 +47,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 			call ProgramManager.reserveMemory
 			mov [edx+Image_image], ebx
 		popa
+		mov dword [ebx+Image_autoUpdate], TRUE
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -69,8 +71,9 @@ Image.Create.sh :
 Image.Create.source :
 	dd 0x0
 Image.Render :	; Image in ebx
+	cmp dword [ebx+Image_autoUpdate], FALSE
+		je Image.Render.goret
 	pusha
-			
 		mov eax, [ebx+Image_w]	; take min(Image_w, Image_sw)
 			cmp eax, [ebx+Image_sw]	
 				jle Image.Render.nos0
@@ -93,6 +96,7 @@ Image.Render :	; Image in ebx
 		mov [Image.copyRegion.nbuf], eax
 		call Image.copyRegion
 	popa
+	Image.Render.goret :
 	ret
 
 Imagescalable_type	equ 0
