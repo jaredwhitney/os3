@@ -150,7 +150,7 @@ Dolphin2.showLoginScreen :
 		call Grouping.Add
 		push dword 200*4
 		push dword 80
-		push dword (1024-200)*4
+		push dword (1024-200-200)*4
 		push dword 200
 		call Grouping.Create
 		mov dword [ecx+Grouping_backingColor], 0xFFC01010
