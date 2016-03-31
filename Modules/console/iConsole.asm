@@ -243,6 +243,7 @@ call ProgramManager.setActive	; Make removable Later
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
+	call Keyboard.poll
 	GoDoLoop :
 	call Dolphin2.renderScreen
 ;	mov al, '!'
