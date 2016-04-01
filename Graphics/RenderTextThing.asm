@@ -6,6 +6,7 @@ Component_w					equ 16
 Component_h					equ 20
 Component_nextLinked		equ 24
 Component_upperRenderFlag	equ 28
+Component_needsUpdate		equ 32
 
 Component.Render :	; Component in ebx
 	pusha
@@ -97,7 +98,7 @@ Textline_x		equ 8
 Textline_y		equ 12
 Textline_w		equ 16
 Textline_h		equ 20
-Textline_text	equ 32
+Textline_text	equ 36
 
 TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.retval]
@@ -108,7 +109,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.str]
 	push eax
 	push ebx
-		mov ebx, 36
+		mov ebx, 40
 		call ProgramManager.reserveMemory
 		mov eax, [TextLine.Create.str]
 		mov [ebx+Textline_text], eax
