@@ -4,9 +4,9 @@ Grouping_x		equ 8
 Grouping_y		equ 12
 Grouping_w		equ 16
 Grouping_h		equ 20
-Grouping_renderFlag	equ 32
-Grouping_subcomponent	equ 36
-Grouping_backingColor	equ 40
+Grouping_renderFlag	equ 36
+Grouping_subcomponent	equ 40
+Grouping_backingColor	equ 44
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -16,7 +16,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.x]
 	push eax
 	push ebx
-		mov ebx, 44
+		mov ebx, 48
 		call ProgramManager.reserveMemory
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
@@ -169,6 +169,8 @@ Grouping.Render :	; Grouping in ebx
 	popa
 	ret
 Grouping.RenderSub :
+	cmp dword [ebx+Component_transparent], FALSE
+		je Grouping.RenderSub_fast
 	pusha
 		call Component.Render
 			
@@ -207,6 +209,46 @@ Grouping.RenderSub :
 		call Image.copyRegionWithTransparency
 	popa
 	ret
+Grouping.RenderSub_fast :
+	pusha
+		call Component.Render
+			
+		mov eax, [ebx+Component_y]
+		imul eax, [edx+Component_w]
+		add eax, [ebx+Component_x]
+		add eax, [edx+Component_image]
+		mov [Image.copyRegion.nbuf], eax
+		
+		mov eax, [ebx+Component_image]
+		mov [Image.copyRegion.obuf], eax
+		
+		; min([ebx+Component_w], [edx+Component_w]-[ebx+Component_x]) -> [Image.copyRegion.w]
+		mov eax, [edx+Component_w]
+		sub eax, [ebx+Component_x]
+			cmp eax, [ebx+Component_w]
+				jle Grouping.Render_fast.nos0
+			mov eax, [ebx+Component_w]
+			Grouping.Render_fast.nos0 :
+		mov [Image.copyRegion.w], eax
+		
+		; min([ebx+Component_h], [edx+Component_h]-[ebx+Component_y]) -> [Image.copyRegion.h]
+		mov eax, [edx+Component_h]
+		sub eax, [ebx+Component_y]
+			cmp eax, [ebx+Component_h]
+				jle Grouping.Render_fast.nos1
+			mov eax, [ebx+Component_h]
+			Grouping.Render_fast.nos1 :
+		mov [Image.copyRegion.h], eax
+		
+		mov eax, [ebx+Component_w]
+		mov [Image.copyRegion.ow], eax
+		mov eax, [edx+Component_w]
+		mov [Image.copyRegion.nw], eax
+		
+		call Image.copyRegion
+	popa
+	ret
+
 Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	pusha
 		mov ecx, [eax+Window_windowbuffer]
@@ -224,7 +266,7 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
 	pusha
-	
+		mov [Grouping.passthroughMouseEvent.g_stor], ebx
 		;mov dword [ebx+Grouping_backingColor], 0xFF00FF00
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
 		mov ebx, [ebx+Grouping_subcomponent]
@@ -233,7 +275,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		mov ebx, [ebx+Component_nextLinked]
 		Grouping.passthroughMouseEvent.beginLoop :
 		cmp ebx, 0x0
-			je Grouping.passthroughMouseEvent.ret
+			je Grouping.passthroughMouseEvent.gocheck
 		mov ecx, [Component.mouseEventX]
 		mov edx, [Component.mouseEventY]
 		
@@ -259,8 +301,18 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 	Grouping.passthroughMouseEvent.ret :
 	popa
 	ret
+	Grouping.passthroughMouseEvent.gocheck :
+		mov ebx, [Grouping.passthroughMouseEvent.g_stor]
+		cmp ebx, [Dolphin2.compositorGrouping]
+			jne Grouping.passthroughMouseEvent.ret
+		mov eax, [Component.mouseEventX]
+		mov ebx, [Component.mouseEventY]
+		call WindowGrouping.moveWindow
+		jmp Grouping.passthroughMouseEvent.ret
 GROUPING_CLICKED_STR :
 	db "A grouping was clicked!", 0
 GROUPING_SUB_CLICKED_STR :
 	db "A subcomponent of a grouping was clicked!", 0
+Grouping.passthroughMouseEvent.g_stor :
+	dd 0x0
 	

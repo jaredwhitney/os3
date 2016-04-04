@@ -1,8 +1,8 @@
-SelectionPanel_renderFlag			equ 32
-SelectionPanel_subcomponent			equ 36
-SelectionPanel_backingColor			equ 40
-SelectionPanel_selectColor			equ 44
-SelectionPanel_selectedComponent	equ 48
+SelectionPanel_renderFlag			equ 36
+SelectionPanel_subcomponent			equ 40
+SelectionPanel_backingColor			equ 44
+SelectionPanel_selectColor			equ 48
+SelectionPanel_selectedComponent	equ 52
 
 SelectionPanel.Create :	; int x, int y, int w, int h
 	pop dword [SelectionPanel.Create.retval]
@@ -15,7 +15,7 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 	push edx
 		
 		mov eax, 0x7
-		mov ebx, 52
+		mov ebx, 56
 		call ProgramManager.reserveMemory
 		mov edx, ebx
 		

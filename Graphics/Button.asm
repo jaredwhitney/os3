@@ -4,9 +4,9 @@ Button_x			equ 8
 Button_y			equ 12
 Button_w			equ 16
 Button_h			equ 20
-Button_text			equ 32
-Button_onClick		equ 36
-Button_backingColor	equ 40
+Button_text			equ 36
+Button_onClick		equ 40
+Button_backingColor	equ 44
 
 Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	pop dword [Button.Create.retval]
@@ -18,7 +18,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	pop dword [Button.Create.text]
 	push eax
 	push ebx
-		mov ebx, 44
+		mov ebx, 48
 		call ProgramManager.reserveMemory
 		mov eax, [Button.Create.text]
 		mov [ebx+Button_text], eax
@@ -34,6 +34,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 		mov [ebx+Button_h], eax
 		mov eax, Component.TYPE_BUTTON
 		mov [ebx+Button_type], eax
+		mov dword [ebx+Component_transparent], TRUE
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Button_w]
