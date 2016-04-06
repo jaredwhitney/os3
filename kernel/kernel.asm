@@ -129,6 +129,61 @@ Kernel.init :
 		
 	;	ALLOW WINDOWS TO BE DRAWN	;
 		mov byte [Dolphin_WAIT_FLAG], 0x00
+			
+			; FPU TEST!!
+				; enable FPU ;
+				mov eax, cr0
+				and eax, (~0b1110)
+				or eax, 0b100000
+				mov cr0, eax
+				fninit
+				
+				mov ebx, FPUTESTSTR_0
+				call console.print
+				
+				fild dword [s_val]
+				fist dword [rs_val]
+				mov ebx, [rs_val]
+				call console.numOut
+				call console.newline
+				
+				mov ebx, FPUTESTSTR_1
+				call console.print
+				
+				;fidiv dword [three]
+				fsin
+				fimul dword [pres]
+				fld st0
+				fbstp [rr_val]
+				mov ebx, [rr_val]
+				call console.numOut
+				call console.newline
+				
+				mov ebx, FPUTESTSTR_2
+				call console.print
+				
+				fistp dword [rr_val]
+				mov ebx, [rr_val]
+				call console.numOut
+				call console.newline
+				
+			jmp $
+					s_val :
+						dd 2
+					rs_val :
+						dd 0
+					rr_val :
+						times 5 dw 0
+					pres :
+						dd 100000
+					three :
+						dd 3
+					FPUTESTSTR_0 :
+						db "Read / Write test (should equal 2): ", 0x0
+					FPUTESTSTR_1 :
+						db "sin(2) = ", 0x0
+					FPUTESTSTR_2 :
+						db "sin(2) = 0x", 0x0
 	
 	;	MAIN LOOP	;
 	kernel.loop:

@@ -7,6 +7,7 @@ Textarea_h		equ 20
 Textarea_text	equ 36
 Textarea_len	equ 40
 Textarea_scrolls	equ 44
+Textarea_customKeyHandler	equ 48
 
 TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.retval]
@@ -18,7 +19,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.len]
 	push eax
 	push ebx
-		mov ebx, 48
+		mov ebx, 52
 		call ProgramManager.reserveMemory
 		mov eax, [TextArea.Create.len]
 		mov [ebx+Textarea_len], eax
@@ -48,6 +49,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov [ebx+Textarea_scrolls], eax
 		mov dword [ebx+Textarea_type], Component.TYPE_TEXTAREA
 		mov dword [ebx+Component_transparent], TRUE
+		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -320,6 +322,12 @@ TextArea.RenderProto.flipTo :
 	dd 0x0
 
 TextArea.onKeyboardEvent :
+	pusha
+		call dword [ebx+Textarea_customKeyHandler]
+	popa
+	ret
+	
+TextArea.onKeyboardEvent.handle :
 	pusha
 		mov al, [Component.keyChar]
 		cmp al, 0xff
