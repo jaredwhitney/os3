@@ -4,6 +4,20 @@
 
 	jmp short bootstart
 	nop
+	db "EXFAT   "	; OEM ID
+	times 53 db 0x0	; padding
+	dq 0x0	; ??
+	dq 0x77e5f00	; fs size in sectors
+	dd 0x800	; sectors to start of FAT
+	dd 0xF00	; sectors used by FAT
+	dd 0x1800	; first cluster start sector
+	dd 0x77e47	; fs size in clusters
+	dd 0x4		; root directory cluster
+	dq 0x10009E6A639F		; ??
+	db 9, 8, 1, 0x80	; log bytes/sector, log sectors/cluster, FAT count, driveID
+	db 0	; percent in use
+	times 7 db 0
+	
 	bootstart :
 	; Initialize stack and segment registers
 	mov ax, 0x0
@@ -93,4 +107,6 @@ ERRORs :
 %include "..\boot\detection.asm"
 
 times 510-($-$$) db 0
+
+
 dw 0xaa55
