@@ -1,0 +1,32 @@
+turn off cr0 bit 2
+enable (?) cr0 bit 5
+turn off cr0 bit 3
+turn on cr0 bit 1
+
+enable cr4 bit 9 (if not already)
+enable cr4 bit 10 (if not already)
+enable (?) cr4 bit 18
+
+mov eax, cr0
+and eax, (~0b1110)
+or eax, 0b100000
+mov cr0, eax
+
+
+fninit
+
+
+fild [s_val]
+fist [rs_val]
+fsin
+fimul [pres]
+fbstp [rr_val]
+
+s_val :
+ dd 2
+rs_val :
+ dd 0
+rr_val :
+ times 5 dw 0
+pres :
+ dd 100

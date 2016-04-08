@@ -6,7 +6,7 @@ Component_w					equ 16
 Component_h					equ 20
 Component_nextLinked		equ 24
 Component_upperRenderFlag	equ 28
-Component_needsUpdate		equ 32
+Component_transparent		equ 32
 
 Component.Render :	; Component in ebx
 	pusha
@@ -123,6 +123,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 		mov [ebx+Textline_h], eax
 		mov eax, Component.TYPE_TEXTLINE
 		mov [ebx+Textline_type], eax
+		mov dword [ebx+Component_transparent], TRUE
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Textline_w]

@@ -197,7 +197,6 @@ Dolphin2.showLoginScreen :
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
 		call Image.Create
-		mov dword [ecx+Image_autoUpdate], FALSE
 		mov eax, ecx
 		call Grouping.Add
 		push dword 200*4
@@ -237,6 +236,7 @@ Dolphin2.showLoginScreen :
 		call TextArea.Create
 		mov eax, ecx
 		call Grouping.Add
+	;;;	mov dword [ecx+Textarea_customKeyHandler], SysHaltScreen.show
 		mov [Dolphin2.passEntryBox], ecx
 		
 		push dword Dolphin2.STR_GOBUTTON
@@ -264,8 +264,8 @@ Dolphin2.passEntryBox :
 Dolphin2.checkPass :
 	pusha
 		mov eax, [Dolphin2.passEntryBox]
-		mov eax, [eax+Textarea_text]
-		mov ebx, Dolphin2.STR_PASS
+		mov ebx, [eax+Textarea_text]
+		mov eax, Dolphin2.STR_PASS
 		call os.seq
 		cmp al, FALSE
 			je Dolphin2.checkPass.ret

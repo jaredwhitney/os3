@@ -34,6 +34,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 		mov [ebx+Button_h], eax
 		mov eax, Component.TYPE_BUTTON
 		mov [ebx+Button_type], eax
+		mov dword [ebx+Component_transparent], TRUE
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Button_w]
