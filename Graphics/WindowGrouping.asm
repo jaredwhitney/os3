@@ -2,11 +2,11 @@ WindowGrouping_x			equ 8
 WindowGrouping_y			equ 12
 WindowGrouping_w			equ 16
 WindowGrouping_h			equ 20
-WindowGrouping_mainGrouping	equ 44
-WindowGrouping_titleBar		equ 48
-WindowGrouping_nameString	equ 52
-WindowGrouping_sizeButton	equ 56
-WindowGrouping_closeButton	equ 60
+WindowGrouping_mainGrouping	equ 48
+WindowGrouping_titleBar		equ 52
+WindowGrouping_nameString	equ 56
+WindowGrouping_sizeButton	equ 60
+WindowGrouping_closeButton	equ 64
 
 WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop dword [WindowGrouping.Create.retval]
@@ -20,7 +20,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push edx
 
 		mov eax, 0x7
-		mov ebx, 64
+		mov ebx, 68
 		call ProgramManager.reserveMemory
 		mov edx, ebx
 			
@@ -122,10 +122,10 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, [WindowGrouping.Create.h]
 		mov [ecx+Grouping_h], eax
 		mov [edx+WindowGrouping_mainGrouping], ecx
-		mov dword [ecx+Grouping_backingColor], 0x00B02020
+		mov dword [ecx+Grouping_backingColor], 0xFFB02020
 		
 		mov dword [edx+Component_type], Component.TYPE_WINDOW
-		mov dword [edx+Grouping_backingColor], 0x00FFFFFF
+		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
 		
 		mov ecx, edx
 		
@@ -151,6 +151,34 @@ WindowGrouping.closeCallback :	; Button in ebx
 	popa
 	ret
 
+WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
+	pusha
+		mov edx, eax
+		mov ecx, ebx
+		mov ebx, [Dolphin2.focusedComponent]
+		WindowGrouping.moveWindow.findWindowLoop :
+		mov eax, [ebx+Component_upperRenderFlag]
+		cmp eax, 0x0
+			jne WindowGrouping.moveWindow.cont
+		mov eax, [WindowGrouping.lastWin]
+		cmp eax, 0x0
+			je WindowGrouping.moveWindow.ret
+		jmp WindowGrouping.moveWindow.foundWindow
+		WindowGrouping.moveWindow.cont :
+		sub eax, Grouping_renderFlag
+		cmp dword [eax+Component_type], Component.TYPE_WINDOW
+			je WindowGrouping.moveWindow.foundWindow
+		mov ebx, eax
+		jmp WindowGrouping.moveWindow.findWindowLoop
+		WindowGrouping.moveWindow.foundWindow :
+		mov [WindowGrouping.lastWin], eax
+		mov [eax+Component_x], edx
+		mov [eax+Component_y], ecx
+	WindowGrouping.moveWindow.ret :
+	popa
+	ret
+WindowGrouping.lastWin :
+	dd 0x0
 WindowGrouping.Create.retval :
 	dd 0x0
 WindowGrouping.Create.h :

@@ -240,11 +240,12 @@ call ProgramManager.setActive	; Make removable Later
 		mov eax, ecx
 		call SelectionPanel.Add
 		
-		call Dolphin2.showLoginScreen
+		;call Dolphin2.showLoginScreen
+		call SimpleRender.init
 		
 ;	mov ebx, eax
-	call Keyboard.poll
 	GoDoLoop :
+	call SimpleRender.runOnce
 	call Dolphin2.renderScreen
 ;	mov al, '!'
 ;	call TextArea.AppendChar
@@ -278,7 +279,181 @@ consoletest_text :
 	db "This is some sample text that should be displayed in the test window.", 0
 consoletest_type :
 	db "Text", 0
+SimpleRender.init :
+	pusha
+		push consoletest_title
+		push dword 0*4
+		push dword 0
+		push dword 400*4
+		push dword 400
+		call Dolphin2.makeWindow
+		mov [SimpleRender.window], ecx
+
+		mov eax, 400*400*4
+		mov ecx, 0x1000
+		xor edx, edx
+		idiv ecx
+		mov ebx, eax
+		mov al, 0x7
+		call Guppy.malloc
+		
+		push ebx
+		push 400*4
+		push 400
+		push 0
+		push 0
+		push 400*4
+		push 400
+		call Image.Create
+		mov eax, ecx
+		mov ebx, [SimpleRender.window]
+		call Grouping.Add
+		mov [SimpleRender.image], eax
+		add eax, Image_source
+		mov [SimpleRender.imagebuffer], eax
+		
+	popa
+	ret
+SimpleRender.runOnce :
+	pusha
+		mov ebx, [SimpleRender.rval]
+		add dword [tri+0+8], ebx
+		add dword [tri+12+8], ebx
+		add dword [tri+24+8], ebx
+		
+		cmp dword [tri+0+8], 50
+			jle .upgood
+		jmp .worry
+		.upgood :
+		cmp dword [tri+0+8], 10
+			jge .dontworry
+		.worry :
+		mov ebx, [SimpleRender.rval]
+		imul ebx, -1
+		mov [SimpleRender.rval], ebx
+		.dontworry :
+		
+		call SimpleRender.goRender
+		
+		mov ebx, [SimpleRender.image]
+		call Component.RequestUpdate
+	popa
+	ret
+SimpleRender.window :
+	dd 0
+SimpleRender.image :
+	dd 0
+SimpleRender.imagebuffer :
+	dd 0
+SimpleRender.rval :
+	dd 1
+tri :
+	dd -1000, -1000, 10
+	dd 1000, -1000, 10
+	dd 1000, 1000, 10
 	
+SimpleRender.goRender :
+	pusha
+		mov eax, [SimpleRender.imagebuffer]
+		mov ebx, 0xFF000000
+		mov edx, 400*400*4
+		call Image.clear
+		
+		xor esi, esi
+		.loop :
+			mov eax, [tri+esi]
+			mov ebx, [tri+8+esi]
+			call SimpleRender.p_func
+			add ecx, 200
+			mov edx, ecx
+			
+			mov eax, [tri+4+esi]
+			mov ebx, [tri+8+esi]
+			call SimpleRender.p_func
+			add ecx, 200
+			
+			mov eax, [SimpleRender.imagebuffer]
+			shl edx, 2
+			add eax, edx
+			imul ecx, 400*4
+			add eax, ecx
+			mov dword [eax], 0xFFFFFFFF
+			
+			mov eax, 10*4
+			mov ebx, 10
+			mov ecx, 200*4
+			mov edx, 400
+			call SimpleRender.drawLine
+			
+		add esi, 12
+		cmp esi, 36
+			jl .loop
+	popa
+	ret
+SimpleRender.p_func :
+	push edx
+		cmp ebx, 0
+			jne .nret0
+		mov ecx, 0
+	pop edx
+	ret
+	.nret0 :
+		mov ecx, ebx
+		xor edx, edx
+		cdq
+		idiv ecx
+		mov ecx, eax
+	pop edx
+	ret
+SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y1, ecx = x2, edx = y2
+	pusha
+		cmp eax, ecx
+			jg .otherway
+		mov [SimpleRender.x1], eax
+		mov [SimpleRender.y1], ebx
+		mov [SimpleRender.x2], ecx
+		mov [SimpleRender.y2], edx
+		jmp .kdone
+		.otherway :
+		mov [SimpleRender.x1], ecx
+		mov [SimpleRender.y1], edx
+		mov [SimpleRender.x2], eax
+		mov [SimpleRender.y2], ebx		
+		.kdone :
+		mov eax, [SimpleRender.y2]
+		sub eax, [SimpleRender.y1]
+		
+		mov ecx, [SimpleRender.x2]
+		sub ecx, [SimpleRender.x1]
+		
+		xor edx, edx
+		idiv ecx
+		imul eax, 400*4
+		
+		mov ebx, [SimpleRender.imagebuffer]
+		add ebx, [SimpleRender.x1]
+		mov ecx, [SimpleRender.y1]
+		imul ecx, 400*4
+		add ebx, ecx
+		mov edx, [SimpleRender.x1]
+		.loop :
+		mov dword [ebx], 0xFFFFFFFF
+		add ebx, eax
+		add ebx, 1
+		add edx, 1
+		cmp edx, [SimpleRender.x2]
+			jle .loop
+	popa
+	ret
+SimpleRender.x1 :
+	dd 0x0
+SimpleRender.y1 :
+	dd 0x0
+SimpleRender.x2 :
+	dd 0x0
+SimpleRender.y2 :
+	dd 0x0
+
 console.memstat :
 	mov ah, 0xFF
 	pusha

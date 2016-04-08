@@ -116,9 +116,6 @@ Kernel.init :
 	
 	;	READY TO LOCK THE COMPUTER	;
 		call Manager.lock
-	
-	;	ACTUALLY LOCK IT	;
-		call Manager.handleLock
 		
 	;mov [rmATA.DMAread.dataBuffer], ecx
 	;	mov eax, [os_imageDataBaseLBA]	; lba low
@@ -126,9 +123,83 @@ Kernel.init :
 	;	mov edx, 100*100*4	; sectorcount
 	;	call rmATA.DMAread;ToBuffer
 		;mov [console_testbuffer], ecx	; original image is in [console_testbuffer]
-		
+			
+			; FPU TEST!!
+				; enable FPU ;
+				mov eax, cr0
+				and eax, (~0b1110)
+				or eax, 0b100000
+				mov cr0, eax
+				fninit
+				
+				; xor edx, edx
+				
+				; fputestoverloop :
+				
+				; xor ecx, ecx
+				
+				; pusha
+					; mov eax, [Graphics.SCREEN_MEMPOS]
+					; mov ebx, 0x0
+					; mov edx, [Graphics.SCREEN_WIDTH]
+					; imul edx, [Graphics.SCREEN_HEIGHT]
+					; call Image.clear
+				; popa
+				
+				; fputestloop :
+				
+				; mov [s_val], ecx
+				; add [s_val], edx
+				
+				; fild dword [s_val]
+				; fidiv dword [widthvalthing]
+				; fsin
+				; fimul dword [pres]
+				; fistp dword [rr_val]
+				; mov ebx, [rr_val]
+
+				; add ebx, 768/2
+				; mov eax, [Graphics.SCREEN_MEMPOS]
+				; push ecx
+				; shl ecx, 2
+				; add eax, ecx
+				; imul ebx, [Graphics.SCREEN_WIDTH]
+				; add eax, ebx
+				; mov dword [eax], 0xFFFFFFFF
+				; pop ecx
+				
+				; add ecx, 1
+				
+				; cmp ecx, [Graphics.SCREEN_REALWIDTH]
+					; jl fputestloop
+					
+				; add edx, 1
+				
+				; jmp fputestoverloop
+				
+			; jmp $
+					; s_val :
+						; dd 2
+					; rs_val :
+						; dd 0
+					; rr_val :
+						; times 5 dw 0
+					; pres :
+						; dd 768/2
+					; widthvalthing :
+						; dd 163
+					; FPUTESTSTR_0 :
+						; db "Read / Write test (should equal 2): ", 0x0
+					; FPUTESTSTR_1 :
+						; db "sin(2) = ", 0x0
+					; FPUTESTSTR_2 :
+						; db "sin(2) = 0x", 0x0
+	
+	;	ACTUALLY LOCK IT	;
+	call Manager.handleLock
+	
 	;	ALLOW WINDOWS TO BE DRAWN	;
-		mov byte [Dolphin_WAIT_FLAG], 0x00
+	mov byte [Dolphin_WAIT_FLAG], 0x00
 	
 	;	MAIN LOOP	;
 	kernel.loop:
