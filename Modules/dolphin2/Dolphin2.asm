@@ -25,10 +25,9 @@ Dolphin2.createCompositorGrouping :
 		call Guppy.malloc
 		mov [Dolphin2.flipBuffer], ebx
 		pop ecx
-				mov ebx, [Graphics.SCREEN_MEMPOS]
 		mov [ecx+Component_image], ebx
 		
-		mov dword [ecx+Grouping_backingColor], 0xFF000040
+		mov dword [ecx+Grouping_backingColor], 0x0;0xFF000040
 		
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
@@ -52,15 +51,66 @@ Dolphin2.renderScreen :
 	;	sub ecx, [Mouse.y]
 	;	mov [ebx+Component_y], ecx
 		
-	;	mov eax, [Dolphin2.flipBuffer]
-	;	mov ebx, [Graphics.SCREEN_MEMPOS]
-	;	mov ecx, [Graphics.SCREEN_WIDTH]
-	;	mov edx, [Graphics.SCREEN_HEIGHT]
-	;	call Video.imagecopy
+		mov dword [FPS_NUM_STR], 0
+		mov dword [FPS_NUM_STR+4], 0
+		mov eax, FPS_NUM_STR
+		mov ebx, [Clock.tics]
+		sub ebx, [Dolphin2.lastFrameTime]
+		shl ebx, 2
+			push eax
+			mov eax, ebx
+			mov ecx, 10
+			xor edx, edx
+			idiv ecx
+			mov ebx, eax
+			pop eax
+		call String.fromHex
+		mov eax, [Clock.tics]
+		mov [Dolphin2.lastFrameTime], eax
+		
+		mov eax, HEX_PREF_STR
+		mov ecx, [Dolphin2.flipBuffer]
+		call d2_easyteletype
+		mov eax, FPS_NUM_STR
+		call d2_easyteletype
+		mov eax, FPS_STR
+		call d2_easyteletype
+		
+		mov eax, [Dolphin2.flipBuffer]
+		mov ebx, [Graphics.SCREEN_MEMPOS]
+		mov ecx, [Graphics.SCREEN_WIDTH]
+		mov edx, [Graphics.SCREEN_HEIGHT]
+		call Video.imagecopy
 		
 	popa
 	ret
-	
+HEX_PREF_STR :
+	db "0x", 0
+FPS_NUM_STR :
+	dq 0
+	db 0
+FPS_STR :
+	db " ms/frame", 0
+Dolphin2.lastFrameTime :
+	dd 0x0
+d2_easyteletype :
+		mov edx, [Graphics.SCREEN_WIDTH]
+		mov ebx, 0xFFFFFFFF
+		
+		reasr4 :
+		push eax
+		mov al, [eax]
+		cmp al, 0x0
+			je qweasdasd
+		call RenderText
+		pop eax
+		add eax, 1
+		add ecx, 0x4*FONTWIDTH
+		jmp reasr4
+		qweasdasd :
+		pop eax	
+	ret
+
 Dolphin2.drawMouse :
 	pusha
 		mov eax, [Graphics.SCREEN_MEMPOS]
@@ -159,6 +209,7 @@ Dolphin2.showLoginScreen :
 		mov eax, ecx
 		call Grouping.Add
 		mov ebx, ecx
+		call Component.RequestUpdate	; test
 		push dword Dolphin2.STR_LOGIN
 		push dword 512*4-(9/2*FONTWIDTH*4)-200*4
 		push dword 100-80
