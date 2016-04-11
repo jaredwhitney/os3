@@ -275,6 +275,40 @@ Dolphin2.checkPass :
 	popa
 	ret
 	
+Dolphin2.SystemMenu.Show :
+	pusha
+		
+		push dword 0
+		push dword 0
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
+		call Grouping.Create
+		mov dword [ecx+Component_transparent], FALSE
+		mov dword [ecx+Grouping_backingColor], 0x80000000
+		mov eax, ecx
+		mov ebx, [Dolphin2.compositorGrouping]
+		;call Grouping.Add
+		;mov ebx, ecx
+		mov eax, [Graphics.SCREEN_WIDTH]
+		shr eax, 1
+		sub eax, 500*4/2
+		push eax
+		mov eax, [Graphics.SCREEN_HEIGHT]
+		shr eax, 1
+		sub eax, 300/2
+		push eax
+		push dword 500*4
+		push dword 300
+		call Grouping.Create
+		mov dword [ecx+Component_transparent], FALSE
+		mov dword [ecx+Grouping_backingColor], 0xFF00FF00
+		mov eax, ecx
+		call Grouping.Add
+		
+	popa
+	ret
+
+	
 Dolphin2.compositorGrouping :
 	dd 0x0
 Dolphin2.makeWindow.ret :
