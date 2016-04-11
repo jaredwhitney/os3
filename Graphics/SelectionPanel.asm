@@ -201,8 +201,11 @@ SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 		cmp edx, eax
 			jg SelectionPanel.HandleMouseEvent.nomatch
 		pop ecx
+		cmp dword [Component.mouseEventType], MOUSE_NOBTN
+			je .dontfocus
 		mov [ecx+SelectionPanel_selectedComponent], ebx
 		mov [Dolphin2.focusedComponent], ebx
+		.dontfocus :
 		mov ebx, ecx
 		call Component.RequestUpdate
 		popa

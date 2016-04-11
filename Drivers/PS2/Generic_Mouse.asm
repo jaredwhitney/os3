@@ -20,13 +20,14 @@ pusha
 	cmp bl, 0x2	; I blame an uncaught ACK or something!
 		jne Mouse.loop.handleMotion
 	call Mouse.storeSubs
+	mov ebx, MOUSE_NOBTN
 	test al, MOUSE_LBTN_FLAG
 		jz Mouse.loop.notleft
 	mov ebx, MOUSE_LBTN
 	jmp Mouse.loop.go
 	Mouse.loop.notleft :
 	test al, MOUSE_RBTN_FLAG
-		jz Mouse.loop.ret
+		jz Mouse.loop.go
 	mov ebx, MOUSE_RBTN
 	Mouse.loop.go :
 	;mov [Mouse.PRESS.type], ebx
@@ -34,7 +35,7 @@ pusha
 	;mov [Mouse.PRESS.x], eax
 	;mov eax, [Mouse.y]
 	;mov [Mouse.PRESS.y], eax
-	call Dolphin2.handleMouseClick
+	call Dolphin2.handleMouseEvent
 Mouse.loop.ret :
 mov bl, [Mouse.datpart]
 cmp bl, 0x01
@@ -173,10 +174,12 @@ Mouse.lastx :
 Mouse.lasty :
 	dd 0x0
 
+MOUSE_NOBTN :
+	dd 0
 MOUSE_LBTN :
-	dd "L_CK"
+	dd 1
 MOUSE_RBTN :
-	dd "R_CK"
+	dd 2
 Mouse.PRESS.type :
 	dd 0x0
 Mouse.PRESS.x :
