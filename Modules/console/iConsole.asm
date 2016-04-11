@@ -351,6 +351,10 @@ tri :
 	dd -1000, -1000, 10
 	dd 1000, -1000, 10
 	dd 1000, 1000, 10
+drawtri :
+	dd 0, 0
+	dd 1, 1
+	dd 0, 0
 	
 SimpleRender.goRender :
 	pusha
@@ -360,6 +364,7 @@ SimpleRender.goRender :
 		call Image.clear
 		
 		xor esi, esi
+		xor edx, edi
 		.loop :
 			mov eax, [tri+esi]
 			mov ebx, [tri+8+esi]
@@ -372,22 +377,21 @@ SimpleRender.goRender :
 			call SimpleRender.p_func
 			add ecx, 200
 			
-			mov eax, [SimpleRender.imagebuffer]
-			shl edx, 2
-			add eax, edx
-			imul ecx, 400*4
-			add eax, ecx
-			mov dword [eax], 0xFFFFFFFF
-			
-			mov eax, 10*4
-			mov ebx, 10
-			mov ecx, 200*4
-			mov edx, 400
-			call SimpleRender.drawLine
+			mov [drawtri+edi], edx
+			mov [drawtri+4+edi], ecx
 			
 		add esi, 12
+		add edi, 8
 		cmp esi, 36
 			jl .loop
+			
+		mov esi, 0
+		mov eax, [drawtri]
+		mov ebx, [drawtri+4]
+		mov ecx, [drawtri+8]
+		mov edx, [drawtri+8+4]
+		call SimpleRender.drawLine
+		
 	popa
 	ret
 SimpleRender.p_func :
@@ -422,9 +426,15 @@ SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y
 		.kdone :
 		mov eax, [SimpleRender.y2]
 		sub eax, [SimpleRender.y1]
+		mov [SimpleRender.delta_y], eax
 		
 		mov ecx, [SimpleRender.x2]
 		sub ecx, [SimpleRender.x1]
+		mov [SimpleRender.delta_x], ecx
+		
+		fild dword [SimpleRender.delta_y]
+		fidiv dword [SimpleRender.delta_x]
+		fstp dword [SimpleRender.slope]
 		
 		xor edx, edx
 		idiv ecx
@@ -435,14 +445,23 @@ SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y
 		mov ecx, [SimpleRender.y1]
 		imul ecx, 400*4
 		add ebx, ecx
+		mov [SimpleRender.drawbase], ebx
 		mov edx, [SimpleRender.x1]
+		fldz
 		.loop :
 		mov dword [ebx], 0xFFFFFFFF
-		add ebx, eax
-		add ebx, 1
-		add edx, 1
+		; ; ;
+			fadd dword [SimpleRender.slope]
+			fist dword [SimpleRender.drawpos]
+			mov ebx, [SimpleRender.drawpos]
+			imul ebx, 400*4
+			add ebx, [SimpleRender.drawbase]
+		; ; ;
+		add dword [SimpleRender.drawbase], 4
+		add edx, 4
 		cmp edx, [SimpleRender.x2]
 			jle .loop
+		fistp dword [SimpleRender.drawbase]	; junk data
 	popa
 	ret
 SimpleRender.x1 :
@@ -452,6 +471,16 @@ SimpleRender.y1 :
 SimpleRender.x2 :
 	dd 0x0
 SimpleRender.y2 :
+	dd 0x0
+SimpleRender.slope :
+	dd 0.5
+SimpleRender.drawbase :
+	dd 0x0
+SimpleRender.drawpos :
+	dd 0x0
+SimpleRender.delta_x :
+	dd 0x0
+SimpleRender.delta_y :
 	dd 0x0
 
 console.memstat :
