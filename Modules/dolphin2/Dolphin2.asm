@@ -56,21 +56,25 @@ Dolphin2.renderScreen :
 		mov eax, FPS_NUM_STR
 		mov ebx, [Clock.tics]
 		sub ebx, [Dolphin2.lastFrameTime]
-		shl ebx, 2
-			push eax
-			mov eax, ebx
-			mov ecx, 10
-			xor edx, edx
-			idiv ecx
-			mov ebx, eax
-			pop eax
+		push eax
+		; ebx is in 5000ths of a second per frame
+		xor edx, edx
+		mov eax, ebx
+		mov ecx, 5
+		idiv ecx
+		mov ebx, eax; ebx is in ms per frame
+		mov [Dolphin2.tempvar], ebx
+		fld1
+		fimul dword [Dolphin2.1k]
+		fidiv dword [Dolphin2.tempvar]
+		fbstp [Dolphin2.tempvar]
+		mov ebx, [Dolphin2.tempvar]
+		pop eax
 		call String.fromHex
 		mov eax, [Clock.tics]
 		mov [Dolphin2.lastFrameTime], eax
 		
-		mov eax, HEX_PREF_STR
 		mov ecx, [Dolphin2.flipBuffer]
-		call d2_easyteletype
 		mov eax, FPS_NUM_STR
 		call d2_easyteletype
 		mov eax, FPS_STR
@@ -84,15 +88,17 @@ Dolphin2.renderScreen :
 		
 	popa
 	ret
-HEX_PREF_STR :
-	db "0x", 0
 FPS_NUM_STR :
 	dq 0
 	db 0
 FPS_STR :
-	db " ms/frame", 0
+	db " fps", 0
 Dolphin2.lastFrameTime :
 	dd 0x0
+Dolphin2.tempvar :
+	times 5 dw 0
+Dolphin2.1k :
+	dd 1000
 d2_easyteletype :
 		mov edx, [Graphics.SCREEN_WIDTH]
 		mov ebx, 0xFFFFFFFF
@@ -167,14 +173,19 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 		push dword [Dolphin2.makeWindow.ret]
 	ret
 
-Dolphin2.handleMouseClick :
+Dolphin2.handleMouseEvent :
 	pusha
-			mov eax, [Mouse.x]
-			imul eax, 4
-			mov [Component.mouseEventX], eax
-			mov eax, [Graphics.SCREEN_HEIGHT]
-			sub eax, [Mouse.y]
-			mov [Component.mouseEventY], eax
+		mov [Component.mouseEventType], ebx
+		mov eax, [Mouse.x]
+		imul eax, 4
+		mov [Component.mouseEventX], eax
+		mov eax, [Graphics.SCREEN_HEIGHT]
+		sub eax, [Mouse.y]
+		mov [Component.mouseEventY], eax
+			cmp dword [Dolphin2.windowMoving], TRUE
+				jne .cont
+			jmp Grouping.passthroughMouseEvent.gocheck
+			.cont :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.HandleMouseEvent
 	popa
@@ -320,6 +331,8 @@ Dolphin2.bgimg :
 Dolphin2.focusedComponent :
 	dd 0x0
 Dolphin2.started :
+	dd 0x0
+Dolphin2.windowMoving :
 	dd 0x0
 Dolphin2.STR_LOGIN_SCREEN :
 	db "Os3 Login", 0
