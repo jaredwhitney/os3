@@ -74,7 +74,7 @@ Component.mouseEventX :
 	dd 0x0
 Component.mouseEventY :
 	dd 0x0
-Component.mouseEventButton :
+Component.mouseEventType :
 	dd 0x0
 Component.HandleKeyboardEvent :	; Component in ebx
 pusha

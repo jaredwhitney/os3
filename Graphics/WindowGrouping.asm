@@ -152,11 +152,14 @@ WindowGrouping.closeCallback :	; Button in ebx
 	ret
 
 WindowGrouping.passthroughMouseEvent :
+	cmp dword [Component.mouseEventType], MOUSE_NOBTN
+		je .goon
 	pusha
 		mov eax, ebx
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.BringToFront
 	popa
+	.goon :
 	call Grouping.passthroughMouseEvent
 	ret
 	

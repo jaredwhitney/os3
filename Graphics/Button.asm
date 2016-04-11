@@ -145,8 +145,11 @@ Button.Render :	; Button in ebx
 Button.Render.startpos :
 	dd 0x0
 Button.onMouseEvent :
+	cmp dword [Component.mouseEventType], MOUSE_NOBTN
+		je .ret
 	pusha
 		mov eax, [ebx+Button_onClick]
 		call eax
 	popa
+	.ret :
 	ret

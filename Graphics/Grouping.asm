@@ -303,18 +303,27 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 	;		mov ebx, GROUPING_SUB_CLICKED_STR
 	;		call console.println
 	;	pop ebx
+		cmp dword [Component.mouseEventType], MOUSE_NOBTN
+			je .dontfocus
 		mov [Dolphin2.focusedComponent], ebx
+		.dontfocus :
 		call Component.HandleMouseEvent
 	Grouping.passthroughMouseEvent.ret :
 	popa
 	ret
 	Grouping.passthroughMouseEvent.gocheck :
+		cmp dword [Component.mouseEventType], MOUSE_NOBTN
+			je Grouping.passthroughMouseEvent.gocheck.kdone
+		mov dword [Dolphin2.windowMoving], TRUE
 		mov ebx, [Grouping.passthroughMouseEvent.g_stor]
 		cmp ebx, [Dolphin2.compositorGrouping]
 			jne Grouping.passthroughMouseEvent.ret
 		mov eax, [Component.mouseEventX]
 		mov ebx, [Component.mouseEventY]
 		call WindowGrouping.moveWindow
+		jmp Grouping.passthroughMouseEvent.ret
+	Grouping.passthroughMouseEvent.gocheck.kdone :
+		mov dword [Dolphin2.windowMoving], FALSE
 		jmp Grouping.passthroughMouseEvent.ret
 GROUPING_CLICKED_STR :
 	db "A grouping was clicked!", 0
