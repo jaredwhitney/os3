@@ -93,6 +93,13 @@ Grouping.Remove :	; Component in eax, Grouping in ebx
 	Grouping.Remove.ret :
 	popa
 	ret
+Grouping.BringToFront :	; Component in eax, Grouping in ebx
+	pusha
+		call Grouping.Remove
+		call Grouping.Add
+		call Grouping.DoUpdate
+	popa
+	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
 	pusha
 	call Grouping.DoUpdate
