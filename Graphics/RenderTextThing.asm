@@ -69,7 +69,7 @@ Component.discardMouseEvent :
 	; discard the event
 ret
 Component.mouseHandlerPointers :
-	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent, SelectionPanel.HandleMouseEvent, Grouping.passthroughMouseEvent
+	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent, SelectionPanel.HandleMouseEvent, WindowGrouping.passthroughMouseEvent
 Component.mouseEventX :
 	dd 0x0
 Component.mouseEventY :

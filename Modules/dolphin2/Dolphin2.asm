@@ -27,7 +27,7 @@ Dolphin2.createCompositorGrouping :
 		pop ecx
 		mov [ecx+Component_image], ebx
 		
-		mov dword [ecx+Grouping_backingColor], 0x0;0xFF000040
+		mov dword [ecx+Grouping_backingColor], 0xFF000040
 		
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx

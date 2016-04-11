@@ -364,7 +364,7 @@ SimpleRender.goRender :
 		call Image.clear
 		
 		xor esi, esi
-		xor edx, edi
+		xor edi, edi
 		.loop :
 			mov eax, [tri+esi]
 			mov ebx, [tri+8+esi]
@@ -390,7 +390,18 @@ SimpleRender.goRender :
 		mov ebx, [drawtri+4]
 		mov ecx, [drawtri+8]
 		mov edx, [drawtri+8+4]
+		call SimpleRender.drawLine	
+		mov eax, [drawtri+8]
+		mov ebx, [drawtri+8+4]
+		mov ecx, [drawtri+16]
+		mov edx, [drawtri+16+4]
+		call SimpleRender.drawLine	
+		mov eax, [drawtri+16]
+		mov ebx, [drawtri+16+4]
+		mov ecx, [drawtri]
+		mov edx, [drawtri+4]
 		call SimpleRender.drawLine
+		
 		
 	popa
 	ret
@@ -410,6 +421,8 @@ SimpleRender.p_func :
 	pop edx
 	ret
 SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y1, ecx = x2, edx = y2
+	cmp eax, ecx
+		je SimpleRender.drawVerticalLine
 	pusha
 		cmp eax, ecx
 			jg .otherway
@@ -441,7 +454,9 @@ SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y
 		imul eax, 400*4
 		
 		mov ebx, [SimpleRender.imagebuffer]
-		add ebx, [SimpleRender.x1]
+		mov ecx, [SimpleRender.x1]
+		shl ecx, 2
+		add ebx, ecx
 		mov ecx, [SimpleRender.y1]
 		imul ecx, 400*4
 		add ebx, ecx
@@ -458,12 +473,50 @@ SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y
 			add ebx, [SimpleRender.drawbase]
 		; ; ;
 		add dword [SimpleRender.drawbase], 4
-		add edx, 4
+		add edx, 1
 		cmp edx, [SimpleRender.x2]
 			jle .loop
 		fistp dword [SimpleRender.drawbase]	; junk data
 	popa
+	.ret :
 	ret
+SimpleRender.drawVerticalLine :
+	cmp ebx, edx
+		je SimpleRender.drawVerticalLine.ret
+	pusha
+		cmp ebx, edx
+			jg SimpleRender.drawVerticalLine.kcont
+		xchg ebx, edx
+		SimpleRender.drawVerticalLine.kcont :
+		mov [SimpleRender.y1], edx
+		mov [SimpleRender.y2], ebx
+		mov [SimpleRender.x1], eax
+		
+		mov dword [SimpleRender.drawpos], 0
+		mov ebx, [SimpleRender.imagebuffer]
+		mov ecx, [SimpleRender.x1]
+		shl ecx, 2
+		add ebx, ecx
+		mov ecx, [SimpleRender.y1]
+		imul ecx, 400*4
+		add ebx, ecx
+		mov [SimpleRender.drawbase], ebx
+		mov edx, [SimpleRender.y1]
+		SimpleRender.drawVerticalLine.loop :
+		mov dword [ebx], 0xFFFFFFFF
+		; ; ;
+			mov ebx, [SimpleRender.drawpos]
+			imul ebx, 400*4
+			add ebx, [SimpleRender.drawbase]
+		; ; ;
+		add dword [SimpleRender.drawpos], 1
+		add edx, 1
+		cmp edx, [SimpleRender.y2]
+			jle SimpleRender.drawVerticalLine.loop
+	SimpleRender.drawVerticalLine.ret :
+	popa
+	ret
+
 SimpleRender.x1 :
 	dd 0x0
 SimpleRender.y1 :

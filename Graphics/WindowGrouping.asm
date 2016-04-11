@@ -151,6 +151,15 @@ WindowGrouping.closeCallback :	; Button in ebx
 	popa
 	ret
 
+WindowGrouping.passthroughMouseEvent :
+	pusha
+		mov eax, ebx
+		mov ebx, [Dolphin2.compositorGrouping]
+		call Grouping.BringToFront
+	popa
+	call Grouping.passthroughMouseEvent
+	ret
+	
 WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
 	pusha
 		mov edx, eax
