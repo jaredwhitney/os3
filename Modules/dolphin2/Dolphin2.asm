@@ -27,7 +27,7 @@ Dolphin2.createCompositorGrouping :
 		pop ecx
 		mov [ecx+Component_image], ebx
 		
-		mov dword [ecx+Grouping_backingColor], 0xFF000040
+		mov dword [ecx+Grouping_backingColor], 0x0;FF000040
 		
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
@@ -184,7 +184,7 @@ Dolphin2.handleMouseEvent :
 		mov [Component.mouseEventY], eax
 			cmp dword [Dolphin2.windowMoving], TRUE
 				jne .cont
-			jmp Grouping.passthroughMouseEvent.gocheck
+			jmp TitleBar.passthroughMouseEvent.gocheck
 			.cont :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.HandleMouseEvent

@@ -7,13 +7,16 @@ Component_h					equ 20
 Component_nextLinked		equ 24
 Component_upperRenderFlag	equ 28
 Component_transparent		equ 32
+Component_renderFunc		equ 36
+Component_mouseHandlerFunc	equ 40
+Component_keyHandlerFunc	equ 44
+Component_CLASS_SIZE		equ 48
 
 Component.Render :	; Component in ebx
 	pusha
-		mov eax, [ebx]
-		imul eax, 4
-		add eax, Component.functionPointers
-		call [eax]
+		cmp dword [ebx+Component_renderFunc], 0
+			je Component.killfunc
+		call [ebx+Component_renderFunc]
 	popa
 	ret
 Component.killfunc :
@@ -29,8 +32,8 @@ Component.DEBUG_ALL :
 Component.Render.layerColor :
 	dd 0x400000
 
-Component.functionPointers :
-	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render, GroupingScrollable.Render, SelectionPanel.Render, Grouping.Render
+;Component.functionPointers :
+;	dd Component.killfunc, TextLine.Render, TextArea.Render, Image.Render, ImageScalable.Render, Grouping.Render, Button.Render, GroupingScrollable.Render, SelectionPanel.Render, Grouping.Render
 Component.TYPE_TEXTLINE				equ 0x1
 Component.TYPE_TEXTAREA				equ 0x2
 Component.TYPE_IMAGE				equ 0x3
@@ -58,15 +61,15 @@ pusha
 	sub eax, [ebx+Component_y]
 	mov [Component.mouseEventY], eax
 	; Call the proper function
-	mov eax, [ebx+Component_type]
-	imul eax, 4
-	add eax, Component.mouseHandlerPointers
-	call [eax]
+	cmp dword [ebx+Component_mouseHandlerFunc], 0x0
+		je Component.discardMouseEvent
+	call [ebx+Component_mouseHandlerFunc]
 popa
 ret
 Component.discardKeyboardEvent :
 Component.discardMouseEvent :
 	; discard the event
+popa
 ret
 Component.mouseHandlerPointers :
 	dd Component.killfunc, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Component.discardMouseEvent, Grouping.passthroughMouseEvent, Button.onMouseEvent, GroupingScrollable.passthroughMouseEvent, SelectionPanel.HandleMouseEvent, WindowGrouping.passthroughMouseEvent
@@ -80,10 +83,9 @@ Component.HandleKeyboardEvent :	; Component in ebx
 pusha
 	cmp byte [Component.keyChar], 0x0
 		je Component.HandleKeyboardEvent.ret
-	mov ecx, [ebx+Component_type]
-	imul ecx, 4
-	add ecx, Component.keyHandlerPointers
-	call [ecx]
+	cmp dword [ebx+Component_keyHandlerFunc], 0x0
+		je Component.discardKeyboardEvent
+	call [ebx+Component_keyHandlerFunc]
 Component.HandleKeyboardEvent.ret :
 popa
 ret
@@ -98,7 +100,7 @@ Textline_x		equ 8
 Textline_y		equ 12
 Textline_w		equ 16
 Textline_h		equ 20
-Textline_text	equ 36
+Textline_text	equ Component_CLASS_SIZE
 
 TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.retval]
@@ -109,7 +111,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 	pop dword [TextLine.Create.str]
 	push eax
 	push ebx
-		mov ebx, 40
+		mov ebx, Component_CLASS_SIZE+4
 		call ProgramManager.reserveMemory
 		mov eax, [TextLine.Create.str]
 		mov [ebx+Textline_text], eax
@@ -124,6 +126,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 		mov eax, Component.TYPE_TEXTLINE
 		mov [ebx+Textline_type], eax
 		mov dword [ebx+Component_transparent], TRUE
+		mov dword [ebx+Component_renderFunc], TextLine.Render
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Textline_w]

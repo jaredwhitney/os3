@@ -1,12 +1,12 @@
-Image_type	equ 0
-Image_image	equ 4
-Image_x		equ 8
-Image_y		equ 12
-Image_w		equ 16
-Image_h		equ 20
-Image_source	equ 36
-Image_sw	equ 40
-Image_sh	equ 44
+Image_type		equ 0
+Image_image		equ 4
+Image_x			equ 8
+Image_y			equ 12
+Image_w			equ 16
+Image_h			equ 20
+Image_source	equ Component_CLASS_SIZE
+Image_sw		equ Component_CLASS_SIZE+4
+Image_sh		equ Component_CLASS_SIZE+8
 
 Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [Image.Create.retval]
@@ -20,7 +20,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	push edx
 	push eax
 	push ebx
-		mov ebx, 48
+		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
 		mov eax, [Image.Create.source]
 		mov [ebx+Image_source], eax
@@ -38,6 +38,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 		mov [ebx+Image_h], eax
 		mov eax, Component.TYPE_IMAGE
 		mov [ebx+Image_type], eax
+		mov dword [ebx+Component_renderFunc], Image.Render
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Image_w]
@@ -101,9 +102,9 @@ Imagescalable_x			equ 8
 Imagescalable_y			equ 12
 Imagescalable_w			equ 16
 Imagescalable_h			equ 20
-Imagescalable_source	equ 36
-Imagescalable_sw		equ 40
-Imagescalable_sh		equ 44
+Imagescalable_source	equ Component_CLASS_SIZE
+Imagescalable_sw		equ Component_CLASS_SIZE+4
+Imagescalable_sh		equ Component_CLASS_SIZE+8
 
 ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop dword [ImageScalable.Create.retval]
@@ -116,7 +117,7 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 	pop dword [ImageScalable.Create.source]
 	push eax
 	push ebx
-		mov ebx, 48
+		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
 		mov eax, [ImageScalable.Create.source]
 		mov [ebx+Imagescalable_source], eax
@@ -134,6 +135,7 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 		mov [ebx+Imagescalable_h], eax
 		mov eax, Component.TYPE_IMAGE_SCALABLE
 		mov [ebx+Imagescalable_type], eax
+		mov dword [ebx+Component_renderFunc], ImageScalable.Render
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Image_w]

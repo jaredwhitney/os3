@@ -1,8 +1,8 @@
-SelectionPanel_renderFlag			equ 36
-SelectionPanel_subcomponent			equ 40
-SelectionPanel_backingColor			equ 44
-SelectionPanel_selectColor			equ 48
-SelectionPanel_selectedComponent	equ 52
+SelectionPanel_renderFlag			equ Component_CLASS_SIZE
+SelectionPanel_subcomponent			equ Component_CLASS_SIZE+4
+SelectionPanel_backingColor			equ Component_CLASS_SIZE+8
+SelectionPanel_selectColor			equ Component_CLASS_SIZE+12
+SelectionPanel_selectedComponent	equ Component_CLASS_SIZE+16
 
 SelectionPanel.Create :	; int x, int y, int w, int h
 	pop dword [SelectionPanel.Create.retval]
@@ -15,7 +15,7 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 	push edx
 		
 		mov eax, 0x7
-		mov ebx, 56
+		mov ebx, Component_CLASS_SIZE+20
 		call ProgramManager.reserveMemory
 		mov edx, ebx
 		
@@ -28,6 +28,8 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 		mov eax, [SelectionPanel.Create.h]
 		mov [edx+Component_h], eax
 		mov dword [edx+Component_type], Component.TYPE_SELECTPANEL
+		mov dword [edx+Component_renderFunc], SelectionPanel.Render
+		mov dword [edx+Component_mouseHandlerFunc], SelectionPanel.HandleMouseEvent
 		pusha
 			mov eax, [ebx+Component_w]
 			imul eax, [ebx+Component_h]

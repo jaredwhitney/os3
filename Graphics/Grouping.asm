@@ -1,12 +1,12 @@
-Grouping_type	equ 0
-Grouping_image	equ 4
-Grouping_x		equ 8
-Grouping_y		equ 12
-Grouping_w		equ 16
-Grouping_h		equ 20
-Grouping_renderFlag	equ 36
-Grouping_subcomponent	equ 40
-Grouping_backingColor	equ 44
+Grouping_type			equ 0
+Grouping_image			equ 4
+Grouping_x				equ 8
+Grouping_y				equ 12
+Grouping_w				equ 16
+Grouping_h				equ 20
+Grouping_renderFlag		equ Component_CLASS_SIZE
+Grouping_subcomponent	equ Component_CLASS_SIZE+4
+Grouping_backingColor	equ Component_CLASS_SIZE+8
 
 Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.retval]
@@ -16,7 +16,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop dword [Grouping.Create.x]
 	push eax
 	push ebx
-		mov ebx, 48
+		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
@@ -28,6 +28,8 @@ Grouping.Create :	; int x, int y, int w, int h
 		mov [ebx+Grouping_h], eax
 		mov eax, Component.TYPE_GROUPING
 		mov [ebx+Grouping_type], eax
+		mov dword [ebx+Component_renderFunc], Grouping.Render
+		mov dword [ebx+Component_mouseHandlerFunc], Grouping.passthroughMouseEvent
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Grouping_w]
@@ -273,7 +275,6 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
 	pusha
-		mov [Grouping.passthroughMouseEvent.g_stor], ebx
 		;mov dword [ebx+Grouping_backingColor], 0xFF00FF00
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
 		mov ebx, [ebx+Grouping_subcomponent]
@@ -282,7 +283,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		mov ebx, [ebx+Component_nextLinked]
 		Grouping.passthroughMouseEvent.beginLoop :
 		cmp ebx, 0x0
-			je Grouping.passthroughMouseEvent.gocheck
+			je Grouping.passthroughMouseEvent.ret
 		mov ecx, [Component.mouseEventX]
 		mov edx, [Component.mouseEventY]
 		
@@ -311,24 +312,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 	Grouping.passthroughMouseEvent.ret :
 	popa
 	ret
-	Grouping.passthroughMouseEvent.gocheck :
-		cmp dword [Component.mouseEventType], MOUSE_NOBTN
-			je Grouping.passthroughMouseEvent.gocheck.kdone
-		mov dword [Dolphin2.windowMoving], TRUE
-		mov ebx, [Grouping.passthroughMouseEvent.g_stor]
-		cmp ebx, [Dolphin2.compositorGrouping]
-			jne Grouping.passthroughMouseEvent.ret
-		mov eax, [Component.mouseEventX]
-		mov ebx, [Component.mouseEventY]
-		call WindowGrouping.moveWindow
-		jmp Grouping.passthroughMouseEvent.ret
-	Grouping.passthroughMouseEvent.gocheck.kdone :
-		mov dword [Dolphin2.windowMoving], FALSE
-		jmp Grouping.passthroughMouseEvent.ret
 GROUPING_CLICKED_STR :
 	db "A grouping was clicked!", 0
 GROUPING_SUB_CLICKED_STR :
 	db "A subcomponent of a grouping was clicked!", 0
-Grouping.passthroughMouseEvent.g_stor :
-	dd 0x0
-	
