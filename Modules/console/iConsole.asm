@@ -281,7 +281,7 @@ consoletest_type :
 	db "Text", 0
 SimpleRender.init :
 	pusha
-		push consoletest_title
+		push SimpleRender.windowTitle
 		push dword 0*4
 		push dword 0
 		push dword 400*4
@@ -339,6 +339,8 @@ SimpleRender.runOnce :
 		call Component.RequestUpdate
 	popa
 	ret
+SimpleRender.windowTitle :
+	db "SimpleRender Test", 0
 SimpleRender.window :
 	dd 0
 SimpleRender.image :

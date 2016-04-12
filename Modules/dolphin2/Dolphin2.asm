@@ -27,7 +27,7 @@ Dolphin2.createCompositorGrouping :
 		pop ecx
 		mov [ecx+Component_image], ebx
 		
-		mov dword [ecx+Grouping_backingColor], 0x0;FF000040
+		mov dword [ecx+Grouping_backingColor], 0xFF000040
 		
 		; Save the Grouping for later use
 		mov [Dolphin2.compositorGrouping], ecx
@@ -193,12 +193,14 @@ Dolphin2.handleMouseEvent :
 	
 Dolphin2.showLoginScreen :
 	pusha
-		push dword Dolphin2.STR_LOGIN_SCREEN
 		push dword 0
 		push dword 0
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
-		call Dolphin2.makeWindow
+		call Grouping.Create
+		mov ebx, [Dolphin2.compositorGrouping]
+		mov eax, ecx
+		call Grouping.Add
 		mov ebx, ecx
 		push dword [Dolphin2.bgimg]
 		push dword 1024*4
@@ -280,8 +282,9 @@ Dolphin2.checkPass :
 		call os.seq
 		cmp al, FALSE
 			je Dolphin2.checkPass.ret
-		mov ebx, [Dolphin2.passEntryBox]
-		call WindowGrouping.closeCallback
+		mov ebx, [Dolphin2.compositorGrouping]
+		mov eax, [ebx+Grouping_subcomponent]
+		call Grouping.Remove
 		Dolphin2.checkPass.ret :
 	popa
 	ret
