@@ -240,8 +240,8 @@ call ProgramManager.setActive	; Make removable Later
 		mov eax, ecx
 		call SelectionPanel.Add
 		
-		;call Dolphin2.showLoginScreen
 		call SimpleRender.init
+		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
 	GoDoLoop :

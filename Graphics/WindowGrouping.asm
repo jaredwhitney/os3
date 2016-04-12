@@ -2,11 +2,11 @@ WindowGrouping_x			equ 8
 WindowGrouping_y			equ 12
 WindowGrouping_w			equ 16
 WindowGrouping_h			equ 20
-WindowGrouping_mainGrouping	equ 48
-WindowGrouping_titleBar		equ 52
-WindowGrouping_nameString	equ 56
-WindowGrouping_sizeButton	equ 60
-WindowGrouping_closeButton	equ 64
+WindowGrouping_mainGrouping	equ Component_CLASS_SIZE+12
+WindowGrouping_titleBar		equ Component_CLASS_SIZE+16
+WindowGrouping_nameString	equ Component_CLASS_SIZE+20
+WindowGrouping_sizeButton	equ Component_CLASS_SIZE+24
+WindowGrouping_closeButton	equ Component_CLASS_SIZE+28
 
 WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop dword [WindowGrouping.Create.retval]
@@ -20,7 +20,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push edx
 
 		mov eax, 0x7
-		mov ebx, 68
+		mov ebx, Component_CLASS_SIZE+32
 		call ProgramManager.reserveMemory
 		mov edx, ebx
 			
@@ -62,6 +62,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		push dword 20
 		call Grouping.Create
 		mov [edx+WindowGrouping_titleBar], ecx
+		mov dword [ecx+Component_mouseHandlerFunc], TitleBar.passthroughMouseEvent
 		mov dword [ecx+Grouping_backingColor], 0xFF201080
 		mov ebx, edx
 		mov eax, ecx
@@ -125,6 +126,8 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov dword [ecx+Grouping_backingColor], 0xFFB02020
 		
 		mov dword [edx+Component_type], Component.TYPE_WINDOW
+		mov dword [edx+Component_renderFunc], Grouping.Render
+		mov dword [edx+Component_mouseHandlerFunc], WindowGrouping.passthroughMouseEvent
 		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
 		
 		mov ecx, edx
@@ -162,9 +165,78 @@ WindowGrouping.passthroughMouseEvent :
 	.goon :
 	call Grouping.passthroughMouseEvent
 	ret
-	
+
+TitleBar.passthroughMouseEvent :	; Grouping in ebx
+	pusha
+		mov ebx, [ebx+Grouping_subcomponent]
+		jmp TitleBar.passthroughMouseEvent.beginLoop
+		TitleBar.passthroughMouseEvent.nomatch :
+		mov ebx, [ebx+Component_nextLinked]
+		TitleBar.passthroughMouseEvent.beginLoop :
+		cmp ebx, 0x0
+			je TitleBar.passthroughMouseEvent.gocheck
+		mov ecx, [Component.mouseEventX]
+		mov edx, [Component.mouseEventY]
+		
+		cmp ecx, [ebx+Component_x]
+			jl TitleBar.passthroughMouseEvent.nomatch
+		mov eax, [ebx+Component_x]
+		add eax, [ebx+Component_w]
+		cmp ecx, eax
+			jg TitleBar.passthroughMouseEvent.nomatch
+		cmp edx, [ebx+Component_y]
+			jl TitleBar.passthroughMouseEvent.nomatch
+		mov eax, [ebx+Component_y]
+		add eax, [ebx+Component_h]
+		cmp edx, eax
+			jg TitleBar.passthroughMouseEvent.nomatch
+		cmp dword [ebx+Component_type], Component.TYPE_BUTTON
+			jne TitleBar.passthroughMouseEvent.gocheck
+		cmp dword [Component.mouseEventType], MOUSE_NOBTN
+			je .dontfocus
+		mov [Dolphin2.focusedComponent], ebx
+		.dontfocus :
+		call Component.HandleMouseEvent
+	TitleBar.passthroughMouseEvent.ret :
+	popa
+	ret
+TitleBar.passthroughMouseEvent.gocheck :
+		cmp dword [Component.mouseEventType], MOUSE_NOBTN
+			je TitleBar.passthroughMouseEvent.gocheck.kdone
+		cmp dword [Dolphin2.windowMoving], TRUE
+			jne TitleBar.passthroughMouseEvent.gosettrue
+		mov dword [Dolphin2.windowMoving], TRUE
+		mov eax, [Component.mouseEventX]
+		sub eax, [TitleBar.passthroughMouseEvent.xoffs]
+		mov ebx, [Component.mouseEventY]
+		sub ebx, [TitleBar.passthroughMouseEvent.yoffs]
+		call WindowGrouping.moveWindow
+		jmp TitleBar.passthroughMouseEvent.ret
+	TitleBar.passthroughMouseEvent.gocheck.kdone :
+		mov dword [Dolphin2.windowMoving], FALSE
+		jmp TitleBar.passthroughMouseEvent.ret
+TitleBar.passthroughMouseEvent.gosettrue :
+		mov dword [Dolphin2.windowMoving], TRUE
+		mov eax, [Component.mouseEventX]
+		mov [TitleBar.passthroughMouseEvent.xoffs], eax
+		mov ebx, [Component.mouseEventY]
+		mov [TitleBar.passthroughMouseEvent.yoffs], ebx
+	jmp TitleBar.passthroughMouseEvent.ret
+TitleBar.passthroughMouseEvent.xoffs :
+	dd 0x0
+TitleBar.passthroughMouseEvent.yoffs :
+	dd 0x0
+
 WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
 	pusha
+		cmp eax, 0x0
+			jge WindowGrouping.moveWindow.noXworry
+		xor eax, eax
+		WindowGrouping.moveWindow.noXworry :
+		cmp ebx, 0x0
+			jge WindowGrouping.moveWindow.noYworry
+		xor ebx, ebx
+		WindowGrouping.moveWindow.noYworry :
 		mov edx, eax
 		mov ecx, ebx
 		mov ebx, [Dolphin2.focusedComponent]
@@ -189,6 +261,7 @@ WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
 	WindowGrouping.moveWindow.ret :
 	popa
 	ret
+	
 WindowGrouping.lastWin :
 	dd 0x0
 WindowGrouping.Create.retval :

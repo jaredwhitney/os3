@@ -1,13 +1,13 @@
-Textarea_type	equ 0
-Textarea_image	equ 4
-Textarea_x		equ 8
-Textarea_y		equ 12
-Textarea_w		equ 16
-Textarea_h		equ 20
-Textarea_text	equ 36
-Textarea_len	equ 40
-Textarea_scrolls	equ 44
-Textarea_customKeyHandler	equ 48
+Textarea_type				equ 0
+Textarea_image				equ 4
+Textarea_x					equ 8
+Textarea_y					equ 12
+Textarea_w					equ 16
+Textarea_h					equ 20
+Textarea_text				equ Component_CLASS_SIZE
+Textarea_len				equ Component_CLASS_SIZE+4
+Textarea_scrolls			equ Component_CLASS_SIZE+8
+Textarea_customKeyHandler	equ Component_CLASS_SIZE+12
 
 TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.retval]
@@ -19,7 +19,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.len]
 	push eax
 	push ebx
-		mov ebx, 52
+		mov ebx, Component_CLASS_SIZE+16
 		call ProgramManager.reserveMemory
 		mov eax, [TextArea.Create.len]
 		mov [ebx+Textarea_len], eax
@@ -49,7 +49,9 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov [ebx+Textarea_scrolls], eax
 		mov dword [ebx+Textarea_type], Component.TYPE_TEXTAREA
 		mov dword [ebx+Component_transparent], TRUE
-		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle
+		mov dword [ebx+Component_renderFunc], TextArea.Render
+		mov dword [ebx+Component_keyHandlerFunc], TextArea.onKeyboardEvent.handle
+		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle	; redundant and should be removed
 		mov ecx, ebx
 	pop ebx
 	pop eax
