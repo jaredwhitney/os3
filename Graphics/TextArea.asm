@@ -98,28 +98,44 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 						imul eax, FONTHEIGHT+4
 						add edx, eax
 						mov [TextArea.Render.flipTo], edx
+				mov eax, [ebx+Textarea_image]
+				mov edx, [ebx+Textarea_w]
+				;shl edx, 2
+				add eax, edx
+				mov edx, [ebx+Textarea_h]
+				sub edx, FONTHEIGHT-1	; anything that won't fit in FONTHEIGHT height can't be drawn
+				imul edx, [ebx+Textarea_w]
+				;shl edx, 2
+				add eax, edx
+				mov [TextArea.Render.maxPos], eax
 		xor edx, edx
 		TextArea.Render.loop :
 		pusha
 		mov eax, [ebx+Textarea_text]
 		add eax, edx	; now [eax] = char
 		mov al, [eax]	; al = char
+		cmp al, 0xFE
+			je TextArea.Render.goNewl
+		cmp al, 0x0A
+			je TextArea.Render.goNewl
 		mov ecx, [TextArea.Render.dest]
+		cmp ecx, [TextArea.Render.maxPos]
+			ja TextArea.Render.aret
 		mov edx, [ebx+Textarea_w]
 		push ebx
 		mov ebx, 0xFFFFFFFF
 		call RenderText
 		pop ebx
-		cmp al, 0x0A
-			jne TextArea.Render.noNewl
-			mov eax, [TextArea.Render.dest]
-			add eax, [ebx+Textarea_w]
-			mov [TextArea.Render.dest], eax
+		jmp TextArea.Render.noNewl
+		TextArea.Render.goNewl :
+		call TextArea.Render.calcFlips
+		jmp TextArea.Render.noadd
 		TextArea.Render.noNewl :
 		; figure out the best way to increment TextArea.Render.dest!
 		mov eax, [TextArea.Render.dest]
 		add eax, FONTWIDTH*4
 		mov [TextArea.Render.dest], eax
+		TextArea.Render.noadd :
 		cmp eax, [TextArea.Render.nextFlip]
 			jb TextArea.Render.loop.noflip
 		call TextArea.Render.calcFlips
@@ -131,11 +147,17 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 			jg TextArea.Render.loop
 	popa
 	ret
+TextArea.Render.aret :
+	popa
+	popa
+	ret
 TextArea.Render.dest :
 	dd 0x0
 TextArea.Render.nextFlip :
 	dd 0x0
 TextArea.Render.flipTo :
+	dd 0x0
+TextArea.Render.maxPos :
 	dd 0x0
 TextArea.Render.calcFlips :
 	pusha
