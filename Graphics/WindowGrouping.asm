@@ -63,7 +63,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		call Grouping.Create
 		mov [edx+WindowGrouping_titleBar], ecx
 		mov dword [ecx+Component_mouseHandlerFunc], TitleBar.passthroughMouseEvent
-		mov dword [ecx+Grouping_backingColor], 0xFF201080
+		mov dword [ecx+Grouping_backingColor], 0xFF404040
 		mov ebx, edx
 		mov eax, ecx
 		call Grouping.Add
@@ -96,7 +96,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
-		mov dword [ecx+Button_backingColor], 0xFFE00000
+		mov dword [ecx+Button_backingColor], 0xFF808080
 		
 		push dword [WindowGrouping.Create.title]
 		push dword 0
@@ -161,6 +161,22 @@ WindowGrouping.passthroughMouseEvent :
 		mov eax, ebx
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.BringToFront
+		mov ebx, [eax+WindowGrouping_titleBar]
+		mov dword [ebx+Grouping_backingColor], 0xFF201080
+		mov ebx, [eax+WindowGrouping_closeButton]
+		mov dword [ebx+Button_backingColor], 0xFFE00000
+		call Component.RequestUpdate
+		cmp dword [WindowGrouping.lastFocused], 0x0
+			je .nouplast
+		cmp eax, [WindowGrouping.lastFocused]
+			je .nouplast
+		mov ecx, [WindowGrouping.lastFocused]
+		mov ebx, [ecx+WindowGrouping_titleBar]
+		mov dword [ebx+Grouping_backingColor], 0xFF404040
+		mov ebx, [ecx+WindowGrouping_closeButton]
+		mov dword [ebx+Button_backingColor], 0xFF808080
+		.nouplast :
+		mov [WindowGrouping.lastFocused], eax
 	popa
 	.goon :
 	call Grouping.passthroughMouseEvent
@@ -281,4 +297,6 @@ WindowGrouping.upArrowStr :
 	db "M", 0
 WindowGrouping.closeStr :
 	db "X", 0
+WindowGrouping.lastFocused :
+	dd 0x0
 
