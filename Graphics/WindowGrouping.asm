@@ -82,7 +82,8 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
-		mov dword [ecx+Button_backingColor], 0xFF180878
+		mov dword [ecx+Button_backingColor], 0xFF383838
+		mov dword [edx+WindowGrouping_sizeButton], ecx
 		
 		push dword WindowGrouping.closeStr
 		push dword WindowGrouping.closeCallback
@@ -97,6 +98,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
 		mov dword [ecx+Button_backingColor], 0xFF808080
+		mov dword [edx+WindowGrouping_closeButton], ecx
 		
 		push dword [WindowGrouping.Create.title]
 		push dword 0
@@ -165,7 +167,8 @@ WindowGrouping.passthroughMouseEvent :
 		mov dword [ebx+Grouping_backingColor], 0xFF201080
 		mov ebx, [eax+WindowGrouping_closeButton]
 		mov dword [ebx+Button_backingColor], 0xFFE00000
-		call Component.RequestUpdate
+		mov ebx, [eax+WindowGrouping_sizeButton]
+		mov dword [ebx+Button_backingColor], 0xFF180878
 		cmp dword [WindowGrouping.lastFocused], 0x0
 			je .nouplast
 		cmp eax, [WindowGrouping.lastFocused]
@@ -175,6 +178,8 @@ WindowGrouping.passthroughMouseEvent :
 		mov dword [ebx+Grouping_backingColor], 0xFF404040
 		mov ebx, [ecx+WindowGrouping_closeButton]
 		mov dword [ebx+Button_backingColor], 0xFF808080
+		mov ebx, [ecx+WindowGrouping_sizeButton]
+		mov dword [ebx+Button_backingColor], 0xFF383838
 		.nouplast :
 		mov [WindowGrouping.lastFocused], eax
 	popa

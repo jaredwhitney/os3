@@ -12,6 +12,7 @@
 %include "..\modules\dolphin\Update_Text.asm"
 
 %include "..\modules\console\iConsole.asm"
+%include "..\modules\console\iConsole2.asm"
 %include "..\modules\video\Video.asm"
 %include "..\modules\xlib\int30.asm"
 
@@ -78,5 +79,11 @@ ret
 View.file:
 ret
 TRUE equ 0xFF
+true equ 0xFF
 FALSE equ 0x00
+false equ 0x00
+null equ 0x0
+nullptr :
+	dq 0
+endstr equ 0x0
 WHITE equ 0xFF

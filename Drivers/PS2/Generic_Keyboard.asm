@@ -109,6 +109,11 @@ KeyManager.handleShift :	; charcode in bl
 	cmp al, 0x0
 	pop ax
 	je KeyManager.handleShift.ret
+	cmp al, "'"
+		jne .notApos
+	mov al, '"'
+	jmp KeyManager.handleShift.ret
+	.notApos :
 	cmp al, 0x61
 	jl KeyManager.handleShift.ret
 	cmp al, 0x7a
@@ -322,6 +327,9 @@ KeyManager.toChar :
 	je KeyManager.toChar.ret
 	cmp bl, 0x0D
 	mov al, '='
+	je KeyManager.toChar.ret
+	cmp bl, 0x28
+	mov al, "'"
 	je KeyManager.toChar.ret
 	cmp bl, 0x0E	; backspace
 	mov al, 0xff

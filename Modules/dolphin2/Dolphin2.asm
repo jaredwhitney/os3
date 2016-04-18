@@ -249,7 +249,8 @@ Dolphin2.showLoginScreen :
 		call TextArea.Create
 		mov eax, ecx
 		call Grouping.Add
-	;;;	mov dword [ecx+Textarea_customKeyHandler], SysHaltScreen.show
+		mov dword [ecx+Component_keyHandlerFunc], Dolphin2.showLoginScreen.passwordKeyHandler
+		mov [Dolphin2.focusedComponent], ecx
 		mov [Dolphin2.passEntryBox], ecx
 		
 		push dword Dolphin2.STR_GOBUTTON
@@ -287,6 +288,16 @@ Dolphin2.checkPass :
 		call Grouping.Remove
 		Dolphin2.checkPass.ret :
 	popa
+	ret
+
+Dolphin2.showLoginScreen.passwordKeyHandler :
+	mov al, [Component.keyChar]
+	cmp al, 0xFE
+		jne kgo
+	call Dolphin2.checkPass
+	ret
+	kgo :
+	call TextArea.onKeyboardEvent.handle
 	ret
 	
 Dolphin2.SystemMenu.Show :

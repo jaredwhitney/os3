@@ -190,57 +190,10 @@ call ProgramManager.setActive	; Make removable Later
 	
 	call Dolphin2.createCompositorGrouping
 	
-	push consoletest_title
-	push dword 80*4
-	push dword 80
-	push dword 300*4
-	push dword 100
-	call Dolphin2.makeWindow
-	mov edx, ecx
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
-	
-		push dword 0
-		push dword 0
-		push dword 300*4
-		push dword 100
-		call SelectionPanel.Create
-		mov eax, ecx
-		mov ebx, edx
-		call Grouping.Add
-		mov dword [ecx+Grouping_backingColor], 0xFFC01010
-		mov ebx, ecx
-
-		push dword 100
-		push dword 0
-		push dword 0
-		push dword 200*4
-		push dword 80
-		push dword FALSE
-		call TextArea.Create
-		mov eax, ecx
-		call SelectionPanel.Add
-
-		push dword consoletest_type
-		push dword screen.wipe
-		push dword 10*4
-		push dword 10
-		push dword 30*4
-		push dword 30
-		call Button.Create
-		mov eax, ecx
-		call SelectionPanel.Add
-
-		push dword consoletest_type
-		push dword screen.wipe
-		push dword 50*4
-		push dword 10
-		push dword 30*4
-		push dword 30
-		call Button.Create
-		mov eax, ecx
-		call SelectionPanel.Add
 		
 		call SimpleRender.init
+		call iConsole2.Init
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax

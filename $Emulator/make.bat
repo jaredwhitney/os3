@@ -1,3 +1,4 @@
+@echo %date% (%time%) > build_time.log
 @nasm.exe -o kernel.bin -f bin ..\boot\stage2.asm
 @nasm.exe -o boot.bin -f bin ..\boot\boot.asm
 @pause
