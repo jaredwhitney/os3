@@ -256,6 +256,8 @@ TextLine.RenderTest.text2 :
 	db "Hellow.", 0
 
 RenderText :	; char in al, color in ebx, image in ecx, image width in edx
+	cmp al, 0x0D
+		je RenderText.ret
 	pusha
 		mov [RenderText.imwidth], edx
 		push ebx
@@ -289,6 +291,7 @@ RenderText :	; char in al, color in ebx, image in ecx, image width in edx
 		cmp edx, 0
 			jg RenderText.mainloop	; repeat mainloop FONTHEIGHT times
 	popa
+	RenderText.ret :
 	ret
 RenderText.imwidth :
 	dd 0x0

@@ -205,7 +205,7 @@ je graphicsgetposret
 add ebx, 7
 add edx, 1
 mov cl, [edx]
-cmp cl, '*'
+cmp cl, 0xFF
 je graphicsgetposret
 jmp graphicsgetposloop
 
