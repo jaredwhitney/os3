@@ -485,7 +485,7 @@ call String.Equals
 pop ebx
 cmp cl, 0xFF
 	jne iConsole.$loop_if.18_close
-call Minnow3.doFormatPartition	; INLINE ASSEMBLY
+call Minnow4.reformatDisk	; INLINE ASSEMBLY
 iConsole.$loop_if.18_close :
 
 push ebx
@@ -863,7 +863,7 @@ push edx
 mov ecx, 0
 mov [String.Append.$local.q], ecx
 push ebx
-mov ebx, ebx
+mov ebx, String.Append.$local.s
 mov ecx, [String.Append.$local.q]
 push ecx
 call String.GetChar
@@ -888,7 +888,6 @@ cmp cl, 0xFF
 	jne String.$loop_while.0_end
 mov ecx, [ebx]
 add ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
-sub ecx, 1	; INLINE ASSEMBLY
 mov dl, [String.Append.$local.ch]	; INLINE ASSEMBLY
 mov [ecx], dl	; INLINE ASSEMBLY
 push edx	; Math start
@@ -899,7 +898,7 @@ add ecx, edx
 pop edx	; Math end
 mov [String.Append.$local.q], ecx
 push ebx
-mov ebx, ebx
+mov ebx, String.Append.$local.s
 mov ecx, [String.Append.$local.q]
 push ecx
 call String.GetChar
@@ -908,8 +907,7 @@ mov [String.Append.$local.ch], cl
 	jmp String.$loop_while.0_open
 String.$loop_while.0_end :
 mov ecx, [ebx]
-mov ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
-sub ecx, 1	; INLINE ASSEMBLY
+add ecx, [String.Append.$local.q]	; INLINE ASSEMBLY
 mov byte [ecx], 0x0	; INLINE ASSEMBLY
 pop edx
 pop ebx
@@ -1104,12 +1102,12 @@ mov edx, ecx
 mov ecx, [String.RawToWhite.$local.length]
 cmp edx, ecx
 pop edx
-jl String.$comp_45.true
+jl String.$comp_43.true
 mov cl, 0x0
-jmp String.$comp_45.done
-String.$comp_45.true :
+jmp String.$comp_43.done
+String.$comp_43.true :
 mov cl, 0xFF
-String.$comp_45.done :
+String.$comp_43.done :
 
 cmp cl, 0xFF
 	je String.$loop_for.0_open
@@ -1159,12 +1157,12 @@ mov edx, ecx
 mov ecx, 0
 cmp edx, ecx
 pop edx
-jne String.$comp_50.true
+jne String.$comp_48.true
 mov cl, 0x0
-jmp String.$comp_50.done
-String.$comp_50.true :
+jmp String.$comp_48.done
+String.$comp_48.true :
 mov cl, 0xFF
-String.$comp_50.done :
+String.$comp_48.done :
 
 cmp cl, 0xFF
 	jne String.$loop_while.1_end
@@ -1220,12 +1218,12 @@ call String.GetLength
 pop ebx
 cmp edx, ecx
 pop edx
-jne String.$comp_57.true
+jne String.$comp_55.true
 mov cl, 0x0
-jmp String.$comp_57.done
-String.$comp_57.true :
+jmp String.$comp_55.done
+String.$comp_55.true :
 mov cl, 0xFF
-String.$comp_57.done :
+String.$comp_55.done :
 
 cmp cl, 0xFF
 	jne String.$loop_if.0_close
@@ -1256,12 +1254,12 @@ call String.GetChar
 pop ebx
 cmp edx, ecx
 pop edx
-jne String.$comp_60.true
+jne String.$comp_58.true
 mov cl, 0x0
-jmp String.$comp_60.done
-String.$comp_60.true :
+jmp String.$comp_58.done
+String.$comp_58.true :
 mov cl, 0xFF
-String.$comp_60.done :
+String.$comp_58.done :
 
 cmp cl, 0xFF
 	jne String.$loop_if.1_close
@@ -1286,12 +1284,12 @@ mov edx, ecx
 mov ecx, [String.Equals.$local.finish]
 cmp edx, ecx
 pop edx
-jl String.$comp_62.true
+jl String.$comp_60.true
 mov cl, 0x0
-jmp String.$comp_62.done
-String.$comp_62.true :
+jmp String.$comp_60.done
+String.$comp_60.true :
 mov cl, 0xFF
-String.$comp_62.done :
+String.$comp_60.done :
 
 cmp cl, 0xFF
 	je String.$loop_for.1_open

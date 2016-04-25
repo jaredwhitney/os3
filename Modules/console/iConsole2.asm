@@ -10,7 +10,7 @@ iConsole2.Init :
 		mov [iConsole2.window], ecx
 		mov dword [ecx+Grouping_backingColor], 0xFF000000
 		
-		push dword 500
+		push dword iConsole2.BUFFER_SIZE
 		push dword 0
 		push dword 0
 		push dword 300*4
@@ -34,6 +34,9 @@ iConsole2.Init :
 		call iConsole2.RegisterCommand	
 		
 		push dword iConsole2.COMMAND_CLEAR
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_HELP
 		call iConsole2.RegisterCommand
 		
 	popa
@@ -73,23 +76,6 @@ iConsole2.HandleKeyEvent :
 		cmp bl, endstr
 			jne .loop
 
-;mov ebx, [iConsole2.text]
-;			
-;mov eax, iConsole2.QUOTES
-;call TextArea.AppendText
-;mov eax, [iConsole2.commandBase]
-;mov eax, [eax]
-;call TextArea.AppendText
-;mov eax, iConsole2.QUOTES
-;call TextArea.AppendText
-;
-;mov eax, iConsole2.QUOTES
-;call TextArea.AppendText
-;mov eax, iConsole2.commandStore
-;call TextArea.AppendText
-;mov eax, iConsole2.QUOTES
-;call TextArea.AppendText
-
 		mov eax, [iConsole2.commandBase]
 		mov ebx, iConsole2.commandStore
 		.cloop :		; need to add a quit if it turns out the command was unknown!
@@ -115,6 +101,7 @@ iConsole2.HandleKeyEvent :
 		push dword iConsole2.INVALID_COMMAND
 		call iConsole2.Echo
 		mov esp, [0x1000]
+		call iConsole2.PrintPrompt
 		popa
 		ret
 iConsole2.QUOTES :
@@ -178,14 +165,38 @@ dd iConsole2.ClearScreen
 dd null
 iConsole2.ClearScreen :
 	enter 0, 0
-		mov ebx, [iConsole2.text]
-		mov ebx, [ebx+Textarea_text]
-		mov byte [ebx], 0
-		mov byte [ebx+1], 0
+		mov ebx, iConsole2.BUFFER_SIZE
+		mov eax, [iConsole2.text] 
+		mov eax, [eax+Textarea_text]
+		call Buffer.clear
 	leave
 	ret 0
 iConsole2.STR_CLEAR :
 	db "clear", 0
+
+iConsole2.COMMAND_HELP :
+dd iConsole2.STR_HELP
+dd iConsole2.DisplayHelp
+dd null
+iConsole2.DisplayHelp :
+	enter 0, 0
+		mov ebx, [iConsole2.text]
+		mov eax, [iConsole2.commandBase]
+		.loop :
+		mov ecx, eax
+		mov eax, [eax+command_name]
+		call TextArea.AppendText
+		mov eax, iConsole2.DisplayHelp.STR_SEPERATOR
+		call TextArea.AppendText
+		mov eax, [ecx+command_nextLink]
+		cmp eax, null
+			jne .loop
+	leave
+	ret 0
+iConsole2.DisplayHelp.STR_SEPERATOR :
+	db ",", newline, null
+iConsole2.STR_HELP :
+	db "help", 0
 
 iConsole2.RegisterCommand :	; Command command
 	enter 0, 0
@@ -231,3 +242,5 @@ iConsole2.commandBase :
 command_name		equ 0x0
 command_function	equ 0x4
 command_nextLink	equ 0x8
+
+iConsole2.BUFFER_SIZE	equ 500

@@ -116,7 +116,7 @@ classdef iConsole
 					sub = 0x1
 				
 				if command.Equals("format")
-					asm("call Minnow3.doFormatPartition")
+					asm("call Minnow4.reformatDisk")
 				
 				if command.Equals("debug")
 					asm("call Minnow3.dumpChunks")
