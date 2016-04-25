@@ -45,6 +45,7 @@
 %include "..\Tools\System\Time.asm"
 %include "..\Tools\System\Guppy.asm"
 ;%include "..\Tools\System\Minnow.asm"
+%include "..\Tools\System\Minnow4.asm"
 %include "..\Tools\System\Minnow3.asm"
 %include "..\Tools\System\Minnow2.asm"
 %include "..\Tools\System\GetValue.asm"
