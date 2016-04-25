@@ -1,21 +1,41 @@
 Minnow4.doTest :
+
 		mov eax, Minnow4.doTest.NAME
 		call Minnow4.createFile
 		mov eax, Minnow4.doTest.NAME2
 		call Minnow4.createFile
+		
+		mov eax, Minnow4.doTest.NAME
+		call Minnow4.getFilePointer
+		mov ecx, Minnow4.TEST_DATA
+		call Minnow4.writeFileBlock
+		
 		mov eax, Minnow4.doTest.NAME2
 		call Minnow4.getFilePointer
-		call console.numOut
+		mov ecx, Minnow4.TEST_DATA_2
+		call Minnow4.writeFileBlock
+
+		mov eax, Minnow4.doTest.NAME
+		call Minnow4.getFilePointer
+		call Minnow4.readFileBlock
+		mov ebx, ecx
+		call console.println
 		call console.newline
-		mov ebx, eax
-		call console.numOut
-		call console.newline
+		mov eax, Minnow4.doTest.NAME2
+		call Minnow4.getFilePointer
+		call Minnow4.readFileBlock
+		mov ebx, ecx
+		call console.println
 	popa
 	ret
 Minnow4.doTest.NAME :
 	db "Test file", null
 Minnow4.doTest.NAME2 :
 	db "MFS Logfile", null
+Minnow4.TEST_DATA :
+	db "This is just some text that has been written to a file.", newline, "Seriously, nothing to see here.", newline, "Just some random test data...", null
+Minnow4.TEST_DATA_2 :
+	db "[Log]", newline, newline, "This log is completely useless as it is currently unimplemented.", newline, newline, "Sorry about that.", null
 
 Minnow4.init :
 	pusha
@@ -54,6 +74,10 @@ Minnow4.init :
 		mov eax, [Minnow4.fs_base]
 		add eax, [Minnow4.fs_size]
 		mov [Minnow4.fs_limit], eax
+			mov eax, 0x7
+			mov ebx, 1
+			call Guppy.malloc
+			mov [Minnow4.setupFileBlock.data], ebx
 		mov dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 	popa
 	ret
@@ -160,7 +184,44 @@ Minnow4.readFileBlock :	; eax = int block : returns ecx = Buffer data
 		add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
 	ret
 
-Minnow4.writeFileBlock :
+Minnow4.writeFileBlock :	; eax = int block, ecx = Buffer data (of size 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE)
+	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
+		jne Minnow4.kGoRet
+	pusha
+		mov [Minnow4.writeFileBlock.block], eax
+		mov edx, ecx
+		call Minnow4.readFileBlock
+		sub ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
+		cmp dword [ecx+Minnow4_BlockDescriptor_nextPointer], Minnow4_BlockDescriptor.INDEX_BLOCK_UNUSED
+			jne .dontAllocNew
+		mov eax, ecx
+		call Minnow4.getFirstOpenBlock
+		mov dword [eax+Minnow4_BlockDescriptor_stringIndex], Minnow4_BlockDescriptor.INDEX_FILE_DATA
+		mov [eax+Minnow4_BlockDescriptor_nextPointer], ecx
+		call Minnow4.setupFileBlock
+		mov ecx, eax
+		.dontAllocNew :
+		; copy buffer from edx into ecx
+		push ecx
+		add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
+		mov ebx, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		.loop :
+		mov eax, [edx]
+		mov [ecx], eax
+		sub ebx, 4
+		add edx, 4
+		add ecx, 4
+		cmp ebx, 0x0
+			jg .loop
+		mov eax, [Minnow4.writeFileBlock.block]
+		pop ecx
+		call Minnow4.writeBlock
+	popa
+	ret
+Minnow4.writeFileBlock.block :
+	dd 0x0
+
+Minnow4.writeBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
@@ -168,7 +229,7 @@ Minnow4.writeFileBlock :
 	popa
 	ret
 
-Minnow4.writeBuffer :
+Minnow4.readBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize : returns ecx = Buffer data
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
@@ -176,7 +237,7 @@ Minnow4.writeBuffer :
 	popa
 	ret
 
-Minnow4.readBuffer :
+Minnow4.renameFile :	; eax = int block, ebx = String newName
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
@@ -184,15 +245,7 @@ Minnow4.readBuffer :
 	popa
 	ret
 
-Minnow4.renameFile :
-	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
-		jne Minnow4.kGoRet
-	pusha
-		
-	popa
-	ret
-
-Minnow4.deleteFile :
+Minnow4.deleteFile :	; eax = int block
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
@@ -313,22 +366,16 @@ Minnow4.setupFileBlock :	; eax = String name, ecx = int block
 	pusha
 		; should actually store name in file block!
 		mov eax, ecx
-		mov ecx, [Minnow4.readBlock.data]
+		mov ecx, [Minnow4.setupFileBlock.data]
 		call Minnow4.readBlock
-		mov dword [ecx+Minnow4_BlockDescriptor_stringIndex], 0xDEADF154
+		mov dword [ecx+Minnow4_BlockDescriptor_stringIndex], Minnow4_BlockDescriptor.INDEX_FILE_END
 		call Minnow4.writeBlock
 	popa
 	ret
+Minnow4.setupFileBlock.data :
+	dd 0x0
 
-Minnow4.getNextFileBlock :
-	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
-		jne Minnow4.kGoRet
-	pusha
-		
-	popa
-	ret
-
-Minnow4.getLastNameBlock :
+Minnow4.getNextFileBlock :	; eax = int block : returns eax = int newBlock
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
