@@ -4,12 +4,14 @@ dd Minnow4.doTest
 dd null
 Minnow4.doTest :
 	enter 0, 0
+	
 		mov eax, Minnow4.doTest.fileName
 		call Minnow4.createFile
 		
 		mov ecx, [Dolphin2.flipBuffer]
-		mov edx, [Graphics.SCREEN_SIZE]
-		call Minnow4.writeFileBlock;Buffer
+		mov edx, [Graphics.SCREEN_WIDTH]
+		imul edx, [Graphics.SCREEN_HEIGHT]
+		call Minnow4.writeBuffer
 		
 	leave
 	ret 0
@@ -27,10 +29,15 @@ Minnow4.viewImage :
 		mov eax, [ebp+8]
 		call Minnow4.getFilePointer
 		mov ecx, [Graphics.SCREEN_MEMPOS]
-		mov edx, [Graphics.SCREEN_SIZE]
+		mov edx, [Graphics.SCREEN_WIDTH]
+		imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
-	cli
-	hlt
+		;mov eax, 5000*2
+		;call System.sleep
+		mov ebx, [Dolphin2.compositorGrouping]
+		call Grouping.DoUpdate
+	leave
+	ret 4
 Minnow4.STR_VIEW_IMAGE :
 	db "vimg", null
 
@@ -264,6 +271,7 @@ Minnow4.readBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize : 
 		call Minnow4.getNextFileBlock
 		jmp Minnow4.readBuffer.loop
 	Minnow4.readBuffer.ret :
+	pop eax
 	popa
 	ret
 Minnow4.readBuffer.data :
@@ -425,7 +433,7 @@ Minnow4.getFirstOpenBlock :	; returns ecx = int block
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	push eax
-		xor eax, eax
+		mov eax, [Minnow4.getFirstOpenBlock.lastFree]
 		mov ecx, [Minnow4.readBlock.data]
 		Minnow4.getFirstOpenBlock.keepSearching :
 		call Minnow4.readBlock
@@ -435,8 +443,12 @@ Minnow4.getFirstOpenBlock :	; returns ecx = int block
 		jmp Minnow4.getFirstOpenBlock.keepSearching
 		Minnow4.getFirstOpenBlock.ret :
 		mov ecx, eax
+		add eax, 1
+		mov [Minnow4.getFirstOpenBlock.lastFree], eax
 	pop eax
 	ret
+Minnow4.getFirstOpenBlock.lastFree :
+	dd 0x0
 
 Minnow4.readBlock :	; eax = int block, ecx = Buffer buffer : returns ecx = Buffer data
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED

@@ -75,6 +75,8 @@ iConsole2.HandleKeyEvent :
 		.notspace :
 		cmp bl, endstr
 			jne .loop
+		
+		mov byte [eax-2], null	; get rid of the trailing enter
 
 		mov eax, [iConsole2.commandBase]
 		mov ebx, iConsole2.commandStore
