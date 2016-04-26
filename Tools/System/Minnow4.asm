@@ -1,5 +1,5 @@
 Minnow4.doTest :
-
+	pusha
 		mov eax, Minnow4.doTest.NAME
 		call Minnow4.createFile
 		mov eax, Minnow4.doTest.NAME2

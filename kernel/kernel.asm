@@ -83,7 +83,8 @@ Kernel.init :
 	;	INITIALIZE THE AHCI DRIVER	;
 		call ATA_DETECT
 		
-		call Minnow3.loadFS
+		;call Minnow3.loadFS
+		call Minnow4.init
 		;call AHCI.searchForDataBlock	; be really surprised if this works!
 		;mov eax, 0x1
 		;mov bx, 0x0
