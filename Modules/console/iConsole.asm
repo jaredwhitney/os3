@@ -178,8 +178,6 @@ console.test :	; command that can be used to test anything.
 pusha
 mov bl, [console.pnum]
 call ProgramManager.setActive	; Make removable Later
-	
-jmp Minnow4.doTest
 
 	mov byte [INTERRUPT_DISABLE], 0xFF
 	
