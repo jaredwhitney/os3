@@ -1,41 +1,38 @@
+Minnow4.COMMAND_DO_TEST :
+dd Minnow4.STR_DO_TEST
+dd Minnow4.doTest
+dd null
 Minnow4.doTest :
-	pusha
-		mov eax, Minnow4.doTest.NAME
-		call Minnow4.createFile
-		mov eax, Minnow4.doTest.NAME2
+	enter 0, 0
+		mov eax, Minnow4.doTest.fileName
 		call Minnow4.createFile
 		
-		mov eax, Minnow4.doTest.NAME
-		call Minnow4.getFilePointer
-		mov ecx, Minnow4.TEST_DATA
-		call Minnow4.writeFileBlock
+		mov ecx, [Dolphin2.flipBuffer]
+		mov edx, [Graphics.SCREEN_SIZE]
+		call Minnow4.writeFileBlock;Buffer
 		
-		mov eax, Minnow4.doTest.NAME2
-		call Minnow4.getFilePointer
-		mov ecx, Minnow4.TEST_DATA_2
-		call Minnow4.writeFileBlock
+	leave
+	ret 0
+Minnow4.STR_DO_TEST :
+	db "screenshot", null
+Minnow4.doTest.fileName :
+	db "screenshot.rawimage", null
 
-		mov eax, Minnow4.doTest.NAME
+Minnow4.COMMAND_VIEW_IMAGE :
+dd Minnow4.STR_VIEW_IMAGE
+dd Minnow4.viewImage
+dd null
+Minnow4.viewImage :
+	enter 0, 0
+		mov eax, [ebp+8]
 		call Minnow4.getFilePointer
-		call Minnow4.readFileBlock
-		mov ebx, ecx
-		call console.println
-		call console.newline
-		mov eax, Minnow4.doTest.NAME2
-		call Minnow4.getFilePointer
-		call Minnow4.readFileBlock
-		mov ebx, ecx
-		call console.println
-	popa
-	ret
-Minnow4.doTest.NAME :
-	db "Test file", null
-Minnow4.doTest.NAME2 :
-	db "MFS Logfile", null
-Minnow4.TEST_DATA :
-	db "This is just some text that has been written to a file.", newline, "Seriously, nothing to see here.", newline, "Just some random test data...", null
-Minnow4.TEST_DATA_2 :
-	db "[Log]", newline, newline, "This log is completely useless as it is currently unimplemented.", newline, newline, "Sorry about that.", null
+		mov ecx, [Graphics.SCREEN_MEMPOS]
+		mov edx, [Graphics.SCREEN_SIZE]
+		call Minnow4.readBuffer
+	cli
+	hlt
+Minnow4.STR_VIEW_IMAGE :
+	db "vimg", null
 
 Minnow4.init :
 	pusha
@@ -78,6 +75,12 @@ Minnow4.init :
 			mov ebx, 1
 			call Guppy.malloc
 			mov [Minnow4.setupFileBlock.data], ebx
+			add ebx, 0x200
+			mov [Minnow4.getNextFileBlock.data], ebx
+		push dword Minnow4.COMMAND_DO_TEST
+		call iConsole2.RegisterCommand
+		push dword Minnow4.COMMAND_VIEW_IMAGE
+		call iConsole2.RegisterCommand
 		mov dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 	popa
 	ret
@@ -225,7 +228,13 @@ Minnow4.writeBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
-		
+		Minnow4.writeBuffer.loop :
+		call Minnow4.writeFileBlock
+		call Minnow4.getNextFileBlock
+		add ecx, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		sub edx, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		cmp edx, 0x0
+			jg Minnow4.writeBuffer.loop
 	popa
 	ret
 
@@ -233,9 +242,34 @@ Minnow4.readBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize : 
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
-		
+		mov [Minnow4.readBuffer.data], ecx
+		mov [Minnow4.readBuffer.byteSize], edx
+		mov edx, [Minnow4.readBuffer.data]
+		Minnow4.readBuffer.loop :
+		call Minnow4.readFileBlock
+		mov ebx, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		push eax
+		.copyDataLoop :
+		mov eax, [ecx]
+		mov [edx], eax
+		sub dword [Minnow4.readBuffer.byteSize], 4
+		cmp dword [Minnow4.readBuffer.byteSize], 0x0
+			jle Minnow4.readBuffer.ret
+		sub ebx, 4
+		add ecx, 4
+		add edx, 4
+		cmp ebx, 0x0
+			jg .copyDataLoop
+		pop eax
+		call Minnow4.getNextFileBlock
+		jmp Minnow4.readBuffer.loop
+	Minnow4.readBuffer.ret :
 	popa
 	ret
+Minnow4.readBuffer.data :
+	dd 0x0
+Minnow4.readBuffer.byteSize :
+	dd 0x0
 
 Minnow4.renameFile :	; eax = int block, ebx = String newName
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
@@ -378,10 +412,14 @@ Minnow4.setupFileBlock.data :
 Minnow4.getNextFileBlock :	; eax = int block : returns eax = int newBlock
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
-	pusha
-		
-	popa
+	push ecx
+		mov ecx, [Minnow4.getNextFileBlock.data]
+		call Minnow4.readBlock
+		mov eax, [ecx+Minnow4_BlockDescriptor_nextPointer]
+	pop ecx
 	ret
+Minnow4.getNextFileBlock.data :
+	dd 0x0
 
 Minnow4.getFirstOpenBlock :	; returns ecx = int block
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
