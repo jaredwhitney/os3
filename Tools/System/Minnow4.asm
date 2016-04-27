@@ -5,7 +5,7 @@ dd null
 Minnow4.doTest :
 	enter 0, 0
 	
-		mov eax, Minnow4.doTest.fileName
+		mov eax, [ebp+8]
 		call Minnow4.createFile
 		
 		mov ecx, [Dolphin2.flipBuffer]
@@ -17,8 +17,6 @@ Minnow4.doTest :
 	ret 0
 Minnow4.STR_DO_TEST :
 	db "screenshot", null
-Minnow4.doTest.fileName :
-	db "screenshot.rawimage", null
 
 Minnow4.COMMAND_VIEW_IMAGE :
 dd Minnow4.STR_VIEW_IMAGE
@@ -26,20 +24,49 @@ dd Minnow4.viewImage
 dd null
 Minnow4.viewImage :
 	enter 0, 0
+		push Minnow4.viewImage.windowTitle
+		push dword 0*4
+		push dword 0
+		push dword 300*4
+		push dword 300
+		call Dolphin2.makeWindow
+		mov [Minnow4.viewImage.window], ecx
+		
+		mov ebx, [Graphics.SCREEN_WIDTH]
+		imul ebx, [Graphics.SCREEN_HEIGHT]
+		call ProgramManager.reserveMemory
+		mov [Minnow4.viewImage.buffer], ebx
+		
 		mov eax, [ebp+8]
 		call Minnow4.getFilePointer
-		mov ecx, [Graphics.SCREEN_MEMPOS]
+		mov ecx, [Minnow4.viewImage.buffer]
 		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
-		mov eax, 5000*2
-		call System.sleep
-		mov ebx, [Dolphin2.compositorGrouping]
-		call Grouping.DoUpdate
+		
+		push dword [Minnow4.viewImage.buffer]
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
+		push dword 0*4
+		push dword 0;3
+		push dword 300*4
+		push dword 300
+		call Image.Create
+		
+		mov eax, ecx
+		mov ebx, [Minnow4.viewImage.window]
+		call Grouping.Add
+		
 	leave
 	ret 4
 Minnow4.STR_VIEW_IMAGE :
 	db "vimg", null
+Minnow4.viewImage.windowTitle :
+	db "Image Viewer", null
+Minnow4.viewImage.window :
+	dd 0x0
+Minnow4.viewImage.buffer :
+	dd 0x0
 
 Minnow4.init :
 	pusha

@@ -88,7 +88,7 @@ Image.Render :	; Image in ebx
 			mov eax, [ebx+Image_sh]
 			Image.Render.nos1 :
 		mov dword [Image.copyRegion.h], eax
-		mov eax, [Dolphin2.bgimg]
+		mov eax, [ebx+Image_source]
 		mov [Image.copyRegion.obuf], eax
 		mov eax, [ebx+Image_image]
 		mov [Image.copyRegion.nbuf], eax
