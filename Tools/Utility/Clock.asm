@@ -189,16 +189,24 @@ ret
 
 System.sleep :	; tics in eax
 pusha
+xor ecx, ecx
 mov ebx, [Clock.tics]
 add eax, ebx
 System.sleepLoop :
 nop
 mov ebx, [Clock.tics]
 cmp ebx, eax
-	jle System.sleepLoop
+	jb System.sleepLoop.go
+	jne System.sleep.ret
+inc ecx
+cmp ecx, 100
+	jb System.sleepLoop
+System.sleep.ret :
 popa
 ret
-
+System.sleepLoop.go :
+xor ecx, ecx
+jmp System.sleepLoop
 
 Clock.window :
 	dd 0x0

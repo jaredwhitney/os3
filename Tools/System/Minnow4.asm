@@ -32,8 +32,8 @@ Minnow4.viewImage :
 		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
-		;mov eax, 5000*2
-		;call System.sleep
+		mov eax, 5000*2
+		call System.sleep
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.DoUpdate
 	leave
@@ -242,6 +242,7 @@ Minnow4.writeBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize
 		sub edx, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
 		cmp edx, 0x0
 			jg Minnow4.writeBuffer.loop
+		mov dword [Minnow4.getFirstOpenBlock.lastFree], 0x0
 	popa
 	ret
 
