@@ -12,7 +12,7 @@ pusha
 	;	je console.init.novesa
 	call Window.getSectorSize	; <- eax
 	add eax, 0x1
-	add eax, 4050
+	add eax, 12000;4050
 	mov ebx, eax
 	console.init.novesa :
 	call ProgramManager.requestMemory

@@ -22,6 +22,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, 0x7
 		mov ebx, Component_CLASS_SIZE+32
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov edx, ebx
 			
 			pusha

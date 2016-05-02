@@ -21,6 +21,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	push ebx
 		mov ebx, Component_CLASS_SIZE+16
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [TextArea.Create.len]
 		mov [ebx+Textarea_len], eax
 		pusha

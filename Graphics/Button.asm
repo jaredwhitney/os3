@@ -20,6 +20,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	push ebx
 		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [Button.Create.text]
 		mov [ebx+Button_text], eax
 		mov eax, [Button.Create.onClick]
