@@ -37,6 +37,10 @@ Minnow4.viewImage :
 		call ProgramManager.reserveMemory
 		mov [Minnow4.viewImage.buffer], ebx
 		
+		cmp dword [_init], true
+			je .nop
+		mov dword [_init], true
+		
 		mov eax, [ebp+8]
 		call Minnow4.getFilePointer
 		mov ecx, [Minnow4.viewImage.buffer]
@@ -44,14 +48,17 @@ Minnow4.viewImage :
 		imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
 		
+		.nop :
+		
 		push dword [Minnow4.viewImage.buffer]
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
 		push dword 0*4
 		push dword 0;3
-		push dword 300*4
-		push dword 300
+		push dword 8*4;[Graphics.SCREEN_WIDTH]
+		push dword 8;[Graphics.SCREEN_HEIGHT]
 		call Image.Create
+		mov dword [ecx+Component_mouseHandlerFunc], null
 		
 		mov eax, ecx
 		mov ebx, [Minnow4.viewImage.window]
@@ -67,6 +74,8 @@ Minnow4.viewImage.window :
 	dd 0x0
 Minnow4.viewImage.buffer :
 	dd 0x0
+_init :
+	dd false
 
 Minnow4.init :
 	pusha

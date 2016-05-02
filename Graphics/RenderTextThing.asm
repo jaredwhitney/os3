@@ -93,6 +93,13 @@ Component.keyHandlerPointers :
 	dd Component.killfunc, Component.discardKeyboardEvent, TextArea.onKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent
 Component.keyChar :
 	db 0x0
+Component.initToDefaults :
+	mov dword [ebx+Component_keyHandlerFunc], null
+	mov dword [ebx+Component_mouseHandlerFunc], null
+	mov dword [ebx+Component_renderFunc], null
+	mov dword [ebx+Component_nextLinked], null
+	mov dword [ebx+Component_transparent], false
+ret
 	
 Textline_type	equ 0
 Textline_image	equ 4
@@ -113,6 +120,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 	push ebx
 		mov ebx, Component_CLASS_SIZE+4
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [TextLine.Create.str]
 		mov [ebx+Textline_text], eax
 		mov eax, [TextLine.Create.x]

@@ -18,6 +18,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	push ebx
 		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [Grouping.Create.x]
 		mov [ebx+Grouping_x], eax
 		mov eax, [Grouping.Create.y]

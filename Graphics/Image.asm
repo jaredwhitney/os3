@@ -22,6 +22,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	push ebx
 		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [Image.Create.source]
 		mov [ebx+Image_source], eax
 		mov eax, [Image.Create.sw]
@@ -119,6 +120,7 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 	push ebx
 		mov ebx, Component_CLASS_SIZE+12
 		call ProgramManager.reserveMemory
+		call Component.initToDefaults
 		mov eax, [ImageScalable.Create.source]
 		mov [ebx+Imagescalable_source], eax
 		mov eax, [ImageScalable.Create.sw]
