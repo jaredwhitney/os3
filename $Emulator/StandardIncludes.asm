@@ -1,6 +1,6 @@
 %include "..\boot\betterRealMode.asm"
 %include "..\boot\IDTmain.asm"
-;%include "..\boot\realMode.asm"
+%include "..\boot\detection.asm"
 %include "..\Drivers\GFX\Generic_Display.asm"
 %include "..\Drivers\PS2\PS_2.asm"
 %include "..\Drivers\PS2\Generic_Mouse.asm"
