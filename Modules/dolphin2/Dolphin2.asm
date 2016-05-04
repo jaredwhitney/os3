@@ -210,14 +210,14 @@ Dolphin2.showLoginScreen :
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
 		call Image.Create
-		push dword [Dolphin2.bgimg]	; TESTING!~!!
-		push dword 1024*4
-		push dword 768
-		push dword 0
-		push dword 0
-		push dword [Graphics.SCREEN_WIDTH]
-		push dword [Graphics.SCREEN_HEIGHT]
-		call Image.Create	; TESTING!~!!
+	;	push dword [Dolphin2.bgimg]	; TESTING!~!!
+	;	push dword 1024*4
+	;	push dword 768
+	;	push dword 0
+	;	push dword 0
+	;	push dword [Graphics.SCREEN_WIDTH]
+	;	push dword [Graphics.SCREEN_HEIGHT]
+	;	call Image.Create	; TESTING!~!!
 		mov eax, ecx
 		call Grouping.Add
 		push dword 200*4
