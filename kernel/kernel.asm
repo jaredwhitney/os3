@@ -203,9 +203,12 @@ Kernel.init :
 		mov eax, 0x3050
 		mov ecx, [0x3050-4]
 		.goloop :
-		mov ebx, [eax+region_type]
-		cmp ebx, 1
-			je .noprint
+		mov ebx, [eax+region_base]
+		cmp ebx, 0x3b00000
+			ja .noprint
+		add ebx, [eax+region_length]
+		cmp ebx, 0x379deeb
+			jb .noprint
 		mov ebx, [eax+region_base]
 		call console.numOut
 		call console.newline
@@ -367,6 +370,8 @@ kernel.textInit :
 	
 	;	PRINT A NEWLINE	;
 		call console.newline
+		
+		call MemoryCheck.run
 	
 	ret
 

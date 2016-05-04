@@ -66,6 +66,7 @@
 %include "..\kernel\Paging.asm"
 
 %include "..\debug\TextMode.asm"
+%include "..\debug\MemoryCheck.asm"
 %include "..\debug\print.asm"	; depricated
 
 %include "..\Meta\Graphics\Window.asm"
