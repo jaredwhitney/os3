@@ -181,24 +181,25 @@ call ProgramManager.setActive	; Make removable Later
 
 	mov byte [INTERRUPT_DISABLE], 0xFF
 	
+	call Minnow4.init
+	
 	mov eax, [os_imageDataBaseLBA]
 	xor ebx, ebx
 	mov edx, 1024*4*768
 	call rmATA.DMAread
 	mov [Dolphin2.bgimg], ecx
-
 	
 	call Dolphin2.createCompositorGrouping
 	
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
 		
-		call SimpleRender.init
+;		call SimpleRender.init
 		call iConsole2.Init
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
 	GoDoLoop :
-	call SimpleRender.runOnce
+;	call SimpleRender.runOnce
 	call Dolphin2.renderScreen
 ;	mov al, '!'
 ;	call TextArea.AppendChar

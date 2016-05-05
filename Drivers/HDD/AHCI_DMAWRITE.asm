@@ -77,9 +77,13 @@ AHCI.DMAwrite.allocateMemory :
 		xor edx, edx
 		idiv ecx
 		add eax, 12
+		imul eax, 0x1000
 		mov ebx, eax
-		mov eax, 0x5
-		call Guppy.malloc
+		mov eax, [ProgramManager.creationOffset]
+		and eax, ~(0xFFF)
+		add eax, 0x1000
+		mov [ProgramManager.creationOffset], eax
+		call ProgramManager.reserveMemory
 		mov [AHCI_DMAread_commandLoc], ebx
 		; no need to allocate a data buffer
 	popa

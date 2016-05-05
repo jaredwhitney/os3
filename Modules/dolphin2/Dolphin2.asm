@@ -14,15 +14,11 @@ Dolphin2.createCompositorGrouping :
 		mov [ecx+Component_h], eax
 		
 		push ecx
-		mov eax, [Graphics.SCREEN_SIZE]
-		sub eax, 1
-		xor edx, edx
-		mov ecx, 0x1000
-		idiv ecx
-		add eax, 1
+		mov eax, [Graphics.SCREEN_WIDTH]
+		imul eax, [Graphics.SCREEN_HEIGHT]
 		mov ebx, eax
 		mov al, 8
-		call Guppy.malloc
+		call ProgramManager.reserveMemory;Guppy.malloc
 		mov [Dolphin2.flipBuffer], ebx
 		pop ecx
 		mov [ecx+Component_image], ebx

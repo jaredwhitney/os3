@@ -91,10 +91,14 @@ AHCI.DMAread.allocateMemory :
 		xor edx, edx
 		idiv ecx
 		add eax, 1
+		imul eax, 0x1000
 		; need to allocate ecx sectors for the command
 		mov ebx, eax
-		mov eax, 0x5
-		call Guppy.malloc
+		mov eax, [ProgramManager.creationOffset]
+		and eax, ~(0xFFF)
+		add eax, 0x1000
+		mov [ProgramManager.creationOffset], eax
+		call ProgramManager.reserveMemory;Guppy.malloc
 		mov [AHCI_DMAread_commandLoc], ebx
 		; need to also allocate data buffer here!!!!~!
 		mov eax, [AHCI_DMAread_byteCount]
@@ -103,9 +107,10 @@ AHCI.DMAread.allocateMemory :
 		xor edx, edx
 		idiv ecx
 		add eax, 1
+		imul eax, 0x1000
 		mov ebx, eax
-		mov eax, 0x5
-		call Guppy.malloc
+	;	mov eax, 0x5
+		call ProgramManager.reserveMemory;Guppy.malloc
 		mov [AHCI_DMAread_dataBuffer], ebx
 		
 		; zero out the buffer

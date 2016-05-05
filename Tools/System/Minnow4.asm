@@ -18,6 +18,48 @@ Minnow4.doTest :
 Minnow4.STR_DO_TEST :
 	db "screenshot", null
 
+Minnow4.COMMAND_PRINT_TREE :
+dd Minnow4.STR_PRINT_TREE
+dd Minnow4.printFileTree
+dd null
+Minnow4.printFileTree :
+	enter 0, 0
+		; stuff
+		mov eax, [Minnow4.readBlock.data]
+		add eax, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		mov [Minnow4.printFileTree.threshold], eax
+		mov eax, 0x0
+		.outerloop :
+		call Minnow4.readFileBlock
+		cmp byte [ecx], null
+			je .done
+		.innerloop :
+		cmp byte [ecx], null
+			je .innerloopend
+		push ecx
+		call iConsole2.Echo
+		push Minnow4.printFileTree.sep
+		call iConsole2.Echo
+		mov ebx, ecx
+		call String.getLength
+		add ecx, edx
+		add ecx, 4
+		cmp ecx, [Minnow4.printFileTree.threshold]
+			jl .innerloop
+		.innerloopend :
+		call Minnow4.getNextFileBlock
+		cmp eax, null
+			jne .outerloop
+		.done :
+	leave
+	ret 0
+Minnow4.STR_PRINT_TREE :
+	db "tree", 0
+Minnow4.printFileTree.sep :
+	db ", ", 0
+Minnow4.printFileTree.threshold :
+	dd 0x0
+	
 Minnow4.COMMAND_VIEW_IMAGE :
 dd Minnow4.STR_VIEW_IMAGE
 dd Minnow4.viewImage
@@ -55,8 +97,8 @@ Minnow4.viewImage :
 		push dword [Graphics.SCREEN_HEIGHT]
 		push dword 0*4
 		push dword 0;3
-		push dword 8*4;[Graphics.SCREEN_WIDTH]
-		push dword 8;[Graphics.SCREEN_HEIGHT]
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
 		call Image.Create
 		mov dword [ecx+Component_mouseHandlerFunc], null
 		
@@ -86,6 +128,7 @@ Minnow4.init :
 		xor ebx, ebx
 		mov edx, 0x200
 		call AHCI.DMAread
+		;call SysHaltScreen.show
 		mov [Minnow4.readBlock.data], ecx
 		add ecx, 0x1BE
 		mov edx, 4
@@ -123,6 +166,8 @@ Minnow4.init :
 		push dword Minnow4.COMMAND_DO_TEST
 		call iConsole2.RegisterCommand
 		push dword Minnow4.COMMAND_VIEW_IMAGE
+		call iConsole2.RegisterCommand
+		push dword Minnow4.COMMAND_PRINT_TREE
 		call iConsole2.RegisterCommand
 		mov dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 	popa
