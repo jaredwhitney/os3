@@ -8,6 +8,7 @@
 
 %include "..\modules\dolphin\Dolphin.asm"
 %include "..\modules\dolphin2\Dolphin2.asm"
+%include "..\modules\dolphin2\PromptBox.asm"
 %include "..\modules\dolphin\WindowTools.asm"
 %include "..\modules\dolphin\Update_Text.asm"
 
