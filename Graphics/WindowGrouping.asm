@@ -45,16 +45,16 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 			mov [edx+Grouping_h], eax
 			mov eax, [Graphics.SCREEN_WIDTH]
 			imul eax, [Graphics.SCREEN_HEIGHT]
-			sub eax, 1
-				push edx
-				xor edx, edx
-				mov ecx, 0x1000
-				idiv ecx
-				pop edx
+		;	sub eax, 1
+		;		push edx
+		;		xor edx, edx
+		;		mov ecx, 0x1000
+		;		idiv ecx
+		;		pop edx
 			mov ebx, eax
-			add ebx, 1
+		;	add ebx, 1
 			mov al, 0x7
-			call Guppy.malloc
+			call ProgramManager.reserveMemory
 			mov [edx+Grouping_image], ebx
 		
 		push dword 4*4

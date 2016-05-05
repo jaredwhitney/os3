@@ -84,7 +84,7 @@ Kernel.init :
 		call ATA_DETECT
 		
 		;call Minnow3.loadFS
-		call Minnow4.init
+		
 		;call AHCI.searchForDataBlock	; be really surprised if this works!
 		;mov eax, 0x1
 		;mov bx, 0x0
@@ -196,30 +196,30 @@ Kernel.init :
 					; FPUTESTSTR_2 :
 						; db "sin(2) = 0x", 0x0
 						
-		mov dword [os_RealMode_functionPointer], rmDetectAllRAM
-		pusha
-		call os.hopToRealMode
-		popa
-		mov eax, 0x3050
-		mov ecx, [0x3050-4]
-		.goloop :
-		mov ebx, [eax+region_type]
-		cmp ebx, 1
-			je .noprint
-		mov ebx, [eax+region_base]
-		call console.numOut
-		call console.newline
-		mov ebx, [eax+region_length]
-		call console.numOut
-		call console.newline
-		mov ebx, [eax+region_type]
-		call console.numOut
-		call console.newline
-		.noprint :
-		add eax, 20
-		sub ecx, 1
-		cmp ecx, 0x0
-			jg .goloop
+	;	mov dword [os_RealMode_functionPointer], rmDetectAllRAM
+	;	pusha
+	;	call os.hopToRealMode
+	;	popa
+	;	mov eax, 0x3050
+	;	mov ecx, [0x3050-4]
+	;	.goloop :
+	;	mov ebx, [eax+region_type]
+	;	cmp ebx, 1
+	;		je .noprint
+	;	mov ebx, [eax+region_base]
+	;	call console.numOut
+	;	call console.newline
+	;	mov ebx, [eax+region_length]
+	;	call console.numOut
+	;	call console.newline
+	;	mov ebx, [eax+region_type]
+	;	call console.numOut
+	;	call console.newline
+	;	.noprint :
+	;	add eax, 20
+	;	sub ecx, 1
+	;	cmp ecx, 0x0
+	;		jg .goloop
 	
 	;	ACTUALLY LOCK IT	;
 	call Manager.handleLock

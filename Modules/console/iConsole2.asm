@@ -5,7 +5,7 @@ iConsole2.Init :
 		push dword 0*4
 		push dword 0
 		push dword 300*4
-		push dword 100
+		push dword 400
 		call Dolphin2.makeWindow
 		mov [iConsole2.window], ecx
 		mov dword [ecx+Grouping_backingColor], 0xFF000000
@@ -14,7 +14,7 @@ iConsole2.Init :
 		push dword 0
 		push dword 0
 		push dword 300*4
-		push dword 100
+		push dword 400
 		push dword FALSE
 		call TextArea.Create
 		mov dword [ecx+Component_keyHandlerFunc], iConsole2.HandleKeyEvent
@@ -245,4 +245,4 @@ command_name		equ 0x0
 command_function	equ 0x4
 command_nextLink	equ 0x8
 
-iConsole2.BUFFER_SIZE	equ 500
+iConsole2.BUFFER_SIZE	equ 1500
