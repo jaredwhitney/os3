@@ -367,6 +367,8 @@ kernel.textInit :
 	
 	;	PRINT A NEWLINE	;
 		call console.newline
+		
+		call MemoryCheck.run
 	
 	ret
 

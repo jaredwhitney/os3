@@ -103,7 +103,14 @@ pop eax
 pop ecx
 pop edx
 pop eax
+	pusha
+	mov eax, ebx
+	mov ebx, 0x1000
+	call Buffer.clear
+	popa
+	ret
 ret	; EBX = Start of allocated memory
+
 
 MALLOC :
 db "malloc: ", 0
