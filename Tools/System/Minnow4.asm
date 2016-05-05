@@ -157,9 +157,10 @@ Minnow4.init :
 		mov eax, [Minnow4.fs_base]
 		add eax, [Minnow4.fs_size]
 		mov [Minnow4.fs_limit], eax
-			mov eax, 0x7
-			mov ebx, 1
-			call Guppy.malloc
+			;mov eax, 0x7
+			mov ebx, 0x1000
+			;call Guppy.malloc
+			call ProgramManager.reserveMemory
 			mov [Minnow4.setupFileBlock.data], ebx
 			add ebx, 0x200
 			mov [Minnow4.getNextFileBlock.data], ebx

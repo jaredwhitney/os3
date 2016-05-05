@@ -153,13 +153,21 @@ dd iConsole2.Echo
 dd null
 iConsole2.Echo :	; String text
 	enter 0, 0
-		mov eax, [ebp+8]
+		;mov eax, [ebp+8]
+				push dword asdasd
+				push dword dsadsa
+				call PromptBox.WaitForResponse
+				mov eax, ecx
 		mov ebx, [iConsole2.text]
 		call TextArea.AppendText
 	leave
 	ret 4
 iConsole2.STR_ECHO :
 	db "echo", 0
+	asdasd :
+	db "iConsole Echo", 0
+	dsadsa :
+	db "String to echo?", 0
 
 iConsole2.COMMAND_CLEAR :
 dd iConsole2.STR_CLEAR
