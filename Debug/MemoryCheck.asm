@@ -1,6 +1,9 @@
 MemoryCheck.run :
 	pusha
-		mov ebx, MEMORY_START
+		mov ebx, MemoryCheck.START_STR
+		call TextMode.println
+		
+		mov ebx, 0x3000000
 		mov edx, 0x3000000
 		.loop :
 		mov ecx, [ebx]
@@ -12,13 +15,18 @@ MemoryCheck.run :
 		.cont :
 		dec ecx
 		mov [ebx], ecx
-		add ebx, 0x10	; check a dword from every 31 bytes
-		sub edx, 0x10	; check a dword from every 31 bytes
+		add ebx, 0x4	; check a dword from every 31 bytes
+		sub edx, 0x4	; check a dword from every 31 bytes
 			push edx
 			push ebx
-			or edx, 0xFFFFF
+			and edx, 0xFFFF
 			cmp edx, 0x0
 				jne .noprint
+			push eax
+			mov eax, MemoryCheck.WORKING_NUM
+			mov ebx, [esp+4]
+			call String.fromHex
+			pop eax
 			mov ebx, MemoryCheck.WORKING_STR
 			call TextMode.println
 			.noprint :
@@ -44,4 +52,8 @@ MemoryCheck.ERR_STR :
 MemoryCheck.DONE_STR :
 	db "Memory check finished.", 0
 MemoryCheck.WORKING_STR :
-	db "Still working...", 0
+	db "Still working... "
+MemoryCheck.WORKING_NUM :
+	times 3 dq 0
+MemoryCheck.START_STR :
+	db "Begin MemoryCheck...", 0
