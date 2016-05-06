@@ -55,6 +55,17 @@ Image.copy :	; eax = source, ebx = dest, cx = width, dx = height
 	
 Image.copyLinear :	; eax = source, ebx = dest, ecx = width, edx = height [IS BROKEN!!!]
 	pusha
+		imul ecx, edx
+		.kgoOn :
+		mov edx, [eax]
+		mov [ebx], edx
+		add eax, 4
+		add ebx, 4
+		sub ecx, 4
+		cmp ecx, 0x0
+			jg .kgoOn
+	popa
+	ret
 		mov ecx, ebx
 		imul edx, ecx
 		push eax
