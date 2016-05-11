@@ -14,7 +14,7 @@ Minnow4.doTest :
 		call Minnow4.writeBuffer
 		
 	leave
-	ret 0
+	ret 4
 Minnow4.STR_DO_TEST :
 	db "screenshot", null
 

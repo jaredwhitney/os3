@@ -14,6 +14,8 @@
 
 %include "..\modules\console\iConsole.asm"
 %include "..\modules\console\iConsole2.asm"
+%include "..\modules\textEditor\TextEditor.asm"
+%include "..\modules\imageEditor\ImageEditor.asm"
 %include "..\modules\video\Video.asm"
 %include "..\modules\xlib\int30.asm"
 
