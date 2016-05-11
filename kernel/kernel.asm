@@ -15,6 +15,7 @@ Kernel.init :
 		mov edx, KERNEL_SIZE
 		sub edx, eax ; edx contains the number of sectors that need to be loaded
 		add edx, 1
+				mov edx, 2
 		;add eax, 2	; eax contains the sector to begin loading from
 		push eax
 		mov ecx, S2_CODE_LOC
@@ -56,9 +57,18 @@ Kernel.init :
 		add eax, 1
 		sub edx, 1
 		add ecx, 0x200
+		mov edx, 2
 		cmp edx, 0x0
+		pusha
+				mov ah, 0xC
+		mov ebx, LOADFAILm
+		mov ecx, 0
+		call consolePM.print
+		popa
 			jg Kernel.init.loadLoop
-	
+	cli
+	hlt
+	jmp $
 		call SSE.enable
 	
 	;	SETUP GRAPHICS MODE		;
@@ -421,6 +431,6 @@ KERNEL_END :
 ; External files to include
 os_imageDataBaseLBA :
 	dd ($-$$)/0x200+1	; 1 additional because the bootloader is LBA 0
-incbin "..\_not os code\Convenience\VGA\bgex2.vesa.dsp"
+;incbin "..\_not os code\Convenience\VGA\bgex2.vesa.dsp"
 
 times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector

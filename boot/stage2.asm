@@ -202,8 +202,8 @@ enter_PM :
 	cmp al, 0x4a
 	jne stop
 	
-	call loadIDT
-	call ps2.init
+;	call loadIDT
+;	call ps2.init
 	
 	jmp Kernel.init
 	
@@ -237,12 +237,15 @@ realMode.ATAload :	; eax = LBA low, bx = LBA high
 		and ebx, 0xFFFF
 		mov [rm.ATAdata.LBA_high], ebx
 		
-		mov di, 0x0
-		mov si, rm.ATAdata
-		mov dl, 0x80
-		mov ah, 0x42
-		int 0x13
-			jc sload_error
+		cmp dword [0x100A], true
+			je realMode.ATAload.fallback	; should be je
+		
+	;	mov di, 0x0
+	;	mov si, rm.ATAdata
+	;	mov dl, [0x1008]
+	;	mov ah, 0x42
+	;	int 0x13
+	;		jc sload_error
 	popa
 	ret
 rm.ATAdata :
@@ -258,6 +261,76 @@ rm.ATAdata :
 sload_error:
 	popa
 	ret
+realMode.ATAload.fallback :	; eax is LBA
+		push eax
+		mov al, 8
+		mov dl, [0x1008]
+		int 0x13	; get drive geometry
+		add dh, 1	; dh is the number of heads
+		shr edx, 8
+		and edx, 0xFF
+				mov edx, 2
+		mov [head_num], edx
+		and ecx, 0x3f	; ecx is the sectors per track
+		pop eax
+		xor edx, edx
+				mov ecx, 26
+		idiv ecx
+		mov [temp], eax
+		add edx, 1
+		mov dword [sector], 2;edx
+		mov eax, [temp]
+		mov ecx, [head_num]
+		xor edx, edx
+		idiv ecx
+		mov dword [head], 0x0;edx
+		mov dword [cylinder], 0;eax
+		; value has now been converted to CHS, time to perform the read
+		mov edx, [cylinder]
+		and edx, 0xFF
+		mov ch, dl
+		mov edx, [cylinder]
+		shr edx, 2
+		and edx, 0xC0
+		or edx, [sector]
+		mov cl, dl
+		mov dh, [head]
+		mov bx, 0x7c00
+	;	push ax
+	;	xor ax, ax
+	;	mov es, ax
+	;	pop ax
+		mov dl, [0x1008]
+		mov ah, 0x2
+		mov al, 1
+		int 0x13
+		cmp al, 0x0
+			je .okay
+		.notokay :
+		xor ecx, ecx
+		mov ah, 0xC
+		mov ebx, LOADFAILm
+		call boot.print
+		jmp .cont
+	.okay :
+	jc .notokay
+	.cont :
+			mov ebx, ENTER_PM
+	mov ecx, 0x3C0
+	mov ah, 0xB
+	call boot.print
+	popa
+	ret
+temp :
+	dd 0x0
+sector :
+	dd 0x0
+cylinder :
+	dd 0x0
+head :
+	dd 0x0
+head_num :
+	dd 0x0
 realMode.ATAwrite :	; eax = LBA low, bx = LBA high (data to copy at 0x7c00)
 	pusha
 		mov [rm.ATAdata.LBA_low], eax
@@ -266,7 +339,7 @@ realMode.ATAwrite :	; eax = LBA low, bx = LBA high (data to copy at 0x7c00)
 		
 		mov di, 0x0
 		mov si, rm.ATAdata
-		mov dl, 0x80
+		mov dl, [0x1008]
 		mov ah, 0x43
 		int 0x13
 			jc swrite_error
@@ -284,6 +357,8 @@ ENTER_PM :
 
 STOPm :
 	db "Halting Execution", 0
+LOADFAILm :
+	db "ATA Loading fail.", 0
 
 SUCCESS :
 	db "Success!", 0xD, 0xA, 0

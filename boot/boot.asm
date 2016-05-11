@@ -4,19 +4,6 @@
 
 	jmp short bootstart
 	nop
-	db "EXFAT   "	; OEM ID
-	times 53 db 0x0	; padding
-	dq 0x0	; ??
-	dq 0x77e5f00	; fs size in sectors
-	dd 0x800	; sectors to start of FAT
-	dd 0xF00	; sectors used by FAT
-	dd 0x1800	; first cluster start sector
-	dd 0x77e47	; fs size in clusters
-	dd 0x4		; root directory cluster
-	dq 0x10009E6A639F		; ??
-	db 9, 8, 1, 0x80	; log bytes/sector, log sectors/cluster, FAT count, driveID
-	db 0	; percent in use
-	times 7 db 0
 	
 	bootstart :
 	; Initialize stack and segment registers
@@ -28,6 +15,9 @@
 	
 	mov ax, 0x0
 	mov ds, ax
+	
+	; Store the drive the computer booted from into dl
+	mov [0x1008], dl
 
 	; Zero out the remaining registers
 	mov cx, 0x0
@@ -36,12 +26,17 @@
 
 	; Poll BIOS for the amount of RAM present
 	call rm_detectRAM
-
-	; Store the drive the computer booted from into dl
-	mov [boot_drive], dl
+	
+	mov dword [0x100A], 0x0	; [0x100A] is whether or not BIOS CHS needs to be used instead of LBA
+	
+	mov ah, 0x41
+	mov bx, 0x55aa
+	mov dl, 0x80
+	int 0x13
+		jc boot.fallBackLoader
 	
 	; Load the kernel into RAM
-	mov dl, 0x80
+	mov dl, [0x1008]
 	mov ch, 0
 	mov bx, S2_CODE_LOC
 	mov cl, 2
@@ -50,15 +45,31 @@
 
 	; Call the auxilary bootloader steps
 	mov bl, 0x0
+	boot.continue :
 	jmp (S2_CODE_LOC+1)
 
-
+boot.fallBackLoader :
+	mov bx, FALLBACKs
+	call boot.print
+	boot.fallBackLoader.go :
+	mov dword [0x100A], 0xFF
+	mov ah, 2
+	mov al, 60
+	mov ch, 0&0xFF
+	mov cl, 2|((0>>2)&0xC0)
+	mov dh, 0
+	mov bx, S2_CODE_LOC
+	mov dl, [boot_drive]
+	int 0x13
+	mov word [0x1000], 60
+	jmp boot.continue
+	
 boot.ATAload :
 	pusha
 		mov di, 0x0
 		mov si, boot.ATAdata
 		mov ah, 0x42
-		mov dl, 0x80
+		mov dl, [0x1008]
 		int 0x13
 			jc sload_error
 		mov ax, [boot.ATAdata.sectorsRead]
@@ -79,7 +90,8 @@ boot.ATAdata :
 		mov bx, ERRORs
 		call boot.print
 		popa
-		ret
+		pop eax
+		jmp boot.fallBackLoader.go
 
 	boot.print :
 		pusha
@@ -102,7 +114,9 @@ boot_drive :
 	db 0x0
 
 ERRORs :
-	db "Warning: Unable to read all sectors.", 0xD, 0xA, 0
+	db "Warning: Unable to read all sectors. Falling back to CHS Read...", 0xD, 0xA, 0
+FALLBACKs :
+	db "Warning: INT13h Extentions Unsupported. Falling back to CHS Read...", 0xD, 0xA, 0
 	
 %include "..\boot\detection.asm"
 
