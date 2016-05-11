@@ -195,6 +195,7 @@ call ProgramManager.setActive	; Make removable Later
 		
 ;		call SimpleRender.init
 		call iConsole2.Init
+		call ImageEditor.init
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax

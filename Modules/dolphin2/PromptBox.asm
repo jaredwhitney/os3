@@ -19,7 +19,7 @@ PromptBox.PromptForString :	; String title, String message, String callback
 		call Grouping.Add
 		push dword 256
 		push dword 10*4
-		push dword 10+FONTHEIGHT
+		push dword 10+10+FONTHEIGHT
 		push dword 300*4
 		push dword FONTHEIGHT
 		push dword FALSE
@@ -31,9 +31,11 @@ PromptBox.PromptForString :	; String title, String message, String callback
 		mov [Dolphin2.focusedComponent], ecx
 		mov [PromptBox.response], edx
 		push dword PromptBox.STR_DONE
-		push dword [ebp+8]
+		mov eax, [ebp+8]
+		mov [PromptBox.callback], eax
+		push dword PromptBox.doCallback
 		push dword 10*4
-		push dword 20+2*FONTHEIGHT
+		push dword 10+20+2*FONTHEIGHT
 		push dword 4*FONTWIDTH*4
 		push dword FONTHEIGHT+4
 		call Button.Create
@@ -48,6 +50,12 @@ PromptBox.window :
 	dd 0x0
 PromptBox.response :
 	dd 0x0
+PromptBox.callback :
+	dd 0x0
 PromptBox.STR_DONE :
 	db "DONE", 0
+PromptBox.doCallback :
+		call dword [PromptBox.callback]
+		call WindowGrouping.closeCallback
+	ret
 	

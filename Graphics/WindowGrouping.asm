@@ -7,6 +7,7 @@ WindowGrouping_titleBar		equ Component_CLASS_SIZE+16
 WindowGrouping_nameString	equ Component_CLASS_SIZE+20
 WindowGrouping_sizeButton	equ Component_CLASS_SIZE+24
 WindowGrouping_closeButton	equ Component_CLASS_SIZE+28
+WindowGrouping_title		equ Component_CLASS_SIZE+32
 
 WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop dword [WindowGrouping.Create.retval]
@@ -20,17 +21,17 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push edx
 
 		mov eax, 0x7
-		mov ebx, Component_CLASS_SIZE+32
+		mov ebx, Component_CLASS_SIZE+36
 		call ProgramManager.reserveMemory
 		call Component.initToDefaults
 		mov edx, ebx
 			
-			pusha
-			mov eax, edx
-			mov edx, 64
-			mov ebx, 0x00000000
-			call Image.clear
-			popa
+		;	pusha
+		;	mov eax, edx
+		;	mov edx, 64
+		;	mov ebx, 0x00000000
+		;	call Image.clear
+		;	popa
 			
 			; THIS SHOULD ALL BE IN THE WindowGrouping main NOT ITS OWN GROUPING
 			mov eax, [WindowGrouping.Create.x]
@@ -112,6 +113,8 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov eax, ecx
 		mov ebx, [edx+WindowGrouping_titleBar]
 		call Grouping.Add
+		add ecx, Textline_text
+		mov [edx+WindowGrouping_title], ecx
 		
 		push dword 4*4
 		push dword 20+2+2
