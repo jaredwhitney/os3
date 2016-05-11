@@ -19,7 +19,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.STR_SIZE
 		push dword 5*4
-		push dword (5+(10+5)*0)*4
+		push dword (5+(10+5)*0)
 		push dword 7*FONTWIDTH*4
 		push dword 10
 		call TextLine.Create
@@ -28,7 +28,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.STR_COLOR
 		push dword 5*4
-		push dword (5+(10+5)*1)*4
+		push dword (5+(10+5)*1)
 		push dword 7*FONTWIDTH*4
 		push dword 10
 		call TextLine.Create
@@ -37,7 +37,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.STR_RED
 		push dword 5*4
-		push dword (5+(10+5)*2)*4
+		push dword (5+(10+5)*2)
 		push dword 7*FONTWIDTH*4
 		push dword 10
 		call TextLine.Create
@@ -46,7 +46,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.STR_GREEN
 		push dword 5*4
-		push dword (5+(10+5)*3)*4
+		push dword (5+(10+5)*3)
 		push dword 7*FONTWIDTH*4
 		push dword 10
 		call TextLine.Create
@@ -55,7 +55,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.STR_BLUE
 		push dword 5*4
-		push dword (5+(10+5)*4)*4
+		push dword (5+(10+5)*4)
 		push dword 7*FONTWIDTH*4
 		push dword 10
 		call TextLine.Create
@@ -67,7 +67,7 @@ ImageEditor.init :
 		push dword ImageEditor.STR_MINUS
 		push dword ImageEditor.decBrushSize
 		push dword (5+7*FONTWIDTH)*4
-		push dword (5+(10+5)*0)*4
+		push dword (5+(10+5)*0)
 		push dword 10*4
 		push dword 10
 		call Button.Create
@@ -76,7 +76,7 @@ ImageEditor.init :
 		
 		push dword ImageEditor.SIZE_VALSTR
 		push dword (5+7*FONTWIDTH+10)*4
-		push dword (5+(10+5)*0)*4
+		push dword (5+(10+5)*0)
 		push dword 25*4
 		push dword 10
 		call TextLine.Create
@@ -86,7 +86,7 @@ ImageEditor.init :
 		push dword ImageEditor.STR_PLUS
 		push dword ImageEditor.incBrushSize
 		push dword (5+7*FONTWIDTH+35)*4
-		push dword (5+(10+5)*0)*4
+		push dword (5+(10+5)*0)
 		push dword 10*4
 		push dword 10
 		call Button.Create

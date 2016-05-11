@@ -109,16 +109,26 @@ KeyManager.handleShift :	; charcode in bl
 	cmp al, 0x0
 	pop ax
 	je KeyManager.handleShift.ret
-	cmp al, "'"
-		jne .notApos
-	mov al, '"'
-	jmp KeyManager.handleShift.ret
-	.notApos :
+	
+	mov ecx, KeyManager.shiftSpecialCases
+	.specialCaseLoop :
+	cmp al, [ecx]
+		je .handleSpecialCase
+	add ecx, 2
+	cmp byte [ecx], 0x0
+		jne .specialCaseLoop
+	jmp .notSpecialCase
+	.handleSpecialCase :
+		mov al, [ecx+1]
+		jmp .ret
+	.notSpecialCase :
+	
 	cmp al, 0x61
 	jl KeyManager.handleShift.ret
 	cmp al, 0x7a
 	jg KeyManager.handleShift.ret
 	sub al, 0x20
+	
 	KeyManager.handleShift.ret :
 	pop ebx
 	ret
@@ -129,6 +139,8 @@ KeyManager.handleShift :	; charcode in bl
 		pop ax
 		pop ebx
 		ret
+KeyManager.shiftSpecialCases :
+	db '`', '~', '1', '!', '2', '@', '3', '#', '4', '$', '5', '%', '6', '^', '7', '&', '8', '*', '9', '(', '0', ')', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', "'", '"', ',', '<', '.', '>', '/', '?', '\', '|', 0x0, 0x0
 
 KeyManager.keyPress :	; key in bl
 pusha
