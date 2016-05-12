@@ -202,11 +202,42 @@ ImageEditor.init :
 		mov eax, ecx
 		call Grouping.Add
 		
+		; Load button ;
+		
+		push dword ImageEditor.STR_LOAD
+		push dword ImageEditor.promptLoadFile
+		push dword 5*4
+		push dword 5+(10+5)*5
+		push dword 4*FONTWIDTH*4
+		push dword FONTHEIGHT
+		call Button.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+		; Save button ;
+		
+		push dword ImageEditor.STR_SAVE
+		push dword ImageEditor.promptSaveFile
+		push dword (5+7*FONTWIDTH)*4
+		push dword 5+(10+5)*5
+		push dword 4*FONTWIDTH*4
+		push dword FONTHEIGHT
+		call Button.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+		
+		
+		; New image button ;
+		
+		
+		
 		; Image view ;
 		
 		mov edx, ebx
-		mov ebx, 200*200*4
+		mov ebx, 200*200*4+8	; +8 gives room for width and height
 		call ProgramManager.reserveMemory
+		add ebx, 8	; data starts at offs 8
 		push ebx
 		push 200*4
 		push 200
@@ -278,9 +309,44 @@ ImageEditor.blueVal :
 ImageEditor.color :
 	dd 0xFF000000
 
+ImageEditor.promptLoadFile :
+	push dword ImageEditor.promptTitle
+	push dword ImageEditor.promptMessage
+	push dword ImageEditor.loadFile
+	call PromptBox.PromptForString
 ImageEditor.loadFile :
-
+	ret
+ImageEditor.promptSaveFile :
+		push dword ImageEditor.promptTitle
+		push dword ImageEditor.promptMessage
+		push dword ImageEditor.saveFile
+		call PromptBox.PromptForString
+	ret
 ImageEditor.saveFile :
+	pusha
+		mov edx, [ImageEditor.image]
+		mov eax, [edx+Image_source]
+		sub eax, 8
+		mov ecx, [edx+Image_sw]
+		shr ecx, 2	; so its in pixels
+		mov [eax], ecx
+		mov ebx, [edx+Image_sh]
+		mov [eax+4], ebx
+		imul ecx, ebx
+		shl ecx, 2
+		add ecx, 8	; ecx is the size of the buffer
+		mov edx, ecx
+		mov ecx, eax
+		mov eax, [PromptBox.response]
+		call Minnow4.getFilePointer
+		cmp ebx, Minnow4.SUCCESS
+			je .dontMake
+		mov eax, [PromptBox.response]
+		call Minnow4.createFile
+		.dontMake :
+		call Minnow4.writeBuffer
+	popa
+	ret
 
 ImageEditor.getFileName :
 

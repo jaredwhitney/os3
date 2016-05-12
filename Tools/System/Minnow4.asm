@@ -9,8 +9,10 @@ Minnow4.doTest :
 		call Minnow4.createFile
 		
 		mov ecx, [Dolphin2.flipBuffer]
+		sub ecx, 8	; to include width and height
 		mov edx, [Graphics.SCREEN_WIDTH]
 		imul edx, [Graphics.SCREEN_HEIGHT]
+		add edx, 8
 		call Minnow4.writeBuffer
 		
 	leave
@@ -66,13 +68,6 @@ dd Minnow4.viewImage
 dd null
 Minnow4.viewImage :
 	enter 0, 0
-		push Minnow4.viewImage.windowTitle
-		push dword 0*4
-		push dword 0
-		push dword 300*4
-		push dword 300
-		call Dolphin2.makeWindow
-		mov [Minnow4.viewImage.window], ecx
 		
 		mov ebx, [Graphics.SCREEN_WIDTH]
 		imul ebx, [Graphics.SCREEN_HEIGHT]
@@ -92,13 +87,31 @@ Minnow4.viewImage :
 		
 		.nop :
 		
-		push dword [Minnow4.viewImage.buffer]
-		push dword [Graphics.SCREEN_WIDTH]
-		push dword [Graphics.SCREEN_HEIGHT]
+		mov ecx, [Minnow4.viewImage.buffer]
+		add ecx, 8
+		
+		push Minnow4.viewImage.windowTitle
+		push dword 0*4
+		push dword 0
+			mov ebx, [ecx-8]
+			shl ebx, 2
+		push dword ebx
+		push dword [ecx-4]
+		call Dolphin2.makeWindow
+		mov [Minnow4.viewImage.window], ecx
+		
+		mov ecx, [Minnow4.viewImage.buffer]
+		add ecx, 8
+		
+		push ecx
+		mov ebx, [ecx-8]
+		shl ebx, 2
+		push dword ebx
+		push dword [ecx-4]
 		push dword 0*4
 		push dword 0;3
-		push dword [Graphics.SCREEN_WIDTH]
-		push dword [Graphics.SCREEN_HEIGHT]
+		push dword ebx
+		push dword [ecx-4]
 		call Image.Create
 		mov dword [ecx+Component_mouseHandlerFunc], null
 		
