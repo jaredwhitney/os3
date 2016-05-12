@@ -163,6 +163,15 @@ TextLine.Create.h :
 
 TextLine.Render :	; textline in ebx
 	pusha
+			push ebx
+				mov edx, ebx
+				mov eax, [edx+Component_image]
+				mov ecx, [edx+Component_w]
+				imul ecx, [edx+Component_h]
+				mov ebx, 0x00000000
+				mov edx, ecx
+				call Image.clear
+			pop ebx
 		push ebx
 			mov ebx, [ebx+Textline_text]
 			call String.getLength
