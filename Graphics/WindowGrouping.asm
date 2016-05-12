@@ -40,9 +40,19 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 			mov [edx+Grouping_y], eax
 			mov eax, [WindowGrouping.Create.w]	; should allocate a screen-sized buffer
 			add eax, 8*4
+				cmp eax, [Graphics.SCREEN_WIDTH]
+					jl .dontFixW
+				mov eax, [Graphics.SCREEN_WIDTH]
+				sub eax, 4
+				.dontFixW :
 			mov [edx+Grouping_w], eax
 			mov eax, [WindowGrouping.Create.h]
 			add eax, 20+4+4
+				cmp eax, [Graphics.SCREEN_HEIGHT]
+					jl .dontFixH
+				mov eax, [Graphics.SCREEN_HEIGHT]
+				sub eax, 1
+				.dontFixH :
 			mov [edx+Grouping_h], eax
 			mov eax, [Graphics.SCREEN_WIDTH]
 			imul eax, [Graphics.SCREEN_HEIGHT]

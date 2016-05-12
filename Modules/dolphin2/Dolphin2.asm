@@ -16,12 +16,19 @@ Dolphin2.createCompositorGrouping :
 		push ecx
 		mov eax, [Graphics.SCREEN_WIDTH]
 		imul eax, [Graphics.SCREEN_HEIGHT]
+		add eax, 8	; space for the width and height
 		mov ebx, eax
-		mov al, 8
 		call ProgramManager.reserveMemory;Guppy.malloc
+		add ebx, 8
 		mov [Dolphin2.flipBuffer], ebx
 		pop ecx
 		mov [ecx+Component_image], ebx
+		
+		mov eax, [Graphics.SCREEN_WIDTH]
+		shr eax, 2
+		mov [ebx-8], eax
+		mov eax, [Graphics.SCREEN_HEIGHT]
+		mov [ebx-4], eax
 		
 		mov dword [ecx+Grouping_backingColor], 0xFF000040
 		
