@@ -131,30 +131,33 @@ Color.fuse :	; overlapping color in ecx, color being written over in edx... retu
 	popa
 	mov ecx, [Color.fuse.ret]
 	ret
-Color.fuse.old :
-Color.fuse.oldblue :
-	db 0x0
-Color.fuse.oldgreen :
-	db 0x0
-Color.fuse.oldred :
-	db 0x0
-Color.fuse.oldalpha :
-	db 0x0
-Color.fuse.new :
-Color.fuse.newblue :
-	db 0x0
-Color.fuse.newgreen :
-	db 0x0
-Color.fuse.newred :
-	db 0x0
-Color.fuse.newalpha :
-	db 0x0
-Color.fuse.ret :
-Color.fuse.retblue :
-	db 0x0
-Color.fuse.retgreen :
-	db 0x0
-Color.fuse.retred :
-	db 0x0
-Color.fuse.retalpha :
-	db 0x0
+Color.fuse.VARDATA :
+dd Color.fuse.VARDATA_END-Color.fuse.VARDATA
+	Color.fuse.old :
+	Color.fuse.oldblue :
+		db 0x0
+	Color.fuse.oldgreen :
+		db 0x0
+	Color.fuse.oldred :
+		db 0x0
+	Color.fuse.oldalpha :
+		db 0x0
+	Color.fuse.new :
+	Color.fuse.newblue :
+		db 0x0
+	Color.fuse.newgreen :
+		db 0x0
+	Color.fuse.newred :
+		db 0x0
+	Color.fuse.newalpha :
+		db 0x0
+	Color.fuse.ret :
+	Color.fuse.retblue :
+		db 0x0
+	Color.fuse.retgreen :
+		db 0x0
+	Color.fuse.retred :
+		db 0x0
+	Color.fuse.retalpha :
+		db 0x0
+Color.fuse.VARDATA_END :

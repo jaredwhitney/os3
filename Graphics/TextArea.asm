@@ -49,7 +49,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov eax, [TextArea.Create.scrolls]
 		mov [ebx+Textarea_scrolls], eax
 		mov dword [ebx+Textarea_type], Component.TYPE_TEXTAREA
-		mov dword [ebx+Component_transparent], TRUE
+		mov dword [ebx+Component_transparent], FALSE
 		mov dword [ebx+Component_renderFunc], TextArea.Render
 		mov dword [ebx+Component_keyHandlerFunc], TextArea.onKeyboardEvent.handle
 		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle	; redundant and should be removed

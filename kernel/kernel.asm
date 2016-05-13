@@ -266,6 +266,25 @@ kernel.runModules :
 		;call InfoPanel.loop
 	
 	ret
+	
+kernel.SaveFunctionState :	; vardata in ebx... trashes eax
+		mov eax, [ebx]
+		.loop :
+		push dword [ebx+4]
+		add ebx, 4
+		sub eax, 4
+		cmp eax, 0
+			jg .loop
+	ret
+kernel.LoadFunctionState :	; vardata in ebx... trashes eax
+		mov eax, [ebx]
+		.loop :
+		pop dword [ebx+4]
+		add ebx, 4
+		sub eax, 4
+		cmp eax, 0
+			jg .loop
+	ret
 
 	
 ;	INITIALIZE ALL PRESENT MODULES	;

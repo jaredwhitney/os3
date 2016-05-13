@@ -122,18 +122,20 @@ d2_easyteletype :
 
 Dolphin2.drawMouse :
 	pusha
+		cmp dword [Dolphin2.started], true
+			jne .ret
 		mov eax, [Graphics.SCREEN_MEMPOS]
 		mov ebx, [Graphics.SCREEN_HEIGHT]
 		pusha
-		sub ebx, [Mouse.lasty]
-		imul ebx, [Graphics.SCREEN_WIDTH]
-		add eax, ebx
-		mov ecx, [Mouse.lastx]
-		imul ecx, 4
-		add eax, ecx
-		mov ebx, 1
-		mov ecx, 1
-		call Dolphin.redrawBackgroundRegion
+			sub ebx, [Mouse.lasty]
+			imul ebx, [Graphics.SCREEN_WIDTH]
+			add eax, ebx
+			mov ecx, [Mouse.lastx]
+			imul ecx, 4
+			add eax, ecx
+			mov ebx, 8
+			mov ecx, 14
+			call Dolphin.redrawBackgroundRegion
 		popa
 		sub ebx, [Mouse.y]
 		imul ebx, [Graphics.SCREEN_WIDTH]
@@ -141,14 +143,66 @@ Dolphin2.drawMouse :
 		mov ecx, [Mouse.x]
 		imul ecx, 4
 		add eax, ecx
-		mov dword [eax], 0xFFFFFF
-
+		
+		push dword [Image.copyRegionWithTransparency.w]
+		push dword [Image.copyRegionWithTransparency.ow]
+		push dword [Image.copyRegionWithTransparency.nw]
+		push dword [Image.copyRegionWithTransparency.h]
+		push dword [Image.copyRegionWithTransparency.obuf]
+		push dword [Image.copyRegionWithTransparency.nbuf]
+		push dword [Image.copyRegionWithTransparency.owa]
+		push dword [Image.copyRegionWithTransparency.nwa]
+		mov ecx, eax
+		;		mov ebx, Color.fuse.VARDATA
+		;		call kernel.SaveFunctionState
+			mov dword [Image.copyRegionWithTransparency.w], CURSOR_WIDTH
+			mov dword [Image.copyRegionWithTransparency.ow], CURSOR_WIDTH
+			mov edx, [Graphics.SCREEN_WIDTH]
+			mov [Image.copyRegionWithTransparency.nw], edx
+			mov dword [Image.copyRegionWithTransparency.h], CURSOR_HEIGHT
+			mov dword [Image.copyRegionWithTransparency.obuf], CursorData
+			mov [Image.copyRegionWithTransparency.nbuf], ecx
+			call Image.copyRegionWithTransparency
+		;		mov ebx, Color.fuse.VARDATA
+		;		call kernel.LoadFunctionState
+		pop dword [Image.copyRegionWithTransparency.nwa]
+		pop dword [Image.copyRegionWithTransparency.owa]
+		pop dword [Image.copyRegionWithTransparency.nbuf]
+		pop dword [Image.copyRegionWithTransparency.obuf]
+		pop dword [Image.copyRegionWithTransparency.h]
+		pop dword [Image.copyRegionWithTransparency.nw]
+		pop dword [Image.copyRegionWithTransparency.ow]
+		pop dword [Image.copyRegionWithTransparency.w]
+		
 		mov ecx, [Mouse.x]
 		mov edx, [Mouse.y]
 		mov [Mouse.lastx], ecx
 		mov [Mouse.lasty], edx
+	.ret :
 	popa
 	ret
+
+B equ 0xFF000000
+W equ 0xFFFFFFFF
+T equ 0x00000000
+
+CURSOR_WIDTH	equ 8*4
+CURSOR_HEIGHT	equ 14
+CursorData :
+	dd B, B, T, T, T, T, T, T
+	dd B, B, T, T, T, T, T, T
+	dd B, B, B, B, T, T, T, T
+	dd B, B, B, B, T, T, T, T
+	dd B, B, W, W, B, B, T, T
+	dd B, B, W, W, B, B, T, T
+	dd B, B, W, W, W, W, B, B
+	dd B, B, W, W, W, W, B, B
+	dd B, B, B, B, B, B, T, T
+	dd B, B, B, B, B, B, T, T
+	dd B, B, T, T, B, B, B, B
+	dd B, B, T, T, B, B, B, B
+	dd T, T, T, T, T, T, B, B
+	dd T, T, T, T, T, T, B, B
 
 Dolphin2.HandleKeyboardEvent :
 	pusha
