@@ -31,6 +31,7 @@ Minnow4.printFileTree :
 		add eax, 0x200-Minnow4.BLOCK_DESCRIPTOR_SIZE
 		mov [Minnow4.printFileTree.threshold], eax
 		mov eax, 0x0
+		mov [.fblockstor], eax
 		.outerloop :
 		call Minnow4.readFileBlock
 		cmp byte [ecx], null
@@ -49,18 +50,28 @@ Minnow4.printFileTree :
 		cmp ecx, [Minnow4.printFileTree.threshold]
 			jl .innerloop
 		.innerloopend :
+		
+		mov eax, [.fblockstor]
+		
 		call Minnow4.getNextFileBlock
+			
+		mov [.fblockstor], eax
+		
 		cmp eax, null
-			jne .outerloop
+		;	jne .outerloop
 		.done :
 	leave
 	ret 0
+	.fblockstor :
+		dd 0x0
 Minnow4.STR_PRINT_TREE :
 	db "tree", 0
 Minnow4.printFileTree.sep :
 	db ", ", 0
 Minnow4.printFileTree.threshold :
 	dd 0x0
+Minnow4.tempNumStor :
+	times 3 dq 0x0
 	
 Minnow4.COMMAND_VIEW_IMAGE :
 dd Minnow4.STR_VIEW_IMAGE
@@ -425,7 +436,7 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		mov [Minnow4.deleteFile.threshold], eax
 		xor ecx, ecx
 		Minnow4.deleteFile.fetchNameBlock :
-		mov eax, ecx
+		mov eax, ecx	; this is wrong!
 		push ecx
 		call Minnow4.readFileBlock
 		mov eax, ecx
@@ -438,7 +449,6 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		cmp al, 0x1
 		pop eax
 			je Minnow4.deleteFile.fileFound
-		mov ebx, eax
 		call String.getLength
 		add eax, edx
 		add eax, 4
@@ -447,7 +457,7 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		mov ecx, [Minnow4.readBlock.data]
 		add ecx, Minnow4_BlockDescriptor_nextPointer
 		cmp dword [ecx], null
-			jne Minnow4.deleteFile.fetchNameBlock
+		;	jne Minnow4.deleteFile.fetchNameBlock
 		mov ebx, Minnow4.FILE_NOT_FOUND
 	pop ecx
 	pop edx
@@ -455,13 +465,25 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 	ret
 	Minnow4.deleteFile.fileFound :
 		mov ebx, eax
+		
+			pusha
+				mov ebx, ecx
+				mov eax, Minnow4.tempNumStor
+				call String.fromHex
+				push eax
+				call iConsole2.Echo
+			popa
+		
 		call String.getLength
 		mov ebx, edx
-		;call Buffer.clear
+		call Buffer.clear
+		
 		mov eax, ecx
 		mov ecx, [Minnow4.readBlock.data]
-		call Minnow4.writeBlock
+		add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
+		call Minnow4.writeFileBlock
 		mov ebx, Minnow4.SUCCESS
+		
 	pop ecx
 	pop edx
 	pop eax
