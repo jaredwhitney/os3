@@ -132,6 +132,26 @@ Minnow4.viewImage.buffer :
 _init :
 	dd false
 
+Minnow4.COMMAND_DELETE_FILE :
+dd Minnow4.STR_DELETE_FILE
+dd Minnow4.goDeleteFile
+dd null
+Minnow4.goDeleteFile :
+	enter 0, 0
+		mov eax, [ebp+8]
+		call Minnow4.deleteFile
+		cmp ebx, Minnow4.FILE_NOT_FOUND
+			jne .ret
+		push Minnow4.STR_FILE_NOT_FOUND
+		call iConsole2.Echo
+	.ret :
+	leave
+	ret 4
+Minnow4.STR_DELETE_FILE :
+	db "del", 0
+Minnow4.STR_FILE_NOT_FOUND :
+	db "The specified file could not be found.", 0
+
 Minnow4.init :
 	pusha
 		mov al, [AHCI_STATUS]
@@ -183,10 +203,18 @@ Minnow4.init :
 		call iConsole2.RegisterCommand
 		push dword Minnow4.COMMAND_PRINT_TREE
 		call iConsole2.RegisterCommand
+		push dword Minnow4.COMMAND_DELETE_FILE
+		call iConsole2.RegisterCommand
+		push dword Minnow4.COMMAND_REFORMAT_DISK
+		call iConsole2.RegisterCommand
 		mov dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 	popa
 	ret
 
+Minnow4.COMMAND_REFORMAT_DISK :
+dd Minnow4.STR_REFORMAT_DISK
+dd Minnow4.reformatDisk
+dd null
 Minnow4.reformatDisk :
 	pusha
 		mov ebx, 0x200
@@ -203,10 +231,12 @@ Minnow4.reformatDisk :
 		Minnow4.reformatDisk.loop :
 		call Minnow4.writeBlock
 		add eax, 1
-		cmp eax, [Minnow4.fs_size]
+		cmp eax, 100;[Minnow4.fs_size]
 			jb Minnow4.reformatDisk.loop
 	popa
 	ret
+Minnow4.STR_REFORMAT_DISK :
+	db "REFORMAT_DISK", 0
 
 Minnow4.createFile :	; eax = String name : returns eax = int block
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
@@ -383,13 +413,63 @@ Minnow4.renameFile :	; eax = int block, ebx = String newName
 	popa
 	ret
 
-Minnow4.deleteFile :	; eax = int block
+Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD MAKE IT USE A BLOCK POINTER INSTEAD OF A STRING]
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
-	pusha
-		
-	popa
+	push eax
+	push edx
+	push ecx
+		mov [Minnow4.deleteFile.name], eax
+		mov eax, [Minnow4.readBlock.data]
+		add eax, 0x200
+		mov [Minnow4.deleteFile.threshold], eax
+		xor ecx, ecx
+		Minnow4.deleteFile.fetchNameBlock :
+		mov eax, ecx
+		push ecx
+		call Minnow4.readFileBlock
+		mov eax, ecx
+		pop ecx
+		Minnow4.deleteFile.searchBlock :
+		mov ebx, [Minnow4.deleteFile.name]
+		push eax
+		xchg eax, ebx	; because os.seq is horrible
+		call os.seq
+		cmp al, 0x1
+		pop eax
+			je Minnow4.deleteFile.fileFound
+		mov ebx, eax
+		call String.getLength
+		add eax, edx
+		add eax, 4
+		cmp eax, [Minnow4.deleteFile.threshold]
+			jl Minnow4.deleteFile.searchBlock
+		mov ecx, [Minnow4.readBlock.data]
+		add ecx, Minnow4_BlockDescriptor_nextPointer
+		cmp dword [ecx], null
+			jne Minnow4.deleteFile.fetchNameBlock
+		mov ebx, Minnow4.FILE_NOT_FOUND
+	pop ecx
+	pop edx
+	pop eax
 	ret
+	Minnow4.deleteFile.fileFound :
+		mov ebx, eax
+		call String.getLength
+		mov ebx, edx
+		;call Buffer.clear
+		mov eax, ecx
+		mov ecx, [Minnow4.readBlock.data]
+		call Minnow4.writeBlock
+		mov ebx, Minnow4.SUCCESS
+	pop ecx
+	pop edx
+	pop eax
+	ret
+Minnow4.deleteFile.name :
+	dd 0x0
+Minnow4.deleteFile.threshold :
+	dd 0x0
 	
 Minnow4.registerName :	; eax = String name
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED

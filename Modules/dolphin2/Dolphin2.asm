@@ -155,6 +155,9 @@ Dolphin2.drawMouse :
 		mov ecx, eax
 		;		mov ebx, Color.fuse.VARDATA
 		;		call kernel.SaveFunctionState
+		push dword [Color.fuse.old]
+		push dword [Color.fuse.new]
+		push dword [Color.fuse.ret]
 			mov dword [Image.copyRegionWithTransparency.w], CURSOR_WIDTH
 			mov dword [Image.copyRegionWithTransparency.ow], CURSOR_WIDTH
 			mov edx, [Graphics.SCREEN_WIDTH]
@@ -163,6 +166,9 @@ Dolphin2.drawMouse :
 			mov dword [Image.copyRegionWithTransparency.obuf], CursorData
 			mov [Image.copyRegionWithTransparency.nbuf], ecx
 			call Image.copyRegionWithTransparency
+		pop dword [Color.fuse.ret]
+		pop dword [Color.fuse.new]
+		pop dword [Color.fuse.old]
 		;		mov ebx, Color.fuse.VARDATA
 		;		call kernel.LoadFunctionState
 		pop dword [Image.copyRegionWithTransparency.nwa]
