@@ -100,10 +100,41 @@ iConsole2.HandleKeyEvent :
 	.instr :
 		dd false
 	uhoh... :	; PANIC!
+		; but first check the filesystem please... [BROKEN ATM AND THERE SHOULD BE A RegisterFileExtentionToCommand THING!]
+		mov eax, ebx
+		mov ecx, ebx
+		call Minnow4.getFilePointer
+		cmp ebx, Minnow4.SUCCESS
+			jne .knvmgoon
+		.fnamechckloop :
+			cmp byte [ecx], '.'
+				je .kcont
+			cmp byte [ecx], 0
+				je .knvmgoon
+			add ecx, 1
+			jmp .fnamechckloop
+			.kcont :
+			add ecx, 1
+			mov eax, ecx
+			mov ebx, Minnow4.FILETYPE_RAWTEXT
+			call os.seq
+			cmp al, 0x1
+				jne .knvmgoon
+			
+		;	mov eax, Minnow4.tempNumStor
+		;	mov ebx, ecx
+		;	call String.fromHex
+			push ecx
+			call iConsole2.Echo
+			
+			jmp .ret
+		
+		.knvmgoon :
 		push dword iConsole2.INVALID_COMMAND
 		call iConsole2.Echo
 		mov esp, [0x1000]
 		call iConsole2.PrintPrompt
+		.ret :
 		popa
 		ret
 iConsole2.QUOTES :

@@ -301,7 +301,8 @@ Minnow4.getFilePointer :	; eax = String name : returns eax = int block, ebx = in
 			jl Minnow4.getFilePointer.searchBlock
 		mov ecx, [Minnow4.readBlock.data]
 		add ecx, Minnow4_BlockDescriptor_nextPointer
-		cmp dword [ecx], null
+		mov ecx, [ecx]
+		cmp ecx, null
 			jne Minnow4.getFilePointer.fetchNameBlock
 		mov ebx, Minnow4.FILE_NOT_FOUND
 		mov eax, null
@@ -436,7 +437,7 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		mov [Minnow4.deleteFile.threshold], eax
 		xor ecx, ecx
 		Minnow4.deleteFile.fetchNameBlock :
-		mov eax, ecx	; this is wrong!
+		mov eax, ecx
 		push ecx
 		call Minnow4.readFileBlock
 		mov eax, ecx
@@ -456,8 +457,9 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 			jl Minnow4.deleteFile.searchBlock
 		mov ecx, [Minnow4.readBlock.data]
 		add ecx, Minnow4_BlockDescriptor_nextPointer
-		cmp dword [ecx], null
-		;	jne Minnow4.deleteFile.fetchNameBlock
+		mov ecx, [ecx]
+		cmp ecx, null
+			jne Minnow4.deleteFile.fetchNameBlock
 		mov ebx, Minnow4.FILE_NOT_FOUND
 	pop ecx
 	pop edx
@@ -466,6 +468,12 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 	Minnow4.deleteFile.fileFound :
 		mov ebx, eax
 		
+	pusha
+		call String.getLength
+		mov ebx, edx
+		call Buffer.clear
+	popa
+		
 			pusha
 				mov ebx, ecx
 				mov eax, Minnow4.tempNumStor
@@ -473,15 +481,27 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 				push eax
 				call iConsole2.Echo
 			popa
-		
-		call String.getLength
-		mov ebx, edx
-		call Buffer.clear
+			pusha
+				push ebx
+				call iConsole2.Echo
+				mov ebx, [Minnow4.readBlock.data]
+				mov eax, Minnow4.tempNumStor
+				call String.fromHex
+				push eax
+				call iConsole2.Echo
+			popa
+			pusha
+				mov ebx, ebx
+				mov eax, Minnow4.tempNumStor
+				call String.fromHex
+				push eax
+				call iConsole2.Echo
+			popa
 		
 		mov eax, ecx
 		mov ecx, [Minnow4.readBlock.data]
 		add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
-		call Minnow4.writeFileBlock
+		call Minnow4.writeFileBlock	; CAN'T USE writeFileBlock FOR THIS!!!
 		mov ebx, Minnow4.SUCCESS
 		
 	pop ecx
@@ -703,6 +723,11 @@ Minnow4.MOUNT_FAILED	equ 0x2
 
 Minnow4.SUCCESS			equ 0x1
 Minnow4.FILE_NOT_FOUND	equ 0x2
+
+Minnow4.FILETYPE_RAWTEXT :
+	db "rawtext", endstr
+Minnow4.FILETYPE_RAWIMAGE :
+	db "rawimage", endstr
 
 Minnow4.STATUS :
 	dd Minnow4.UNMOUNTED
