@@ -1,4 +1,17 @@
+TextEditor.COMMAND_RUN :
+	dd TextEditor.STR_TEXTEDITORNAME
+	dd TextEditor.main
+	dd null
 TextEditor.init :
+	pusha
+		push dword TextEditor.COMMAND_RUN
+		call iConsole2.RegisterCommand
+	popa
+	ret
+TextEditor.STR_TEXTEDITORNAME :
+	db "textedit", 0x0
+
+TextEditor.main :
 	pusha
 		push dword TextEditor.placeholderTitle
 		push dword 0*4

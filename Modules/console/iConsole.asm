@@ -196,12 +196,16 @@ call ProgramManager.setActive	; Make removable Later
 ;		call SimpleRender.init
 		call iConsole2.Init
 		call ImageEditor.init
+		call TextEditor.init
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
 	GoDoLoop :
 ;	call SimpleRender.runOnce
+	call Dolphin2.drawMouse
 	call Dolphin2.renderScreen
+;	call Keyboard.poll
+	
 ;	mov al, '!'
 ;	call TextArea.AppendChar
 	;mov eax, 500

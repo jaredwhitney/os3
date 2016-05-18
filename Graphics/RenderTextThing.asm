@@ -10,7 +10,8 @@ Component_transparent		equ 32
 Component_renderFunc		equ 36
 Component_mouseHandlerFunc	equ 40
 Component_keyHandlerFunc	equ 44
-Component_CLASS_SIZE		equ 48
+Component_needsRedraw		equ 48
+Component_CLASS_SIZE		equ 52
 
 Component.Render :	; Component in ebx
 	pusha
@@ -45,10 +46,11 @@ Component.TYPE_SELECTPANEL			equ 0x8
 Component.TYPE_WINDOW				equ 0x9
 
 Component.RequestUpdate :	; Component in ebx
-pusha
-	mov ecx, [ebx+Component_upperRenderFlag]
-	mov dword [ecx], TRUE
-popa
+;pusha
+	;mov ecx, [ebx+Component_upperRenderFlag]
+	;mov dword [ecx], TRUE
+	mov dword [ebx+Component_needsRedraw], true
+;popa
 ret
 
 Component.HandleMouseEvent :	; Component in ebx
@@ -99,6 +101,7 @@ Component.initToDefaults :
 	mov dword [ebx+Component_renderFunc], null
 	mov dword [ebx+Component_nextLinked], null
 	mov dword [ebx+Component_transparent], false
+	mov dword [ebx+Component_needsRedraw], true
 ret
 	
 Textline_type	equ 0

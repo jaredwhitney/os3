@@ -63,7 +63,10 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 		mov ecx, ebx
 		add ecx, Grouping_renderFlag
 		mov [eax+Component_upperRenderFlag], ecx
-		call Grouping.DoUpdate
+		push ebx
+		mov ebx, eax
+		call Component.RequestUpdate
+		pop ebx
 	popa
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
@@ -86,13 +89,13 @@ Grouping.Remove :	; Component in eax, Grouping in ebx
 		; ebx now contains the component before the one to be removed, eax contains the component to be removed
 		mov eax, [eax+Component_nextLinked]
 		mov [ebx+Component_nextLinked], eax
-		call Grouping.DoUpdate
+;		call Grouping.DoUpdate
 		jmp Grouping.Remove.ret
 		Grouping.Remove.foundSub :
 		; ebx now contains the Grouping, eax contains the component to be removed
 		mov eax, [eax+Component_nextLinked]
 		mov [ebx+Grouping_subcomponent], eax
-		call Grouping.DoUpdate
+		call Component.RequestUpdate
 	Grouping.Remove.ret :
 	popa
 	ret
@@ -100,12 +103,11 @@ Grouping.BringToFront :	; Component in eax, Grouping in ebx
 	pusha
 		call Grouping.Remove
 		call Grouping.Add
-		call Grouping.DoUpdate
 	popa
 	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
 	pusha
-	call Grouping.DoUpdate
+		call Component.RequestUpdate
 	popa
 	ret
 Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [NEEDS TO BE REWORKED TO WORK WITH subcomponent]
@@ -127,18 +129,18 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [N
 	pop ebx
 	pop eax
 	ret
-Grouping.DoUpdate :	; Grouping in ebx
-pusha
-	mov dword [ebx+Grouping_renderFlag], TRUE
-popa
-ret
+;Grouping.DoUpdate :	; Grouping in ebx
+;pusha
+;	mov dword [ebx+Grouping_renderFlag], TRUE
+;popa
+;ret
 Grouping.Render :	; Grouping in ebx
 	pusha
 	
 		mov edx, ebx	; edx always points to Grouping
 		
-		cmp dword [edx+Grouping_renderFlag], FALSE
-			je Grouping.Render.ret
+		;cmp dword [edx+Grouping_renderFlag], FALSE
+		;	je Grouping.Render.ret
 			
 			test dword [edx+Grouping_backingColor], 0xFF000000
 				jz Grouping.Render.noLayerColor
@@ -182,8 +184,17 @@ Grouping.RenderSub :
 	cmp dword [ebx+Component_transparent], FALSE
 		je Grouping.RenderSub_fast
 	pusha
+		cmp dword [ebx+Component_type], Component.TYPE_GROUPING
+	;		jne .noForceRender
 		call Component.Render
-			
+		jmp .doneRendering
+		.noForceRender :
+		cmp dword [ebx+Component_needsRedraw], true
+			jne .ret	; should only redraw if it needs to!
+		call Component.Render
+		.doneRendering :
+		mov dword [ebx+Component_needsRedraw], false
+		
 		mov eax, [ebx+Component_y]
 		imul eax, [edx+Component_w]
 		add eax, [ebx+Component_x]
@@ -217,11 +228,21 @@ Grouping.RenderSub :
 		mov [Image.copyRegionWithTransparency.nw], eax
 		
 		call Image.copyRegionWithTransparency
+	Grouping.RenderSub.ret :
 	popa
 	ret
 Grouping.RenderSub_fast :
 	pusha
+		cmp dword [ebx+Component_type], Component.TYPE_GROUPING
+	;		jne .noForceRender
 		call Component.Render
+		jmp .doneRendering
+		.noForceRender :
+		cmp dword [ebx+Component_needsRedraw], true
+			jne .ret	; should only redraw if it needs to!
+		call Component.Render
+		.doneRendering :
+		mov dword [ebx+Component_needsRedraw], false
 			
 		mov eax, [ebx+Component_y]
 		imul eax, [edx+Component_w]
@@ -256,6 +277,7 @@ Grouping.RenderSub_fast :
 		mov [Image.copyRegion.nw], eax
 		
 		call Image.copyRegion
+	Grouping.RenderSub_fast.ret :
 	popa
 	ret
 

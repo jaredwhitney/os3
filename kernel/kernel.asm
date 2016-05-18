@@ -230,6 +230,8 @@ Kernel.init :
 	;	MAIN LOOP	;
 	kernel.loop:
 	
+		;	call Keyboard.poll
+	
 		;	RUN INSTALLED MODULES	;
 			call kernel.runModules
 		
