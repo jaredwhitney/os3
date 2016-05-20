@@ -222,15 +222,32 @@ Kernel.init :
 	;		jg .goloop
 	
 	;	ACTUALLY LOCK IT	;
-	call Manager.handleLock
+	;call Manager.handleLock
 	
 	;	ALLOW WINDOWS TO BE DRAWN	;
 	mov byte [Dolphin_WAIT_FLAG], 0x00
 	
+	mov al, [Dolphin.currentWindow]
+	mov [Dolphin.activeWindow], al
+	
+	mov eax, 100
+	call System.sleep
+	
+	;mov bl, 't'
+	;call KeyManager.keyPress
+	;mov bl, 'e'
+	;call KeyManager.keyPress
+	;mov bl, 's'
+	;call KeyManager.keyPress
+	;mov bl, 't'
+	;call KeyManager.keyPress
+	;mov bl, 0xFE
+	;call KeyManager.keyPress
+	
+	call console.test
+	
 	;	MAIN LOOP	;
 	kernel.loop:
-	
-		;	call Keyboard.poll
 	
 		;	RUN INSTALLED MODULES	;
 			call kernel.runModules
