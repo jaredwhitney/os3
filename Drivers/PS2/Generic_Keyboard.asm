@@ -82,15 +82,6 @@ Keyboard.poll :
 	;KeyManager.handleShift.reentry :
 	mov bl, al
 	call KeyManager.keyPress	; keypress will be sent to the currently registered program in al
-			push ebx
-			mov [Component.keyChar], al
-			mov ebx, [Dolphin2.started]
-			cmp ebx, 0x0
-				je qwerfasdf
-			mov ebx, [Dolphin2.focusedComponent]
-			call Component.HandleKeyboardEvent
-			qwerfasdf :
-			pop ebx
 	Keyboard.poll.drawKeyFinalize :
 	mov cx, 0x0
 	mov [KeyManager.isReady], cx	; so we know that we have already printed the character, and should not do so again
@@ -172,6 +163,15 @@ pusha
 	mov [KeyManager.bufferpos], eax
 	KeyManager.keyPress.ret :
 popa
+			push ebx
+			mov [Component.keyChar], al
+			mov ebx, [Dolphin2.started]
+			cmp ebx, 0x0
+				je qwerfasdf
+			mov ebx, [Dolphin2.focusedComponent]
+			call Component.HandleKeyboardEvent
+			qwerfasdf :
+			pop ebx
 ret
 
 Keyboard.getKey :

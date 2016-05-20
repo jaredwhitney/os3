@@ -46,42 +46,9 @@ Dolphin2.renderScreen :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.Render
 		
-	;	mov ebx, [ebx+Grouping_subcomponent]
-	;	mov ecx, [Mouse.x]
-	;	imul ecx, 4
-	;	mov [ebx+Component_x], ecx
-	;	mov ecx, [Graphics.SCREEN_HEIGHT]
-	;	sub ecx, [Mouse.y]
-	;	mov [ebx+Component_y], ecx
+		call Dolphin2.drawFPScounter
 		
-		mov dword [FPS_NUM_STR], 0
-		mov dword [FPS_NUM_STR+4], 0
-		mov eax, FPS_NUM_STR
-		mov ebx, [Clock.tics]
-		sub ebx, [Dolphin2.lastFrameTime]
-		push eax
-		; ebx is in 5000ths of a second per frame
-		xor edx, edx
-		mov eax, ebx
-		mov ecx, 5
-		idiv ecx
-		mov ebx, eax; ebx is in ms per frame
-		mov [Dolphin2.tempvar], ebx
-		fld1
-		fimul dword [Dolphin2.1k]
-		fidiv dword [Dolphin2.tempvar]
-		fbstp [Dolphin2.tempvar]
-		mov ebx, [Dolphin2.tempvar]
-		pop eax
-		call String.fromHex
-		mov eax, [Clock.tics]
-		mov [Dolphin2.lastFrameTime], eax
-		
-		mov ecx, [Dolphin2.flipBuffer]
-		mov eax, FPS_NUM_STR
-		call d2_easyteletype
-		mov eax, FPS_STR
-		call d2_easyteletype
+		call Dolphin2.drawMouse
 		
 		mov eax, [Dolphin2.flipBuffer]
 		mov ebx, [Graphics.SCREEN_MEMPOS]
@@ -120,23 +87,56 @@ d2_easyteletype :
 		pop eax	
 	ret
 
+Dolphin2.drawFPScounter :
+	pusha
+		mov dword [FPS_NUM_STR], 0
+		mov dword [FPS_NUM_STR+4], 0
+		mov eax, FPS_NUM_STR
+		mov ebx, [Clock.tics]
+		sub ebx, [Dolphin2.lastFrameTime]
+		push eax
+		; ebx is in 5000ths of a second per frame
+		xor edx, edx
+		mov eax, ebx
+		mov ecx, 5
+		idiv ecx
+		mov ebx, eax; ebx is in ms per frame
+		mov [Dolphin2.tempvar], ebx
+		fld1
+		fimul dword [Dolphin2.1k]
+		fidiv dword [Dolphin2.tempvar]
+		fbstp [Dolphin2.tempvar]
+		mov ebx, [Dolphin2.tempvar]
+		pop eax
+		call String.fromHex
+		mov eax, [Clock.tics]
+		mov [Dolphin2.lastFrameTime], eax
+		
+		mov ecx, [Dolphin2.flipBuffer]
+		mov eax, FPS_NUM_STR
+		call d2_easyteletype
+		mov eax, FPS_STR
+		call d2_easyteletype
+	popa
+	ret
+	
 Dolphin2.drawMouse :
 	pusha
 		cmp dword [Dolphin2.started], true
 			jne .ret
-		mov eax, [Graphics.SCREEN_MEMPOS]
+		mov eax, [Dolphin2.flipBuffer]
 		mov ebx, [Graphics.SCREEN_HEIGHT]
-		pusha
-			sub ebx, [Mouse.lasty]
-			imul ebx, [Graphics.SCREEN_WIDTH]
-			add eax, ebx
-			mov ecx, [Mouse.lastx]
-			imul ecx, 4
-			add eax, ecx
-			mov ebx, 8
-			mov ecx, 14
-			call Dolphin.redrawBackgroundRegion
-		popa
+	;	pusha
+	;		sub ebx, [Mouse.lasty]
+	;		imul ebx, [Graphics.SCREEN_WIDTH]
+	;		add eax, ebx
+	;		mov ecx, [Mouse.lastx]
+	;		imul ecx, 4
+	;		add eax, ecx
+	;		mov ebx, 8
+	;		mov ecx, 14
+	;		call Dolphin.redrawBackgroundRegion
+	;	popa
 		sub ebx, [Mouse.y]
 		imul ebx, [Graphics.SCREEN_WIDTH]
 		add eax, ebx
@@ -192,23 +192,31 @@ B equ 0xFF000000
 W equ 0xFFFFFFFF
 T equ 0x00000000
 
-CURSOR_WIDTH	equ 8*4
-CURSOR_HEIGHT	equ 14
+CURSOR_WIDTH	equ 11*4
+CURSOR_HEIGHT	equ 21
 CursorData :
-	dd B, B, T, T, T, T, T, T
-	dd B, B, T, T, T, T, T, T
-	dd B, B, B, B, T, T, T, T
-	dd B, B, B, B, T, T, T, T
-	dd B, B, W, W, B, B, T, T
-	dd B, B, W, W, B, B, T, T
-	dd B, B, W, W, W, W, B, B
-	dd B, B, W, W, W, W, B, B
-	dd B, B, B, B, B, B, T, T
-	dd B, B, B, B, B, B, T, T
-	dd B, B, T, T, B, B, B, B
-	dd B, B, T, T, B, B, B, B
-	dd T, T, T, T, T, T, B, B
-	dd T, T, T, T, T, T, B, B
+	dd B, T, T, T, T, T, T, T, T, T, T
+	dd B, B, T, T, T, T, T, T, T, T, T
+	dd B, W, B, T, T, T, T, T, T, T, T
+	dd B, W, W, B, T, T, T, T, T, T, T
+	dd B, W, W, W, B, T, T, T, T, T, T
+	dd B, W, W, W, W, B, T, T, T, T, T
+	dd B, W, W, W, W, W, B, T, T, T, T
+	dd B, W, W, W, W, W, W, B, T, T, T
+	dd B, W, W, W, W, W, W, W, B, T, T
+	dd B, W, W, W, W, W, W, W, W, B, T
+	dd B, W, W, W, W, W, W, W, W, W, B
+	dd B, W, W, W, W, W, W, W, W, B, B
+	dd B, W, W, W, W, W, W, B, B, T, T
+	dd B, W, W, W, B, W, W, B, T, T, T
+	dd B, W, W, B, T, B, W, B, T, T, T
+	dd B, W, B, T, T, B, W, W, B, T, T
+	dd B, B, T, T, T, T, B, W, W, B, T
+	dd T, T, T, T, T, T, T, B, W, B, T
+	dd T, T, T, T, T, T, T, B, W, W, B
+	dd T, T, T, T, T, T, T, B, W, B, B
+	dd T, T, T, T, T, T, T, T, B, T, T
+	
 
 Dolphin2.HandleKeyboardEvent :
 	pusha

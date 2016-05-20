@@ -79,6 +79,8 @@ iConsole2.HandleKeyEvent :
 		mov byte [eax-2], null	; get rid of the trailing enter
 
 		mov eax, [iConsole2.commandBase]
+		cmp eax, null
+			je uhoh...
 		mov ebx, iConsole2.commandStore
 		.cloop :		; need to add a quit if it turns out the command was unknown!
 		mov ecx, eax
@@ -105,31 +107,40 @@ iConsole2.HandleKeyEvent :
 		mov ecx, ebx
 		call Minnow4.getFilePointer
 		cmp ebx, Minnow4.SUCCESS
-			jne .knvmgoon
+			jne .bindingNotFound
+		
+		mov edx, [iConsole2.filetypeBindingBase]
+		cmp edx, null
+			je .bindingNotFound
 		.fnamechckloop :
 			cmp byte [ecx], '.'
 				je .kcont
 			cmp byte [ecx], 0
-				je .knvmgoon
+				je .bindingNotFound
 			add ecx, 1
 			jmp .fnamechckloop
-			.kcont :
-			add ecx, 1
-			mov eax, ecx
-			mov ebx, Minnow4.FILETYPE_RAWTEXT
-			call os.seq
-			cmp al, 0x1
-				jne .knvmgoon
-			
-		;	mov eax, Minnow4.tempNumStor
-		;	mov ebx, ecx
-		;	call String.fromHex
-			push ecx
-			call iConsole2.Echo
-			
-			jmp .ret
 		
-		.knvmgoon :
+		.kcont :
+		add ecx, 1
+		mov eax, ecx
+		
+		.goSearchBindingsLoop :
+		push eax
+		mov ebx, [edx+filetypebinding_name]
+		call os.seq
+		cmp al, 0x1
+		pop eax
+			je .kgoRun
+		mov edx, [edx+filetypebinding_nextLink]
+		cmp edx, null
+			je .bindingNotFound
+		jmp .goSearchBindingsLoop
+		
+		.kgoRun :
+		call [edx+filetypebinding_function]	
+		jmp .ret
+		
+		.bindingNotFound :
 		push dword iConsole2.INVALID_COMMAND
 		call iConsole2.Echo
 		mov esp, [0x1000]
@@ -250,6 +261,26 @@ iConsole2.RegisterCommand :	; Command command
 			mov [iConsole2.commandBase], eax
 		leave
 		ret 4
+
+iConsole2.RegisterFiletypeBinding :	; Command command
+	enter 0, 0
+		mov eax, [ebp+8]
+		mov ebx, [iConsole2.filetypeBindingBase]
+		cmp ebx, 0
+			je .setbase
+		.loop :
+		mov ecx, ebx
+		mov ebx, [ebx+filetypebinding_nextLink]
+		cmp ebx, null
+			jne .loop
+		mov [ecx+filetypebinding_nextLink], eax
+	
+	leave
+	ret 4
+	.setbase :
+			mov [iConsole2.filetypeBindingBase], eax
+		leave
+		ret 4
 	
 iConsole2.window :
 	dd 0x0
@@ -271,9 +302,15 @@ iConsole2.commandStore :
 	times 512 db 0
 iConsole2.commandBase :
 	dd 0x0
+iConsole2.filetypeBindingBase :
+	dd 0x0
 	
 command_name		equ 0x0
 command_function	equ 0x4
 command_nextLink	equ 0x8
+
+filetypebinding_name		equ 0x0
+filetypebinding_function	equ 0x4
+filetypebinding_nextLink	equ 0x8
 
 iConsole2.BUFFER_SIZE	equ 1500
