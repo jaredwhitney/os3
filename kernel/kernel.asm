@@ -230,7 +230,7 @@ Kernel.init :
 	mov al, [Dolphin.currentWindow]
 	mov [Dolphin.activeWindow], al
 	
-	mov eax, 100
+	mov eax, 1000
 	call System.sleep
 	
 	;mov bl, 't'
