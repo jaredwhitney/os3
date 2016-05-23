@@ -2,14 +2,22 @@ TextEditor.COMMAND_RUN :
 	dd TextEditor.STR_TEXTEDITORNAME
 	dd TextEditor.main
 	dd null
+TextEditor.BINDING_RAWTEXT :
+	dd TextEditor.STR_RAWTEXTTYPE
+	dd TextEditor.mainFromConsoleFile
+	dd null
 TextEditor.init :
 	pusha
 		push dword TextEditor.COMMAND_RUN
 		call iConsole2.RegisterCommand
+		push dword TextEditor.BINDING_RAWTEXT
+		call iConsole2.RegisterFiletypeBinding
 	popa
 	ret
 TextEditor.STR_TEXTEDITORNAME :
 	db "textedit", 0x0
+TextEditor.STR_RAWTEXTTYPE :
+	db "rawtext", 0x0
 
 TextEditor.main :
 	pusha
@@ -48,7 +56,16 @@ TextEditor.window :
 	dd 0x0
 TextEditor.text  :
 	dd 0x0
-	
+
+TextEditor.mainFromConsoleFile :
+	pusha
+		mov eax, iConsole2.commandStore
+		mov [PromptBox.response], eax
+		call TextEditor.main
+		call TextEditor.loadFile
+	popa
+	ret
+
 TextEditor.loadFile :
 	pusha
 		mov eax, [PromptBox.response]
@@ -62,8 +79,8 @@ TextEditor.loadFile :
 		mov eax, TextEditor.fileTitle	; title changing is broken!
 		mov ebx, 20*8
 		call Buffer.clear
-		mov eax, [PromptBox.response]
-		mov ebx, [TextEditor.fileTitle]
+		mov eax, PromptBox.response
+		mov ebx, TextEditor.fileTitle
 		call String.copy
 		mov ecx, [TextEditor.window]
 		mov eax, [ecx+WindowGrouping_title]
