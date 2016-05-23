@@ -112,6 +112,7 @@ iConsole2.HandleKeyEvent :
 		mov edx, [iConsole2.filetypeBindingBase]
 		cmp edx, null
 			je .bindingNotFound
+		
 		.fnamechckloop :
 			cmp byte [ecx], '.'
 				je .kcont
@@ -138,14 +139,14 @@ iConsole2.HandleKeyEvent :
 		
 		.kgoRun :
 		call [edx+filetypebinding_function]	
-		jmp .ret
+		jmp .aret
 		
 		.bindingNotFound :
 		push dword iConsole2.INVALID_COMMAND
 		call iConsole2.Echo
 		mov esp, [0x1000]
+		.aret :
 		call iConsole2.PrintPrompt
-		.ret :
 		popa
 		ret
 iConsole2.QUOTES :
@@ -262,7 +263,7 @@ iConsole2.RegisterCommand :	; Command command
 		leave
 		ret 4
 
-iConsole2.RegisterFiletypeBinding :	; Command command
+iConsole2.RegisterFiletypeBinding :	; FiletypeBinding binding
 	enter 0, 0
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.filetypeBindingBase]
@@ -301,9 +302,9 @@ iConsole2.invalidCommand :
 iConsole2.commandStore :
 	times 512 db 0
 iConsole2.commandBase :
-	dd 0x0
+	dd null
 iConsole2.filetypeBindingBase :
-	dd 0x0
+	dd null
 	
 command_name		equ 0x0
 command_function	equ 0x4

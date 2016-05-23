@@ -256,8 +256,10 @@ ImageEditor.init :
 	ret
 ImageEditor.placeholderTitle :
 	db "ImageEditor- Untitled", 0x0
-ImageEditor.promptTitle :
-	db "ImageEditor", 0x0
+ImageEditor.promptSaveTitle :
+	db "Save an Image", 0x0
+ImageEditor.promptLoadTitle :
+	db "Open an Image", 0x0
 ImageEditor.promptMessage :
 	db "File Name: ", 0x0
 ImageEditor.STR_SIZE :
@@ -299,7 +301,7 @@ ImageEditor.image :
 ImageEditor.colorPreview :
 	dd 0x0
 ImageEditor.brushSize :
-	dd 0x0
+	dd 4
 ImageEditor.redVal :
 	dd 0x0
 ImageEditor.greenVal :
@@ -310,14 +312,32 @@ ImageEditor.color :
 	dd 0xFF000000
 
 ImageEditor.promptLoadFile :
-	push dword ImageEditor.promptTitle
+	push dword ImageEditor.promptLoadTitle
 	push dword ImageEditor.promptMessage
 	push dword ImageEditor.loadFile
 	call PromptBox.PromptForString
 ImageEditor.loadFile :
+	pusha
+		mov ebx, [Graphics.SCREEN_WIDTH]
+		imul ebx, [Graphics.SCREEN_HEIGHT]
+		call ProgramManager.reserveMemory
+		mov edx, [ImageEditor.image]
+		mov [edx+Image_source], ebx
+		
+		mov eax, [PromptBox.response]
+		call Minnow4.getFilePointer
+		mov ecx, [ImageEditor.image]
+		mov ecx, [ecx+Image_source]
+		mov edx, [Graphics.SCREEN_WIDTH]
+		imul edx, [Graphics.SCREEN_HEIGHT]
+		call Minnow4.readBuffer
+		
+		; should resize the window etx here
+		
+	popa
 	ret
 ImageEditor.promptSaveFile :
-		push dword ImageEditor.promptTitle
+		push dword ImageEditor.promptSaveTitle
 		push dword ImageEditor.promptMessage
 		push dword ImageEditor.saveFile
 		call PromptBox.PromptForString
@@ -353,6 +373,8 @@ ImageEditor.getFileName :
 ImageEditor.mouseHandlerFunc :
 
 ImageEditor.decBrushSize :
+		cmp dword [ImageEditor.brushSize], 4
+			je .ret
 		dec dword [ImageEditor.brushSize]
 		pusha
 			mov eax, ImageEditor.SIZE_VALSTR
@@ -361,8 +383,11 @@ ImageEditor.decBrushSize :
 			mov ebx, [ImageEditor.brushSize]
 			call String.fromHex
 		popa
+	.ret :
 	ret
 ImageEditor.incBrushSize :
+		cmp dword [ImageEditor.brushSize], 255
+			je .ret
 		inc dword [ImageEditor.brushSize]
 		pusha
 			mov eax, ImageEditor.SIZE_VALSTR
@@ -371,8 +396,11 @@ ImageEditor.incBrushSize :
 			mov ebx, [ImageEditor.brushSize]
 			call String.fromHex
 		popa
+	.ret :
 	ret
 ImageEditor.decRedValue :
+		cmp dword [ImageEditor.redVal], 0
+			je .ret
 		dec dword [ImageEditor.redVal]
 		pusha
 			mov eax, ImageEditor.RED_VALSTR
@@ -382,8 +410,11 @@ ImageEditor.decRedValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.incRedValue :
+		cmp dword [ImageEditor.redVal], 255
+			je .ret
 		inc dword [ImageEditor.redVal]
 		pusha
 			mov eax, ImageEditor.RED_VALSTR
@@ -393,8 +424,11 @@ ImageEditor.incRedValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.decGreenValue :
+		cmp dword [ImageEditor.greenVal], 0
+			je .ret
 		dec dword [ImageEditor.greenVal]
 		pusha
 			mov eax, ImageEditor.GREEN_VALSTR
@@ -404,8 +438,11 @@ ImageEditor.decGreenValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.incGreenValue :
+		cmp dword [ImageEditor.greenVal], 255
+			je .ret
 		inc dword [ImageEditor.greenVal]
 		pusha
 			mov eax, ImageEditor.GREEN_VALSTR
@@ -415,8 +452,11 @@ ImageEditor.incGreenValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.decBlueValue :
+		cmp dword [ImageEditor.blueVal], 0
+			je .ret
 		dec dword [ImageEditor.blueVal]
 		pusha
 			mov eax, ImageEditor.BLUE_VALSTR
@@ -426,8 +466,11 @@ ImageEditor.decBlueValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.incBlueValue :
+		cmp dword [ImageEditor.blueVal], 255
+			je .ret
 		inc dword [ImageEditor.blueVal]
 		pusha
 			mov eax, ImageEditor.BLUE_VALSTR
@@ -437,6 +480,7 @@ ImageEditor.incBlueValue :
 			call String.fromHex
 		popa
 		call ImageEditor.updateColorPreview
+	.ret :
 	ret
 ImageEditor.updateColorPreview :
 	pusha
@@ -455,14 +499,31 @@ ImageEditor.drawStroke :
 	cmp dword [Component.mouseEventType], MOUSE_NOBTN
 		je .ret
 	pusha
-		mov ebx, [ImageEditor.image]
-		mov edx, [ebx+Image_source]
-		add edx, [Component.mouseEventX]
-		mov ecx, [Component.mouseEventY]
-		imul ecx, [ebx+Image_sw]
-		add edx, ecx
-		mov eax, [ImageEditor.color]
-		mov dword [edx], eax
+	;	mov ebx, [ImageEditor.image]
+	;	mov edx, [ebx+Image_source]
+	;	add edx, [Component.mouseEventX]
+	;	mov ecx, [Component.mouseEventY]
+	;	imul ecx, [ebx+Image_sw]
+	;	add edx, ecx
+	;	mov eax, [ImageEditor.color]
+	;	mov dword [edx], eax
+		
+		mov eax, [ImageEditor.image]
+		mov ebx, [eax+Image_w]
+		shr ebx, 2
+		mov ecx, [eax+Image_h]
+		shr ecx, 2
+		mov eax, [eax+Image_source]
+		call L3gxImage.FromBuffer
+		push ecx
+		mov edx, [Component.mouseEventX]
+		shr edx, 2
+		push edx
+		push dword [Component.mouseEventY]
+		push dword [ImageEditor.brushSize]
+		push dword [ImageEditor.brushSize]
+		push dword [ImageEditor.color]
+		call L3gx.fillRect
 		
 		mov ebx, [ImageEditor.image]
 		call Component.RequestUpdate
