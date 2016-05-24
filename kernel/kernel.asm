@@ -45,8 +45,8 @@ Kernel.init :
 		mov al, [Dolphin.currentWindow]
 		mov [Dolphin.activeWindow], al
 	
-	; Pause for 100 clock tics (needed workaround or will not boot)
-		mov eax, 100
+	; Pause for 1000 clock tics (needed workaround or will not boot)
+		mov eax, 1000
 		call System.sleep
 	
 	; Set up and run the windowing system (does not return).
@@ -108,6 +108,7 @@ kernel.finishLoading :
 		add ecx, 0x200
 		cmp edx, 0x0
 			jg .loadLoop
+	ret
 		
 		
 [bits 16]	; to be used in real mode

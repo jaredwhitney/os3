@@ -88,7 +88,11 @@ L3gx.fillRect :	; L3gxImage image, int x, int y, int w, int h, int Color
 	pop dword [fillRect.y]
 	pop dword [fillRect.x]
 	pop dword [fillRect.image]
+	cmp dword [fillRect.h], 0x0
+		je .ret
 	pusha
+		cmp dword [fillRect.w], 4
+			jl L3gx.fillNarrowRect
 		mov eax, [fillRect.w]
 		shl eax, 2	; mul by 4
 		mov [fillRect.w], eax
@@ -106,7 +110,7 @@ L3gx.fillRect :	; L3gxImage image, int x, int y, int w, int h, int Color
 		mov eax, [fillRect.w]
 		shr eax, 2	; 4 bytes per pixel
 		shr eax, 2	; 4 pixels per move... eax is the number of movdqu's
-		mov ebx, eax
+		; mov ebx, eax
 		mov ecx, [fillRect.w]
 		shr ecx, 2
 		and ecx, 0b11	; ecx is the number of leftover pixels
@@ -124,32 +128,33 @@ L3gx.fillRect :	; L3gxImage image, int x, int y, int w, int h, int Color
 		pop eax
 		mov edx, [fillRect.color]
 		push eax
-		fillRect.loop :
+		.loop :
 			pop eax
 			push eax
-			fillRect.innerLoop0 :
+			.innerLoop0 :
 				movdqu [ebx], xmm0
 				dec eax
 				add ebx, 4*4	; 4 pixels
 				cmp eax, 0x0
-					jg fillRect.innerLoop0
+					jg .innerLoop0
 			mov eax, ecx
-			fillRect.innerLoop1 :
+			.innerLoop1 :
 				cmp eax, 0x0
-					jle fillRect.innerLoop1_end
+					jle .innerLoop1_end
 				mov [ebx], edx
 				add ebx, 4*1	; 1 pixel
 				dec eax
-				jmp fillRect.innerLoop1
-			fillRect.innerLoop1_end :
+				jmp .innerLoop1
+			.innerLoop1_end :
 			add ebx, [fillRect.addBack]
 			mov eax, [fillRect.h]
 			dec eax
 			mov [fillRect.h], eax
 			cmp eax, 0x0
-				jg fillRect.loop
+				jg .loop
 			pop eax
 	popa
+	.ret :
 	push dword [fillRect.retval]
 	ret
 fillRect.retval :
@@ -170,3 +175,51 @@ fillRect.addBack :
 	dd 0x0
 fillRect.kcol :
 	dq 0x0, 0x0
+
+L3gx.fillNarrowRect :
+		cmp dword [fillRect.w], 0x0
+			je .ret
+		mov eax, [fillRect.w]
+		shl eax, 2	; mul by 4
+		mov [fillRect.w], eax
+		mov ebx, [fillRect.image]
+		mov eax, [ebx+L3gxImage_w]
+		shl eax, 2
+		sub eax, [fillRect.w]
+		mov [fillRect.addBack], eax
+		mov eax, [fillRect.w]
+		shr eax, 2	; 4 bytes per pixel
+		push eax
+		mov eax, [fillRect.image]
+		mov ebx, [eax+L3gxImage_data]
+		mov edx, [fillRect.x]
+		shl edx, 2
+		add ebx, edx
+		mov edx, [fillRect.y]
+		mov eax, [eax+L3gxImage_w]
+		shl eax, 2
+		imul edx, eax
+		add ebx, edx	; ebx is the location in the image
+		pop eax
+		mov edx, [fillRect.color]
+		push eax
+		.loop :
+			pop eax
+			push eax
+			.innerLoop :
+				mov [ebx], edx
+				dec eax
+				add ebx, 4
+				cmp eax, 0x0
+					jg .innerLoop
+			add ebx, [fillRect.addBack]
+			mov eax, [fillRect.h]
+			dec eax
+			mov [fillRect.h], eax
+			cmp eax, 0x0
+				jg .loop
+		pop eax
+	.ret :
+	popa
+	push dword [fillRect.retval]
+	ret

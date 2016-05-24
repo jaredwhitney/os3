@@ -1,4 +1,25 @@
+ImageEditor.COMMAND_RUN :
+	dd ImageEditor.STR_IMAGEEDITORNAME
+	dd ImageEditor.main
+	dd null
+ImageEditor.BINDING_RAWIMAGE :
+	dd ImageEditor.STR_RAWIMAGETYPE
+	dd ImageEditor.mainFromConsoleFile
+	dd null
 ImageEditor.init :
+	pusha
+		push dword ImageEditor.COMMAND_RUN
+		call iConsole2.RegisterCommand
+		push dword ImageEditor.BINDING_RAWIMAGE
+		call iConsole2.RegisterFiletypeBinding
+	popa
+	ret
+ImageEditor.STR_IMAGEEDITORNAME :
+	db "imageedit", 0x0
+ImageEditor.STR_RAWIMAGETYPE :
+	db "rawimage", 0x0
+
+ImageEditor.main :
 	pusha
 		push dword ImageEditor.placeholderTitle
 		push dword 0*4
@@ -265,7 +286,7 @@ ImageEditor.promptMessage :
 ImageEditor.STR_SIZE :
 	db "Size: ", 0x0
 ImageEditor.SIZE_VALSTR :
-	db '0'
+	db '1'
 	times 4 dq 0x0
 ImageEditor.STR_COLOR :
 	db "Color: ", 0x0
@@ -301,7 +322,7 @@ ImageEditor.image :
 ImageEditor.colorPreview :
 	dd 0x0
 ImageEditor.brushSize :
-	dd 4
+	dd 1
 ImageEditor.redVal :
 	dd 0x0
 ImageEditor.greenVal :
@@ -311,11 +332,21 @@ ImageEditor.blueVal :
 ImageEditor.color :
 	dd 0xFF000000
 
+ImageEditor.mainFromConsoleFile :
+	pusha
+		mov eax, iConsole2.commandStore
+		mov [PromptBox.response], eax
+		call ImageEditor.main
+		call ImageEditor.loadFile
+	popa
+	ret
+	
 ImageEditor.promptLoadFile :
-	push dword ImageEditor.promptLoadTitle
-	push dword ImageEditor.promptMessage
-	push dword ImageEditor.loadFile
-	call PromptBox.PromptForString
+		push dword ImageEditor.promptLoadTitle
+		push dword ImageEditor.promptMessage
+		push dword ImageEditor.loadFile
+		call PromptBox.PromptForString
+	ret
 ImageEditor.loadFile :
 	pusha
 		mov ebx, [Graphics.SCREEN_WIDTH]
@@ -373,7 +404,7 @@ ImageEditor.getFileName :
 ImageEditor.mouseHandlerFunc :
 
 ImageEditor.decBrushSize :
-		cmp dword [ImageEditor.brushSize], 4
+		cmp dword [ImageEditor.brushSize], 1
 			je .ret
 		dec dword [ImageEditor.brushSize]
 		pusha

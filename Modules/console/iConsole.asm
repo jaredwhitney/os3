@@ -183,10 +183,10 @@ call ProgramManager.setActive	; Make removable Later
 	
 	call Minnow4.init
 	
-	mov eax, [os_imageDataBaseLBA]
-	xor ebx, ebx
-	mov edx, 1024*4*768
-	call rmATA.DMAread
+	;mov eax, [os_imageDataBaseLBA]
+	;xor ebx, ebx
+	;mov edx, 1024*4*768
+	;call rmATA.DMAread
 	mov [Dolphin2.bgimg], ecx
 	
 	call Dolphin2.createCompositorGrouping
