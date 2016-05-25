@@ -135,6 +135,7 @@
 
 	;  Paging Includes	;
 		%include "..\kernel\Paging.asm"	; unimplemented
+		%include "..\kernel\betterPaging.asm"
 	
 	;  EHCI Driver Includes	;
 		%include "..\Drivers\USB\EHCI.asm"	; unimplemented

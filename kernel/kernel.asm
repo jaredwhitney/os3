@@ -34,7 +34,9 @@ Kernel.init :
 	
 	; Initialize the USB Driver
 		; call EHCI.findDevice
-	
+	cli
+	call betterPaging.init
+	sti
 	; Enable the FPU
 		call FPU.enable
 	
