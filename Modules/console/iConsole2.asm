@@ -65,6 +65,14 @@ iConsole2.HandleKeyEvent :
 		cmp bl, '"'
 			jne .notQuotes
 		xor dword [.instr], true
+		cmp dword [.instr], true
+			jne .dontFixQuoteOpen
+		inc dword [esp]
+		.dontFixQuoteOpen :
+		cmp dword [.instr], false
+			jne .dontFixQuoteClose
+		mov byte [eax-1], 0x0
+		.dontFixQuoteClose :
 		.notQuotes :
 		cmp bl, ' '
 			jne .notspace

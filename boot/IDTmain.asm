@@ -509,7 +509,7 @@ _IRQ0 :
 		idiv ecx
 		cmp edx, 0x0	; update screen once every 83 tics (5000tics/sec * 60frames/sec)
 			jne _IRQ0.ret
-		call Dolphin.updateScreen
+		; call Dolphin.updateScreen
 	_IRQ0.ret :
 	popa
 	iret
