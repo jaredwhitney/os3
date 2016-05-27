@@ -64,6 +64,7 @@
 		%include "..\modules\textEditor\TextEditor.asm"
 		%include "..\modules\imageEditor\ImageEditor.asm"
 		%include "..\modules\video\Video.asm"
+		%include "..\modules\simpleRender\SimpleRender.asm"
 	
 	;  Program Loader Includes	;
 		%include "..\kernel\ProgramLoader.asm"	; depricated in part

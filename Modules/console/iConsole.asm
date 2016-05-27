@@ -193,15 +193,15 @@ call ProgramManager.setActive	; Make removable Later
 	
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
 		
-;		call SimpleRender.init
-		call iConsole2.Init
+		call SimpleRender.init
+	;	call iConsole2.Init
 		call ImageEditor.init
 		call TextEditor.init
 		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
 	GoDoLoop :
-;	call SimpleRender.runOnce
+	call SimpleRender.loop
 	call Dolphin2.drawMouse
 	call Dolphin2.renderScreen
 ;	call Keyboard.poll
@@ -238,264 +238,264 @@ consoletest_text :
 	db "This is some sample text that should be displayed in the test window.", 0
 consoletest_type :
 	db "Text", 0
-SimpleRender.init :
-	pusha
-		push SimpleRender.windowTitle
-		push dword 0*4
-		push dword 0
-		push dword 400*4
-		push dword 400
-		call Dolphin2.makeWindow
-		mov [SimpleRender.window], ecx
+; SimpleRender.init :
+	; pusha
+		; push SimpleRender.windowTitle
+		; push dword 0*4
+		; push dword 0
+		; push dword 400*4
+		; push dword 400
+		; call Dolphin2.makeWindow
+		; mov [SimpleRender.window], ecx
 
-		mov eax, 400*400*4
-		mov ecx, 0x1000
-		xor edx, edx
-		idiv ecx
-		mov ebx, eax
-		mov al, 0x7
-		call Guppy.malloc
+		; mov eax, 400*400*4
+		; mov ecx, 0x1000
+		; xor edx, edx
+		; idiv ecx
+		; mov ebx, eax
+		; mov al, 0x7
+		; call Guppy.malloc
 		
-		push ebx
-		push 400*4
-		push 400
-		push 0
-		push 0
-		push 400*4
-		push 400
-		call Image.Create
-		mov eax, ecx
-		mov ebx, [SimpleRender.window]
-		call Grouping.Add
-		mov [SimpleRender.image], eax
-		add eax, Image_source
-		mov [SimpleRender.imagebuffer], eax
+		; push ebx
+		; push 400*4
+		; push 400
+		; push 0
+		; push 0
+		; push 400*4
+		; push 400
+		; call Image.Create
+		; mov eax, ecx
+		; mov ebx, [SimpleRender.window]
+		; call Grouping.Add
+		; mov [SimpleRender.image], eax
+		; add eax, Image_source
+		; mov [SimpleRender.imagebuffer], eax
 		
-	popa
-	ret
-SimpleRender.runOnce :
-	pusha
-		mov ebx, [SimpleRender.rval]
-		add dword [tri+0+8], ebx
-		add dword [tri+12+8], ebx
-		add dword [tri+24+8], ebx
+	; popa
+	; ret
+; SimpleRender.runOnce :
+	; pusha
+		; mov ebx, [SimpleRender.rval]
+		; add dword [tri+0+8], ebx
+		; add dword [tri+12+8], ebx
+		; add dword [tri+24+8], ebx
 		
-		cmp dword [tri+0+8], 50
-			jle .upgood
-		jmp .worry
-		.upgood :
-		cmp dword [tri+0+8], 10
-			jge .dontworry
-		.worry :
-		mov ebx, [SimpleRender.rval]
-		imul ebx, -1
-		mov [SimpleRender.rval], ebx
-		.dontworry :
+		; cmp dword [tri+0+8], 50
+			; jle .upgood
+		; jmp .worry
+		; .upgood :
+		; cmp dword [tri+0+8], 10
+			; jge .dontworry
+		; .worry :
+		; mov ebx, [SimpleRender.rval]
+		; imul ebx, -1
+		; mov [SimpleRender.rval], ebx
+		; .dontworry :
 		
-		call SimpleRender.goRender
+		; call SimpleRender.goRender
 		
-		mov ebx, [SimpleRender.image]
-		call Component.RequestUpdate
-	popa
-	ret
-SimpleRender.windowTitle :
-	db "SimpleRender Test", 0
-SimpleRender.window :
-	dd 0
-SimpleRender.image :
-	dd 0
-SimpleRender.imagebuffer :
-	dd 0
-SimpleRender.rval :
-	dd 1
-tri :
-	dd -1000, -1000, 10
-	dd 1000, -1000, 10
-	dd 1000, 1000, 10
-drawtri :
-	dd 0, 0
-	dd 1, 1
-	dd 0, 0
+		; mov ebx, [SimpleRender.image]
+		; call Component.RequestUpdate
+	; popa
+	; ret
+; SimpleRender.windowTitle :
+	; db "SimpleRender Test", 0
+; SimpleRender.window :
+	; dd 0
+; SimpleRender.image :
+	; dd 0
+; SimpleRender.imagebuffer :
+	; dd 0
+; SimpleRender.rval :
+	; dd 1
+; tri :
+	; dd -1000, -1000, 10
+	; dd 1000, -1000, 10
+	; dd 1000, 1000, 10
+; drawtri :
+	; dd 0, 0
+	; dd 1, 1
+	; dd 0, 0
 	
-SimpleRender.goRender :
-	pusha
-		mov eax, [SimpleRender.imagebuffer]
-		mov ebx, 0xFF000000
-		mov edx, 400*400*4
-		call Image.clear
+; SimpleRender.goRender :
+	; pusha
+		; mov eax, [SimpleRender.imagebuffer]
+		; mov ebx, 0xFF000000
+		; mov edx, 400*400*4
+		; call Image.clear
 		
-		xor esi, esi
-		xor edi, edi
-		.loop :
-			mov eax, [tri+esi]
-			mov ebx, [tri+8+esi]
-			call SimpleRender.p_func
-			add ecx, 200
-			mov edx, ecx
+		; xor esi, esi
+		; xor edi, edi
+		; .loop :
+			; mov eax, [tri+esi]
+			; mov ebx, [tri+8+esi]
+			; call SimpleRender.p_func
+			; add ecx, 200
+			; mov edx, ecx
 			
-			mov eax, [tri+4+esi]
-			mov ebx, [tri+8+esi]
-			call SimpleRender.p_func
-			add ecx, 200
+			; mov eax, [tri+4+esi]
+			; mov ebx, [tri+8+esi]
+			; call SimpleRender.p_func
+			; add ecx, 200
 			
-			mov [drawtri+edi], edx
-			mov [drawtri+4+edi], ecx
+			; mov [drawtri+edi], edx
+			; mov [drawtri+4+edi], ecx
 			
-		add esi, 12
-		add edi, 8
-		cmp esi, 36
-			jl .loop
+		; add esi, 12
+		; add edi, 8
+		; cmp esi, 36
+			; jl .loop
 			
-		mov esi, 0
-		mov eax, [drawtri]
-		mov ebx, [drawtri+4]
-		mov ecx, [drawtri+8]
-		mov edx, [drawtri+8+4]
-		call SimpleRender.drawLine	
-		mov eax, [drawtri+8]
-		mov ebx, [drawtri+8+4]
-		mov ecx, [drawtri+16]
-		mov edx, [drawtri+16+4]
-		call SimpleRender.drawLine	
-		mov eax, [drawtri+16]
-		mov ebx, [drawtri+16+4]
-		mov ecx, [drawtri]
-		mov edx, [drawtri+4]
-		call SimpleRender.drawLine
+		; mov esi, 0
+		; mov eax, [drawtri]
+		; mov ebx, [drawtri+4]
+		; mov ecx, [drawtri+8]
+		; mov edx, [drawtri+8+4]
+		; call SimpleRender.drawLine	
+		; mov eax, [drawtri+8]
+		; mov ebx, [drawtri+8+4]
+		; mov ecx, [drawtri+16]
+		; mov edx, [drawtri+16+4]
+		; call SimpleRender.drawLine	
+		; mov eax, [drawtri+16]
+		; mov ebx, [drawtri+16+4]
+		; mov ecx, [drawtri]
+		; mov edx, [drawtri+4]
+		; call SimpleRender.drawLine
 		
 		
-	popa
-	ret
-SimpleRender.p_func :
-	push edx
-		cmp ebx, 0
-			jne .nret0
-		mov ecx, 0
-	pop edx
-	ret
-	.nret0 :
-		mov ecx, ebx
-		xor edx, edx
-		cdq
-		idiv ecx
-		mov ecx, eax
-	pop edx
-	ret
-SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y1, ecx = x2, edx = y2
-	cmp eax, ecx
-		je SimpleRender.drawVerticalLine
-	pusha
-		cmp eax, ecx
-			jg .otherway
-		mov [SimpleRender.x1], eax
-		mov [SimpleRender.y1], ebx
-		mov [SimpleRender.x2], ecx
-		mov [SimpleRender.y2], edx
-		jmp .kdone
-		.otherway :
-		mov [SimpleRender.x1], ecx
-		mov [SimpleRender.y1], edx
-		mov [SimpleRender.x2], eax
-		mov [SimpleRender.y2], ebx		
-		.kdone :
-		mov eax, [SimpleRender.y2]
-		sub eax, [SimpleRender.y1]
-		mov [SimpleRender.delta_y], eax
+	; popa
+	; ret
+; SimpleRender.p_func :
+	; push edx
+		; cmp ebx, 0
+			; jne .nret0
+		; mov ecx, 0
+	; pop edx
+	; ret
+	; .nret0 :
+		; mov ecx, ebx
+		; xor edx, edx
+		; cdq
+		; idiv ecx
+		; mov ecx, eax
+	; pop edx
+	; ret
+; SimpleRender.drawLine :	; Image in [SimpleRender.imagebuffer], eax = x1, ebx = y1, ecx = x2, edx = y2
+	; cmp eax, ecx
+		; je SimpleRender.drawVerticalLine
+	; pusha
+		; cmp eax, ecx
+			; jg .otherway
+		; mov [SimpleRender.x1], eax
+		; mov [SimpleRender.y1], ebx
+		; mov [SimpleRender.x2], ecx
+		; mov [SimpleRender.y2], edx
+		; jmp .kdone
+		; .otherway :
+		; mov [SimpleRender.x1], ecx
+		; mov [SimpleRender.y1], edx
+		; mov [SimpleRender.x2], eax
+		; mov [SimpleRender.y2], ebx		
+		; .kdone :
+		; mov eax, [SimpleRender.y2]
+		; sub eax, [SimpleRender.y1]
+		; mov [SimpleRender.delta_y], eax
 		
-		mov ecx, [SimpleRender.x2]
-		sub ecx, [SimpleRender.x1]
-		mov [SimpleRender.delta_x], ecx
+		; mov ecx, [SimpleRender.x2]
+		; sub ecx, [SimpleRender.x1]
+		; mov [SimpleRender.delta_x], ecx
 		
-		fild dword [SimpleRender.delta_y]
-		fidiv dword [SimpleRender.delta_x]
-		fstp dword [SimpleRender.slope]
+		; fild dword [SimpleRender.delta_y]
+		; fidiv dword [SimpleRender.delta_x]
+		; fstp dword [SimpleRender.slope]
 		
-		xor edx, edx
-		idiv ecx
-		imul eax, 400*4
+		; xor edx, edx
+		; idiv ecx
+		; imul eax, 400*4
 		
-		mov ebx, [SimpleRender.imagebuffer]
-		mov ecx, [SimpleRender.x1]
-		shl ecx, 2
-		add ebx, ecx
-		mov ecx, [SimpleRender.y1]
-		imul ecx, 400*4
-		add ebx, ecx
-		mov [SimpleRender.drawbase], ebx
-		mov edx, [SimpleRender.x1]
-		fldz
-		.loop :
-		mov dword [ebx], 0xFFFFFFFF
-		; ; ;
-			fadd dword [SimpleRender.slope]
-			fist dword [SimpleRender.drawpos]
-			mov ebx, [SimpleRender.drawpos]
-			imul ebx, 400*4
-			add ebx, [SimpleRender.drawbase]
-		; ; ;
-		add dword [SimpleRender.drawbase], 4
-		add edx, 1
-		cmp edx, [SimpleRender.x2]
-			jle .loop
-		fistp dword [SimpleRender.drawbase]	; junk data
-	popa
-	.ret :
-	ret
-SimpleRender.drawVerticalLine :
-	cmp ebx, edx
-		je SimpleRender.drawVerticalLine.ret
-	pusha
-		cmp ebx, edx
-			jg SimpleRender.drawVerticalLine.kcont
-		xchg ebx, edx
-		SimpleRender.drawVerticalLine.kcont :
-		mov [SimpleRender.y1], edx
-		mov [SimpleRender.y2], ebx
-		mov [SimpleRender.x1], eax
+		; mov ebx, [SimpleRender.imagebuffer]
+		; mov ecx, [SimpleRender.x1]
+		; shl ecx, 2
+		; add ebx, ecx
+		; mov ecx, [SimpleRender.y1]
+		; imul ecx, 400*4
+		; add ebx, ecx
+		; mov [SimpleRender.drawbase], ebx
+		; mov edx, [SimpleRender.x1]
+		; fldz
+		; .loop :
+		; mov dword [ebx], 0xFFFFFFFF
+		; ; ; ;
+			; fadd dword [SimpleRender.slope]
+			; fist dword [SimpleRender.drawpos]
+			; mov ebx, [SimpleRender.drawpos]
+			; imul ebx, 400*4
+			; add ebx, [SimpleRender.drawbase]
+		; ; ; ;
+		; add dword [SimpleRender.drawbase], 4
+		; add edx, 1
+		; cmp edx, [SimpleRender.x2]
+			; jle .loop
+		; fistp dword [SimpleRender.drawbase]	; junk data
+	; popa
+	; .ret :
+	; ret
+; SimpleRender.drawVerticalLine :
+	; cmp ebx, edx
+		; je SimpleRender.drawVerticalLine.ret
+	; pusha
+		; cmp ebx, edx
+			; jg SimpleRender.drawVerticalLine.kcont
+		; xchg ebx, edx
+		; SimpleRender.drawVerticalLine.kcont :
+		; mov [SimpleRender.y1], edx
+		; mov [SimpleRender.y2], ebx
+		; mov [SimpleRender.x1], eax
 		
-		mov dword [SimpleRender.drawpos], 0
-		mov ebx, [SimpleRender.imagebuffer]
-		mov ecx, [SimpleRender.x1]
-		shl ecx, 2
-		add ebx, ecx
-		mov ecx, [SimpleRender.y1]
-		imul ecx, 400*4
-		add ebx, ecx
-		mov [SimpleRender.drawbase], ebx
-		mov edx, [SimpleRender.y1]
-		SimpleRender.drawVerticalLine.loop :
-		mov dword [ebx], 0xFFFFFFFF
-		; ; ;
-			mov ebx, [SimpleRender.drawpos]
-			imul ebx, 400*4
-			add ebx, [SimpleRender.drawbase]
-		; ; ;
-		add dword [SimpleRender.drawpos], 1
-		add edx, 1
-		cmp edx, [SimpleRender.y2]
-			jle SimpleRender.drawVerticalLine.loop
-	SimpleRender.drawVerticalLine.ret :
-	popa
-	ret
+		; mov dword [SimpleRender.drawpos], 0
+		; mov ebx, [SimpleRender.imagebuffer]
+		; mov ecx, [SimpleRender.x1]
+		; shl ecx, 2
+		; add ebx, ecx
+		; mov ecx, [SimpleRender.y1]
+		; imul ecx, 400*4
+		; add ebx, ecx
+		; mov [SimpleRender.drawbase], ebx
+		; mov edx, [SimpleRender.y1]
+		; SimpleRender.drawVerticalLine.loop :
+		; mov dword [ebx], 0xFFFFFFFF
+		; ; ; ;
+			; mov ebx, [SimpleRender.drawpos]
+			; imul ebx, 400*4
+			; add ebx, [SimpleRender.drawbase]
+		; ; ; ;
+		; add dword [SimpleRender.drawpos], 1
+		; add edx, 1
+		; cmp edx, [SimpleRender.y2]
+			; jle SimpleRender.drawVerticalLine.loop
+	; SimpleRender.drawVerticalLine.ret :
+	; popa
+	; ret
 
-SimpleRender.x1 :
-	dd 0x0
-SimpleRender.y1 :
-	dd 0x0
-SimpleRender.x2 :
-	dd 0x0
-SimpleRender.y2 :
-	dd 0x0
-SimpleRender.slope :
-	dd 0.5
-SimpleRender.drawbase :
-	dd 0x0
-SimpleRender.drawpos :
-	dd 0x0
-SimpleRender.delta_x :
-	dd 0x0
-SimpleRender.delta_y :
-	dd 0x0
+; SimpleRender.x1 :
+	; dd 0x0
+; SimpleRender.y1 :
+	; dd 0x0
+; SimpleRender.x2 :
+	; dd 0x0
+; SimpleRender.y2 :
+	; dd 0x0
+; SimpleRender.slope :
+	; dd 0.5
+; SimpleRender.drawbase :
+	; dd 0x0
+; SimpleRender.drawpos :
+	; dd 0x0
+; SimpleRender.delta_x :
+	; dd 0x0
+; SimpleRender.delta_y :
+	; dd 0x0
 
 console.memstat :
 	mov ah, 0xFF
