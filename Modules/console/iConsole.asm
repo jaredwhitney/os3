@@ -197,7 +197,7 @@ call ProgramManager.setActive	; Make removable Later
 	;	call iConsole2.Init
 		call ImageEditor.init
 		call TextEditor.init
-		call Dolphin2.showLoginScreen
+;		call Dolphin2.showLoginScreen
 		
 ;	mov ebx, eax
 	GoDoLoop :

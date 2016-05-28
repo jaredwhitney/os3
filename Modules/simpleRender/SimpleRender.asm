@@ -5,14 +5,29 @@ Point_x		equ 0
 Point_y		equ 4
 Point_z		equ 8
 
-SimpleRender.tri :
-	dd -100, -100, 500
+SimpleRender.trinumber :
+
+	dd 0x2
+	
+SimpleRender.tridata :
+
+	dd -100, -100, 500	; tri 1
 	dd 100, -100, 500
+	dd -100, 100, 500
+	
+	dd 100, -100, 500	; tri 2
+	dd -100, 100, 500
 	dd 100, 100, 500
+
+SimpleRender.TRI_SIZE	equ SimpleRender.POINT_SIZE*3
+SimpleRender.POINT_SIZE	equ 4*3
 
 SimpleRender.drawTri :
 	times 2*3 dd 0x0
 
+SimpleRender.currentTri :
+	dd SimpleRender.tridata
+	
 SimpleRender.newPoint :
 	times 3 dd 0x0
 	
@@ -53,14 +68,32 @@ SimpleRender.init :
 		mov ebx, [SimpleRender.window]
 		mov eax, ecx
 		call Grouping.Add
+		mov [Dolphin2.focusedComponent], ecx
+		mov dword [ecx+Component_keyHandlerFunc], SimpleRender.keyFunc
+		
+		mov eax, [SimpleRender.image]
+		mov ebx, 400
+		mov ecx, 400
+		call L3gxImage.FromBuffer
+		mov [SimpleRender.ximage], ecx
 		
 	popa
 	ret
 	.STR_TITLE :
 		db "SimpleRender v2", 0
 
+SimpleRender.ximage :
+	dd 0x0
+
+SimpleRender.keyFunc :
+		xor dword [SimpleRender.lockMouse], TRUE
+	ret
+
 SimpleRender.loop :
 	pusha
+		
+		cmp dword [SimpleRender.lockMouse], TRUE
+			jne .dontUseMouse
 		
 		mov eax, [Mouse.x]
 		mov ebx, [Graphics.SCREEN_WIDTH]
@@ -72,7 +105,7 @@ SimpleRender.loop :
 		
 		mov [Mouse_xsum], ebx
 		;mov [Mouse_ysum], 
-		
+		.dontUseMouse :
 		; repaint the thing!
 		
 		mov eax, [SimpleRender.image]
@@ -83,12 +116,26 @@ SimpleRender.loop :
 		fdiv dword [.f500]
 		fstp dword [SimpleRender.mxaccf]
 		
+		mov dword [SimpleRender.currentTri], SimpleRender.tridata
+		mov edx, [SimpleRender.trinumber]
+		
+		.loop :
+		call SimpleRender.goDrawTri
+		add dword [SimpleRender.currentTri], SimpleRender.TRI_SIZE
+		dec edx
+		cmp edx, 0x0
+			jg .loop
+		
+	popa
+	ret
+SimpleRender.goDrawTri :
+	push edx
 		xor ecx, ecx
 		mov [SimpleRender.loop.count], ecx
 		
 		.loop :
 		
-		mov eax, SimpleRender.tri
+		mov eax, [SimpleRender.currentTri]
 		mov ecx, [SimpleRender.loop.count]
 		imul ecx, 4*3
 		add eax, ecx
@@ -142,48 +189,68 @@ SimpleRender.loop :
 		call SimpleRender.p_func
 		add ecx, 200
 		mov [.v], ecx
-		
-		cmp dword [.u], 0
-			jl .noDraw
-		cmp dword [.u], 400
-			jge .noDraw
-		cmp dword [.v], 0
-			jl .noDraw
-		cmp dword [.v], 400
-			jge .noDraw
-		
-		mov ebx, [SimpleRender.image]
-		mov edx, [.u]
-		shl edx, 2
-		add ebx, edx
+	
+		cmp dword [SimpleRender.loop.count], 0
+			jne .goon
+		mov eax, [.u]
+		mov [.u0], eax
 		mov eax, [.v]
-		imul eax, 400*4
-		add ebx, eax
+		mov [.v0], eax
+		jmp .noDraw
 		
-		mov dword [ebx], 0xFF00FF00
+		.goon :
+		push dword [SimpleRender.ximage]
+		push dword [.u]
+		push dword [.v]
+		push dword [.ul]
+		push dword [.vl]
+		call SimpleRender.drawLine
+		
+		cmp dword [SimpleRender.loop.count], 2
+			jne .noDraw
+	
+		push dword [SimpleRender.ximage]
+		push dword [.u]
+		push dword [.v]
+		push dword [.u0]
+		push dword [.v0]
+		call SimpleRender.drawLine
 		
 		.noDraw :
+		
+		mov eax, [.u]
+		mov [.ul], eax
+		mov eax, [.v]
+		mov [.vl], eax
 		
 		inc dword [SimpleRender.loop.count]
 		cmp dword [SimpleRender.loop.count], 3
 			jl .loop
-		
-	popa
+	pop edx
 	ret
+
 	.u :
 		dd 0x0
 	.v :
 		dd 0x0
-	.count :
+	.u0 :
 		dd 0x0
-	.f500 :
-		dd 500.
+	.v0 :
+		dd 0x0
+	.ul :
+		dd 0x0
+	.vl :
+		dd 0x0
 	.fstor0 :
 		dd 0x0
 	SimpleRender.triS :
 		dd 0x0
 	SimpleRender.drawTriS :
 		dd 0x0
+	SimpleRender.loop.count :
+		dd 0x0
+	SimpleRender.loop.f500 :
+		dd 500.
 
 SimpleRender.p_func :
 	push eax
@@ -222,3 +289,5 @@ SimpleRender.p_func :
 		dd 0x0
 	.f80 :
 		dd 80.
+
+%include "..\modules\simpleRender\lineFunc.asm"
