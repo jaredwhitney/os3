@@ -163,7 +163,8 @@ Dolphin2.drawMouse :
 			mov edx, [Graphics.SCREEN_WIDTH]
 			mov [Image.copyRegionWithTransparency.nw], edx
 			mov dword [Image.copyRegionWithTransparency.h], CURSOR_HEIGHT
-			mov dword [Image.copyRegionWithTransparency.obuf], CursorData
+			mov eax, [Mouse.cursor]
+			mov dword [Image.copyRegionWithTransparency.obuf], eax
 			mov [Image.copyRegionWithTransparency.nbuf], ecx
 			call Image.copyRegionWithTransparency
 		pop dword [Color.fuse.ret]
@@ -194,7 +195,9 @@ T equ 0x00000000
 
 CURSOR_WIDTH	equ 11*4
 CURSOR_HEIGHT	equ 21
-CursorData :
+Mouse.cursor :
+	dd Mouse.CURSOR_DEFAULT
+Mouse.CURSOR_DEFAULT :
 	dd B, T, T, T, T, T, T, T, T, T, T
 	dd B, B, T, T, T, T, T, T, T, T, T
 	dd B, W, B, T, T, T, T, T, T, T, T
@@ -216,7 +219,8 @@ CursorData :
 	dd T, T, T, T, T, T, T, B, W, W, B
 	dd T, T, T, T, T, T, T, B, W, B, B
 	dd T, T, T, T, T, T, T, T, B, T, T
-	
+Mouse.CURSOR_TRANSPARENT :
+	times CURSOR_WIDTH*CURSOR_HEIGHT dd T
 
 Dolphin2.HandleKeyboardEvent :
 	pusha

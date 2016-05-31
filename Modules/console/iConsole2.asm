@@ -41,6 +41,67 @@ iConsole2.Init :
 		
 	popa
 	ret
+
+iConsole2.runLoops :
+	pusha
+		mov ebx, [iConsole2.taskBase]
+		.loop :
+		cmp ebx, null
+			je .ret
+		call [ebx+Task_func]
+		mov ebx, [ebx+Task_nextLinked]
+		jmp .loop
+	.ret :
+	popa
+	ret
+
+iConsole2.RegisterTask :
+	enter 0, 0
+	
+		mov ecx, [ebp+8]
+		mov ebx, [iConsole2.taskBase]
+		cmp ebx, null
+			jne .notSpecialCase
+		mov [iConsole2.taskBase], ecx
+		jmp .ret
+		.notSpecialCase :
+		mov edx, [ebx+Task_nextLinked]
+		mov [ebx+Task_nextLinked], ecx
+		mov [ecx+Task_nextLinked], edx
+		
+	.ret :
+	leave
+	ret 4
+
+iConsole2.UnregisterTask :
+	enter 0, 0
+		
+		mov eax, [ebp+8]
+		mov ecx, [iConsole2.taskBase]
+		cmp ecx, 0x0
+			je .ret
+		cmp ecx, eax
+			je .foundBase
+		mov ebx, ecx
+		.loop :
+		mov ecx, [ebx+Task_nextLinked]
+		cmp ecx, 0x0
+			jmp .ret
+		cmp ecx, eax
+			je .foundBefore
+		mov ebx, ecx
+		jmp .loop
+		.foundBefore :
+		mov eax, [eax+Task_nextLinked]
+		mov [ebx+Task_nextLinked], eax
+		jmp .ret
+		.foundBase :
+		mov eax, [eax+Task_nextLinked]
+		mov [iConsole2.taskBase], eax
+		
+	.ret :
+	leave
+	ret 4
 	
 iConsole2.HandleKeyEvent :
 	pusha
@@ -309,6 +370,9 @@ iConsole2.invalidCommand :
 	db "Command invalid: ", 0
 iConsole2.commandStore :
 	times 512 db 0
+
+iConsole2.taskBase :
+	dd null
 iConsole2.commandBase :
 	dd null
 iConsole2.filetypeBindingBase :
@@ -321,5 +385,8 @@ command_nextLink	equ 0x8
 filetypebinding_name		equ 0x0
 filetypebinding_function	equ 0x4
 filetypebinding_nextLink	equ 0x8
+
+Task_func			equ 0x0
+Task_nextLinked		equ 0x4
 
 iConsole2.BUFFER_SIZE	equ 1500

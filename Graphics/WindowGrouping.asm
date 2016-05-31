@@ -8,6 +8,7 @@ WindowGrouping_nameString	equ Component_CLASS_SIZE+20
 WindowGrouping_sizeButton	equ Component_CLASS_SIZE+24
 WindowGrouping_closeButton	equ Component_CLASS_SIZE+28
 WindowGrouping_title		equ Component_CLASS_SIZE+32
+WindowGrouping_onClose		equ Component_CLASS_SIZE+36
 
 WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop dword [WindowGrouping.Create.retval]
@@ -21,7 +22,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push edx
 
 		mov eax, 0x7
-		mov ebx, Component_CLASS_SIZE+36
+		mov ebx, Component_CLASS_SIZE+40
 		call ProgramManager.reserveMemory
 		call Component.initToDefaults
 		mov edx, ebx
@@ -141,6 +142,7 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov dword [edx+Component_renderFunc], Grouping.Render
 		mov dword [edx+Component_mouseHandlerFunc], WindowGrouping.passthroughMouseEvent
 		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
+		mov dword [edx+WindowGrouping_onClose], null
 		
 		mov ecx, edx
 		
@@ -163,9 +165,29 @@ WindowGrouping.closeCallback :	; Button in ebx
 		WindowGrouping.closeCallback.foundWindow :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.Remove
+		cmp dword [eax+WindowGrouping_onClose], null
+			je .ret
+		call [eax+WindowGrouping_onClose]
+	.ret :
 	popa
 	ret
 
+WindowGrouping.RegisterCloseCallback :	; subcomponent in ebx, func in eax
+	pusha
+		mov edx, eax
+		mov eax, ebx
+		.findWindowLoop :
+		mov eax, [ebx+Component_upperRenderFlag]
+		sub eax, Grouping_renderFlag
+		cmp dword [eax+Component_type], Component.TYPE_WINDOW
+			je .foundWindow
+		mov ebx, eax
+		jmp .findWindowLoop
+		.foundWindow :
+		mov [eax+WindowGrouping_onClose], edx
+	popa
+	ret
+		
 WindowGrouping.passthroughMouseEvent :
 	cmp dword [Component.mouseEventType], MOUSE_NOBTN
 		je .goon

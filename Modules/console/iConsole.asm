@@ -193,24 +193,19 @@ call ProgramManager.setActive	; Make removable Later
 	
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
 		
-		call SimpleRender.init
-	;	call iConsole2.Init
+		call iConsole2.Init
 		call ImageEditor.init
 		call TextEditor.init
-;		call Dolphin2.showLoginScreen
+		call SimpleRender.init
+		call Dolphin2.showLoginScreen
 		
-;	mov ebx, eax
 	GoDoLoop :
-	call SimpleRender.loop
-	call Dolphin2.drawMouse
-	call Dolphin2.renderScreen
-;	call Keyboard.poll
 	
-;	mov al, '!'
-;	call TextArea.AppendChar
-	;mov eax, 500
-	;call System.sleep
-	jmp GoDoLoop
+		call iConsole2.runLoops
+		call Dolphin2.drawMouse
+		call Dolphin2.renderScreen
+		
+		jmp GoDoLoop
 	
 	mov eax, [Dolphin2.compositorGrouping]
 	mov ebx, [eax+Grouping_subcomponent]

@@ -5,9 +5,15 @@ Point_x		equ 0
 Point_y		equ 4
 Point_z		equ 8
 
-SimpleRender.trinumber :
+SimpleRender.init :
+	pusha
+		push dword SimpleRender.COMMAND_RUN
+		call iConsole2.RegisterCommand
+	popa
+	ret
 
-	dd 0x2
+SimpleRender.trinumber :
+	dd 0x8
 	
 SimpleRender.tridata :
 
@@ -18,6 +24,30 @@ SimpleRender.tridata :
 	dd 100, -100, 500	; tri 2
 	dd -100, 100, 500
 	dd 100, 100, 500
+	
+	dd -100, -100, 500
+	dd -100, 100, 500
+	dd -100, -100, 700
+	
+	dd -100, 100, 500
+	dd -100, 100, 700
+	dd -100, -100, 700
+	
+	dd 100, -100, 500
+	dd 100, 100, 500
+	dd 100, -100, 700
+	
+	dd 100, 100, 500
+	dd 100, 100, 700
+	dd 100, -100, 700
+	
+	dd -100, -100, 700
+	dd 100, -100, 700
+	dd 100, 100, 700
+	
+	dd -100, -100, 700
+	dd -100, 100, 700
+	dd 100, 100, 700
 
 SimpleRender.TRI_SIZE	equ SimpleRender.POINT_SIZE*3
 SimpleRender.POINT_SIZE	equ 4*3
@@ -36,13 +66,21 @@ SimpleRender.window :
 
 SimpleRender.image :
 	dd 0x0
-	
+SimpleRender.tempZ :
+	dd 0x0
 SimpleRender.mxacc :
 	dd 0	
 SimpleRender.mxaccf :
 	times 2 dd 0x0
-
-SimpleRender.init :
+SimpleRender.lockMouse :
+	dd FALSE
+SimpleRender.STR_SIMPLERENDER :
+	db "3dengine", 0x0
+SimpleRender.COMMAND_RUN :
+	dd SimpleRender.STR_SIMPLERENDER
+	dd SimpleRender.main
+	dd null
+SimpleRender.main :
 	pusha
 	
 		push dword .STR_TITLE
@@ -77,6 +115,13 @@ SimpleRender.init :
 		call L3gxImage.FromBuffer
 		mov [SimpleRender.ximage], ecx
 		
+		push dword SimpleRender.TASK_MAINLOOP
+		call iConsole2.RegisterTask
+		
+		mov eax, SimpleRender.exit
+		mov ebx, [SimpleRender.window]
+		call WindowGrouping.RegisterCloseCallback
+	
 	popa
 	ret
 	.STR_TITLE :
@@ -87,8 +132,23 @@ SimpleRender.ximage :
 
 SimpleRender.keyFunc :
 		xor dword [SimpleRender.lockMouse], TRUE
+		cmp dword [SimpleRender.lockMouse], TRUE
+			jne .aret
+		mov dword [Mouse.cursor], Mouse.CURSOR_TRANSPARENT
+		jmp .ret
+		.aret :
+		mov dword [Mouse.cursor], Mouse.CURSOR_DEFAULT
+	.ret :
 	ret
-
+SimpleRender.exit :
+	pusha
+		push dword SimpleRender.TASK_MAINLOOP
+		call iConsole2.UnregisterTask
+	popa
+	ret
+SimpleRender.TASK_MAINLOOP :
+	dd SimpleRender.loop
+	dd null
 SimpleRender.loop :
 	pusha
 		
@@ -151,14 +211,16 @@ SimpleRender.goDrawTri :
 		
 			mov ebx, [SimpleRender.triS]
 			mov ecx, SimpleRender.newPoint
-			
+			mov edx, [ebx+Point_z]
+			sub edx, 600
+			mov [SimpleRender.tempZ], edx
 			fld dword [SimpleRender.mxaccf]
 			fcos
 			fimul dword [ebx+Point_x]
 			fstp dword [.fstor0]
 			fld dword [SimpleRender.mxaccf]
 			fsin
-			fimul dword [ebx+Point_z]
+			fimul dword [SimpleRender.tempZ]
 			fsub dword [.fstor0]
 			fistp dword [ecx+Point_x]
 			
@@ -169,9 +231,11 @@ SimpleRender.goDrawTri :
 			fstp dword [.fstor0]
 			fld dword [SimpleRender.mxaccf]
 			fcos
-			fimul dword [ebx+Point_z]
+			fimul dword [SimpleRender.tempZ]
 			fadd dword [.fstor0]
 			fistp dword [ecx+Point_z]
+			
+			add dword [ecx+Point_z], 600
 			
 			mov eax, [ebx+Point_y]
 			mov [ecx+Point_y], eax
@@ -288,6 +352,6 @@ SimpleRender.p_func :
 	.rstor :
 		dd 0x0
 	.f80 :
-		dd 80.
+		dd 160.
 
 %include "..\modules\simpleRender\lineFunc.asm"
