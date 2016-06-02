@@ -39,6 +39,11 @@ iConsole2.Init :
 		push dword iConsole2.COMMAND_HELP
 		call iConsole2.RegisterCommand
 		
+		push dword 0
+		push dword 0
+		push dword 0
+		call FileChooser.Prompt
+		
 	popa
 	ret
 

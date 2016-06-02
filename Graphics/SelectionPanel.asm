@@ -70,8 +70,8 @@ SelectionPanel.Render :
 		
 		mov edx, ebx
 		
-		cmp dword [edx+SelectionPanel_renderFlag], FALSE
-			je SelectionPanel.Render.ret
+		;cmp dword [edx+SelectionPanel_renderFlag], FALSE
+		;	je SelectionPanel.Render.ret
 		
 		test dword [edx+SelectionPanel_backingColor], 0xFF000000
 			jz SelectionPanel.Render.noLayerColor

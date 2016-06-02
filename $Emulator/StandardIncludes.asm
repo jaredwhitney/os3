@@ -39,7 +39,8 @@
 		%include "..\Meta\Graphics\Window.asm"	; depricated
 		%include "..\modules\dolphin2\Dolphin2.asm"
 		%include "..\modules\dolphin2\PromptBox.asm"
-		%include "..\modules\dolphin\WindowTools.asm"
+		%include "..\modules\dolphin2\FileChooser.asm"
+		%include "..\modules\dolphin\WindowTools.asm"	; depricated
 		%include "..\modules\dolphin\Update_Text.asm"
 	
 	;  Component Includes	;

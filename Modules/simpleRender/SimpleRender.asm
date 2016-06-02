@@ -206,8 +206,7 @@ SimpleRender.goDrawTri :
 		add ebx, ecx
 		mov [SimpleRender.drawTriS], eax
 		
-		; jmp .nor0y
-			; r0y (not working)
+			; r0y
 		
 			mov ebx, [SimpleRender.triS]
 			mov ecx, SimpleRender.newPoint

@@ -282,7 +282,7 @@ ImageEditor.promptSaveTitle :
 ImageEditor.promptLoadTitle :
 	db "Open an Image", 0x0
 ImageEditor.promptMessage :
-	db "File Name: ", 0x0
+	db "Open", 0x0
 ImageEditor.STR_SIZE :
 	db "Size: ", 0x0
 ImageEditor.SIZE_VALSTR :
@@ -345,7 +345,7 @@ ImageEditor.promptLoadFile :
 		push dword ImageEditor.promptLoadTitle
 		push dword ImageEditor.promptMessage
 		push dword ImageEditor.loadFile
-		call PromptBox.PromptForString
+		call FileChooser.Prompt
 	ret
 ImageEditor.loadFile :
 	pusha
@@ -355,7 +355,7 @@ ImageEditor.loadFile :
 		mov edx, [ImageEditor.image]
 		mov [edx+Image_source], ebx
 		
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
 		mov ecx, [ImageEditor.image]
 		mov ecx, [ecx+Image_source]

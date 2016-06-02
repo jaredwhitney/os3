@@ -25,7 +25,7 @@ TextEditor.main :
 		push dword 0*4
 		push dword 0
 		push dword 300*4
-		push dword 300
+		push dword 400
 		call Dolphin2.makeWindow
 		mov [TextEditor.window], ecx
 		mov ebx, ecx
@@ -40,8 +40,28 @@ TextEditor.main :
 		mov eax, ecx
 		call Grouping.Add
 		mov [TextEditor.text], ecx
+		;mov dword [ecx+Component_keyHandlerFunc], TextEditor.keyHandlerFunc
 		
-		mov dword [ecx+Component_keyHandlerFunc], TextEditor.keyHandlerFunc
+		push dword TextEditor.doLoadFile.loadButtonMessage
+		push dword TextEditor.doLoadFile
+		push dword 150*4
+		push dword 300
+		push dword 50*4
+		push dword 100
+		call Button.Create
+		mov eax, ecx
+		call Grouping.Add
+		
+		push dword TextEditor.doSaveFile.saveButtonMessage
+		push dword TextEditor.doSaveFile
+		push dword 0*4
+		push dword 300
+		push dword 50*4
+		push dword 100
+		call Button.Create
+		mov eax, ecx
+		call Grouping.Add
+		
 	popa
 	ret
 TextEditor.placeholderTitle :
@@ -60,7 +80,7 @@ TextEditor.text  :
 TextEditor.mainFromConsoleFile :
 	pusha
 		mov eax, iConsole2.commandStore
-		mov [PromptBox.response], eax
+		mov [FileChooser.fileName], eax
 		call TextEditor.main
 		call TextEditor.loadFile
 	popa
@@ -68,7 +88,7 @@ TextEditor.mainFromConsoleFile :
 
 TextEditor.loadFile :
 	pusha
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
 		;cmp ebx,  Minnow4.SUCCESS
 		;	jne .fileNotFound
@@ -79,7 +99,7 @@ TextEditor.loadFile :
 		mov eax, TextEditor.fileTitle	; title changing is broken!
 		mov ebx, 20*8
 		call Buffer.clear
-		mov eax, PromptBox.response
+		mov eax, [FileChooser.fileName]
 		mov ebx, TextEditor.fileTitle
 		call String.copy
 		mov ecx, [TextEditor.window]
@@ -113,30 +133,29 @@ TextEditor.saveFile :
 	popa
 	ret
 
-TextEditor.getFileName :
+TextEditor.doSaveFile :
 		push dword TextEditor.promptTitle
 		push dword TextEditor.promptMessage
-		push dword [TextEditor.callbackFunc]
+		push dword TextEditor.saveFile
 		call PromptBox.PromptForString
 	ret
+	.saveButtonMessage :
+		db "Save", 0x0
+
+TextEditor.doLoadFile :
+		push dword .loadPromptTitle
+		push dword .loadButtonMessage
+		push dword TextEditor.loadFile
+		call FileChooser.Prompt
+	ret
+.loadPromptTitle :
+	db "Open a File", 0
+.loadButtonMessage :
+	db "Open", 0
 	
 TextEditor.keyHandlerFunc :
 	pusha
-		mov al, [Component.keyChar]
-		cmp al, '1'	; just for now, replace with F1 later
-			jne .dontLoadFile
-		mov dword [TextEditor.callbackFunc], TextEditor.loadFile
-		call TextEditor.getFileName
-		jmp .ret
-		.dontLoadFile :
-		cmp al, '2'	; just for now, replace with F2 later
-			jne .dontSaveFile
-		mov dword [TextEditor.callbackFunc], TextEditor.saveFile
-		call TextEditor.getFileName
-		jmp .ret
-		.dontSaveFile :
 		call TextArea.onKeyboardEvent.handle
-	.ret :
 	popa
 	ret
 TextEditor.callbackFunc :
