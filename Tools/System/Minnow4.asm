@@ -81,13 +81,13 @@ Minnow4.viewImage :
 	enter 0, 0
 		
 		mov ebx, [Graphics.SCREEN_WIDTH]
-		imul ebx, [Graphics.SCREEN_HEIGHT]
+		imul ebx, [Graphics.SCREEN_HEIGHT]	; :(
 		call ProgramManager.reserveMemory
 		mov [Minnow4.viewImage.buffer], ebx
 		
-		cmp dword [_init], true
-			je .nop
-		mov dword [_init], true
+		;cmp dword [_init], true
+		;	je .nop
+		;mov dword [_init], true
 		
 		mov eax, [ebp+8]
 		call Minnow4.getFilePointer
@@ -96,7 +96,7 @@ Minnow4.viewImage :
 		imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
 		
-		.nop :
+		;.nop :
 		
 		mov ecx, [Minnow4.viewImage.buffer]
 		add ecx, 8

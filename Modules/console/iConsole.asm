@@ -205,7 +205,19 @@ call ProgramManager.setActive	; Make removable Later
 		call Dolphin2.drawMouse
 		call Dolphin2.renderScreen
 		
-		jmp GoDoLoop
+		mov ebx, [ProgramManager.memoryStart]
+		add ebx, [ProgramManager.creationOffset]
+		cmp ebx, 0xE0000000
+			jbe GoDoLoop
+		
+		mov eax, SysHaltScreen.RESET
+		mov ebx, .restartStr
+		mov ecx, 4
+	
+		jmp $
+		
+	.restartStr :
+		db "OOM...", 0
 	
 	mov eax, [Dolphin2.compositorGrouping]
 	mov ebx, [eax+Grouping_subcomponent]

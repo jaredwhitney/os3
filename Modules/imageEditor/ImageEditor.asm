@@ -349,9 +349,10 @@ ImageEditor.promptLoadFile :
 	ret
 ImageEditor.loadFile :
 	pusha
-		mov ebx, [Graphics.SCREEN_WIDTH]
-		imul ebx, [Graphics.SCREEN_HEIGHT]
+		mov ebx, 200*200*4+8;[Graphics.SCREEN_WIDTH]
+		;imul ebx, [Graphics.SCREEN_HEIGHT]
 		call ProgramManager.reserveMemory
+		add ebx, 8
 		mov edx, [ImageEditor.image]
 		mov [edx+Image_source], ebx
 		
@@ -359,8 +360,8 @@ ImageEditor.loadFile :
 		call Minnow4.getFilePointer
 		mov ecx, [ImageEditor.image]
 		mov ecx, [ecx+Image_source]
-		mov edx, [Graphics.SCREEN_WIDTH]
-		imul edx, [Graphics.SCREEN_HEIGHT]
+		mov edx, 200*200*4;[Graphics.SCREEN_WIDTH]
+		;imul edx, [Graphics.SCREEN_HEIGHT]
 		call Minnow4.readBuffer
 		
 		; should resize the window etx here
