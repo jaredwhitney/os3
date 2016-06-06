@@ -66,10 +66,6 @@ TextEditor.main :
 	ret
 TextEditor.placeholderTitle :
 	db "TextEditor- Untitled", 0x0
-TextEditor.promptTitle :
-	db "TextEditor", 0x0
-TextEditor.promptMessage :
-	db "File Name: ", 0x0
 TextEditor.fileTitle :
 	times 20 dq 0x0
 TextEditor.window :
@@ -134,11 +130,13 @@ TextEditor.saveFile :
 	ret
 
 TextEditor.doSaveFile :
-		push dword TextEditor.promptTitle
-		push dword TextEditor.promptMessage
+		push dword .savePromptTitle
+		push dword .saveButtonMessage
 		push dword TextEditor.saveFile
-		call PromptBox.PromptForString
+		call PromptBox.PromptForString	; change~!
 	ret
+	.savePromptTitle :
+		db "Save a File", 0
 	.saveButtonMessage :
 		db "Save", 0x0
 

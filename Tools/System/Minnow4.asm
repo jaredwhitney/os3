@@ -34,19 +34,25 @@ Minnow4.printFileTree :
 		mov [.fblockstor], eax
 		.outerloop :
 		call Minnow4.readFileBlock
-		cmp byte [ecx], null
-			je .done
+		;cmp byte [ecx], null
+		;	je .done
 		.innerloop :
 		cmp byte [ecx], null
-			je .innerloopend
+			je .noprint
 		push ecx
 		call iConsole2.Echo
 		push Minnow4.printFileTree.sep
 		call iConsole2.Echo
+		jmp .kgoOn
+		.noprint :
+		add ecx, 1
+		jmp .kDone
+		.kgoOn :
 		mov ebx, ecx
 		call String.getLength
 		add ecx, edx
 		add ecx, 4
+		.kDone :
 		cmp ecx, [Minnow4.printFileTree.threshold]
 			jl .innerloop
 		.innerloopend :
@@ -58,7 +64,7 @@ Minnow4.printFileTree :
 		mov [.fblockstor], eax
 		
 		cmp eax, null
-		;	jne .outerloop
+			jne .outerloop
 		.done :
 	leave
 	ret 0
@@ -293,10 +299,16 @@ Minnow4.getFilePointer :	; eax = String name : returns eax = int block, ebx = in
 		cmp al, 0x1
 		pop eax
 			je Minnow4.getFilePointer.fileFound
+		cmp byte [eax], null
+			jne .notMissing
+		add eax, 1
+		jmp .goOn
+		.notMissing :
 		mov ebx, eax
 		call String.getLength
 		add eax, edx
 		add eax, 4
+		.goOn :
 		cmp eax, [Minnow4.getFilePointer.threshold]
 			jl Minnow4.getFilePointer.searchBlock
 		mov ecx, [Minnow4.readBlock.data]
@@ -470,8 +482,13 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		
 	pusha
 		call String.getLength
+		add edx, 4	; 4 byte pointer to file block
 		mov ebx, edx
 		call Buffer.clear
+		add eax, ebx
+		sub eax, 4
+		mov eax, [eax]
+		call Minnow4.markAllBlocksUnused
 	popa
 		
 			pusha
@@ -500,8 +517,8 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		
 		mov eax, ecx
 		mov ecx, [Minnow4.readBlock.data]
-		add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
-		call Minnow4.writeFileBlock	; CAN'T USE writeFileBlock FOR THIS!!!
+		;add ecx, Minnow4.BLOCK_DESCRIPTOR_SIZE
+		call Minnow4.writeBlock;FileBlock	; CAN'T USE writeFileBlock FOR THIS!!!
 		mov ebx, Minnow4.SUCCESS
 		
 	pop ecx
@@ -512,6 +529,20 @@ Minnow4.deleteFile.name :
 	dd 0x0
 Minnow4.deleteFile.threshold :
 	dd 0x0
+
+Minnow4.markAllBlocksUnused :	; ptr in eax
+	pusha
+		.delLoop :
+		mov ecx, [Minnow4.readBlock.data]
+		add ecx, 0x200	; !
+		call Minnow4.readBlock
+		mov dword [ecx+Minnow4_BlockDescriptor_stringIndex], Minnow4_BlockDescriptor.INDEX_BLOCK_UNUSED
+		call Minnow4.writeBlock
+		call Minnow4.getNextFileBlock
+		cmp eax, null
+			jne .delLoop
+	popa
+	ret
 	
 Minnow4.registerName :	; eax = String name
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
