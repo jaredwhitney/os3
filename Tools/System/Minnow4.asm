@@ -484,11 +484,12 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		call String.getLength
 		add edx, 4	; 4 byte pointer to file block
 		mov ebx, edx
+				add eax, ebx
+				sub eax, 4
+				mov eax, [eax]
+				call Minnow4.markAllBlocksUnused
+				pop eax
 		call Buffer.clear
-		add eax, ebx
-		sub eax, 4
-		mov eax, [eax]
-		call Minnow4.markAllBlocksUnused
 	popa
 		
 			pusha
@@ -552,6 +553,7 @@ Minnow4.registerName :	; eax = String name
 			pusha
 				mov ebx, eax
 				call String.getLength
+				mov [Minnow4.registerName.nameLen], edx
 				mov ecx, edx
 				mov edx, [Minnow4.readBlock.data]
 				add edx, 0x200
@@ -563,9 +565,11 @@ Minnow4.registerName :	; eax = String name
 		Minnow4.registerName.fetchNameBlock :
 		call Minnow4.readFileBlock
 		Minnow4.registerName.searchBlock :
-		mov ebx, [ecx]
-		cmp ebx, null
-			je Minnow4.registerName.foundEndOfList
+			push eax
+			call Minnow4.ecxZerosSub4toEax
+			cmp eax, [Minnow4.registerName.nameLen]
+			pop eax
+				jge Minnow4.registerName.foundEndOfList
 		mov ebx, ecx
 		call String.getLength
 		add ecx, edx
@@ -595,9 +599,29 @@ Minnow4.registerName :	; eax = String name
 	ret
 Minnow4.registerName.name :
 	dd 0x0
+Minnow4.registerName.nameLen :
+	dd 0x0
 Minnow4.registerName.threshold :
 	dd 0x0
 
+Minnow4.ecxZerosSub4toEax :
+	push ecx
+	push edx
+		xor eax, eax
+		mov edx, [Minnow4.deleteFile.threshold]
+		.loop :
+			cmp byte [ecx], 0x0
+				jne .ret
+			cmp ecx, edx
+				jae .ret
+			inc ecx
+			inc eax
+	.ret :
+	sub eax, 4
+	pop edx
+	pop ecx
+	ret
+	
 Minnow4.registerPositionFromName :	; eax = String name, ecx = int block
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
