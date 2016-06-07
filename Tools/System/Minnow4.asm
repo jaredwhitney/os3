@@ -484,6 +484,7 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		call String.getLength
 		add edx, 4	; 4 byte pointer to file block
 		mov ebx, edx
+				push eax	; :/
 				add eax, ebx
 				sub eax, 4
 				mov eax, [eax]
