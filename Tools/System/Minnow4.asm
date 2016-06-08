@@ -571,10 +571,16 @@ Minnow4.registerName :	; eax = String name
 			cmp eax, [Minnow4.registerName.nameLen]
 			pop eax
 				jge Minnow4.registerName.foundEndOfList
+		cmp byte [ecx], null
+			jne .notMissing
+		add ecx, 1;eax
+		jmp .goOn
+		.notMissing :
 		mov ebx, ecx
 		call String.getLength
 		add ecx, edx
 		add ecx, 4
+		.goOn :
 		cmp ecx, [Minnow4.registerName.threshold]
 			jb Minnow4.registerName.searchBlock
 		mov eax, [Minnow4.readBlock.data]
@@ -583,12 +589,15 @@ Minnow4.registerName :	; eax = String name
 			jne Minnow4.registerName.fetchNameBlock
 		call Minnow4.registerName.createNewNameBlock	; return block in eax, offs+[Minnow4.readBlock.data] in ecx
 		Minnow4.registerName.foundEndOfList :
+		mov [Minnow4.registerName.offs], ecx
 		push eax
 		mov eax, [Minnow4.registerName.name]
 		mov ebx, ecx
 		call String.copy
 		pop eax
 		mov ecx, [Minnow4.readBlock.data]
+				sub [Minnow4.registerName.offs], ecx
+				mov [Minnow4.registerName.block], eax
 		call Minnow4.writeBlock
 	popa
 	ret
@@ -604,6 +613,11 @@ Minnow4.registerName.nameLen :
 	dd 0x0
 Minnow4.registerName.threshold :
 	dd 0x0
+; used in registerPositionFromName
+Minnow4.registerName.block :
+	dd 0x0
+Minnow4.registerName.offs :
+	dd 0x0
 
 Minnow4.ecxZerosSub4toEax :
 	push ecx
@@ -613,51 +627,57 @@ Minnow4.ecxZerosSub4toEax :
 		.loop :
 			cmp byte [ecx], 0x0
 				jne .ret
-			cmp ecx, edx
-				jae .ret
+			;cmp ecx, edx
+			;	jae .ret
 			inc ecx
 			inc eax
+			jmp .loop
 	.ret :
-	sub eax, 4
+	;sub eax, 4
 	pop edx
 	pop ecx
 	ret
 	
-Minnow4.registerPositionFromName :	; eax = String name, ecx = int block
+Minnow4.registerPositionFromName :	; eax = String name, ecx = int block, registerName block and offs must be set up prior to calling
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 		jne Minnow4.kGoRet
 	pusha
 		mov [Minnow4.registerPositionFromName.name], eax
 		mov [Minnow4.registerPositionFromName.block], ecx
-		mov eax, [Minnow4.readBlock.data]
-		add eax, 0x200
-		mov [Minnow4.registerPositionFromName.threshold], eax
-		xor ecx, ecx
-		Minnow4.registerPositionFromName.fetchNameBlock :
-		mov eax, ecx
-		push ecx
-		call Minnow4.readFileBlock
-		mov eax, ecx
-		pop ecx
-		Minnow4.registerPositionFromName.searchBlock :
-		mov ebx, [Minnow4.registerPositionFromName.name]
-		push ax
-		call os.seq
-		cmp al, 0x1
-		pop ax
-			je Minnow4.registerPositionFromName.fileFound
-		mov ebx, eax
-		call String.getLength
-		add eax, edx
-		add eax, 4
-		cmp eax, [Minnow4.registerPositionFromName.threshold]
-			jb Minnow4.registerPositionFromName.searchBlock
-		mov ecx, [Minnow4.readBlock.data]
-		add ecx, Minnow4_BlockDescriptor_nextPointer
-		cmp ecx, null
-			jne Minnow4.registerPositionFromName.fetchNameBlock
-	popa	; something went horribly wrong... D:
-	ret
+;		mov eax, [Minnow4.readBlock.data]
+;		add eax, 0x200
+;		mov [Minnow4.registerPositionFromName.threshold], eax
+;		xor ecx, ecx
+;		Minnow4.registerPositionFromName.fetchNameBlock :
+;		mov eax, ecx
+;		push ecx
+;		call Minnow4.readFileBlock
+;		mov eax, ecx
+;		pop ecx
+;		Minnow4.registerPositionFromName.searchBlock :
+;		mov ebx, [Minnow4.registerPositionFromName.name]
+;		push ax
+;		call os.seq
+;		cmp al, 0x1
+;		pop ax
+;			je Minnow4.registerPositionFromName.fileFound
+;		mov ebx, eax
+;		call String.getLength
+;		add eax, edx
+;		add eax, 4
+;		cmp eax, [Minnow4.registerPositionFromName.threshold]
+;			jb Minnow4.registerPositionFromName.searchBlock
+;		mov ecx, [Minnow4.readBlock.data]
+;		add ecx, Minnow4_BlockDescriptor_nextPointer
+;		cmp ecx, null
+;			jne Minnow4.registerPositionFromName.fetchNameBlock
+;	popa	; something went horribly wrong... D:
+;	ret
+	mov eax, [Minnow4.registerName.block]
+	call Minnow4.readFileBlock
+	mov eax, [Minnow4.readBlock.data]
+	mov eax, ecx
+	add eax, [Minnow4.registerName.offs]
 		Minnow4.registerPositionFromName.fileFound :
 		mov ebx, eax
 		call String.getLength
