@@ -40,6 +40,46 @@ Dolphin2.createCompositorGrouping :
 	popa
 	ret
 
+SystemConfig.getBgColor :
+	pusha
+		mov eax, SystemConfig.STR_FILE_NAME
+		call Minnow4.getFilePointer
+		cmp ebx, Minnow4.SUCCESS
+			jne .default
+		call Minnow4.readFileBlock
+		mov ebx, ecx
+		mov eax, 3
+		.loop :
+		call Integer.decimalFromString
+		shl dword [.color], 8
+		or [.color], ecx
+			.inloop :
+			cmp byte [ebx], ','
+				je .loopDone
+			inc ebx
+			jmp .inloop
+			.loopDone :
+			add ebx, 1
+		dec eax
+		cmp eax, 0x0
+			jg .loop
+		mov eax, [Dolphin2.compositorGrouping]
+		mov edx, [.color]
+		or edx, 0xFF000000
+		mov dword [eax+Grouping_backingColor], edx
+	popa
+	ret
+	.default :
+		mov eax, [Dolphin2.compositorGrouping]
+		mov edx, 0xFF000040
+		mov dword [eax+Grouping_backingColor], edx
+	popa
+	ret
+.color :
+	dd 0x0
+SystemConfig.STR_FILE_NAME :
+	db "D2CFG.rawtext", 0x0
+
 Dolphin2.renderScreen :
 	pusha
 	

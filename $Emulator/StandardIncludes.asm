@@ -128,7 +128,7 @@
 	
 	;  Number Utility Includes	;
 		%include "..\Tools\Number\BCDconversions.asm"
-		; %include "..\Tools\Number\parsing.asm"
+		%include "..\Tools\Number\parsing.asm"
 		
 	;  Buffer Utility Includes	;
 		%include "..\Meta\Buffer.asm"

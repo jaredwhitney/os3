@@ -633,7 +633,7 @@ Minnow4.ecxZerosSub4toEax :
 			inc eax
 			jmp .loop
 	.ret :
-	;sub eax, 4
+	sub eax, 4
 	pop edx
 	pop ecx
 	ret
@@ -676,7 +676,6 @@ Minnow4.registerPositionFromName :	; eax = String name, ecx = int block, registe
 	mov eax, [Minnow4.registerName.block]
 	call Minnow4.readFileBlock
 	mov eax, [Minnow4.readBlock.data]
-	mov eax, ecx
 	add eax, [Minnow4.registerName.offs]
 		Minnow4.registerPositionFromName.fileFound :
 		mov ebx, eax
@@ -686,7 +685,7 @@ Minnow4.registerPositionFromName :	; eax = String name, ecx = int block, registe
 		mov edx, [Minnow4.registerPositionFromName.block]
 		mov [eax], edx
 		pop edx
-		mov eax, ecx
+		mov eax, [Minnow4.registerName.block]
 		mov ecx, [Minnow4.readBlock.data]
 		call Minnow4.writeBlock
 	popa

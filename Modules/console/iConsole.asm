@@ -191,6 +191,8 @@ call ProgramManager.setActive	; Make removable Later
 	
 	call Dolphin2.createCompositorGrouping
 	
+	call SystemConfig.getBgColor
+	
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
 		
 		call iConsole2.Init
