@@ -249,7 +249,7 @@ iConsole2.PrintPrompt :
 	pusha
 		mov ebx, [iConsole2.text]
 		mov eax, iConsole2.prompt
-		call TextArea.AppendText
+		call TextArea.InsertText
 		mov ebx, [iConsole2.text]
 		mov ebx, [ebx+Textarea_text]
 		call String.getLength
@@ -267,7 +267,7 @@ iConsole2.Echo :	; String text
 	enter 0, 0
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.text]
-		call TextArea.AppendText
+		call TextArea.InsertText
 	leave
 	ret 4
 iConsole2.STR_ECHO :
@@ -299,9 +299,9 @@ iConsole2.DisplayHelp :
 		.loop :
 		mov ecx, eax
 		mov eax, [eax+command_name]
-		call TextArea.AppendText
+		call TextArea.InsertText
 		mov eax, iConsole2.DisplayHelp.STR_SEPERATOR
-		call TextArea.AppendText
+		call TextArea.InsertText
 		mov eax, [ecx+command_nextLink]
 		cmp eax, null
 			jne .loop

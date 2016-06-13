@@ -456,6 +456,11 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		pop ecx
 		Minnow4.deleteFile.searchBlock :
 		mov ebx, [Minnow4.deleteFile.name]
+		cmp byte [eax], null
+			jne .notMissing
+		add eax, 1
+		jmp .cont
+		.notMissing :
 		push eax
 		xchg eax, ebx	; because os.seq is horrible
 		call os.seq
@@ -465,6 +470,7 @@ Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD M
 		call String.getLength
 		add eax, edx
 		add eax, 4
+		.cont :
 		cmp eax, [Minnow4.deleteFile.threshold]
 			jl Minnow4.deleteFile.searchBlock
 		mov ecx, [Minnow4.readBlock.data]
