@@ -50,9 +50,11 @@ DolphinConfig.proccessFile :
 		call DolphinConfig.colorFromString
 		mov [Dolphin2.titleBarActiveColor], edx
 		.advance :
-		inc ebx
 		cmp byte [ebx], 0xFE	; newline
-			jne .advance
+			je .advanceDone
+		inc ebx
+		jmp .advance
+		.advanceDone :
 		inc ebx
 		cmp byte [ebx], 0x0
 			jne .loop

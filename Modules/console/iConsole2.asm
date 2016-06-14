@@ -110,6 +110,8 @@ iConsole2.HandleKeyEvent :
 		cmp al, 0xFE
 			jne iConsole2.HandleKeyEvent.notnewl
 		
+		call TextArea.CursorToEnd
+		
 		call TextArea.onKeyboardEvent.handle
 		
 		push ebx

@@ -106,7 +106,7 @@ TextEditor.loadFile :
 	
 TextEditor.saveFile :
 	pusha
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
 		cmp ebx, Minnow4.SUCCESS
 			je .goon
@@ -120,7 +120,7 @@ TextEditor.saveFile :
 		mov eax, TextEditor.fileTitle	; title changing is broken!
 		mov ebx, 20*8
 		call Buffer.clear
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		mov ebx, [TextEditor.fileTitle]
 		call String.copy
 		mov ecx, [TextEditor.window]
@@ -133,7 +133,7 @@ TextEditor.doSaveFile :
 		push dword .savePromptTitle
 		push dword .saveButtonMessage
 		push dword TextEditor.saveFile
-		call PromptBox.PromptForString	; change~!
+		call FileChooser.Prompt
 	ret
 	.savePromptTitle :
 		db "Save a File", 0

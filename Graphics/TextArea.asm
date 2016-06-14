@@ -234,6 +234,15 @@ TextArea.InsertText :	; text in eax, textarea in ebx
 	popa
 	ret
 
+TextArea.CursorToEnd :
+	pusha
+		mov ecx, ebx
+		mov ebx, [ecx+Textarea_text]
+		call String.getLength
+		mov [ecx+Textarea_cursorPos], edx
+	popa
+	ret
+	
 TextArea.InsertChar :	; char in al, textarea in ebx
 	pusha
 		mov ecx, ebx
