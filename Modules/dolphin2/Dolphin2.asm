@@ -39,6 +39,8 @@ Dolphin2.createCompositorGrouping :
 		
 	popa
 	ret
+	
+
 
 SystemConfig.getBgColor :
 	pusha
@@ -59,7 +61,7 @@ SystemConfig.getBgColor :
 			inc ebx
 			jmp .inloop
 			.loopDone :
-			add ebx, 1
+			inc ebx
 		dec eax
 		cmp eax, 0x0
 			jg .loop
@@ -79,6 +81,12 @@ SystemConfig.getBgColor :
 	dd 0x0
 SystemConfig.STR_FILE_NAME :
 	db "D2CFG.rawtext", 0x0
+Dolphin2.windowTrimColor :
+	dd 0xFFFFFFFF
+Dolphin2.titleBarColor :
+	dd 0xFF808080
+Dolphin2.titleBarActiveColor :
+	dd 0xFF201080
 
 Dolphin2.renderScreen :
 	pusha

@@ -191,7 +191,7 @@ call ProgramManager.setActive	; Make removable Later
 	
 	call Dolphin2.createCompositorGrouping
 	
-	call SystemConfig.getBgColor
+	call DolphinConfig.proccessFile
 	
 	;mov dword [edx+Grouping_backingColor], 0xFF202000
 		
