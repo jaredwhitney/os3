@@ -26,8 +26,18 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov [ebx+Textarea_len], eax
 		pusha
 			mov edx, ebx
-			mov ebx, eax
-			call ProgramManager.reserveMemory
+				; Guppy2 test
+				push eax
+				push edx
+				push ecx
+					push ebx
+					call Guppy2.malloc
+				pop ecx
+				pop edx
+				pop eax
+				; end
+			; mov ebx, eax
+			; call ProgramManager.reserveMemory
 			mov [edx+Textarea_text], ebx
 		popa
 		mov eax, [TextArea.Create.x]

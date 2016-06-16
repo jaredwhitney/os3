@@ -100,6 +100,7 @@
 	;  System Tool Includes	;
 		%include "..\Tools\System\Time.asm"
 		%include "..\Tools\System\Guppy.asm"
+		%include "..\Tools\System\Guppy2.asm"	; New!
 		%include "..\Tools\System\GetValue.asm"
 		; %include "..\Tools\System\TaskSwapHandler.asm"
 	
@@ -154,7 +155,8 @@
 	
 	; Null
 		null equ 0x0
-		nullptr : dq 0
+		nullptr : times 4 dq 0
+		fullptr : times 4 dq 0xFFFFFFFFFFFFFFFF
 	
 	; String
 		endstr equ 0x0

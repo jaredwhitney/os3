@@ -18,13 +18,17 @@ Kernel.init :
 		call Graphics.init
 	
 	; Set up the main memory management
-		call Guppy.init
+	;;	call Guppy.init
+		call Guppy2.init
 	
 	; Initialize kernel modules
-		call kernel.initModules
+	;;	call kernel.initModules
 	
 	; Display the text mode welcome message if needed
 		call kernel.checkRunTextModeInit
+		
+		call Guppy2.runTest
+		jmp $
 	
 	; Initialize the AHCI Driver
 		call ATA_DETECT
@@ -34,6 +38,7 @@ Kernel.init :
 	
 	; Initialize the USB Driver
 		; call EHCI.findDevice
+	
 	cli
 	call betterPaging.init
 	sti
