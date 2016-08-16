@@ -1,0 +1,24 @@
+3+((8-1*5)/2)
+
+val is 3+parenval0
+need to store parenval0
+parenval0 is parenval1/2
+need to store parenval1
+parenval1 is 8-1*5
+calc parenval1:
+	ORDER OF OPS:
+		E: none -> 8-1*5
+		M/D: 1*5 -> 8-5
+		A/S: 8-5 -> 3
+	parenval1 = 3
+calc parenval0:
+	ORDER OF OPS:
+		E: none -> 3/2
+		M/D: 3/2 -> 1.5
+		A/S: none -> 1.5
+	parenval0 = 1.5
+calc val:
+	ORDER OF OPS:
+		E: none -> 3+1.5
+		M/D: none -> 3+1.5
+		A/SP: 3+

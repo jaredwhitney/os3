@@ -21,14 +21,47 @@ pop ebx
 pop eax
 ret
 
-PCI_TABLES.lookupHardwareType :	; ecx contains obj
-push eax
+PCI_TABLES.lookupHardwareType :
 push ebx
 push edx
-
+	mov ebx, PCI_TYPE_LOOKUP_TABLE
+	.loop :
+	cmp byte [ebx], cl
+		je .ret
+	cmp byte [ebx], 0xFE
+		je .ret
+	inc ebx
+	call String.getLength
+	add ebx, edx
+	jmp .loop
+	.ret :
+	mov ecx, ebx
+	inc ecx
 pop edx
 pop ebx
-pop eax
+ret
+
+PCI_TYPE_LOOKUP_TABLE :
+db 0x0, "Legacy Device", 0
+db 0x1, "Mass Storage Controller", 0
+db 0x2, "Network Controller", 0
+db 0x3, "Display Controller", 0
+db 0x4, "Multimedia Controller", 0
+db 0x5, "Memory Controller", 0
+db 0x6, "Bridge Device", 0
+db 0x7, "Simple Communcations Controller", 0
+db 0x8, "Base System Peripheral", 0
+db 0x9, "Input Device", 0
+db 0xA, "Docking Station", 0
+db 0xB, "Processor", 0
+db 0xC, "Serial Bus Controller", 0
+db 0xD, "Wireless Controller", 0
+db 0xE, "Intelligent I/O Controller", 0
+db 0xF, "Satellite Communication Controller", 0
+db 0x10, "Encryption/Decryption Controller", 0
+db 0x11, "Data Acquisition / Signal Processing Controller", 0
+db 0xFF, "[DEVICE CLASS UNDEFINED]", 0
+db 0xFE, "[DEVICE CLASS UNRECOGNIZED]", 0
 
 ; The following is a modified and formatted derivitive of the list found at http://pcidatabase.com/vendors.php
 PCI_VENDOR_LOOPKUP_TABLE :

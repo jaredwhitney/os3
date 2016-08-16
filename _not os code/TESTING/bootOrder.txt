@@ -1,0 +1,15 @@
+main:
+	misc
+		Load the rest of the kernel
+	enable
+		SSE					YES [k]
+		FPU					YES [k]
+	init hardware drivers
+		VGA					YES [s2]
+		VESA				YES [s2]
+		RTC					YES [s2]
+		PS2					YES [s2]
+		PCI					* N/A *
+		AHCI				YES [d4]
+		EHCI				YES [k]
+	
