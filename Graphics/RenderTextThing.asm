@@ -11,7 +11,8 @@ Component_renderFunc		equ 36
 Component_mouseHandlerFunc	equ 40
 Component_keyHandlerFunc	equ 44
 Component_needsRedraw		equ 48
-Component_CLASS_SIZE		equ 52
+Component_freeFunc		equ 52
+Component_CLASS_SIZE		equ 56
 
 Component.Render :	; Component in ebx
 	pusha
@@ -95,6 +96,24 @@ Component.keyHandlerPointers :
 	dd Component.killfunc, Component.discardKeyboardEvent, TextArea.onKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent
 Component.keyChar :
 	db 0x0
+Component.Free :	; Component in ebx
+pusha
+	cmp dword [ebx+Component_freeFunc], null
+		je Component.defaultFreeFunc
+	call [ebx+Component_freeFunc]
+popa
+ret
+Component.defaultFreeFunc :
+	; free self image
+	mov edx, ebx
+	mov ebx, [edx+Component_image]
+	call Guppy2.free
+	; free self
+	mov ebx, edx
+	call Guppy2.free
+popa
+ret
+
 Component.initToDefaults :
 	mov dword [ebx+Component_keyHandlerFunc], null
 	mov dword [ebx+Component_mouseHandlerFunc], null
@@ -102,6 +121,7 @@ Component.initToDefaults :
 	mov dword [ebx+Component_nextLinked], null
 	mov dword [ebx+Component_transparent], false
 	mov dword [ebx+Component_needsRedraw], true
+	mov dword [ebx+Component_freeFunc], null
 ret
 	
 Textline_type	equ 0

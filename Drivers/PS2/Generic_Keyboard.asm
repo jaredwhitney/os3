@@ -164,7 +164,8 @@ pusha
 	KeyManager.keyPress.ret :
 popa
 			push ebx
-			mov [Component.keyChar], al
+			mov [Component.keyChar], al	; NEED TO NOT DO THIS
+		;	call WinMan.HandleKeyEvent
 			mov ebx, [Dolphin2.started]
 			cmp ebx, 0x0
 				je qwerfasdf
@@ -304,6 +305,12 @@ KeyManager.toChar :
 	cmp bl, 0x33
 	mov al, ','
 	je KeyManager.toChar.ret
+	cmp bl, 0x1A
+	mov al, '['
+	je KeyManager.toChar.ret
+	cmp bl, 0x1B
+	mov al, ']'
+	je KeyManager.toChar.ret
 	cmp bl, 0x02
 	mov al, '1'
 	je KeyManager.toChar.ret
@@ -357,6 +364,12 @@ KeyManager.toChar :
 	je KeyManager.toChar.ret
 	cmp bl, 0x48	; UP ARROW
 	mov al, 0xfb
+	je KeyManager.toChar.ret
+	cmp bl, 0x4D	; RIGHT ARROW
+	mov al, 0xfa
+	je KeyManager.toChar.ret
+	cmp bl, 0x4B
+	mov al, 0xf9	; LEFT ARROW
 	je KeyManager.toChar.ret
 	mov al, bl
 	pusha

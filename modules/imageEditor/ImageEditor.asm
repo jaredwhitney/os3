@@ -34,7 +34,7 @@ ImageEditor.main :
 		mov edx, 5+(10+5)*5+5
 		._max0 :
 		push edx
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [ImageEditor.window], ecx
 		mov ebx, ecx
 		
@@ -277,12 +277,12 @@ ImageEditor.main :
 	ret
 ImageEditor.placeholderTitle :
 	db "ImageEditor- Untitled", 0x0
-ImageEditor.promptSaveTitle :
-	db "Save an Image", 0x0
-ImageEditor.promptLoadTitle :
-	db "Open an Image", 0x0
-ImageEditor.promptMessage :
-	db "Open", 0x0
+;ImageEditor.promptSaveTitle :
+;	db "Save an Image", 0x0
+;ImageEditor.promptLoadTitle :
+;	db "Open an Image", 0x0
+;ImageEditor.promptMessage :
+;	db "Open", 0x0
 ImageEditor.STR_SIZE :
 	db "Size: ", 0x0
 ImageEditor.SIZE_VALSTR :
@@ -306,9 +306,9 @@ ImageEditor.BLUE_VALSTR :
 	db '0'
 	times 4 dq 0x0
 ImageEditor.STR_LOAD :
-	db "Load: ", 0x0
+	db "Load", 0x0
 ImageEditor.STR_SAVE :
-	db "Save: ", 0x0
+	db "Save", 0x0
 ImageEditor.STR_MINUS :
 	db "-", 0x0
 ImageEditor.STR_PLUS :
@@ -342,11 +342,15 @@ ImageEditor.mainFromConsoleFile :
 	ret
 	
 ImageEditor.promptLoadFile :
-		push dword ImageEditor.promptLoadTitle
-		push dword ImageEditor.promptMessage
+		push dword .promptLoadTitle
+		push dword .promptLoadMessage
 		push dword ImageEditor.loadFile
 		call FileChooser.Prompt
 	ret
+	.promptLoadTitle :
+		db "Open an Image", 0x0
+	.promptLoadMessage :
+		db "Open", 0x0
 ImageEditor.loadFile :
 	pusha
 		mov ebx, 200*200*4+8;[Graphics.SCREEN_WIDTH]
@@ -369,11 +373,15 @@ ImageEditor.loadFile :
 	popa
 	ret
 ImageEditor.promptSaveFile :
-		push dword ImageEditor.promptSaveTitle
-		push dword ImageEditor.promptMessage
+		push dword .promptSaveTitle
+		push dword .promptSaveMessage
 		push dword ImageEditor.saveFile
-		call PromptBox.PromptForString
+		call FileChooser.Prompt
 	ret
+	.promptSaveTitle :
+		db "Save an Image", 0x0
+	.promptSaveMessage :
+		db "Save", 0x0
 ImageEditor.saveFile :
 	pusha
 		mov edx, [ImageEditor.image]
@@ -389,11 +397,11 @@ ImageEditor.saveFile :
 		add ecx, 8	; ecx is the size of the buffer
 		mov edx, ecx
 		mov ecx, eax
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
 		cmp ebx, Minnow4.SUCCESS
 			je .dontMake
-		mov eax, [PromptBox.response]
+		mov eax, [FileChooser.fileName]
 		call Minnow4.createFile
 		.dontMake :
 		call Minnow4.writeBuffer

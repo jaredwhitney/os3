@@ -31,12 +31,16 @@ Grouping.Create :	; int x, int y, int w, int h
 		mov [ebx+Grouping_type], eax
 		mov dword [ebx+Component_renderFunc], Grouping.Render
 		mov dword [ebx+Component_mouseHandlerFunc], Grouping.passthroughMouseEvent
+		mov dword [ebx+Component_freeFunc], Grouping.Free
 		pusha
 			mov edx, ebx
 			mov eax, [ebx+Grouping_w]
 			imul eax, [ebx+Grouping_h]
 			mov ebx, eax
+			cmp ebx, 0
+				je .noalloc
 			call ProgramManager.reserveMemory
+			.noalloc :
 			mov [edx+Grouping_image], ebx
 		popa
 		call Component.RequestUpdate
@@ -339,3 +343,26 @@ GROUPING_CLICKED_STR :
 	db "A grouping was clicked!", 0
 GROUPING_SUB_CLICKED_STR :
 	db "A subcomponent of a grouping was clicked!", 0
+
+Grouping.Free :	; Grouping in ebx
+	pusha
+		mov edx, ebx
+		mov ebx, [edx+Grouping_subcomponent]
+		.loop :
+		cmp ebx, null
+			je .done
+		mov ecx, [ebx+Component_nextLinked]
+		call Component.Free
+		mov ebx, ecx
+		jmp .loop
+		.done :
+		; free self image
+		mov ebx, [edx+Component_image]
+		call Guppy2.free
+		; free self
+		mov ebx, edx
+		call Guppy2.free
+	popa
+	ret
+
+

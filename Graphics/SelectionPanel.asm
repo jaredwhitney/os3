@@ -31,12 +31,13 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 		mov dword [edx+Component_type], Component.TYPE_SELECTPANEL
 		mov dword [edx+Component_renderFunc], SelectionPanel.Render
 		mov dword [edx+Component_mouseHandlerFunc], SelectionPanel.HandleMouseEvent
+		mov dword [edx+Component_freeFunc], SelectionPanel.Free
 		pusha
 			mov eax, [ebx+Component_w]
 			imul eax, [ebx+Component_h]
 			mov ebx, eax
 			call ProgramManager.reserveMemory
-			mov [edx+GroupingScrollable_image], ebx
+			mov [edx+Component_image], ebx
 		popa
 		call Component.RequestUpdate
 		mov ecx, ebx
@@ -56,6 +57,9 @@ SelectionPanel.Create.h :
 	dd 0x0
 SelectionPanel.Create.retval :
 	dd 0x0
+
+SelectionPanel.Free :
+	ret
 
 SelectionPanel.Add :
 	call Grouping.Add

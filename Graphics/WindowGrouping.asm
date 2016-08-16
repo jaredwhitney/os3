@@ -21,9 +21,10 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	push ebx
 	push edx
 
-		mov eax, 0x7
+		;mov eax, 0x7
 		mov ebx, Component_CLASS_SIZE+40
-		call ProgramManager.reserveMemory
+		call Guppy2.malloc
+
 		call Component.initToDefaults
 		mov edx, ebx
 			
@@ -72,7 +73,8 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		call Grouping.Create
 		mov [edx+WindowGrouping_titleBar], ecx
 		mov dword [ecx+Component_mouseHandlerFunc], TitleBar.passthroughMouseEvent
-		mov dword [ecx+Grouping_backingColor], 0xFF404040
+		mov eax, [Dolphin2.titleBarColor]
+		mov dword [ecx+Grouping_backingColor], eax
 		mov ebx, edx
 		mov eax, ecx
 		call Grouping.Add
@@ -141,7 +143,9 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 		mov dword [edx+Component_type], Component.TYPE_WINDOW
 		mov dword [edx+Component_renderFunc], Grouping.Render
 		mov dword [edx+Component_mouseHandlerFunc], WindowGrouping.passthroughMouseEvent
-		mov dword [edx+Grouping_backingColor], 0xFFFFFFFF
+		mov dword [edx+Component_freeFunc], Grouping.Free
+		mov eax, [Dolphin2.windowTrimColor]
+		mov dword [edx+Grouping_backingColor], eax
 		mov dword [edx+WindowGrouping_onClose], null
 		
 		mov ecx, edx
@@ -166,9 +170,14 @@ WindowGrouping.closeCallback :	; Button in ebx
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.Remove
 		cmp dword [eax+WindowGrouping_onClose], null
-			je .ret
+			je .kret
 		call [eax+WindowGrouping_onClose]
-	.ret :
+		.kret :
+		
+		; Free memory! (WindowGrouping acts like a Grouping)
+		mov ebx, eax
+		call Component.Free
+		
 	popa
 	ret
 
@@ -196,7 +205,8 @@ WindowGrouping.passthroughMouseEvent :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Grouping.BringToFront
 		mov ebx, [eax+WindowGrouping_titleBar]
-		mov dword [ebx+Grouping_backingColor], 0xFF201080
+		mov edx, [Dolphin2.titleBarActiveColor]
+		mov dword [ebx+Grouping_backingColor], edx
 		mov ebx, [eax+WindowGrouping_closeButton]
 		mov dword [ebx+Button_backingColor], 0xFFE00000
 		mov ebx, [eax+WindowGrouping_sizeButton]
@@ -207,7 +217,8 @@ WindowGrouping.passthroughMouseEvent :
 			je .nouplast
 		mov ecx, [WindowGrouping.lastFocused]
 		mov ebx, [ecx+WindowGrouping_titleBar]
-		mov dword [ebx+Grouping_backingColor], 0xFF404040
+		mov edx, [Dolphin2.titleBarColor]
+		mov dword [ebx+Grouping_backingColor], edx
 		mov ebx, [ecx+WindowGrouping_closeButton]
 		mov dword [ebx+Button_backingColor], 0xFF808080
 		mov ebx, [ecx+WindowGrouping_sizeButton]
@@ -313,6 +324,31 @@ WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
 		mov [eax+Component_y], ecx
 	WindowGrouping.moveWindow.ret :
 	popa
+	ret
+
+WindowGrouping.getBoundingWindow :	; component in ebx
+	push eax
+	push ebx
+		.findWindowLoop :
+		mov eax, [ebx+Component_upperRenderFlag]
+		cmp eax, 0x0	; if the component is not part of a window, perform the operation on the last found window
+			jne .cont
+		mov eax, [WindowGrouping.lastWin]
+		cmp eax, 0x0	; if no window has ever been found... for now do nothing :\
+			je .ret
+		jmp .foundWindow
+		.cont :
+		sub eax, Grouping_renderFlag
+		cmp dword [eax+Component_type], Component.TYPE_WINDOW
+			je .foundWindow
+		mov ebx, eax
+		jmp .findWindowLoop
+		.foundWindow :
+		mov [WindowGrouping.lastWin], eax
+		mov ecx, eax
+	.ret :
+	pop ebx
+	pop eax
 	ret
 	
 WindowGrouping.lastWin :

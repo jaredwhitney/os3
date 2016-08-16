@@ -6,8 +6,9 @@ Textarea_w					equ 16
 Textarea_h					equ 20
 Textarea_text				equ Component_CLASS_SIZE
 Textarea_len				equ Component_CLASS_SIZE+4
-Textarea_scrolls			equ Component_CLASS_SIZE+8
-Textarea_customKeyHandler	equ Component_CLASS_SIZE+12
+Textarea_cursorPos			equ Component_CLASS_SIZE+8
+Textarea_scrolls			equ Component_CLASS_SIZE+12
+Textarea_customKeyHandler	equ Component_CLASS_SIZE+16
 
 TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.retval]
@@ -19,7 +20,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop dword [TextArea.Create.len]
 	push eax
 	push ebx
-		mov ebx, Component_CLASS_SIZE+16
+		mov ebx, Component_CLASS_SIZE+20
 		call ProgramManager.reserveMemory
 		call Component.initToDefaults
 		mov eax, [TextArea.Create.len]
@@ -52,7 +53,9 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov dword [ebx+Component_transparent], FALSE
 		mov dword [ebx+Component_renderFunc], TextArea.Render
 		mov dword [ebx+Component_keyHandlerFunc], TextArea.onKeyboardEvent.handle
+		mov dword [ebx+Component_freeFunc], TextArea.Free
 		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle	; redundant and should be removed
+		mov dword [ebx+Textarea_cursorPos], 0
 		mov ecx, ebx
 	pop ebx
 	pop eax
@@ -122,9 +125,21 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 		mov ecx, [TextArea.Render.dest]
 		cmp ecx, [TextArea.Render.maxPos]
 			ja TextArea.Render.aret
-		mov edx, [ebx+Textarea_w]
 		push ebx
+		cmp edx, [ebx+Textarea_cursorPos]
+		mov edx, [ebx+Textarea_w]
+			jne .useWhite
+		push edx
+		mov edx, [Dolphin2.focusedComponent]
+		cmp ebx, edx
+			pop edx
+			jne .useWhite
+		mov ebx, 0xFF00FF00
+		jmp .render
+		.useWhite :
 		mov ebx, 0xFFFFFFFF
+		jmp .render
+		.render :
 		call RenderText
 		pop ebx
 		jmp TextArea.Render.noNewl
@@ -176,9 +191,10 @@ TextArea.Render.calcFlips :
 	ret
 TextArea.SetText :	; text in eax, textarea in ebx
 	pusha
-		mov ecx, [Textarea_text]
+		mov ecx, [ebx+Textarea_text]
 		mov byte [ecx], 0x0
-		call TextArea.AppendText
+		mov dword [ebx+Textarea_cursorPos], 0
+		call TextArea.InsertText
 	popa
 	ret
 TextArea.SetText.obj :
@@ -193,15 +209,78 @@ TextArea.AppendText :	; text in eax, textarea in ebx
 			mov ecx, edx
 		pop ebx
 		pop edx
-		TextArea.SetText.loop :
+		.loop :
 		mov al, [edx]	; char
 		call TextArea.AppendChar
 		add edx, 1
 		sub ecx, 1
 		cmp ecx, 0
-			jg TextArea.SetText.loop
+			jg .loop
 		call Component.RequestUpdate
 	popa
+	ret
+TextArea.InsertText :	; text in eax, textarea in ebx
+	pusha
+		mov edx, eax
+		push edx
+		push ebx
+			mov ebx, edx
+			call String.getLength
+			mov ecx, edx
+		pop ebx
+		pop edx
+		.loop :
+		mov al, [edx]	; char
+		call TextArea.InsertChar
+		add edx, 1
+		sub ecx, 1
+		cmp ecx, 0
+			jg .loop
+		call Component.RequestUpdate
+	popa
+	ret
+
+TextArea.CursorToEnd :
+	pusha
+		mov ecx, ebx
+		mov ebx, [ecx+Textarea_text]
+		call String.getLength
+		mov [ecx+Textarea_cursorPos], edx
+	popa
+	ret
+	
+TextArea.InsertChar :	; char in al, textarea in ebx
+	pusha
+		mov ecx, ebx
+		mov ebx, [ebx+Textarea_text]
+		call String.getLength
+		cmp [ecx+Textarea_cursorPos], edx
+			jl .insertChar
+		mov ebx, ecx
+		call TextArea.AppendChar
+		popa
+		ret
+		.insertChar :
+		mov ebx, [ecx+Textarea_text]	; ebx is the buffer
+		add ebx, edx	; ebx is the buffer end
+		sub edx, [ecx+Textarea_cursorPos]	; edx is the size of the buffer
+		add edx, 1
+		.copyLoop :
+		mov al, [ebx]
+		inc ebx
+		mov [ebx], al
+		sub ebx, 2
+		dec edx
+		cmp edx, 0x0
+			jg .copyLoop
+		inc dword [ecx+Textarea_cursorPos]
+	popa
+			push edx
+				mov edx, [ebx+Textarea_text]
+				add edx, [ebx+Textarea_cursorPos]
+				sub edx, 1
+				mov [edx], al
+			pop edx
 	ret
 TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra text from being rendered]
 	cmp dword [ebx+Textarea_scrolls], 0xFF
@@ -357,23 +436,78 @@ TextArea.onKeyboardEvent.handle :
 		mov al, [Component.keyChar]
 		cmp al, 0xff
 			je TextArea.onKeyboardEvent.handleBackspace
-		call TextArea.AppendChar
+		cmp al, 0xfa
+			je TextArea.onKeyboardEvent.incCursor
+		cmp al, 0xf9
+			je TextArea.onKeyboardEvent.decCursor
+		call TextArea.InsertChar
 		call Component.RequestUpdate
 	popa
 	ret
 TextArea.onKeyboardEvent.handleBackspace :
 		push ebx
+		mov [.textarea], ebx
 		mov ebx, [ebx+Textarea_text]
 		call String.getLength
+			push ebx
+			mov ebx, [.textarea]
+			mov ebx, [ebx+Textarea_cursorPos]
+			cmp ebx, edx
+				jge .nobother
+			mov edx, ebx
+			.nobother :
+			pop ebx
 		cmp edx, 1
 			jle TextArea.onKeyboardEvent.handleBackspace.ret
+		push ebx
+			mov ebx, [.textarea]
+			dec dword [ebx+Textarea_cursorPos]
+		pop ebx
 		add ebx, edx
-		sub ebx, 2
-		mov byte [ebx], 0
+				push ebx
+				mov ecx, edx
+				mov ebx, [.textarea]
+				mov ebx, [ebx+Textarea_text]
+				call String.getLength
+				sub edx, ecx
+				add edx, 1
+				pop ebx
+		;	 byte [ebx] will be deleted
+			.copyLoop :
+			mov al, [ebx]
+			dec ebx
+			mov [ebx], al
+			add ebx, 2
+			dec edx
+			cmp edx, 0x0
+				jg .copyLoop
 		TextArea.onKeyboardEvent.handleBackspace.ret :
 		pop ebx
 		call Component.RequestUpdate
 	popa
 	ret
+	TextArea.onKeyboardEvent.handleBackspace.textarea :
+		dd 0x0
 
+TextArea.onKeyboardEvent.incCursor :
+		inc dword [ebx+Textarea_cursorPos]
+	popa
+	ret
+TextArea.onKeyboardEvent.decCursor :
+		dec dword [ebx+Textarea_cursorPos]
+	popa
+	ret
+
+TextArea.Free :
+	pusha
+		mov edx, ebx
+		mov ebx, [edx+Component_image]	; free self image
+		call Guppy2.free
+		mov ebx, [edx+Textarea_text]	; free self text buffer
+		call Guppy2.free
+		mov ebx, edx			; free self
+		call Guppy2.free
+	popa
+	ret
+	
 ; Also make TextAreaScrollable (TextArea with scroll functions that modify which parts of the buffer are displayed at any given time)

@@ -19,6 +19,7 @@ Kernel.init :
 	
 	; Set up the main memory management
 		call Guppy.init
+		call Guppy2.init
 	
 	; Initialize kernel modules
 		call kernel.initModules
@@ -27,7 +28,7 @@ Kernel.init :
 		call kernel.checkRunTextModeInit
 	
 	; Initialize the AHCI Driver
-		call ATA_DETECT
+		call ATA_DETECT	; NEEDS TRANSITION TO GUPPY2
 
 	; Set up the OrcaHLL console and memory workaround (deprecated)
 		call kernel.OrcaHLLsetup_memhack
@@ -37,6 +38,7 @@ Kernel.init :
 	cli
 	call betterPaging.init
 	sti
+	
 	; Enable the FPU
 		call FPU.enable
 	
@@ -307,7 +309,7 @@ KERNEL_END :
 
 	; The file's data
 	
-		incbin "..\_not os code\Convenience\VGA\bgex2.vesa.dsp"
+		incbin "../_not os code/Convenience/VGA/bgex2.vesa.dsp"
 
 	
 ; File Padding

@@ -9,7 +9,7 @@ FileChooser.Prompt :	; String title, String buttonText, String callback
 		push dword 0
 		push dword 300*4
 		push dword 300
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [.win], ecx
 		
 		push dword 0*4
@@ -117,8 +117,19 @@ FileChooser.loadFiles :
 		mov eax, 0x0
 		.outerLoop :
 		call Minnow4.readFileBlock
+		push ecx
+		add ecx, 200-Minnow4.BLOCK_DESCRIPTOR_SIZE
+		mov dword [.threshold], ecx
+		pop ecx
 		.innerLoop :
 		mov ebx, ecx
+		cmp byte [ecx], null
+			jne .notMissing
+		add ecx, 1
+		cmp ecx, [.threshold]
+			jae .goNextOuter
+		jmp .innerLoop	; should have a threshold to check against!
+		.notMissing :
 		call String.getLength
 		add ecx, edx
 		add ecx, 4
@@ -143,8 +154,9 @@ FileChooser.loadFiles :
 			cmp dword [.y], 250-(FONTHEIGHT+5)
 				jg .kret
 		;
-		cmp byte [ecx], null
-			jne .innerLoop
+		cmp ecx, [.threshold]
+			jb .innerLoop
+		.goNextOuter :
 		call Minnow4.getNextFileBlock
 		cmp eax, 0x0
 			jne .outerLoop
@@ -154,6 +166,8 @@ FileChooser.loadFiles :
 	.x :
 		dd 0x0
 	.y :
+		dd 0x0
+	.threshold :
 		dd 0x0
 	
 FileChooser.fileName :
