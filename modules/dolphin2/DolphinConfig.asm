@@ -116,6 +116,9 @@ DolphinConfig.colorFromString :
 		call Integer.decimalFromString
 		shl dword [.color], 8
 		or [.color], ecx
+		dec eax
+		cmp eax, 0x0
+			jle .loopExit
 			.inloop :
 			cmp byte [ebx], ','
 				je .loopDone
@@ -124,9 +127,8 @@ DolphinConfig.colorFromString :
 			.loopDone :
 			inc ebx
 			call DolphinConfig.skipWhitespace
-		dec eax
-		cmp eax, 0x0
-			jg .loop
+		jmp .loop
+		.loopExit :
 		mov eax, [Dolphin2.compositorGrouping]
 		mov edx, [.color]
 		or edx, 0xFF000000

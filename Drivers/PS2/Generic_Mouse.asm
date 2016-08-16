@@ -35,7 +35,8 @@ pusha
 	;mov [Mouse.PRESS.x], eax
 	;mov eax, [Mouse.y]
 	;mov [Mouse.PRESS.y], eax
-	call Dolphin2.handleMouseEvent
+	;push dword null
+	call WinMan.HandleMouseEvent;Dolphin2.handleMouseEvent
 Mouse.loop.ret :
 mov bl, [Mouse.datpart]
 cmp bl, 0x01

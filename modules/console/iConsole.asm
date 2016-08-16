@@ -3,56 +3,56 @@
 console.init :
 pusha
 	
-	call ProgramManager.getProgramNumber	; register program with the OS
-	mov [console.pnum], bl
-	call ProgramManager.setActive	; Make removable Later
+;	call ProgramManager.getProgramNumber	; register program with the OS
+;	mov [console.pnum], bl
+;	call ProgramManager.setActive	; Make removable Later
+;	
+;	;mov ebx, 0x10fa	; sectors
+;	;cmp byte [Graphics.VESA_MODE], 0x0
+;	;	je console.init.novesa
+;	call Window.getSectorSize	; <- eax
+;	add eax, 0x1
+;	add eax, 12000;4050
+;	mov ebx, eax
+;	console.init.novesa :
+;	call ProgramManager.requestMemory
+;			;mov eax, [ProgramManager.memoryStart]
+;			;call DebugLogEAX
+;	push dword console.title
+;	push word Window.TYPE_TEXT
+;	call Window.create	; essentially: Window windowStructLoc = new Window(title, Window.TYPE_TEXT)
+;	mov [console.windowStructLoc], ecx
+;	mov [console.winNum], bl	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
+;	
+;	mov ebx, [console.windowStructLoc]
+;	add bl, [Window.WIDTH]
+;	mov word [ebx], 0x3C0	; need to fix window width so it is NOT dependent on bpp!
+;	mov ebx, [console.windowStructLoc]
+;	add bl, [Window.HEIGHT]
+;	mov word [ebx], 0xC8
 	
-	;mov ebx, 0x10fa	; sectors
-	;cmp byte [Graphics.VESA_MODE], 0x0
-	;	je console.init.novesa
-	call Window.getSectorSize	; <- eax
-	add eax, 0x1
-	add eax, 12000;4050
-	mov ebx, eax
-	console.init.novesa :
-	call ProgramManager.requestMemory
-			;mov eax, [ProgramManager.memoryStart]
-			;call DebugLogEAX
-	push dword console.title
-	push word Window.TYPE_TEXT
-	call Window.create	; essentially: Window windowStructLoc = new Window(title, Window.TYPE_TEXT)
-	mov [console.windowStructLoc], ecx
-	mov [console.winNum], bl	; PHASE OUT winNum/wnum !!! Dolphin.currentWindow should contain the window struct pointer! NOTE: in this case, 'winNum' should become 'window' and contain the same data 'windowStructLoc' does right now, and 'windowStructLoc' should be removed	
-	
-	mov ebx, [console.windowStructLoc]
-	add bl, [Window.WIDTH]
-	mov word [ebx], 0x3C0	; need to fix window width so it is NOT dependent on bpp!
-	mov ebx, [console.windowStructLoc]
-	add bl, [Window.HEIGHT]
-	mov word [ebx], 0xC8
-	
-	mov ebx, [console.windowStructLoc]
-	mov word [ebx+Window_xpos], 300*4
-	mov word [ebx+Window_ypos], 80
-	
-	call console.createWindow
-	
-	;mov ah, 0xF	; yellow
-	;call JASM.console.init	; initiallize the console
-	
-	;call console.clearScreen
-	
-	;mov ah, 0xFF
-	;call Time.printToConsole
-	
-	;call JASM.console.post_init
-	
-	;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
-	
-	;call console.update
-	
-	call ProgramManager.finalize	; Make removable Later
-
+;	mov ebx, [console.windowStructLoc]
+;	mov word [ebx+Window_xpos], 300*4
+;	mov word [ebx+Window_ypos], 80
+;	
+;	call console.createWindow
+;	
+;	;mov ah, 0xF	; yellow
+;	;call JASM.console.init	; initiallize the console
+;	
+;	;call console.clearScreen
+;	
+;	;mov ah, 0xFF
+;	;call Time.printToConsole
+;	
+;	;call JASM.console.post_init
+;	
+;	;call debug.toggleView	; fine to turn off debugging, the console should be under the user's control by now
+;	
+;	;call console.update
+;	
+;	call ProgramManager.finalize	; Make removable Later
+;
 popa
 ret
 
@@ -176,8 +176,8 @@ ret
 
 console.test :	; command that can be used to test anything.
 pusha
-mov bl, [console.pnum]
-call ProgramManager.setActive	; Make removable Later
+;mov bl, [console.pnum]
+;call ProgramManager.setActive	; Make removable Later
 
 	mov byte [INTERRUPT_DISABLE], 0xFF
 	
@@ -187,30 +187,29 @@ call ProgramManager.setActive	; Make removable Later
 	;xor ebx, ebx
 	;mov edx, 1024*4*768
 	;call rmATA.DMAread
-	mov [Dolphin2.bgimg], ecx
+	;mov [Dolphin2.bgimg], ecx
 	
-	call Dolphin2.createCompositorGrouping
+	push dword Dolphin2_WinManStruct
+	call WinMan.Register
 	
-	call DolphinConfig.proccessFile
-	
-	;mov dword [edx+Grouping_backingColor], 0xFF202000
+	call WinMan.Init
 		
 		call iConsole2.Init
 		call ImageEditor.init
 		call TextEditor.init
 		call SimpleRender.init
-		call Dolphin2.showLoginScreen
-		
+		call Catfish.init
+		call SystemMemoryMap.init
+		call BFCK.init
+	
+	call WinMan.ShowLoginScreen
+	
 	GoDoLoop :
 	
-		call iConsole2.runLoops
-		call Dolphin2.drawMouse
-		call Dolphin2.renderScreen
-		
-		mov ebx, [ProgramManager.memoryStart]
-		add ebx, [ProgramManager.creationOffset]
-		cmp ebx, 0xE0000000
-			jbe GoDoLoop
+	call iConsole2.runLoops
+	call Dolphin2.renderScreen
+
+	jmp GoDoLoop
 		
 		mov eax, SysHaltScreen.RESET
 		mov ebx, .restartStr
@@ -221,11 +220,11 @@ call ProgramManager.setActive	; Make removable Later
 	.restartStr :
 		db "OOM...", 0
 	
-	mov eax, [Dolphin2.compositorGrouping]
-	mov ebx, [eax+Grouping_subcomponent]
-	call console.numOut
-	mov ebx, [ebx+Grouping_subcomponent]
-	call console.numOut
+	;mov eax, [Dolphin2.compositorGrouping]
+	;mov ebx, [eax+Grouping_subcomponent]
+	;call console.numOut
+	;mov ebx, [ebx+Grouping_subcomponent]
+	;call console.numOut
 	
 	mov byte [INTERRUPT_DISABLE], 0x00
 	
@@ -238,7 +237,7 @@ call ProgramManager.setActive	; Make removable Later
 ;push edx
 ;call Minnow3.makeFile
 
-call ProgramManager.finalize
+;call ProgramManager.finalize
 popa
 ret
 consoletest_title :

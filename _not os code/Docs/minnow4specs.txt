@@ -1,0 +1,15 @@
+namelist block:
+	BlockDescriptor INDEX_IS_NAMELIST
+	BlockDescriptor	ptr -> null OR nextNamelistBlock
+	BlockDescriptor	reserved
+	NameEntry... entries
+		String entryName
+			char... data
+			null-terminator
+		ptr -> fileBlock
+file block:
+	BlockDescriptor INDEX_BLOCK_UNUSED OR INDEX_FILE_DATA OR INDEX_FILE_END OR INDEX_FILE_DELETED
+	BlockDescriptor ptr -> nextFileBlock OR null
+	BlockDescriptor reserved
+	Buffer... data
+

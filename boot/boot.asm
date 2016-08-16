@@ -101,9 +101,9 @@ boot.print :
 	
 ; Includes
 
-	%include "..\boot\config.asm"
-	%include "..\boot\detection.asm"
-	%include "..\boot\stringConstants.asm"
+	%include "../boot/config.asm"
+	%include "../boot/detection.asm"
+	%include "../boot/stringConstants.asm"
 	
 
 ; Data

@@ -26,7 +26,7 @@ TextEditor.main :
 		push dword 0
 		push dword 300*4
 		push dword 400
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [TextEditor.window], ecx
 		mov ebx, ecx
 		

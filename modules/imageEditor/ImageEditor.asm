@@ -34,7 +34,7 @@ ImageEditor.main :
 		mov edx, 5+(10+5)*5+5
 		._max0 :
 		push edx
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [ImageEditor.window], ecx
 		mov ebx, ecx
 		

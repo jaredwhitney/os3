@@ -79,11 +79,11 @@ AHCI.DMAwrite.allocateMemory :
 		add eax, 12
 		imul eax, 0x1000
 		mov ebx, eax
-		mov eax, [ProgramManager.creationOffset]
-		and eax, ~(0xFFF)
-		add eax, 0x1000
-		mov [ProgramManager.creationOffset], eax
-		call ProgramManager.reserveMemory
+;		mov eax, [ProgramManager.creationOffset]
+;		and eax, ~(0xFFF)
+;		add eax, 0x1000
+;		mov [ProgramManager.creationOffset], eax
+		call Guppy2.mallocPageAligned;ProgramManager.reserveMemory
 		mov [AHCI_DMAread_commandLoc], ebx
 		; no need to allocate a data buffer
 	popa

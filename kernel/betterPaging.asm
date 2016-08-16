@@ -22,8 +22,8 @@ betterPaging.enablePaging :
 betterPaging.createPageDirectory :
 	pusha
 		mov al, 0xFE
-		mov ebx, 0x1
-		call Guppy.malloc	; alloc space for the page directory
+		mov ebx, 0x1000	; should be using Guppy2.mallocAligned
+		call Guppy2.mallocPageAligned	; alloc space for the page directory
 		mov [Paging.directory], ebx
 		test ebx, 0xFFF
 			jnz .haltNotPageAligned

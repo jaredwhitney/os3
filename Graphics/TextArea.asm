@@ -53,6 +53,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 		mov dword [ebx+Component_transparent], FALSE
 		mov dword [ebx+Component_renderFunc], TextArea.Render
 		mov dword [ebx+Component_keyHandlerFunc], TextArea.onKeyboardEvent.handle
+		mov dword [ebx+Component_freeFunc], TextArea.Free
 		mov dword [ebx+Textarea_customKeyHandler], TextArea.onKeyboardEvent.handle	; redundant and should be removed
 		mov dword [ebx+Textarea_cursorPos], 0
 		mov ecx, ebx
@@ -127,6 +128,11 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 		push ebx
 		cmp edx, [ebx+Textarea_cursorPos]
 		mov edx, [ebx+Textarea_w]
+			jne .useWhite
+		push edx
+		mov edx, [Dolphin2.focusedComponent]
+		cmp ebx, edx
+			pop edx
 			jne .useWhite
 		mov ebx, 0xFF00FF00
 		jmp .render
@@ -489,6 +495,18 @@ TextArea.onKeyboardEvent.incCursor :
 	ret
 TextArea.onKeyboardEvent.decCursor :
 		dec dword [ebx+Textarea_cursorPos]
+	popa
+	ret
+
+TextArea.Free :
+	pusha
+		mov edx, ebx
+		mov ebx, [edx+Component_image]	; free self image
+		call Guppy2.free
+		mov ebx, [edx+Textarea_text]	; free self text buffer
+		call Guppy2.free
+		mov ebx, edx			; free self
+		call Guppy2.free
 	popa
 	ret
 	

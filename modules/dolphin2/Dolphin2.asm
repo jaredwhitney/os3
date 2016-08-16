@@ -1,3 +1,25 @@
+Dolphin2_WinManStruct :
+	dd .niceName
+	dd 0x00000000
+	dd 0x00000000
+	dd Dolphin2.init
+	dd null
+	dd null
+	dd Dolphin2.renderScreen
+	dd Dolphin2.handleMouseEvent
+	dd Dolphin2.HandleKeyboardEvent
+	dd Dolphin2.makeWindow
+	dd Dolphin2.showLoginScreen
+	dd Dolphin2.SystemMenu.Show
+	dd null
+	.niceName :
+		db "Dolphin2 Compositor [os3-default]", 0x0
+
+Dolphin2.init :
+		call Dolphin2.createCompositorGrouping
+		call DolphinConfig.proccessFile
+	ret
+
 Dolphin2.createCompositorGrouping :
 	pusha
 		; Create the Grouping
@@ -94,7 +116,7 @@ Dolphin2.renderScreen :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.Render
 		
-		call Dolphin2.drawFPScounter
+		call Dolphin2.drawDiagnosticInformation
 		
 		call Dolphin2.drawMouse
 		
@@ -135,7 +157,7 @@ d2_easyteletype :
 		pop eax	
 	ret
 
-Dolphin2.drawFPScounter :
+Dolphin2.drawDiagnosticInformation :
 	pusha
 		mov dword [FPS_NUM_STR], 0
 		mov dword [FPS_NUM_STR+4], 0
@@ -160,13 +182,36 @@ Dolphin2.drawFPScounter :
 		mov eax, [Clock.tics]
 		mov [Dolphin2.lastFrameTime], eax
 		
+		
 		mov ecx, [Dolphin2.flipBuffer]
 		mov eax, FPS_NUM_STR
 		call d2_easyteletype
 		mov eax, FPS_STR
 		call d2_easyteletype
+		
+		call Guppy2.getFreeMemorySize
+		mov ebx, ecx
+		mov eax, FREE_MEM_NUM_STR
+		add eax, 2
+		mov dword [eax], 0
+		mov dword [eax+4], 0
+		call String.fromHex
+		
+		mov ecx, FONTHEIGHT
+		add ecx, 2
+		imul ecx, [Graphics.SCREEN_WIDTH]
+		add ecx, [Dolphin2.flipBuffer]
+		mov eax, FREE_MEM_STR
+		call d2_easyteletype
+		mov eax, FREE_MEM_NUM_STR
+		call d2_easyteletype
 	popa
 	ret
+FREE_MEM_STR :
+	db "Free Memory: ", 0
+FREE_MEM_NUM_STR :
+	db "0x"
+	times 3 dd 0x0
 	
 Dolphin2.drawMouse :
 	pusha
@@ -325,36 +370,80 @@ Dolphin2.showLoginScreen :
 		mov eax, ecx
 		call Grouping.Add
 		mov ebx, ecx
-		push dword [Dolphin2.bgimg]	; for some reason breaks 'Image's made later...
-		push dword 1024*4
-		push dword 768
+	;	push dword [Dolphin2.bgimg]	; for some reason breaks 'Image's made later...
+		mov edx, ebx
+		mov ebx, [Graphics.SCREEN_WIDTH]
+		imul ebx, [Graphics.SCREEN_HEIGHT]
+		call Guppy2.malloc
+		mov [.img], ebx
+		push ebx
+		mov ebx, edx
+		push dword [Graphics.SCREEN_WIDTH]
+		push dword [Graphics.SCREEN_HEIGHT]
 		push dword 0
 		push dword 0
 		push dword [Graphics.SCREEN_WIDTH]
 		push dword [Graphics.SCREEN_HEIGHT]
 		call Image.Create
-	;	push dword [Dolphin2.bgimg]	; TESTING!~!!
-	;	push dword 1024*4
-	;	push dword 768
-	;	push dword 0
-	;	push dword 0
-	;	push dword [Graphics.SCREEN_WIDTH]
-	;	push dword [Graphics.SCREEN_HEIGHT]
-	;	call Image.Create	; TESTING!~!!
+				pusha
+				; now make it pretty :D
+					xor eax, eax
+					.ioutloop :
+						xor edx, edx
+						.iinloop :
+							mov ecx, edx
+							imul ecx, [Graphics.SCREEN_WIDTH]
+							add ecx, eax
+							add ecx, [.img]
+								push eax
+								push ecx
+								push edx
+									mov ecx, edx
+									inc ecx
+									mov eax, [Graphics.SCREEN_HEIGHT]
+									inc eax
+									shl ecx, 6
+									xchg eax, ecx
+									xor edx, edx
+									idiv ecx
+								;	imul eax, 2
+									and eax, 0xFF
+									mov ebx, 0xFF
+									shl ebx, 8
+									or ebx, eax
+									shl ebx, 8
+									or ebx, eax
+									shl ebx, 8
+									or ebx, eax
+								pop edx
+								pop ecx
+								pop eax
+							mov [ecx], ebx	; need a better color alg than that lol
+							inc edx
+							cmp edx, [Graphics.SCREEN_HEIGHT]
+								jb .iinloop
+						add eax, 4
+						cmp eax, [Graphics.SCREEN_WIDTH]
+							jb .ioutloop
+				popa
 		mov eax, ecx
 		call Grouping.Add
-		push dword 200*4
+		push dword 300*4
 		push dword 80
-		push dword (1024-200-200)*4
-		push dword 200
+		push dword (1024-300-300)*4
+		push dword 70
 		call Grouping.Create
-		mov dword [ecx+Grouping_backingColor], 0xFFC01010
+		mov dword [ecx+Component_transparent], TRUE
+		mov edx, [Dolphin2.windowTrimColor]
+		and edx, 0xFFFFFF
+		or edx, 0x20000000
+		mov [ecx+Grouping_backingColor], edx
 		mov eax, ecx
 		call Grouping.Add
 		mov ebx, ecx
 		call Component.RequestUpdate	; test
 		push dword Dolphin2.STR_LOGIN
-		push dword 512*4-(9/2*FONTWIDTH*4)-200*4
+		push dword 512*4-(9/2*FONTWIDTH*4)-300*4
 		push dword 100-80
 		push dword 9*FONTWIDTH*4
 		push dword FONTHEIGHT
@@ -363,7 +452,7 @@ Dolphin2.showLoginScreen :
 		call Grouping.Add
 		
 		push dword Dolphin2.STR_PASSWORD
-		push dword 512*4-(5*FONTWIDTH*4)-10*FONTWIDTH*4-200*4
+		push dword 512*4-(5*FONTWIDTH*4)-10*FONTWIDTH*4-300*4
 		push dword 100+FONTHEIGHT+5-80
 		push dword FONTWIDTH*4*10
 		push dword FONTHEIGHT
@@ -372,7 +461,7 @@ Dolphin2.showLoginScreen :
 		call Grouping.Add
 		
 		push dword 20
-		push dword 512*4+(5*FONTWIDTH*4)-10*FONTWIDTH*4-200*4
+		push dword 512*4+(5*FONTWIDTH*4)-10*FONTWIDTH*4-300*4
 		push dword 100+FONTHEIGHT+5-80
 		push dword 20*FONTWIDTH*4
 		push dword FONTHEIGHT
@@ -386,7 +475,7 @@ Dolphin2.showLoginScreen :
 		
 		push dword Dolphin2.STR_GOBUTTON
 		push dword Dolphin2.checkPass
-		push dword 512*4-20*4/2-200*4
+		push dword 512*4-20*4/2-300*4
 		push dword 100+FONTHEIGHT*2+10-80
 		push dword 20*4
 		push dword 10
@@ -396,6 +485,8 @@ Dolphin2.showLoginScreen :
 		
 	popa
 	ret
+	.img :
+		dd 0x0
 Dolphin2.STR_PASSWORD :
 	db "Password: ", 0
 Dolphin2.STR_LOGIN :

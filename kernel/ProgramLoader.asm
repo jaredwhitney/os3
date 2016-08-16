@@ -127,23 +127,24 @@ popa
 ret
 
 ProgramManager.reserveMemory :	; ebx contains bytes to reserve, returns ebx = location
-push eax
-push ecx
-	mov ecx, ebx
-	push dword [ProgramManager.creationOffset]
-	mov eax, [ProgramManager.creationOffset]
-	add eax, ebx
-	mov [ProgramManager.creationOffset], eax
-	pop ebx
-	add ebx, [ProgramManager.memoryStart]
-	push ebx
-	mov eax, ebx
-	mov ebx, ecx
-	call Buffer.clear
-	pop ebx
-pop ecx
-pop eax
-ret
+;push eax
+;push ecx
+jmp Guppy2.malloc ;	call Guppy2.malloc
+;	mov ecx, ebx
+;	push dword [ProgramManager.creationOffset]
+;	mov eax, [ProgramManager.creationOffset]
+;	add eax, ebx
+;	mov [ProgramManager.creationOffset], eax
+;	pop ebx
+;	add ebx, [ProgramManager.memoryStart]
+;	push ebx
+;	mov eax, ebx
+;	mov ebx, ecx
+;	call Buffer.clear
+;	pop ebx
+;pop ecx
+;pop eax
+;ret
 
 	
 ProgramManager.PROGRAM_REGISTERED :

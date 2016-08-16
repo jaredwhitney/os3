@@ -9,7 +9,7 @@ FileChooser.Prompt :	; String title, String buttonText, String callback
 		push dword 0
 		push dword 300*4
 		push dword 300
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [.win], ecx
 		
 		push dword 0*4

@@ -224,6 +224,8 @@ Minnow4.init :
 		call iConsole2.RegisterCommand
 		push dword Minnow4.COMMAND_REFORMAT_DISK
 		call iConsole2.RegisterCommand
+		push dword Minnow4.RENAME_FILE_COMMAND
+		call iConsole2.RegisterCommand
 		mov dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
 	popa
 	ret
@@ -248,7 +250,7 @@ Minnow4.reformatDisk :
 		Minnow4.reformatDisk.loop :
 		call Minnow4.writeBlock
 		add eax, 1
-		cmp eax, 100;[Minnow4.fs_size]
+		cmp eax, 2500;[Minnow4.fs_size]
 			jb Minnow4.reformatDisk.loop
 	popa
 	ret
@@ -429,13 +431,6 @@ Minnow4.readBuffer.data :
 Minnow4.readBuffer.byteSize :
 	dd 0x0
 
-Minnow4.renameFile :	; eax = int block, ebx = String newName
-	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
-		jne Minnow4.kGoRet
-	pusha
-		
-	popa
-	ret
 
 Minnow4.deleteFile :	; eax = String name : returns ebx = int errorCode	[SHOULD MAKE IT USE A BLOCK POINTER INSTEAD OF A STRING]
 	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
@@ -537,6 +532,131 @@ Minnow4.deleteFile.name :
 	dd 0x0
 Minnow4.deleteFile.threshold :
 	dd 0x0
+
+Minnow4.RENAME_FILE_COMMAND :
+	dd .renameStr
+	dd Minnow4.doRenameFile
+	dd null
+	.renameStr :
+		db "ren", 0
+	
+Minnow4.doRenameFile :
+	enter 0, 0
+		mov eax, .oldName ;[ebp+12]
+		mov ecx, .newName ;[ebp+8]
+		call Minnow4.renameFile
+		cmp ebx, Minnow4.FILE_NOT_FOUND
+	;		jne .ret
+		push Minnow4.STR_FILE_NOT_FOUND
+		call iConsole2.Echo
+	.ret :
+	leave
+	ret 0 ;8
+	.oldName :
+		db "file_001.rawtext", 0
+	.newName :
+		db "file_002.rawtext", 0
+
+Minnow4.renameFile :	; eax = String oldName, ecx = String newName : returns ebx = int errorCode
+	cmp dword [Minnow4.STATUS], Minnow4.INIT_FINISHED
+		jne Minnow4.kGoRet
+	mov [.newName], ecx
+			
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			; ; Getting the file pointer  ; ;
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			
+	push eax
+	push edx
+	push ecx
+		mov [.name], eax
+		mov eax, [Minnow4.readBlock.data]
+		add eax, 0x200
+		mov [.threshold], eax
+		xor ecx, ecx
+		.fetchNameBlock :
+		mov eax, ecx
+		push ecx
+		call Minnow4.readFileBlock
+		mov eax, ecx
+		pop ecx
+		.searchBlock :
+		mov ebx, [.name]
+		cmp byte [eax], null
+			jne .notMissing
+		add eax, 1
+		jmp .cont
+		.notMissing :
+		push eax
+		xchg eax, ebx
+		call os.seq
+		cmp al, 0x1
+		pop eax
+			je .fileFound
+		call String.getLength
+		add eax, edx
+		add eax, 4
+		.cont :
+		cmp eax, [.threshold]
+			jl .searchBlock
+		mov ecx, [.data]
+		add ecx, Minnow4_BlockDescriptor_nextPointer
+		mov ecx, [ecx]
+		cmp ecx, null
+			jne .fetchNameBlock
+		mov ebx, Minnow4.FILE_NOT_FOUND
+	pop ecx
+	pop edx
+	pop eax
+	ret
+	
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			; ; Clearing the name block entry ; ;
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			
+	.fileFound :
+		mov ebx, eax
+	pusha
+		call String.getLength
+		add edx, 4
+			push ebx
+			add ebx, edx
+			mov ebx, [ebx]
+			mov [.filePointer], ebx
+			pop ebx
+		mov ebx, edx
+		call Buffer.clear
+	popa
+		mov eax, ecx
+		mov ecx, [.data]
+		call Minnow4.writeBlock
+		; at this point the file entry is gone
+			
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			; ; Creating the new name block entry ; ;
+			; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;
+			
+	mov eax, [.newName]
+	mov ecx, [.filePointer]
+	call Minnow4.registerName
+	call Minnow4.registerPositionFromName
+		
+	mov ebx, Minnow4.SUCCESS
+	pop ecx
+	pop edx
+	pop eax
+	ret
+	.name :
+		dd 0x0
+	.threshold :
+		dd 0x0
+	.newName :
+		dd 0x0
+	.data :
+		dd 0x0
+	.filePointer :
+		dd 0x0
+
 
 Minnow4.markAllBlocksUnused :	; ptr in eax
 	pusha

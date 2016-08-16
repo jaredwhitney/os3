@@ -6,7 +6,8 @@ iConsole2.Init :
 		push dword 0
 		push dword 300*4
 		push dword 400
-		call Dolphin2.makeWindow
+		
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [iConsole2.window], ecx
 		mov dword [ecx+Grouping_backingColor], 0xFF000000
 		
@@ -33,10 +34,19 @@ iConsole2.Init :
 		push dword iConsole2.COMMAND_ECHO
 		call iConsole2.RegisterCommand	
 		
+		push dword iConsole2.COMMAND_ECHO_HEX
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_ECHO_DEC
+		call iConsole2.RegisterCommand
+		
 		push dword iConsole2.COMMAND_CLEAR
 		call iConsole2.RegisterCommand
 		
 		push dword iConsole2.COMMAND_HELP
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_PRINT_ARGNUM
 		call iConsole2.RegisterCommand
 		
 	popa
@@ -103,7 +113,29 @@ iConsole2.UnregisterTask :
 	leave
 	ret 4
 	
+iConsole2.HandleKeyEventNoMod :
+	pusha
+		mov al, [Component.keyChar]
+		cmp al, 0xFE
+			jne .notnewl
+		call TextArea.CursorToEnd
+		call TextArea.onKeyboardEvent.handle
+		jmp .ret
+		
+		.notnewl :
+		cmp al, 0xFF
+			je iConsole2.HandleKeyEvent.handleBackspace
+		; do some other stuff?
+		call TextArea.onKeyboardEvent.handle
+	.ret :
+	popa
+	ret
+
 iConsole2.HandleKeyEvent :
+	cmp dword [iConsole2.keyRedirect], null
+		je .noRedirect
+	jmp [iConsole2.keyRedirect]
+	.noRedirect :
 	pusha
 		mov [0x1000], esp
 		mov al, [Component.keyChar]
@@ -119,6 +151,8 @@ iConsole2.HandleKeyEvent :
 		mov ebx, iConsole2.commandStore
 		call String.copy
 		pop ebx
+		
+		mov dword [iConsole2.argNum], 0
 		
 		mov dword [.instr], false
 		mov eax, iConsole2.commandStore
@@ -143,6 +177,7 @@ iConsole2.HandleKeyEvent :
 			je .notspace
 		mov byte [eax-1], 0x0
 		push eax
+		inc dword [iConsole2.argNum]
 		.notspace :
 		cmp bl, endstr
 			jne .loop
@@ -210,20 +245,30 @@ iConsole2.HandleKeyEvent :
 		
 		.kgoRun :
 		call [edx+filetypebinding_function]	
-		jmp .aret
+		jmp iConsole2.returnBlind.aret
 		
 		.bindingNotFound :
 		push dword iConsole2.INVALID_COMMAND
 		call iConsole2.Echo
+		iConsole2.returnBlind :
 		mov esp, [0x1000]
 		.aret :
 		call iConsole2.PrintPrompt
+		popa
+		ret
+	iConsole2.returnBlindSilent :
+		call iConsole2.GoResetCommandPtr
+		mov esp, [0x1000]
 		popa
 		ret
 iConsole2.QUOTES :
 	db '"', 0
 iConsole2.INVALID_COMMAND :
 	db "Command invalid.", 0
+iConsole2.argNum :
+	dd null
+iConsole2.keyRedirect :
+	dd null
 iConsole2.HandleKeyEvent.notnewl :
 		cmp al, 0xFF
 			je iConsole2.HandleKeyEvent.handleBackspace
@@ -249,9 +294,18 @@ iConsole2.HandleKeyEvent.handleBackspace :
 
 iConsole2.PrintPrompt :
 	pusha
+		
 		mov ebx, [iConsole2.text]
 		mov eax, iConsole2.prompt
 		call TextArea.InsertText
+		
+		call iConsole2.GoResetCommandPtr
+		
+	popa
+	ret
+
+iConsole2.GoResetCommandPtr :
+	pusha
 		mov ebx, [iConsole2.text]
 		mov ebx, [ebx+Textarea_text]
 		call String.getLength
@@ -267,13 +321,98 @@ dd iConsole2.Echo
 dd null
 iConsole2.Echo :	; String text
 	enter 0, 0
+	pusha
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.text]
 		call TextArea.InsertText
+	popa
 	leave
 	ret 4
 iConsole2.STR_ECHO :
 	db "echo", 0
+
+iConsole2.EchoChar :	; char ptr
+	enter 0, 0
+	pusha
+		mov eax, [ebp+8]
+		mov al, [eax]
+		mov ebx, [iConsole2.text]
+		call TextArea.InsertChar
+	popa
+	leave
+	ret 4
+
+iConsole2.COMMAND_ECHO_HEX :
+dd iConsole2.STR_ECHO_HEX
+dd iConsole2.EchoHex
+dd null
+iConsole2.EchoHex :
+	enter 0, 0
+	pusha
+		mov eax, .strdata
+		mov ebx, 12
+		call Buffer.clear
+		add eax, 2
+		mov ebx, [ebp+8]
+		call String.fromHex
+		push eax
+		call iConsole2.Echo
+	popa
+	leave
+	ret 4
+	.strdata :
+		db "0x"
+		times 5 dw 0
+iConsole2.STR_ECHO_HEX :
+	db "ehex", 0
+
+iConsole2.COMMAND_ECHO_DEC :
+dd iConsole2.STR_ECHO_DEC
+dd iConsole2.EchoDec
+dd null
+iConsole2.EchoDec :
+	enter 0, 0
+	pusha
+		mov eax, .strdata
+		mov ebx, 12
+		call Buffer.clear
+		add eax, 2
+		fild dword [ebp+8]
+		fbstp [.dat]
+		mov ebx, [.dat]
+		call String.fromHex
+		push eax
+		call iConsole2.Echo
+	popa
+	leave
+	ret 4
+	.strdata :
+		times 3 dd 0
+	.dat :
+		times 3 dd 0
+iConsole2.STR_ECHO_DEC :
+	dd "edec", 0
+
+iConsole2.COMMAND_PRINT_ARGNUM :
+	dd .commandStr
+	dd iConsole2.PrintNumArgs
+	dd null
+	.commandStr :
+		db "argnum", 0
+iConsole2.PrintNumArgs :
+	enter 0, 0
+		mov eax, [iConsole2.argNum]
+		push dword .STR_PREFACE
+		call iConsole2.Echo
+		push eax
+		call iConsole2.EchoHex
+	leave
+	jmp iConsole2.returnBlind
+	.STR_PREFACE :
+		db "args: ", 0
+
+nowhere :
+	times 4 dq null
 
 iConsole2.COMMAND_CLEAR :
 dd iConsole2.STR_CLEAR

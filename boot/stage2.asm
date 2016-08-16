@@ -1,5 +1,5 @@
 KERNEL_START :
-%include "..\boot\config.asm"
+%include "../boot/config.asm"
 [bits 16]
 [org S2_CODE_LOC]
 db 0x4a
@@ -282,7 +282,7 @@ swrite_error:
 
 [bits 32]	; Data / Includes are back in 32-bit mode
 
-%include "..\boot\init_GDT.asm"	; protected mode GDT data
+%include "../boot/init_GDT.asm"	; protected mode GDT data
 
 ENTER_PM :
 	db "Booted into Protected Mode.", 0
@@ -354,4 +354,4 @@ RMIDTSAVE :
 DisplayMode :
 	dd 0x0
 
-%include "..\kernel\kernel.asm"	; kernel code
+%include "../kernel/kernel.asm"	; kernel code

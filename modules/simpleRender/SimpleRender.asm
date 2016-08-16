@@ -88,7 +88,7 @@ SimpleRender.main :
 		push dword 0
 		push dword 400*4
 		push dword 400
-		call Dolphin2.makeWindow
+		call WinMan.CreateWindow;Dolphin2.makeWindow
 		mov [SimpleRender.window], ecx
 		
 		mov ebx, 400*400*4
@@ -106,7 +106,7 @@ SimpleRender.main :
 		mov ebx, [SimpleRender.window]
 		mov eax, ecx
 		call Grouping.Add
-		mov [Dolphin2.focusedComponent], ecx
+		;mov [Dolphin2.focusedComponent], ecx
 		mov dword [ecx+Component_keyHandlerFunc], SimpleRender.keyFunc
 		
 		mov eax, [SimpleRender.image]
@@ -353,4 +353,4 @@ SimpleRender.p_func :
 	.f80 :
 		dd 160.
 
-%include "..\modules\simpleRender\lineFunc.asm"
+%include "../modules/simpleRender/lineFunc.asm"

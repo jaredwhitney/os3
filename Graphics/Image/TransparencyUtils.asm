@@ -88,7 +88,7 @@ Color.fuse :	; overlapping color in ecx, color being written over in edx... retu
 		mov eax, ecx
 		mov ecx, 100
 		idiv ecx
-		add ebx, eax
+		add edx, eax
 		pop eax
 		mov [Color.fuse.retblue], dl
 		

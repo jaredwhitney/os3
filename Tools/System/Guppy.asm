@@ -33,6 +33,9 @@ mov ebx, [Guppy.totalRAM]
 ret
 
 Guppy.malloc :	; AL = PNUM, EBX = Sectors requested (used to be ah)
+			imul ebx, 0x1000
+			call Guppy2.malloc
+		ret
 ;pusha;test
 ;mov ebx, [Guppy.table]
 ;call console.numOut
