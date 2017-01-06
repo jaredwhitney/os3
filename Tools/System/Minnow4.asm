@@ -421,7 +421,8 @@ Minnow4.readBuffer :	; eax = int block, ecx = Buffer data, edx = int byteSize : 
 			jg .copyDataLoop
 		pop eax
 		call Minnow4.getNextFileBlock
-		jmp Minnow4.readBuffer.loop
+		cmp eax, null
+			jne Minnow4.readBuffer.loop
 	Minnow4.readBuffer.ret :
 	pop eax
 	popa
