@@ -8,12 +8,32 @@ mouse.init :
 pusha
 	mov al, MOUSE_DEV_RESET
 	call ps2.commandPort2
+	call ps2.waitForData
 	mov al, MOUSE_DEV_ENABLE_REPORTING
 	call ps2.commandPort2
+	
+	in al, PS2_DATA_PORT
+	cmp al, 0xFA
+		jne .noResetAck
+	in al, PS2_DATA_PORT
+	cmp al, 0xAA
+		je .gotSecondAck
+	jmp .fixNoAA
+	.noResetAck :
+	call SysHaltScreen.show
+	.fixNoAA :
+	inc byte [Mouse.datpart] ; got 1 too many already, need to make sure the mouse packet part counter is intact
+	.gotSecondAck :
+	.gotAck :
+	
+	.doneloop :
+	mov dword [Mouse.inited], true
 popa
 ret
 
 Mouse.loop :
+cmp dword [Mouse.inited], true
+	jne .rret
 pusha
 	in al, PS2_DATA_PORT
 	mov bl, [Mouse.datpart]
@@ -45,6 +65,7 @@ call Mouse.sanityCheckAndUpdate
 Mouse.loop.ret.noup :
 call Mouse.incpart
 popa
+Mouse.loop.rret :
 ret
 
 Mouse.loop.handleMotion:
@@ -69,7 +90,7 @@ sub [ecx], eax
 jmp Mouse.loop.ret
 
 Mouse.datpart :
-db 0x1	; looks like 1 for bochs, 0 for real... should figure out what is making the incorrect calls during init...
+db 0x0
 
 Mouse.storeSubs :
 pusha
@@ -174,6 +195,8 @@ Mouse.lastx :
 	dd 0x0
 Mouse.lasty :
 	dd 0x0
+Mouse.inited :
+	dd false
 
 MOUSE_NOBTN :
 	dd 0
