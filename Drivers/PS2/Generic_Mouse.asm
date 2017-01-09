@@ -17,7 +17,7 @@ Mouse.loop :
 pusha
 	in al, PS2_DATA_PORT
 	mov bl, [Mouse.datpart]
-	cmp bl, 0x2	; I blame an uncaught ACK or something!
+	cmp bl, 0x2
 		jne Mouse.loop.handleMotion
 	call Mouse.storeSubs
 	mov ebx, MOUSE_NOBTN
@@ -69,7 +69,7 @@ sub [ecx], eax
 jmp Mouse.loop.ret
 
 Mouse.datpart :
-db 0x0
+db 0x1	; looks like 1 for bochs, 0 for real... should figure out what is making the incorrect calls during init...
 
 Mouse.storeSubs :
 pusha

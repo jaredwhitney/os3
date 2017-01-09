@@ -1,8 +1,8 @@
 ; BOOT CRITICAL
 
 	;  Stage2 Required Includes	;
-		%include "../boot/betterRealMode.asm"
-		%include "../boot/IDTmain.asm"
+	;	%include "../boot/betterRealMode.asm"
+	;	%include "../boot/IDTmain.asm"
 		%include "../Drivers/PS2/PS_2.asm"	; init should be dealt with in kernel, not s2!
 		
 	;  BootCritical Signature	;
@@ -12,7 +12,7 @@
 ; KERNEL CRITICAL
 
 	;  Memory Check Includes	;
-		%include "../boot/detection.asm"
+;		%include "../boot/detection.asm"
 		
 	;  PS/2 Driver Includes	;
 		%include "../Drivers/PS2/Generic_Mouse.asm"

@@ -115,17 +115,17 @@ Graphics.doVESAtest.sub :
 	ret
 
 Graphics.init :
-	cmp dword [DisplayMode], MODE_TEXT
-		je Graphics.init.ret
+	;cmp dword [DisplayMode], MODE_TEXT
+	;	je Graphics.init.ret
 	pusha
-	mov ebx, Graphics.VESA_SUPPORTED_MSG
-	call debug.print
-	xor ebx, ebx
-	mov bx, [Graphics.VESA_SUPPORTED]
-	call debug.num
-	call debug.newl
-	cmp bx, 0xff
-	jne ccacont
+	;mov ebx, Graphics.VESA_SUPPORTED_MSG
+	;call debug.print
+	;xor ebx, ebx
+	;mov bx, [Graphics.VESA_SUPPORTED]
+	;call debug.num
+	;call debug.newl
+	;cmp bx, 0xff
+	;jne ccacont
 							;jmp ccacont	; if left uncommented (ALONG WITH THE OTHER LINE), disable VESA mode.
 	xor ebx, ebx
 	mov bx, [VESA_CLOSEST_XRES]
@@ -252,6 +252,36 @@ db "Applying patch to palette...", 0
 	
 Graphics.VESA_SUPPORTED_MSG :
 db "VESA Support: ", 0x0
+
+VESA_OEMMSG :
+	db "OEM String: ", 0x0
+	
+VESA_VER :
+	db "VESA Version: ", 0x0
+
+VESA_TAGMSG :
+	db "VESA Signature: ", 0x0
+
+VESA_TAG :
+	dd 0x0, 0x0
+
+VESA_VMODENUMMSG :
+	db "Modes Available: 0x", 0x0
+
+VESA_CLOSEST_RESMSG :
+	db "    Resolution: ", 0x0
+
+VESA_CLOSEST_RESDIV :
+	db "x", 0x0
+
+VESA_CLOSEST_MATCHMSG :
+	db "Found mode: ", 0x0
+
+VESA_CLOSEST_BPPMSG :
+	db ", bpp = ", 0x0
+
+VESA_CLOSEST_BUFFERLOCMSG :
+	db "    Buffer position: ", 0x0
 
 Graphics.VESA_VER equ 0x2004	; word
 

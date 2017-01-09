@@ -112,7 +112,6 @@ Dolphin2.titleBarActiveColor :
 
 Dolphin2.renderScreen :
 	pusha
-	
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.Render
 		
@@ -167,10 +166,10 @@ Dolphin2.drawDiagnosticInformation :
 		push eax
 		; ebx is in 5000ths of a second per frame
 		xor edx, edx
-		mov eax, ebx
-		mov ecx, 5
-		idiv ecx
-		mov ebx, eax; ebx is in ms per frame
+;		mov eax, ebx
+;		mov ecx, 5
+;		idiv ecx
+;		mov ebx, eax; ebx is in ms per frame
 		mov [Dolphin2.tempvar], ebx
 		fld1
 		fimul dword [Dolphin2.1k]
@@ -316,10 +315,13 @@ Mouse.CURSOR_TRANSPARENT :
 	times CURSOR_WIDTH*CURSOR_HEIGHT dd T
 
 Dolphin2.HandleKeyboardEvent :
+	cmp dword [Dolphin2.focusedComponent], null
+		je .ret
 	pusha
 		mov ebx, [Dolphin2.focusedComponent]
 		call Component.HandleKeyboardEvent
 	popa
+	.ret :
 	ret
 	
 Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns WindowGrouping in ecx
@@ -342,6 +344,8 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 	ret
 
 Dolphin2.handleMouseEvent :
+	cmp dword [Dolphin2.started], true
+		jne .ret
 	pusha
 		mov [Component.mouseEventType], ebx
 		mov eax, [Mouse.x]
@@ -357,6 +361,7 @@ Dolphin2.handleMouseEvent :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.HandleMouseEvent
 	popa
+	.ret :
 	ret
 	
 Dolphin2.showLoginScreen :
