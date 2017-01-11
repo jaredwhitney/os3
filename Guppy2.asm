@@ -13,11 +13,11 @@ Guppy2.init :
 		call Guppy2.setBlockNoChecks
 		
 		mov eax, 0x0		; should use actual memory map
-		mov ebx, S2_CODE_LOC+KERNEL_SIZE
+		mov ebx, S2_CODE_LOC+KERNEL_SIZE*0x200
 		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
 		call Guppy2.setBlock
 		
-		call Guppy2.proccessMemoryMap
+;		call Guppy2.proccessMemoryMap	; no memory map present atm
 		
 		mov eax, Guppy2.TABLE_POSITION
 		mov ebx, 0x10000
