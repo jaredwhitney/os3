@@ -3,15 +3,10 @@ SysHaltScreen.KILL	equ 0x2
 SysHaltScreen.RESET	equ 0x3
 
 SysHaltScreen.show :	; warn type in eax, message in ebx, timeout in ecx (if applicable)
+methodTraceEnter
 pusha
+mov ebp, esp
 mov byte [INTERRUPT_DISABLE], 0xFF
-
-	;
-	;pusha
-	;mov ah, 0xFF
-	;call console.println
-	;popa
-	;
 	
 	mov [SHS.wtyp], eax
 	mov [SHS.ss], ebx
@@ -23,29 +18,41 @@ mov byte [INTERRUPT_DISABLE], 0xFF
 		mov eax, [Graphics.SCREEN_MEMPOS]
 		mov edx, [Graphics.SCREEN_SIZE]
 		mov ebx, 0xFF0000
+		cmp dword [SHS.wtyp], SysHaltScreen.KILL
+			jne .noModifyBgColor
+		mov ebx, 0x600000
+		.noModifyBgColor :
 		call Image.clear
 	
+	call SysHaltScreen.printMainMessage
 	mov ecx, 0x0
-	SysHaltScreen.timeout_loop :
+	cmp dword [SHS.wtyp], SysHaltScreen.KILL
+		je .noCountDown
+	.timeout_loop :
 		call SysHaltScreen.printCountdown
-		call SysHaltScreen.printMainMessage
 		mov eax, 5000
 		call System.sleep
-		add ecx, 1
+		inc ecx
 		cmp ecx, [SHS.tout]
-			jl SysHaltScreen.timeout_loop
+			jl .timeout_loop
+	.noCountDown :
 	cmp dword [SHS.wtyp], SysHaltScreen.WARN	; if warn
 		je SysHaltScreen.show.ret
 	cmp dword [SHS.wtyp], SysHaltScreen.RESET	; if reset
 		je ps2.resetCPU
+	
+	call SysHaltScreen.printStackTrace
+	
 	cli	; if kill (or unspecified)
 	hlt
 SysHaltScreen.show.ret :
 mov byte [INTERRUPT_DISABLE], 0x00
 popa
+methodTraceLeave
 ret
 
 SysHaltScreen.printMainMessage :
+methodTraceEnter
 pusha
 	mov dword [TextHandler.textSizeMultiplier], 3
 		mov eax, [Graphics.SCREEN_HEIGHT]
@@ -65,13 +72,19 @@ pusha
 		sub eax, ebx
 		add eax, [Graphics.SCREEN_MEMPOS]
 	mov ebx, [SHS.ss]
-	mov cl, WHITE
+	mov dword [TextHandler.selectedColor], 0xFFFFFF
+	cmp dword [SHS.wtyp], SysHaltScreen.KILL
+		jne .noModifyMessageColor
+	mov dword [TextHandler.selectedColor], 0x606060
+	.noModifyMessageColor :
 	call drawStringDirect
 	mov dword [TextHandler.textSizeMultiplier], 1
 popa
-	ret
+methodTraceLeave
+ret
 
 SysHaltScreen.printCountdown :
+methodTraceEnter
 pusha
 	mov eax, SHS.cdown	; string to store things in
 	mov ebx, [SHS.tout]
@@ -114,9 +127,11 @@ pusha
 	
 	mov dword [TextHandler.textSizeMultiplier], 1
 popa
+methodTraceLeave
 ret
 
 SysHaltScreen.saveRegionDimensions :
+methodTraceEnter
 pusha
 	mov ebx, SHS.cdown
 	call String.getLength
@@ -130,7 +145,61 @@ pusha
 	imul eax, [TextHandler.textSizeMultiplier]
 	mov [SHS.rh], eax
 popa
+methodTraceLeave
 ret
+
+SysHaltScreen.printStackTrace :
+methodTraceEnter
+pusha
+
+	mov ecx, FONTHEIGHT+2
+	imul ecx, [Graphics.SCREEN_WIDTH]
+	mov edx, [Debug.methodTraceStack]
+	sub edx, 4
+	mov eax, [Graphics.SCREEN_MEMPOS]
+	
+	.loop :
+	
+	push eax
+	mov eax, SHS.trace
+	mov ebx, [edx]
+	mov [.istor], ebx
+	call String.fromHex
+	pop eax
+	
+	mov ebx, SHS.trace
+	mov dword [TextHandler.selectedColor], 0xFFFFFF
+	call drawStringDirect
+	
+	pusha
+	mov ecx, [Graphics.SCREEN_WIDTH]
+	shr ecx, 1
+	add eax, ecx
+	mov ebx, Debug.methodTraceLookupTable
+	mov edx, [.istor]
+	.lookuploop :
+	cmp dword [ebx], edx
+		ja .foundMatch
+	add ebx, 8
+	jmp .lookuploop
+	.foundMatch :
+	sub ebx, 4
+	mov ebx, [ebx]
+	mov dword [TextHandler.selectedColor], 0xF0F0F0
+	call drawStringDirect
+	popa
+	
+	
+	add eax, ecx
+	sub edx, 4
+	
+	cmp edx, [Debug.methodTraceStackBase]
+		jge .loop
+popa
+methodTraceLeave
+ret
+.istor :
+	dd 0x0
 
 SHS.ss :
 	dd 0x0
@@ -140,6 +209,8 @@ SHS.wtyp :
 	dd 0x0
 SHS.cdown :
 	dq 0x0
+SHS.trace :
+	times 20 dq 0x0
 SHS.rl :
 	dd 0x0
 SHS.rw :

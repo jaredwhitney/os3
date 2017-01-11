@@ -1,0 +1,21 @@
+stackAddr
+stackOffs
+
+mov eax, [stackAddr]
+add eax, [stackOffs]
+mov [eax], eip
+add dword [stackOffs], 4
+
+stackPos
+
+FUNCTION_START :
+mov ebp, [Debug.methodTraceStack]
+mov [ebp], eip
+add dword [Debug.methodTraceStack], 4
+	pusha
+		--
+	popa
+sub dword [Debug.methodTraceStack], 4
+ret
+
+

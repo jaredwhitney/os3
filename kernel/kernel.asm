@@ -1,7 +1,9 @@
 [bits 32]	; the kernel will be run in 32-bit protected mode
 
 ; Begin executing the kernel
-Kernel.init :	
+Kernel.init :
+methodTraceEnter
+
 	; Prevent windows from being drawn (deprecated?)
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
@@ -46,6 +48,8 @@ Kernel.init :
 	; Pause for 1000 clock tics (needed workaround or will not boot)
 		mov eax, 1000
 		;call System.sleep
+	
+	call kernel.halt
 	
 	; Set up and run the windowing system (does not return).
 		call console.test
@@ -101,21 +105,25 @@ kernel.LoadFunctionState :	; vardata in ebx... trashes eax
 
 ; Initialize kernel modules
 kernel.initModules :
+	methodTraceEnter
 		call Dolphin.init
 		call console.init
 		call KeyManager.init
+	methodTraceLeave
 	ret
 	
 
 ; Halt the CPU and display a message
 kernel.halt :
-
+methodTraceEnter
+	mov ebp, esp
 	; Clear/disable interrupts
 		cli
 	
 	; Print a debug halt message (deprecated)	;
+		mov eax, SysHaltScreen.KILL
 		mov ebx, kernel.HALT_MESSAGE
-		call debug.println
+		call SysHaltScreen.show
 		
 		mov eax, 0x80808080
 		mov ebx, 0x01234567
@@ -163,15 +171,18 @@ kernel.OrcaHLLsetup_memhack :
 	
 ; Print text mode greeting if needed
 kernel.checkRunTextModeInit :
+	methodTraceEnter
 	cmp dword [DisplayMode], MODE_TEXT
 		jne kernel.checkRunTextModeInit.ret
 		call kernel.textInit
 	kernel.checkRunTextModeInit.ret :
+	methodTraceLeave
 	ret
 	
 
 ; Prints a greeting message (for use in text mode)
 kernel.textInit :
+	methodTraceEnter
 
 	; Clear the console
 		call console.clearScreen
@@ -183,6 +194,7 @@ kernel.textInit :
 	; Print a newline
 		call console.newline
 	
+	methodTraceLeave
 	ret
 	
 	TEXTMODE_INIT :
@@ -190,6 +202,7 @@ kernel.textInit :
 	
 ; Enable the use of SSE instructions
 SSE.enable :
+	methodTraceEnter
 	pusha
 	
 		; Check for SSE support
@@ -220,6 +233,7 @@ SSE.enable :
 			jne kernel.halt
 		
 	popa
+	methodTraceLeave
 	ret
 
 	SSETESTDATA :
@@ -230,11 +244,13 @@ SSE.enable :
 
 ; Enables use of the FPU
 FPU.enable :
+	methodTraceEnter
 		mov eax, cr0
 		and eax, (~0b1110)
 		or eax, 0b100000
 		mov cr0, eax
 		fninit
+	methodTraceLeave
 	ret
 
 

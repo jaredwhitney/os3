@@ -154,8 +154,9 @@
 	
 	;  EHCI Driver Includes	;
 		%include "../Drivers/USB/EHCI.asm"	; unimplemented
-
-
+		
+		%include "../$Emulator/map.asm"
+		
 ; DEFINITIONS
 	
 	; Truthy / Falsey

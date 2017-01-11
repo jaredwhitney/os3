@@ -1,6 +1,8 @@
 KERNEL_START :
 
-%include "..\newboot\bootdefinitions.asm"
+%include "../newboot/bootdefinitions.asm"
+%include "../Tools/methodTraceMacros.asm"
+[map all labels.map]
 
 [bits 16]
 [org KERNEL_LOADER_LOC]

@@ -22,7 +22,7 @@ endstring equ 0x0
 
 TextHandler.drawCharFromBitmap :	; ebx contains char to draw
 pusha
-mov [TextHandler.selectedColor], ah
+;mov [TextHandler.selectedColor], ah
 mov dx, 0x0
 TextHandler.drawCharloop :
 ; ah contains the current row of the char

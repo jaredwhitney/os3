@@ -1,4 +1,8 @@
 Guppy2.TABLE_POSITION	equ 0xAA0000	; use same actual # as in Guppy
+Debug.methodTraceStackBase :
+	dd 0xA80000
+Debug.methodTraceStack :
+	dd 0xA80000
 
 Guppy2.init :
 	pusha
