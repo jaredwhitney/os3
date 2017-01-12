@@ -8,4 +8,4 @@
 @java MapFormatter > map.asm
 @nasm.exe -o kernel.bin -f bin ..\newboot\kernelLoader.asm
 @pause
-@type boot.bin kernel.bin > os.img
+@type boot.bin kernel.bin > os.img 2>nul
