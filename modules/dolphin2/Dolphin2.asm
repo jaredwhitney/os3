@@ -16,11 +16,14 @@ Dolphin2_WinManStruct :
 		db "Dolphin2 Compositor [os3-default]", 0x0
 
 Dolphin2.init :
+	methodTraceEnter
 		call Dolphin2.createCompositorGrouping
 		call DolphinConfig.proccessFile
+	methodTraceLeave
 	ret
 
 Dolphin2.createCompositorGrouping :
+	methodTraceEnter
 	pusha
 		; Create the Grouping
 		push dword 0
@@ -60,11 +63,13 @@ Dolphin2.createCompositorGrouping :
 		mov dword [Dolphin2.started], 0xFF
 		
 	popa
+	methodTraceLeave
 	ret
 	
 
 
 SystemConfig.getBgColor :
+	methodTraceEnter
 	pusha
 		mov eax, SystemConfig.STR_FILE_NAME
 		call Minnow4.getFilePointer
@@ -92,12 +97,14 @@ SystemConfig.getBgColor :
 		or edx, 0xFF000000
 		mov dword [eax+Grouping_backingColor], edx
 	popa
+	methodTraceLeave
 	ret
 	.default :
 		mov eax, [Dolphin2.compositorGrouping]
 		mov edx, 0xFF000040
 		mov dword [eax+Grouping_backingColor], edx
 	popa
+	methodTraceLeave
 	ret
 .color :
 	dd 0x0
@@ -111,6 +118,7 @@ Dolphin2.titleBarActiveColor :
 	dd 0xFF201080
 
 Dolphin2.renderScreen :
+	methodTraceEnter
 	pusha
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.Render
@@ -126,6 +134,7 @@ Dolphin2.renderScreen :
 		call Video.imagecopy
 		
 	popa
+	methodTraceLeave
 	ret
 FPS_NUM_STR :
 	dq 0
@@ -139,6 +148,7 @@ Dolphin2.tempvar :
 Dolphin2.1k :
 	dd 1000
 d2_easyteletype :
+	methodTraceEnter
 		mov edx, [Graphics.SCREEN_WIDTH]
 		mov ebx, 0xFFFFFFFF
 		
@@ -154,9 +164,11 @@ d2_easyteletype :
 		jmp reasr4
 		qweasdasd :
 		pop eax	
+	methodTraceLeave
 	ret
 
 Dolphin2.drawDiagnosticInformation :
+	methodTraceEnter
 	pusha
 		mov dword [FPS_NUM_STR], 0
 		mov dword [FPS_NUM_STR+4], 0
@@ -205,6 +217,7 @@ Dolphin2.drawDiagnosticInformation :
 		mov eax, FREE_MEM_NUM_STR
 		call d2_easyteletype
 	popa
+	methodTraceLeave
 	ret
 FREE_MEM_STR :
 	db "Free Memory: ", 0
@@ -213,6 +226,7 @@ FREE_MEM_NUM_STR :
 	times 3 dd 0x0
 	
 Dolphin2.drawMouse :
+	methodTraceEnter
 	pusha
 		cmp dword [Dolphin2.started], true
 			jne .ret
@@ -279,6 +293,7 @@ Dolphin2.drawMouse :
 		mov [Mouse.lasty], edx
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 B equ 0xFF000000
@@ -315,6 +330,7 @@ Mouse.CURSOR_TRANSPARENT :
 	times CURSOR_WIDTH*CURSOR_HEIGHT dd T
 
 Dolphin2.HandleKeyboardEvent :
+	methodTraceEnter
 	cmp dword [Dolphin2.focusedComponent], null
 		je .ret
 	pusha
@@ -322,9 +338,11 @@ Dolphin2.HandleKeyboardEvent :
 		call Component.HandleKeyboardEvent
 	popa
 	.ret :
+	methodTraceLeave
 	ret
 	
 Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns WindowGrouping in ecx
+	methodTraceEnter
 		pop dword [Dolphin2.makeWindow.ret]
 		call WindowGrouping.Create
 	;		pop dword [0x1000]
@@ -341,9 +359,11 @@ Dolphin2.makeWindow :	; String title, int x, int y, int w, int h; returns Window
 		pop eax
 		mov ecx, [ecx+WindowGrouping_mainGrouping]
 		push dword [Dolphin2.makeWindow.ret]
+	methodTraceLeave
 	ret
 
 Dolphin2.handleMouseEvent :
+	methodTraceEnter
 	cmp dword [Dolphin2.started], true
 		jne .ret
 	pusha
@@ -356,15 +376,18 @@ Dolphin2.handleMouseEvent :
 		mov [Component.mouseEventY], eax
 			cmp dword [Dolphin2.windowMoving], TRUE
 				jne .cont
+			methodTraceLeave
 			jmp TitleBar.passthroughMouseEvent.gocheck
 			.cont :
 		mov ebx, [Dolphin2.compositorGrouping]
 		call Component.HandleMouseEvent
 	popa
 	.ret :
+	methodTraceLeave
 	ret
 	
 Dolphin2.showLoginScreen :
+	methodTraceEnter
 	pusha
 		push dword 0
 		push dword 0
@@ -489,6 +512,7 @@ Dolphin2.showLoginScreen :
 		call Grouping.Add
 		
 	popa
+	methodTraceLeave
 	ret
 	.img :
 		dd 0x0
@@ -503,6 +527,7 @@ Dolphin2.STR_PASS :
 Dolphin2.passEntryBox :
 	dd 0x0
 Dolphin2.checkPass :
+	methodTraceEnter
 	pusha
 		mov eax, [Dolphin2.passEntryBox]
 		mov ebx, [eax+Textarea_text]
@@ -515,19 +540,24 @@ Dolphin2.checkPass :
 		call Grouping.Remove
 		Dolphin2.checkPass.ret :
 	popa
+	methodTraceLeave
 	ret
 
 Dolphin2.showLoginScreen.passwordKeyHandler :
+	methodTraceEnter
 	mov al, [Component.keyChar]
 	cmp al, 0xFE
 		jne kgo
 	call Dolphin2.checkPass
+	methodTraceLeave
 	ret
 	kgo :
 	call TextArea.onKeyboardEvent.handle
+	methodTraceLeave
 	ret
 	
 Dolphin2.SystemMenu.Show :
+	methodTraceEnter
 	pusha
 		
 		push dword 0
@@ -558,6 +588,7 @@ Dolphin2.SystemMenu.Show :
 		call Grouping.Add
 		
 	popa
+	methodTraceLeave
 	ret
 
 	

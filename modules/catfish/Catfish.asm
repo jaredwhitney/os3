@@ -10,6 +10,7 @@ Catfish.TASK_UPDATE_WINDOWS :
 	dd null
 
 Catfish.init :
+	methodTraceEnter
 	pusha
 		
 		push dword Catfish.TASK_UPDATE_WINDOWS
@@ -19,9 +20,11 @@ Catfish.init :
 		call iConsole2.RegisterCommand
 		
 	popa
+	methodTraceLeave
 	ret
 
 Catfish.notify :
+	methodTraceEnter
 	enter 0, 0
 	
 		mov dword [.x], 0
@@ -98,6 +101,7 @@ Catfish.notify :
 		mov [edx+CatfishStruct_lastTime], eax
 		
 	leave
+	methodTraceLeave
 	ret 4
 	.title :
 		db "Notification", 0x0
@@ -116,6 +120,7 @@ Catfish.realWindow :
 	dd 0x0
 
 Catfish.loop :
+	methodTraceEnter
 	pusha
 		
 		.repeat :
@@ -156,6 +161,7 @@ Catfish.loop :
 		
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 

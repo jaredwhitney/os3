@@ -4,6 +4,9 @@
 Kernel.init :
 methodTraceEnter
 
+	mov eax, [Debug.methodTraceStackBase2]
+	mov [Debug.methodTraceStack2], eax
+	
 	; Prevent windows from being drawn (deprecated?)
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
@@ -48,8 +51,6 @@ methodTraceEnter
 	; Pause for 1000 clock tics (needed workaround or will not boot)
 		mov eax, 1000
 		;call System.sleep
-	
-	call kernel.halt
 	
 	; Set up and run the windowing system (does not return).
 		call console.test

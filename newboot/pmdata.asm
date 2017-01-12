@@ -456,7 +456,9 @@ CLOCK_CALL :
 
 KEYBOARD_CALL :
 	pusha
+	mov byte [IN_INT_CALL], true
 		call Keyboard.poll
+	mov byte [IN_INT_CALL], false
 		mov al, 0x20
 		out 0xA0, al
 		mov al, 0x20
@@ -466,7 +468,9 @@ KEYBOARD_CALL :
 
 MOUSE_CALL :
 	pusha
+	mov byte [IN_INT_CALL], true
 		call Mouse.loop
+	mov byte [IN_INT_CALL], false
 		mov al, 0x20
 		out 0xA0, al
 		mov al, 0x20
@@ -503,6 +507,9 @@ RMGDTEND :
 RMGDT :
 dw RMGDTEND-RMGDTSTART-1
 dd RMGDTSTART
+
+IN_INT_CALL :
+	db FALSE
 
 rmCodeOffs equ RMGDTCODE-RMGDTSTART
 rmDataOffs equ RMGDTDATA-RMGDTSTART

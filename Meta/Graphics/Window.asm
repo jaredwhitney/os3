@@ -1,6 +1,7 @@
 WINDOW_CLASS_SIZE equ 47
 
 Window.create.createBuffers :
+methodTraceEnter
 pusha
 
 	;mov dl, [Graphics.VESA_MODE]
@@ -32,9 +33,11 @@ pusha
 		call Dolphin.setAttribDouble
 
 popa
+methodTraceLeave
 ret	; returns buffer locations in ebx, ecx
 
 Window.create :	; String title, byte type : returns ebx (bl) = winNum, ecx = object pointer
+methodTraceEnter
 pop dword [retstor]
 pop dx
 pop ecx
@@ -55,6 +58,7 @@ pop ecx
 	pop ecx
 ; return
 push dword [retstor]
+methodTraceLeave
 ret
 
 ;Window.create.NONVESA :
@@ -86,6 +90,7 @@ ret
 retstor :
 	dd 0x0
 Window.create.allocNewWindow :
+methodTraceEnter
 
 	mov ebx, WINDOW_CLASS_SIZE	; window size
 	call ProgramManager.reserveMemory
@@ -113,9 +118,11 @@ Window.create.allocNewWindow :
 	mov byte [ebx], 0	; unused (winNum)
 	pop ebx
 	mov dword [ebx+Window_linkedComponent], 0		; linkedComponent
+methodTraceLeave
 ret
 
 Window.makeGlassSmart :
+methodTraceEnter
 pusha
 		mov ecx, [Dolphin.activeWindow]
 		add ecx, Dolphin.windowStructs
@@ -185,6 +192,7 @@ pusha
 	call Window.makeGlass
 Window.makeGlass.ret :
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.x :
@@ -209,6 +217,7 @@ Window.makeGlassSmart.dh :
 	dd 0x0
 
 Window.makeGlassSmart.sub1 :
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.x]
 	sub eax, [Window.makeGlassSmart.xl]
@@ -225,9 +234,11 @@ pusha
 	;	;	;
 	call Dolphin.redrawBackgroundRegion
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.sub2 :
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.x]
 	add eax, [Window.makeGlassSmart.w]
@@ -249,9 +260,11 @@ pusha
 	;	;	;
 	call Dolphin.redrawBackgroundRegion
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.sub3 :
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.xl]
 	add eax, [Window.makeGlassSmart.w]
@@ -273,9 +286,11 @@ pusha
 	;	;	;
 	call Dolphin.redrawBackgroundRegion
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.sub3star :
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.x]
 	mov ebx, [Window.makeGlassSmart.xl]
@@ -287,9 +302,11 @@ pusha
 	mov [Window.makeGlassSmart.xl], eax
 	mov [Window.makeGlassSmart.x], ebx
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.sub4 :	; this is broken for some reason :(
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.y]
 	add eax, [Window.makeGlassSmart.h]
@@ -316,9 +333,11 @@ pusha
 	;	;	;
 	call Dolphin.redrawBackgroundRegion
 popa
+methodTraceLeave
 ret
 
 Window.makeGlassSmart.sub4star :
+methodTraceEnter
 pusha
 	mov eax, [Window.makeGlassSmart.x]
 	mov ebx, [Window.makeGlassSmart.xl]
@@ -330,9 +349,11 @@ pusha
 	mov [Window.makeGlassSmart.xl], eax
 	mov [Window.makeGlassSmart.x], ebx
 popa
+methodTraceLeave
 ret
 
 Window.makeGlass :
+methodTraceEnter
 pusha
 	mov bl, [Window.LASTX_POS]
 	call Dolphin.getAttribWord
@@ -367,11 +388,13 @@ pusha
 	call Dolphin.redrawBackgroundRegion
 	
 popa
+methodTraceLeave
 ret
 Window.makeGlass.lineVal :
 	dd 0x0
 
 Window.getSectorSize :
+methodTraceEnter
 push edx
 push ecx
 	mov eax, [Graphics.SCREEN_SIZE]
@@ -382,9 +405,11 @@ push ecx
 	imul eax, 3
 pop ecx
 pop edx
+methodTraceLeave
 ret
 
 Window.forceFlush :	; winnum in ebx
+methodTraceEnter
 pusha
 Window.forceFlush.wait :
 ;cmp byte [Dolphin_WAIT_FLAG], 0xFF
@@ -409,6 +434,7 @@ Window.forceFlush.wait :
 		call Buffer.clear
 ;mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
+methodTraceLeave
 ret
 
 

@@ -3,6 +3,7 @@
 CHANGE_MASK equ 0x80000000
 
 Dolphin.init :
+	methodTraceEnter
 	pusha
 		
 		;mov bl, [Graphics.VESA_MODE]
@@ -23,6 +24,7 @@ Dolphin.init :
 		;call Dolphin.redrawBG
 	
 	popa
+	methodTraceLeave
 	ret
 
 
@@ -43,16 +45,19 @@ Dolphin.init :
 
 
 Dolphin.redrawBG :
+	methodTraceEnter
 	push ebx
 		mov byte [Dolphin_WAIT_FLAG], 0xFF
 		mov ebx, [bglocstor]
 		call Dolphin.makeBG
 		mov byte [Dolphin_WAIT_FLAG], 0x00
 	pop ebx
+	methodTraceLeave
 	ret
 
 
 Dolphin.makeBG :	; ebx contains location of data
+	methodTraceEnter
 	pusha
 		mov [bglocstor], ebx
 		cmp ebx, 0x0
@@ -65,6 +70,7 @@ Dolphin.makeBG :	; ebx contains location of data
 	
 	Dolphin.makeBG.ret :
 	popa
+	methodTraceLeave
 	ret
 
 
@@ -74,10 +80,12 @@ Dolphin.solidBG :
 		call Dolphin.getSolidBGColor
 		call Image.clear
 	popa
+	methodTraceLeave
 	ret
 
 
 Dolphin.getSolidBGColor :
+	methodTraceEnter
 	push cx
 		mov ebx, 0x10101010
 		mov cl, [Graphics.VESA_MODE]
@@ -86,10 +94,12 @@ Dolphin.getSolidBGColor :
 		mov ebx, 0x0000C7
 	Dolphin.solidBGNOVESA :
 	pop cx
+	methodTraceLeave
 	ret
 	
 
 Dolphin.updateScreen :
+	methodTraceEnter
 	pusha
 		cmp byte [Dolphin_WAIT_FLAG], 0xFF
 			je Dolphin.updateScreen.ret
@@ -149,10 +159,12 @@ Dolphin.updateScreen :
 		
 	Dolphin.updateScreen.ret :
 	popa
+	methodTraceLeave
 	ret
 
 
 Dolphin.compositeWindow :
+	methodTraceEnter
 
 		mov [Dolphin.currentWindow], ebx
 		add ebx, Dolphin.windowStructs
@@ -191,10 +203,12 @@ Dolphin.compositeWindow :
 
 		call Image.copy
 
+	methodTraceLeave
 	ret
 
 
 Dolphin.uUpdate :	; currentWindow is the window
+	methodTraceEnter
 	pusha
 		mov bl, [Window.TYPE]
 		call Dolphin.getAttribByte
@@ -225,9 +239,11 @@ Dolphin.uUpdate :	; currentWindow is the window
 		call Component.Render	; Window_linkedComponent will be a Grouping whose size is always kept in sync with the host Window and whose image is the same as the host Window, so no further calls should be needed
 		Dolphin.uUpdate.noComponents :
 	popa
+	methodTraceLeave
 	ret
 
 Dolphin.updateWindows :
+	methodTraceEnter
 	pusha
 	
 		xor ecx, ecx
@@ -245,9 +261,11 @@ Dolphin.updateWindows :
 			; should check and if needed jump back to the start of the loop
 			
 	popa
+	methodTraceLeave
 	ret
 
 Dolphin.redrawBackgroundRegion :
+	methodTraceEnter
 	pusha
 		cmp dword [bglocstor], 0x0
 			jne Dolphin.redrawBackgroundRegion.redrawImage
@@ -257,6 +275,7 @@ Dolphin.redrawBackgroundRegion :
 		pop ebx
 		call Image.clearRegion
 	popa
+	methodTraceLeave
 	ret
 Dolphin.redrawBackgroundRegion.redrawImage :	; ebx:w, eax:nbuf, ecx:h
 		mov [Image.copyRegion.w], ebx
@@ -270,9 +289,11 @@ Dolphin.redrawBackgroundRegion.redrawImage :	; ebx:w, eax:nbuf, ecx:h
 		mov [Image.copyRegion.obuf], eax
 		call Image.copyRegion
 	popa
+	methodTraceLeave
 	ret
 
 Dolphin.handleMouseClick :
+	methodTraceEnter
 	pusha
 		mov ecx, [Dolphin.currentWindow]
 		add ecx, Dolphin.windowStructs
@@ -326,6 +347,7 @@ Dolphin.handleMouseClick :
 		;call Window.makeGlassSmart ; is broken atm
 	Dolphin.handleMouseClick.ret :
 	popa
+	methodTraceLeave
 	ret
 
 Dolphin.SCREEN_BUFFER :

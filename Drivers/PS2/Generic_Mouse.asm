@@ -5,6 +5,7 @@ MOUSE_LBTN_FLAG	equ 0b00000001
 MOUSE_RBTN_FLAG	equ 0b00000010
 
 mouse.init :
+methodTraceEnter
 pusha
 	mov al, MOUSE_DEV_RESET
 	call ps2.commandPort2
@@ -29,9 +30,11 @@ pusha
 	.doneloop :
 	mov dword [Mouse.inited], true
 popa
+methodTraceLeave
 ret
 
 Mouse.loop :
+methodTraceEnter
 cmp dword [Mouse.inited], true
 	jne .rret
 pusha
@@ -66,6 +69,7 @@ Mouse.loop.ret.noup :
 call Mouse.incpart
 popa
 Mouse.loop.rret :
+methodTraceLeave
 ret
 
 Mouse.loop.handleMotion:
@@ -93,6 +97,7 @@ Mouse.datpart :
 db 0x0
 
 Mouse.storeSubs :
+methodTraceEnter
 pusha
 	mov cl, 0x00
 	test al, 0b10000
@@ -107,9 +112,11 @@ pusha
 	mov [Mouse.xsub], cl
 	mov [Mouse.ysub], ch
 popa
+methodTraceLeave
 ret
 
 Mouse.incpart :
+methodTraceEnter
 	mov bl, [Mouse.datpart]
 	add bl, 1
 	cmp bl, 3
@@ -117,9 +124,11 @@ Mouse.incpart :
 	mov bl, 0x0
 	Mouse.loop.ret.nofix :
 	mov [Mouse.datpart], bl
+methodTraceLeave
 ret
 
 Mouse.sanityCheckAndUpdate :
+methodTraceEnter
 pusha
 	mov eax, [Mouse_xsum]
 	test eax, 0xF0000000
@@ -147,9 +156,11 @@ pusha
 	Mouse.sCAU.nyfix2 :
 	mov [Mouse.y], eax
 popa
+methodTraceLeave
 ret
 
 Mouse.drawOnScreen :
+methodTraceEnter
 pusha
 	mov eax, [Graphics.SCREEN_MEMPOS]
 	mov ebx, [Graphics.SCREEN_HEIGHT]
@@ -177,6 +188,7 @@ pusha
 								mov [Mouse.lastx], ecx
 								mov [Mouse.lasty], edx
 popa
+methodTraceLeave
 ret
 
 Mouse.xsub :

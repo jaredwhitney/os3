@@ -1,4 +1,5 @@
 Graphics.setVGApalette :
+methodTraceEnter
 pusha
 	mov dx, 0x3c6	; setting palette mask, unneeded on bochs
 	mov al, 0xff
@@ -48,10 +49,12 @@ Graphics.setVGApalette.cont :
 cmp cx, 64
 jle Graphics.setVGApalette.loop1
 popa
+methodTraceLeave
 ret
 
 Graphics.setGrayscalePalette :
 pusha
+methodTraceEnter
 mov ax, [0x1000]
 cmp ax, 0xF
 jne Graphics.setGrayscalePalette2
@@ -69,6 +72,7 @@ add ax, 1
 cmp ax, 255
 jle Graphics.setGrayscalePalette.loop1
 popa
+methodTraceLeave
 ret
 
 Graphics.setGrayscalePalette2 :	; no longer needed, remove
@@ -88,6 +92,7 @@ popa
 ret
 
 Graphics.doVESAtest :
+methodTraceEnter
 pusha
 mov eax, [Graphics.SCREEN_MEMPOS]
 mov ebx, 0x000000
@@ -99,8 +104,10 @@ add edx, 0x1
 cmp edx, [Graphics.SCREEN_HEIGHT]
 jle Graphics.VESAloop
 popa
+methodTraceLeave
 ret
 Graphics.doVESAtest.sub :
+	methodTraceEnter
 	xor ecx, ecx
 	Graphics.doVESAtest.loop :
 	mov [eax], ebx
@@ -112,9 +119,11 @@ Graphics.doVESAtest.sub :
 	add ecx, 1
 	cmp ecx, [Graphics.SCREEN_WIDTH]
 		jl Graphics.doVESAtest.loop
+	methodTraceLeave
 	ret
 
 Graphics.init :
+	methodTraceEnter
 	;cmp dword [DisplayMode], MODE_TEXT
 	;	je Graphics.init.ret
 	pusha
@@ -153,10 +162,12 @@ Graphics.init :
 		call Graphics.setVGApalette
 	popa
 	Graphics.init.ret :
+	methodTraceLeave
 	ret
 	
 Graphics.grabCardName :
 	pusha
+	methodTraceEnter
 		mov ax, [0x2006]
 		mov bx, [0x2008]
 		and ebx, 0xFFFF
@@ -166,9 +177,11 @@ Graphics.grabCardName :
 		mov ebx, eax
 		mov [Graphics.CARDNAME], ebx
 	popa
+	methodTraceLeave
 	ret
 	
 Graphics.printModeInfo :
+	methodTraceEnter
 	pusha
 		
 		mov eax, [0x2000]
@@ -244,6 +257,7 @@ Graphics.printModeInfo :
 		call DebugLogEAX
 		call console.newline
 	popa
+	methodTraceLeave
 	ret
 	
 

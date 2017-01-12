@@ -279,6 +279,7 @@
 	
 	
 Dolphin.drawTextNew2 :
+methodTraceEnter
 pusha
 push dword [TextHandler.charpos]
 push dword [TextHandler.textWidth]
@@ -366,9 +367,11 @@ pop word [TextHandler.solidChar]
 pop dword [TextHandler.textWidth]
 pop dword [TextHandler.charpos]
 popa
+methodTraceLeave
 ret
 
 D.dTN2.checkNeedsNewl :
+methodTraceEnter
 push eax
 push ecx
 push edx
@@ -400,9 +403,11 @@ D.dTN2.cNN.ret :
 pop edx
 pop ecx
 pop eax
+methodTraceLeave
 ret
 
 D.dTN2.handleNewl :
+methodTraceEnter
 push ebx
 push ecx
 push edx
@@ -414,6 +419,7 @@ push edx
 pop edx
 pop ecx
 pop ebx
+methodTraceLeave
 ret
 
 D.dTN2.imgbase :

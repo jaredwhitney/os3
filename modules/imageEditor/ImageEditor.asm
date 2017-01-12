@@ -20,6 +20,7 @@ ImageEditor.STR_RAWIMAGETYPE :
 	db "rawimage", 0x0
 
 ImageEditor.main :
+	methodTraceEnter
 	pusha
 		push dword ImageEditor.placeholderTitle
 		push dword 0*4
@@ -274,6 +275,7 @@ ImageEditor.main :
 		mov [ImageEditor.image], ecx
 		
 	popa
+	methodTraceLeave
 	ret
 ImageEditor.placeholderTitle :
 	db "ImageEditor- Untitled", 0x0
@@ -333,25 +335,30 @@ ImageEditor.color :
 	dd 0xFF000000
 
 ImageEditor.mainFromConsoleFile :
+	methodTraceEnter
 	pusha
 		mov eax, iConsole2.commandStore
 		mov [PromptBox.response], eax
 		call ImageEditor.main
 		call ImageEditor.loadFile
 	popa
+	methodTraceLeave
 	ret
 	
 ImageEditor.promptLoadFile :
+	methodTraceEnter
 		push dword .promptLoadTitle
 		push dword .promptLoadMessage
 		push dword ImageEditor.loadFile
 		call FileChooser.Prompt
+	methodTraceLeave
 	ret
 	.promptLoadTitle :
 		db "Open an Image", 0x0
 	.promptLoadMessage :
 		db "Open", 0x0
 ImageEditor.loadFile :
+	methodTraceEnter
 	pusha
 		mov ebx, 200*200*4+8;[Graphics.SCREEN_WIDTH]
 		;imul ebx, [Graphics.SCREEN_HEIGHT]
@@ -371,18 +378,22 @@ ImageEditor.loadFile :
 		; should resize the window etx here
 		
 	popa
+	methodTraceLeave
 	ret
 ImageEditor.promptSaveFile :
+	methodTraceEnter
 		push dword .promptSaveTitle
 		push dword .promptSaveMessage
 		push dword ImageEditor.saveFile
 		call FileChooser.Prompt
+	methodTraceLeave
 	ret
 	.promptSaveTitle :
 		db "Save an Image", 0x0
 	.promptSaveMessage :
 		db "Save", 0x0
 ImageEditor.saveFile :
+	methodTraceEnter
 	pusha
 		mov edx, [ImageEditor.image]
 		mov eax, [edx+Image_source]
@@ -406,6 +417,7 @@ ImageEditor.saveFile :
 		.dontMake :
 		call Minnow4.writeBuffer
 	popa
+	methodTraceLeave
 	ret
 
 ImageEditor.getFileName :
@@ -413,6 +425,7 @@ ImageEditor.getFileName :
 ImageEditor.mouseHandlerFunc :
 
 ImageEditor.decBrushSize :
+	methodTraceEnter
 		cmp dword [ImageEditor.brushSize], 1
 			je .ret
 		dec dword [ImageEditor.brushSize]
@@ -424,8 +437,10 @@ ImageEditor.decBrushSize :
 			call String.fromHex
 		popa
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.incBrushSize :
+	methodTraceEnter
 		cmp dword [ImageEditor.brushSize], 255
 			je .ret
 		inc dword [ImageEditor.brushSize]
@@ -437,8 +452,10 @@ ImageEditor.incBrushSize :
 			call String.fromHex
 		popa
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.decRedValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.redVal], 0
 			je .ret
 		dec dword [ImageEditor.redVal]
@@ -451,8 +468,10 @@ ImageEditor.decRedValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.incRedValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.redVal], 255
 			je .ret
 		inc dword [ImageEditor.redVal]
@@ -465,8 +484,10 @@ ImageEditor.incRedValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.decGreenValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.greenVal], 0
 			je .ret
 		dec dword [ImageEditor.greenVal]
@@ -479,8 +500,10 @@ ImageEditor.decGreenValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.incGreenValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.greenVal], 255
 			je .ret
 		inc dword [ImageEditor.greenVal]
@@ -493,8 +516,10 @@ ImageEditor.incGreenValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.decBlueValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.blueVal], 0
 			je .ret
 		dec dword [ImageEditor.blueVal]
@@ -507,8 +532,10 @@ ImageEditor.decBlueValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.incBlueValue :
+	methodTraceEnter
 		cmp dword [ImageEditor.blueVal], 255
 			je .ret
 		inc dword [ImageEditor.blueVal]
@@ -521,8 +548,10 @@ ImageEditor.incBlueValue :
 		popa
 		call ImageEditor.updateColorPreview
 	.ret :
+	methodTraceLeave
 	ret
 ImageEditor.updateColorPreview :
+	methodTraceEnter
 	pusha
 		mov ecx, [ImageEditor.colorPreview]
 		mov bh, 0xFF
@@ -534,8 +563,10 @@ ImageEditor.updateColorPreview :
 		mov [ecx+Grouping_backingColor], ebx
 		mov dword [ecx+Grouping_renderFlag], true
 	popa
+	methodTraceLeave
 	ret
 ImageEditor.drawStroke :
+	methodTraceEnter
 	cmp dword [Component.mouseEventType], MOUSE_NOBTN
 		je .ret
 	pusha
@@ -569,4 +600,5 @@ ImageEditor.drawStroke :
 		call Component.RequestUpdate
 	popa
 	.ret :
+	methodTraceLeave
 	ret

@@ -13,27 +13,35 @@ WinMan_showPrimaryMenuFunc	equ 0x2C
 WinMan_showSecondaryMenuFunc	equ 0x30
 
 WinMan.Register :
+	methodTraceEnter
 	enter 0, 0
 	push eax
 		mov eax, [ebp+8]
 		mov [WinMan.modulePointer], eax
 	pop eax
 	leave
+	methodTraceLeave
 	ret 4
 
 WinMan.GetNiceName :
+	methodTraceEnter
 		mov ecx, [WinMan.modulePointer]
 		mov ecx, [ecx+WinMan_niceName]
+	methodTraceLeave
 	ret
 
 WinMan.GetSpecVersionNumber :
+	methodTraceEnter
 		mov ecx, [WinMan.modulePointer]
 		mov ecx, [ecx+WinMan_specVersionNumber]
+	methodTraceLeave
 	ret
 
 WinMan.GetVersionNumber :
+	methodTraceEnter
 		mov ecx, [WinMan.modulePointer]
 		mov ecx, [ecx+WinMan_versionNumber]
+	methodTraceLeave
 	ret
 
 WinMan.Init :
@@ -76,6 +84,7 @@ WinMan.SetPrimaryColor :
 ;	ret 4
 
 WinMan.UpdateScreen :
+	methodTraceEnter
 	push eax
 		mov eax, [WinMan.modulePointer]
 		cmp dword [WinMan_updateScreenFunc], null
@@ -83,6 +92,7 @@ WinMan.UpdateScreen :
 		call [eax+WinMan_updateScreenFunc]
 	.funcMissing :
 	pop eax
+	methodTraceLeave
 	ret
 
 WinMan.HandleMouseEvent :
@@ -130,6 +140,7 @@ WinMan.CreateWindow :
 ;	ret; 4
 
 WinMan.ShowLoginScreen :
+	methodTraceEnter
 	push eax
 		mov eax, [WinMan.modulePointer]
 		cmp dword [WinMan_showLoginScreenFunc], null
@@ -137,9 +148,11 @@ WinMan.ShowLoginScreen :
 		call [eax+WinMan_showLoginScreenFunc]
 	.funcMissing :
 	pop eax
+	methodTraceLeave
 	ret
 
 WinMan.ShowPrimaryMenu :
+	methodTraceEnter
 	push eax
 		mov eax, [WinMan.modulePointer]
 		cmp dword [WinMan_showPrimaryMenuFunc], null
@@ -147,9 +160,11 @@ WinMan.ShowPrimaryMenu :
 		call [eax+WinMan_showPrimaryMenuFunc]
 	.funcMissing :
 	pop eax
+	methodTraceLeave
 	ret
 
 WinMan.ShowSecondaryMenu :
+	methodTraceEnter
 	push eax
 		mov eax, [WinMan.modulePointer]
 		cmp dword [WinMan_showSecondaryMenuFunc], null
@@ -157,6 +172,7 @@ WinMan.ShowSecondaryMenu :
 		call [eax+WinMan_showSecondaryMenuFunc]
 	.funcMissing :
 	pop eax
+	methodTraceLeave
 	ret
 
 WinMan.modulePointer :

@@ -73,7 +73,7 @@
 	;  Module Includes	;
 		%include "../modules/textEditor/TextEditor.asm"
 		%include "../modules/imageEditor/ImageEditor.asm"
-		%include "../modules/video/Video.asm"
+		%include "../modules/video/Video.asm"	; here on needs method traces added
 		%include "../modules/simpleRender/SimpleRender.asm"
 		%include "../modules/systemMemoryMap/SystemMemoryMap.asm"
 		%include "../modules/bfParse/bfParse.asm"

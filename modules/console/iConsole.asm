@@ -1,6 +1,7 @@
 [bits 32]
 
 console.init :
+methodTraceEnter
 pusha
 	
 ;	call ProgramManager.getProgramNumber	; register program with the OS
@@ -54,9 +55,11 @@ pusha
 ;	call ProgramManager.finalize	; Make removable Later
 ;
 popa
+methodTraceLeave
 ret
 
 console.createWindow :
+	methodTraceEnter
 	pusha
 		
 	mov ebx, 0x1
@@ -66,14 +69,17 @@ console.createWindow :
 	;call JASM.console.post_init		; FIX THIS!!!
 	;call console.update
 	popa
+	methodTraceLeave
 	ret
 
 console.rereg :
+methodTraceEnter
 pusha
 	;mov eax, [console.windowStructLoc]
 	;call Dolphin.registerWindow
 	;mov [console.winNum], bl
 popa
+methodTraceLeave
 ret
 
 ;console.loop :	; UNUSED
@@ -126,13 +132,16 @@ ret
 ;ret
 
 console.runOHLL_workaround :
+	methodTraceEnter
 		mov bl, [OHLLPROTO_PNUM]
 		call ProgramManager.setActive
 			call iConsole._loop
 		call ProgramManager.finalize
+	methodTraceLeave
 	ret
 
 console.setWidth :
+methodTraceEnter
 pusha
 and ebx, 0xFFFF
 mov eax, [Graphics.bytesPerPixel]
@@ -141,26 +150,32 @@ mov eax, ebx
 mov bl, [Window.WIDTH]
 call Dolphin.setAttribWord
 popa
+methodTraceLeave
 ret
 
 console.setHeight :
+methodTraceEnter
 pusha
 	mov ax, bx
 	mov bl, [Window.HEIGHT]	; -> ecx
 	call Dolphin.setAttribWord
 popa
+methodTraceLeave
 ret
 
 console.setPos :
+methodTraceEnter
 pusha
 mov al, [console.winNum]
 mov [Dolphin.currentWindow], al
 mov eax, ebx
 call Dolphin.moveWindowAbsolute
 popa
+methodTraceLeave
 ret
 
 JASM.console.safeFullscreen :
+methodTraceEnter
 pusha
 
 	mov ebx, [console.windowStructLoc]
@@ -172,9 +187,11 @@ pusha
 	mov [ebx+Window_height], ax
 	
 popa
+methodTraceLeave
 ret
 
 console.test :	; command that can be used to test anything.
+methodTraceEnter
 pusha
 ;mov bl, [console.pnum]
 ;call ProgramManager.setActive	; Make removable Later
@@ -239,6 +256,7 @@ pusha
 
 ;call ProgramManager.finalize
 popa
+methodTraceLeave
 ret
 consoletest_title :
 	db "Window Test", 0
@@ -506,6 +524,7 @@ consoletest_type :
 	; dd 0x0
 
 console.memstat :
+methodTraceEnter
 	mov ah, 0xFF
 	pusha
 	mov ebx, [Guppy.usedRAM]
@@ -525,13 +544,16 @@ console.memstat :
 	mov ebx, Guppy.div3
 	call console.println
 popa
+methodTraceLeave
 ret
 
 console.checkColor :
+	methodTraceEnter
 	cmp ah, 0x0
 		jne console.checkColor_ret
 	mov ah, 0xFF
 	console.checkColor_ret :
+	methodTraceLeave
 	ret
 
 console.FUNCTION_UNSUPPORTED :
@@ -539,9 +561,11 @@ mov ah, 0x3	; RED
 mov ebx, console.UNSUP_MSG
 call console.println
 popa
+methodTraceLeave
 ret
 
 screen.wipe :
+methodTraceEnter
 ;pusha
 ;mov ebx, [console.pos]
 ;add ebx, [Dolphin.SCREEN_BUFFER]
@@ -549,6 +573,7 @@ screen.wipe :
 ;mov dx, [console.height]
 ;call Dolphin.clear
 ;popa
+methodTraceLeave
 ret
 
 ; console.update :
@@ -566,6 +591,7 @@ ret
 ; ret
 
 console.update.gone :
+methodTraceEnter
 mov bl, [console.winNum]
 call Dolphin.windowExists
 cmp eax, 0x0
@@ -573,6 +599,7 @@ je console.update.gone.ret
 call Dolphin.unregisterWindow
 console.update.gone.ret :
 popa
+methodTraceLeave
 ret
 
 ;console.checkClear :
@@ -584,6 +611,7 @@ ret
 ;ret
 
 console.print :
+methodTraceEnter
 cmp dword [DisplayMode], MODE_TEXT
 	je TextMode.print
 pusha
@@ -632,6 +660,7 @@ printdonep :
 mov word [edx], 0x0
 ;call console.update
 popa
+methodTraceLeave
 ret
 
 ;console.drawCursor :
@@ -646,11 +675,14 @@ ret
 ;ret
 
 console.println :
+methodTraceEnter
 call console.print
 call console.newline
+methodTraceLeave
 ret
 
 console.numOutFakeDecimal :	; just go base 10 -> the same characters in hex (ONLY WORKS WITH 2-DIGIT DECIMAL NUMBERS)
+methodTraceEnter
 pusha
 	mov eax, ebx
 	xor edx, edx
@@ -663,11 +695,13 @@ pusha
 add ebx, [cnOFDchange]
 call console.numOut
 popa
+methodTraceLeave
 ret
 cnOFDchange :
 dd 0x0
 
 console.numOut :
+methodTraceEnter
 pusha
 call console.checkColor
 mov [console.cstor], ah
@@ -682,6 +716,7 @@ console.numOut.start :
 	mov al, '0'
 	call console.cprint
 	popa
+	methodTraceLeave
 	ret
 	console.numOut.cont :
 mov edx, ebx
@@ -714,6 +749,7 @@ sub cl, 4
 jmp console.numOut.start
 console.numOut.end :
 popa
+methodTraceLeave
 ret
 
 console.numOut.checkZ :
@@ -723,6 +759,7 @@ jmp console.numOut.dontcare
 
 ; newline
 console.newline :
+	methodTraceEnter
 	cmp dword [DisplayMode], MODE_TEXT
 		je TextMode.newline
 	pusha
@@ -755,9 +792,11 @@ console.newline :
 			mov bl, [Window.BUFFERSIZE]	; <- ebx
 			call Dolphin.setAttribDouble
 	popa
+	methodTraceLeave
 	ret
 
 console.doBackspace :
+methodTraceEnter
 		mov bl, [Window.BUFFERSIZE]	; -> eax
 		call Dolphin.getAttribDouble
 mov edx, 0x0
@@ -862,6 +901,7 @@ mov [eax], bx
 jmp kernel.halt
 
 console.cprint :
+methodTraceEnter
 cmp dword [DisplayMode], MODE_TEXT
 	je TextMode.cprint
 pusha
@@ -906,9 +946,11 @@ add ebx, 0x2
 ;call console.update
 
 popa
+methodTraceLeave
 ret
 
 console.clearScreen :	; something about this corrupts subComponents...
+methodTraceEnter
 cmp dword [DisplayMode], MODE_TEXT
 	je TextMode.clearScreen
 pusha
@@ -927,12 +969,15 @@ pusha
 
 		mov dword [edx+Window_buffersize], 0
 popa
+methodTraceLeave
 ret
 console.clearScreen.end :
 	dd 0x0
 
 console.setColor :
+methodTraceEnter
 mov [console.vgacolor], bl
+methodTraceLeave
 ret
 
 console.vgacolor :

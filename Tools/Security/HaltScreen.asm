@@ -155,6 +155,14 @@ pusha
 	mov ecx, FONTHEIGHT+2
 	imul ecx, [Graphics.SCREEN_WIDTH]
 	mov edx, [Debug.methodTraceStack]
+	mov eax, [Debug.methodTraceStackBase]
+	mov [.end], eax
+	cmp byte [IN_INT_CALL], false
+		je .cont
+	mov edx, [Debug.methodTraceStack2]
+	mov eax, [Debug.methodTraceStackBase2]
+	mov [.end], eax
+	.cont :
 	sub edx, 4
 	mov eax, [Graphics.SCREEN_MEMPOS]
 	
@@ -193,13 +201,31 @@ pusha
 	add eax, ecx
 	sub edx, 4
 	
-	cmp edx, [Debug.methodTraceStackBase]
-		jge .loop
+	cmp edx, [.end]
+		jae .loop
+	
+	cmp byte [IN_INT_CALL], false
+		je .cont2
+	mov ebx, .ihandlers1
+	mov dword [TextHandler.selectedColor], 0xB0F0B0
+	call drawStringDirect
+	mov ecx, [Graphics.SCREEN_WIDTH]
+	shr ecx, 1
+	add eax, ecx
+	mov ebx, .ihandlers2
+	call drawStringDirect
+	.cont2 :
 popa
 methodTraceLeave
 ret
 .istor :
 	dd 0x0
+.end :
+	dd 0x0
+.ihandlers1 :
+	db "------", 0
+.ihandlers2 :
+	db "<System Interrupt>", 0
 
 SHS.ss :
 	dd 0x0

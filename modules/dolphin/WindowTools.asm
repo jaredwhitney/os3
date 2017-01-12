@@ -1,4 +1,5 @@
 Dolphin.windowExists :	; windowNum in ebx, returns either 0x0 or 0xF (F|T) in eax
+methodTraceEnter
 push ebx
 add ebx, Dolphin.windowStructs
 mov eax, [ebx]
@@ -6,12 +7,15 @@ pop ebx
 cmp eax, 0x0
 je Dolphin.windowExists.false
 mov eax, 0xF
+methodTraceLeave
 ret
 Dolphin.windowExists.false :
 mov eax, 0x0
+methodTraceLeave
 ret
 
 Dolphin.activateNext :	; activates the next window in the list
+methodTraceEnter
 pusha
 xor ebx, ebx
 mov bl, [Dolphin.activeWindow]
@@ -36,9 +40,11 @@ mov ch, 0x0
 	mov [Dolphin.activeWindow], bl
 	call debug.num
 popa
+methodTraceLeave
 ret
 
 Dolphin.registerWindow :	; eax = pointer to windowStruct; returns bl contains windowNum
+methodTraceEnter
 push ecx
 push edx
 mov edx, Dolphin.windowStructs
@@ -60,9 +66,11 @@ mov [Dolphin.activeWindow], bl
 	popa
 pop edx
 pop ecx
+methodTraceLeave
 ret
 
 Dolphin.getAttribDouble :	; returns eax. bl = offset
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -75,9 +83,11 @@ mov eax, [eax]
 pop ebx
 pop ecx
 pop edx
+methodTraceLeave
 ret
 
 Dolphin.getAttribWord :	; returns eax
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -91,9 +101,11 @@ pop ebx
 pop ecx
 pop edx
 and eax, 0xFFFF
+methodTraceLeave
 ret
 
 Dolphin.getAttribByte :	; returns eax
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -107,10 +119,12 @@ pop ebx
 pop ecx
 pop edx
 and eax, 0xFF
+methodTraceLeave
 ret
 
 
 Dolphin.setAttribDouble :	; attrib val in eax
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -128,10 +142,12 @@ mov [ecx], eax
 pop ebx
 pop ecx
 pop edx
+methodTraceLeave
 ret
 
 
 Dolphin.setAttribWord :	; attrib val in ax
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -149,10 +165,12 @@ mov [ecx], ax
 pop ebx
 pop ecx
 pop edx
+methodTraceLeave
 ret
 
 
 Dolphin.setAttribByte :	; attrib val in al
+methodTraceEnter
 push edx
 push ecx
 push ebx
@@ -170,9 +188,11 @@ mov [ecx], al
 pop ebx
 pop ecx
 pop edx
+methodTraceLeave
 ret
 
 Dolphin.unregisterWindow :	; winNum in bl
+methodTraceEnter
 pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 
@@ -194,9 +214,11 @@ Dolphin.registerWindow.noActiveChange :
 
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
+methodTraceLeave
 ret
 
 Dolphin.moveWindow :	; xchange in eax, y change in ebx
+methodTraceEnter
 pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 
@@ -217,9 +239,11 @@ mov byte [Dolphin_WAIT_FLAG], 0xFF
 	
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
+methodTraceLeave
 ret
 
 Dolphin.moveWindowAbsolute :	; x in eax, y in ebx
+methodTraceEnter
 pusha
 ;mov byte [Dolphin_WAIT_FLAG], 0xFF
 mov ecx, ebx
@@ -246,9 +270,11 @@ call Window.makeGlassSmart
 
 ;mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
+methodTraceLeave
 ret
 
 Dolphin.anyActiveWindows :	; eax ret
+methodTraceEnter
 push ebx
 push ecx
 push edx
@@ -266,6 +292,7 @@ mov eax, 0x0
 pop edx
 pop ecx
 pop ebx
+methodTraceLeave
 ret
 Dolphin.anyActiveWindows.yes :
 mov eax, edx
@@ -273,9 +300,11 @@ add eax, 1
 pop edx
 pop ecx
 pop ebx
+methodTraceLeave
 ret
 
 Dolphin.activeWinNum :
+	methodTraceEnter
 	pusha
 	xor edx, edx
 	mov [Dolphin.awctcnt], edx
@@ -292,6 +321,7 @@ Dolphin.activeWinNum :
 	mov eax, 0x0
 	popa
 	mov eax, [Dolphin.awctcnt]
+	methodTraceLeave
 	ret
 	Dolphin.awct.yes :
 	push eax
@@ -304,6 +334,7 @@ Dolphin.activeWinNum :
 	dd 0x0
 
 Dolphin.sizeWindow :	; xchange in eax, y change in ebx
+methodTraceEnter
 pusha
 mov byte [Dolphin_WAIT_FLAG], 0xFF
 
@@ -328,9 +359,11 @@ mov byte [Dolphin_WAIT_FLAG], 0xFF
 
 mov byte [Dolphin_WAIT_FLAG], 0x0
 popa
+methodTraceLeave
 ret
 
 Dolphin.drawBorder :	; ebx = image buffer, cx = width, dx = height
+methodTraceEnter
 pusha
 and ecx, 0xFFFF
 push ecx
@@ -362,9 +395,11 @@ jg Dolphin.drawBorder.loop2
 mov [ebx], al
 
 popa
+methodTraceLeave
 ret
 
 Dolphin.drawTitle :	; [currentWindow] contains window data
+methodTraceEnter
 pusha
 push dword [TextHandler.charpos]
 push dword [TextHandler.textWidth]
@@ -412,6 +447,7 @@ pop word [TextHandler.solidChar]
 pop dword [TextHandler.textWidth]
 pop dword [TextHandler.charpos]
 popa
+methodTraceLeave
 ret
 
 

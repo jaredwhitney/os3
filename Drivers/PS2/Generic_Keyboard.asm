@@ -1,14 +1,17 @@
 KeyManager.init :
+methodTraceEnter
 pusha
 	mov al, 0x1
 	mov ebx, 0x10
 	call Guppy.malloc
 	mov [Keyboard_buffer], ebx
 popa
+methodTraceLeave
 ret
 
 ;	POLL THE PS2 KEYBOARD FOR DATA	;
 Keyboard.poll :
+methodTraceEnter
 	pusha
 	
 	in al, 0x60	; get last keycode
@@ -89,9 +92,11 @@ Keyboard.poll :
 	mov [KeyManager.lastKey], bl
 	Keyboard.poll.return :
 	popa
+	methodTraceLeave
 	ret
 
 KeyManager.handleShift :	; charcode in bl
+methodTraceEnter
 	push ebx
 	cmp bl, 0x2a
 		je KeyManager.handleShift.on	; DONT JUMP, handle it
@@ -122,6 +127,7 @@ KeyManager.handleShift :	; charcode in bl
 	
 	KeyManager.handleShift.ret :
 	pop ebx
+	methodTraceLeave
 	ret
 	KeyManager.handleShift.on :
 		push ax
@@ -129,11 +135,13 @@ KeyManager.handleShift :	; charcode in bl
 		mov [KeyManager.caps], al
 		pop ax
 		pop ebx
+		methodTraceLeave
 		ret
 KeyManager.shiftSpecialCases :
 	db '`', '~', '1', '!', '2', '@', '3', '#', '4', '$', '5', '%', '6', '^', '7', '&', '8', '*', '9', '(', '0', ')', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', "'", '"', ',', '<', '.', '>', '/', '?', '\', '|', 0x0, 0x0
 
 KeyManager.keyPress :	; key in bl
+methodTraceEnter
 pusha
 	; old code kept for compatability
 	;mov [0x1030], bl
@@ -173,9 +181,11 @@ popa
 			call Component.HandleKeyboardEvent
 			qwerfasdf :
 			pop ebx
+methodTraceLeave
 ret
 
 Keyboard.getKey :
+	methodTraceEnter
 	push eax
 	;	 check the program is allowed to get keypresses here
 	mov al, [Dolphin.currentWindow]
@@ -184,6 +194,7 @@ Keyboard.getKey :
 		je Keyboard.getKey.kcont
 	pop eax
 	mov bl, 0x0
+	methodTraceLeave
 	ret
 	Keyboard.getKey.kcont :
 	
@@ -215,9 +226,11 @@ Keyboard.getKey :
 	pop ecx
 	Keyboard.getKey.new_retk :
 	pop eax
+	methodTraceLeave
 	ret
 
 KeyManager.toChar :
+	methodTraceEnter
 	cmp bl, 0x1E
 	mov al, 'a'
 	je KeyManager.toChar.ret
@@ -382,9 +395,11 @@ KeyManager.toChar :
 		call debug.newl
 	popa
 	KeyManager.toChar.ret :
+	methodTraceLeave
 	ret
 
 KeyManager.handleSpecialKey :
+	methodTraceEnter
 	pusha
 	push word [Dolphin.currentWindow]
 	cmp bl, 0x50
@@ -430,6 +445,7 @@ KeyManager.handleSpecialKey :
 		mov [KeyManager.hsmode], bl
 		pop word [Dolphin.currentWindow]
 		popa
+		methodTraceLeave
 		jmp Keyboard.poll.drawKeyFinalize
 	KeyManager.handleSpecialKey.ret :
 		push bx
@@ -448,6 +464,7 @@ KeyManager.handleSpecialKey :
 	KeyManager.handleSpecialKey.aret :
 	pop word [Dolphin.currentWindow]
 	popa
+	methodTraceLeave
 	jmp Keyboard.poll.drawKeyFinalize
 
 	KeyManager.handleSpecialKey.closeWindow :
@@ -456,6 +473,7 @@ KeyManager.handleSpecialKey :
 	jmp KeyManager.handleSpecialKey.aret
 	
 KeyManager.hasEvent :
+methodTraceEnter
 push bx
 	mov bl, [Dolphin.currentWindow]
 	mov bh, [Dolphin.activeWindow]
@@ -470,6 +488,7 @@ push bx
 	mov cl, 0x00
 	KeyManager.hasEvent.ret :
 pop bx
+methodTraceLeave
 ret
 
 	

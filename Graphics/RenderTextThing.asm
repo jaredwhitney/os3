@@ -15,17 +15,21 @@ Component_freeFunc		equ 52
 Component_CLASS_SIZE		equ 56
 
 Component.Render :	; Component in ebx
+	methodTraceEnter
 	pusha
 		cmp dword [ebx+Component_renderFunc], 0
 			je Component.killfunc
 		call [ebx+Component_renderFunc]
 	popa
+	methodTraceLeave
 	ret
 Component.killfunc :
+	methodTraceEnter
 	mov eax, SysHaltScreen.KILL
 	mov ebx, Component.INVALID_COMPONENT_MESSAGE
 	mov ecx, 5
 	call SysHaltScreen.show
+	methodTraceLeave
 	jmp $
 Component.INVALID_COMPONENT_MESSAGE :
 	db "[Dolphin] An attempt was made to access an invalid Component.", 0
@@ -47,14 +51,17 @@ Component.TYPE_SELECTPANEL			equ 0x8
 Component.TYPE_WINDOW				equ 0x9
 
 Component.RequestUpdate :	; Component in ebx
+methodTraceEnter
 ;pusha
 	;mov ecx, [ebx+Component_upperRenderFlag]
 	;mov dword [ecx], TRUE
 	mov dword [ebx+Component_needsRedraw], true
 ;popa
+methodTraceLeave
 ret
 
 Component.HandleMouseEvent :	; Component in ebx
+methodTraceEnter
 pusha
 	; Make the coordinates relative to the component
 	mov eax, [Component.mouseEventX]
@@ -65,9 +72,13 @@ pusha
 	mov [Component.mouseEventY], eax
 	; Call the proper function
 	cmp dword [ebx+Component_mouseHandlerFunc], 0x0
-		je Component.discardMouseEvent
+		jne .callfunc
+	methodTraceLeave
+	jmp Component.discardMouseEvent
+	.callfunc :
 	call [ebx+Component_mouseHandlerFunc]
 popa
+methodTraceLeave
 ret
 Component.discardKeyboardEvent :
 Component.discardMouseEvent :
@@ -83,6 +94,7 @@ Component.mouseEventY :
 Component.mouseEventType :
 	dd 0x0
 Component.HandleKeyboardEvent :	; Component in ebx
+methodTraceEnter
 pusha
 	cmp byte [Component.keyChar], 0x0
 		je Component.HandleKeyboardEvent.ret
@@ -91,19 +103,23 @@ pusha
 	call [ebx+Component_keyHandlerFunc]
 Component.HandleKeyboardEvent.ret :
 popa
+methodTraceLeave
 ret
 Component.keyHandlerPointers :
 	dd Component.killfunc, Component.discardKeyboardEvent, TextArea.onKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent, Component.discardKeyboardEvent
 Component.keyChar :
 	db 0x0
 Component.Free :	; Component in ebx
+methodTraceEnter
 pusha
 	cmp dword [ebx+Component_freeFunc], null
 		je Component.defaultFreeFunc
 	call [ebx+Component_freeFunc]
 popa
+methodTraceLeave
 ret
 Component.defaultFreeFunc :
+methodTraceEnter
 	; free self image
 	mov edx, ebx
 	mov ebx, [edx+Component_image]
@@ -112,9 +128,11 @@ Component.defaultFreeFunc :
 	mov ebx, edx
 	call Guppy2.free
 popa
+methodTraceLeave
 ret
 
 Component.initToDefaults :
+methodTraceEnter
 	mov dword [ebx+Component_keyHandlerFunc], null
 	mov dword [ebx+Component_mouseHandlerFunc], null
 	mov dword [ebx+Component_renderFunc], null
@@ -122,6 +140,7 @@ Component.initToDefaults :
 	mov dword [ebx+Component_transparent], false
 	mov dword [ebx+Component_needsRedraw], true
 	mov dword [ebx+Component_freeFunc], null
+methodTraceLeave
 ret
 	
 Textline_type	equ 0
@@ -133,6 +152,7 @@ Textline_h		equ 20
 Textline_text	equ Component_CLASS_SIZE
 
 TextLine.Create :	; String str, int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [TextLine.Create.retval]
 	pop dword [TextLine.Create.h]
 	pop dword [TextLine.Create.w]
@@ -170,6 +190,7 @@ TextLine.Create :	; String str, int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [TextLine.Create.retval]
+	methodTraceLeave
 	ret
 TextLine.Create.retval :
 	dd 0x0
@@ -185,6 +206,7 @@ TextLine.Create.h :
 	dd 0x0
 
 TextLine.Render :	; textline in ebx
+	methodTraceEnter
 	pusha
 			push ebx
 				mov edx, ebx
@@ -232,9 +254,11 @@ TextLine.Render :	; textline in ebx
 			jg TextLine.Render.loop
 		
 	popa
+	methodTraceLeave
 	ret
 
 TextLine.RenderTest :
+methodTraceEnter
 pusha
 	; create the component
 ;	mov byte [INTERRUPT_DISABLE], 0xFF
@@ -271,10 +295,12 @@ pusha
 ;	call Image.copy
 ;	mov byte [INTERRUPT_DISABLE], 0x00
 popa
+methodTraceLeave
 ret
 TextLine.RenderTest.button :
 	dd 0x0
 TextLine.RenderTest.isClicked :
+methodTraceEnter
 pusha
 	mov ecx, TextLine.RenderTest.text
 	mov dl, [TextLine.RenderTest.flip]
@@ -287,6 +313,7 @@ pusha
 	xor dl, 0xFF
 	mov [TextLine.RenderTest.flip], dl
 popa
+methodTraceLeave
 ret
 TextLine.RenderTest.flip :
 	db 0xFF
@@ -296,6 +323,7 @@ TextLine.RenderTest.text2 :
 	db "Hellow.", 0
 
 RenderText :	; char in al, color in ebx, image in ecx, image width in edx
+	methodTraceEnter
 	cmp al, 0x0D
 		je RenderText.ret
 	pusha
@@ -332,6 +360,7 @@ RenderText :	; char in al, color in ebx, image in ecx, image width in edx
 			jg RenderText.mainloop	; repeat mainloop FONTHEIGHT times
 	popa
 	RenderText.ret :
+	methodTraceLeave
 	ret
 RenderText.imwidth :
 	dd 0x0

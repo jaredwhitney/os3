@@ -10,6 +10,7 @@ GroupingScrollable_xoffs			equ 44
 GroupingScrollable_yoffs			equ 48
 
 GroupingScrollable.Create :	; int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [GroupingScrollable.Create.retval]
 	pop dword [GroupingScrollable.Create.h]
 	pop dword [GroupingScrollable.Create.w]
@@ -45,6 +46,7 @@ GroupingScrollable.Create :	; int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [GroupingScrollable.Create.retval]
+	methodTraceLeave
 	ret
 GroupingScrollable.Create.retval :
 	dd 0x0
@@ -64,6 +66,7 @@ GroupingScrollable.Remove :
 	call Grouping.Remove
 	ret
 GroupingScrollable.Render :	; GroupingScrollable in ebx, basically Grouping.Render with a few added lines
+	methodTraceEnter
 		mov edx, ebx
 		cmp dword [edx+GroupingScrollable_renderFlag], FALSE
 			je GroupingScrollable.Render.ret
@@ -129,6 +132,7 @@ GroupingScrollable.Render :	; GroupingScrollable in ebx, basically Grouping.Rend
 		mov dword [edx+GroupingScrollable_renderFlag], FALSE
 	GroupingScrollable.Render.ret :
 	popa
+	methodTraceLeave
 	ret
 GroupingScrollable.doScrollLeft :
 	ret
@@ -139,6 +143,7 @@ GroupingScrollable.doScrollUp :
 GroupingScrollable.doScrollDown :
 	ret
 GroupingScrollable.passthroughMouseEvent :	; GroupingScrollable in ebx
+	methodTraceEnter
 	pusha
 		GroupingScrollable.passthroughMouseEvent.nomatch :
 		mov ebx, [ebx+Component_nextLinked]
@@ -149,5 +154,6 @@ GroupingScrollable.passthroughMouseEvent :	; GroupingScrollable in ebx
 		; ... finish this!
 	GroupingScrollable.passthroughMouseEvent.ret :
 	popa
+	methodTraceLeave
 	ret
 

@@ -9,6 +9,7 @@ Image_sw		equ Component_CLASS_SIZE+4
 Image_sh		equ Component_CLASS_SIZE+8
 
 Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [Image.Create.retval]
 	pop dword [Image.Create.h]
 	pop dword [Image.Create.w]
@@ -53,6 +54,7 @@ Image.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
 	pop eax
 	pop edx
 	push dword [Image.Create.retval]
+	methodTraceLeave
 	ret
 Image.Create.retval :
 	dd 0x0
@@ -71,6 +73,7 @@ Image.Create.sh :
 Image.Create.source :
 	dd 0x0
 Image.Render :	; Image in ebx
+	methodTraceEnter
 	pusha
 			
 		mov eax, [ebx+Image_w]	; take min(Image_w, Image_sw)
@@ -95,6 +98,7 @@ Image.Render :	; Image in ebx
 		mov [Image.copyRegion.nbuf], eax
 		call Image.copyRegion
 	popa
+	methodTraceLeave
 	ret
 
 Imagescalable_type		equ 0
@@ -108,6 +112,7 @@ Imagescalable_sw		equ Component_CLASS_SIZE+4
 Imagescalable_sh		equ Component_CLASS_SIZE+8
 
 ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [ImageScalable.Create.retval]
 	pop dword [ImageScalable.Create.h]
 	pop dword [ImageScalable.Create.w]
@@ -150,6 +155,7 @@ ImageScalable.Create :	; Image source, int sw, int sh, int x, int y, int w, int 
 	pop ebx
 	pop eax
 	push dword [ImageScalable.Create.retval]
+	methodTraceLeave
 	ret
 ImageScalable.Create.retval :
 	dd 0x0
@@ -168,9 +174,11 @@ ImageScalable.Create.sh :
 ImageScalable.Create.source :
 	dd 0x0
 ImageScalable.Render :	; ImageScalable in ebx
+	methodTraceEnter
 	pusha
 		; Figure out how to nicely scale images!
 	popa
+	methodTraceLeave
 	ret
 
 ; Image, ImageScalable [s:w,h], ImageScrollable[mscrolls]

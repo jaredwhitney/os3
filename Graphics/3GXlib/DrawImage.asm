@@ -1,4 +1,5 @@
 L3gx.drawImage :	; L3gxImage dest, L3gxImage source, int x, int y
+	methodTraceEnter
 	pop dword [.retval]
 	pop dword [.y]
 	pop dword [.x]
@@ -85,6 +86,7 @@ L3gx.drawImage :	; L3gxImage dest, L3gxImage source, int x, int y
 		
 	popa
 	push dword [.retval]
+	methodTraceLeave
 	ret
 	.retval :
 		dd 0x0

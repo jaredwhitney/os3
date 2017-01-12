@@ -1,4 +1,5 @@
 iConsole2.Init :
+	methodTraceEnter
 	pusha
 		
 		push iConsole2.windowTitle
@@ -50,9 +51,11 @@ iConsole2.Init :
 		call iConsole2.RegisterCommand
 		
 	popa
+	methodTraceLeave
 	ret
 
 iConsole2.runLoops :
+	methodTraceEnter
 	pusha
 		mov ebx, [iConsole2.taskBase]
 		.loop :
@@ -63,9 +66,11 @@ iConsole2.runLoops :
 		jmp .loop
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 iConsole2.RegisterTask :
+	methodTraceEnter
 	enter 0, 0
 	
 		mov ecx, [ebp+8]
@@ -81,9 +86,11 @@ iConsole2.RegisterTask :
 		
 	.ret :
 	leave
+	methodTraceLeave
 	ret 4
 
 iConsole2.UnregisterTask :
+	methodTraceEnter
 	enter 0, 0
 		
 		mov eax, [ebp+8]
@@ -111,9 +118,11 @@ iConsole2.UnregisterTask :
 		
 	.ret :
 	leave
+	methodTraceLeave
 	ret 4
 	
 iConsole2.HandleKeyEventNoMod :
+	methodTraceEnter
 	pusha
 		mov al, [Component.keyChar]
 		cmp al, 0xFE
@@ -129,6 +138,7 @@ iConsole2.HandleKeyEventNoMod :
 		call TextArea.onKeyboardEvent.handle
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 iConsole2.HandleKeyEvent :
@@ -136,6 +146,7 @@ iConsole2.HandleKeyEvent :
 		je .noRedirect
 	jmp [iConsole2.keyRedirect]
 	.noRedirect :
+	methodTraceEnter
 	pusha
 		mov [0x1000], esp
 		mov al, [Component.keyChar]
@@ -204,6 +215,7 @@ iConsole2.HandleKeyEvent :
 		
 		call iConsole2.PrintPrompt
 	popa
+	methodTraceLeave
 	ret
 	.instr :
 		dd false
@@ -255,11 +267,13 @@ iConsole2.HandleKeyEvent :
 		.aret :
 		call iConsole2.PrintPrompt
 		popa
+		methodTraceLeave
 		ret
 	iConsole2.returnBlindSilent :
 		call iConsole2.GoResetCommandPtr
 		mov esp, [0x1000]
 		popa
+		methodTraceLeave
 		ret
 iConsole2.QUOTES :
 	db '"', 0
@@ -275,6 +289,7 @@ iConsole2.HandleKeyEvent.notnewl :
 		; do some other stuff?
 		call TextArea.onKeyboardEvent.handle
 	popa
+	methodTraceLeave
 	ret
 iConsole2.HandleKeyEvent.handleBackspace :
 		push ebx
@@ -285,14 +300,17 @@ iConsole2.HandleKeyEvent.handleBackspace :
 		cmp ebx, [iConsole2.commandStart]
 			jbe iConsole2.HandleKeyEvent.handleBackspace.ret
 		pop ebx
+		methodTraceLeave
 		jmp TextArea.onKeyboardEvent.handleBackspace
 	iConsole2.HandleKeyEvent.handleBackspace.ret :
 	pop ebx
 	popa
+	methodTraceLeave
 	ret
 		
 
 iConsole2.PrintPrompt :
+	methodTraceEnter
 	pusha
 		
 		mov ebx, [iConsole2.text]
@@ -302,9 +320,11 @@ iConsole2.PrintPrompt :
 		call iConsole2.GoResetCommandPtr
 		
 	popa
+	methodTraceLeave
 	ret
 
 iConsole2.GoResetCommandPtr :
+	methodTraceEnter
 	pusha
 		mov ebx, [iConsole2.text]
 		mov ebx, [ebx+Textarea_text]
@@ -313,6 +333,7 @@ iConsole2.GoResetCommandPtr :
 		add ebx, edx
 		mov [iConsole2.commandStart], ebx
 	popa
+	methodTraceLeave
 	ret
 
 iConsole2.COMMAND_ECHO :
@@ -320,6 +341,7 @@ dd iConsole2.STR_ECHO
 dd iConsole2.Echo
 dd null
 iConsole2.Echo :	; String text
+	methodTraceEnter
 	enter 0, 0
 	pusha
 		mov eax, [ebp+8]
@@ -327,11 +349,13 @@ iConsole2.Echo :	; String text
 		call TextArea.InsertText
 	popa
 	leave
+	methodTraceLeave
 	ret 4
 iConsole2.STR_ECHO :
 	db "echo", 0
 
 iConsole2.EchoChar :	; char ptr
+	methodTraceEnter
 	enter 0, 0
 	pusha
 		mov eax, [ebp+8]
@@ -340,6 +364,7 @@ iConsole2.EchoChar :	; char ptr
 		call TextArea.InsertChar
 	popa
 	leave
+	methodTraceLeave
 	ret 4
 
 iConsole2.COMMAND_ECHO_HEX :
@@ -347,6 +372,7 @@ dd iConsole2.STR_ECHO_HEX
 dd iConsole2.EchoHex
 dd null
 iConsole2.EchoHex :
+	methodTraceEnter
 	enter 0, 0
 	pusha
 		mov eax, .strdata
@@ -359,6 +385,7 @@ iConsole2.EchoHex :
 		call iConsole2.Echo
 	popa
 	leave
+	methodTraceLeave
 	ret 4
 	.strdata :
 		db "0x"
@@ -371,6 +398,7 @@ dd iConsole2.STR_ECHO_DEC
 dd iConsole2.EchoDec
 dd null
 iConsole2.EchoDec :
+	methodTraceEnter
 	enter 0, 0
 	pusha
 		mov eax, .strdata
@@ -385,6 +413,7 @@ iConsole2.EchoDec :
 		call iConsole2.Echo
 	popa
 	leave
+	methodTraceLeave
 	ret 4
 	.strdata :
 		times 3 dd 0
@@ -400,6 +429,7 @@ iConsole2.COMMAND_PRINT_ARGNUM :
 	.commandStr :
 		db "argnum", 0
 iConsole2.PrintNumArgs :
+	methodTraceEnter
 	enter 0, 0
 		mov eax, [iConsole2.argNum]
 		push dword .STR_PREFACE
@@ -407,6 +437,7 @@ iConsole2.PrintNumArgs :
 		push eax
 		call iConsole2.EchoHex
 	leave
+	methodTraceLeave
 	jmp iConsole2.returnBlind
 	.STR_PREFACE :
 		db "args: ", 0
@@ -419,12 +450,14 @@ dd iConsole2.STR_CLEAR
 dd iConsole2.ClearScreen
 dd null
 iConsole2.ClearScreen :
+	methodTraceEnter
 	enter 0, 0
 		mov ebx, iConsole2.BUFFER_SIZE
 		mov eax, [iConsole2.text] 
 		mov eax, [eax+Textarea_text]
 		call Buffer.clear
 	leave
+	methodTraceLeave
 	ret 0
 iConsole2.STR_CLEAR :
 	db "clear", 0
@@ -434,6 +467,7 @@ dd iConsole2.STR_HELP
 dd iConsole2.DisplayHelp
 dd null
 iConsole2.DisplayHelp :
+	methodTraceEnter
 	enter 0, 0
 		mov ebx, [iConsole2.text]
 		mov eax, [iConsole2.commandBase]
@@ -447,6 +481,7 @@ iConsole2.DisplayHelp :
 		cmp eax, null
 			jne .loop
 	leave
+	methodTraceLeave
 	ret 0
 iConsole2.DisplayHelp.STR_SEPERATOR :
 	db ",", newline, null
@@ -454,6 +489,7 @@ iConsole2.STR_HELP :
 	db "help", 0
 
 iConsole2.RegisterCommand :	; Command command
+	methodTraceEnter
 	enter 0, 0
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.commandBase]
@@ -467,13 +503,16 @@ iConsole2.RegisterCommand :	; Command command
 		mov [ecx+command_nextLink], eax
 	
 	leave
+	methodTraceLeave
 	ret 4
 	.setbase :
 			mov [iConsole2.commandBase], eax
 		leave
+		methodTraceLeave
 		ret 4
 
 iConsole2.RegisterFiletypeBinding :	; FiletypeBinding binding
+	methodTraceEnter
 	enter 0, 0
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.filetypeBindingBase]
@@ -487,10 +526,12 @@ iConsole2.RegisterFiletypeBinding :	; FiletypeBinding binding
 		mov [ecx+filetypebinding_nextLink], eax
 	
 	leave
+	methodTraceLeave
 	ret 4
 	.setbase :
 			mov [iConsole2.filetypeBindingBase], eax
 		leave
+		methodTraceLeave
 		ret 4
 	
 iConsole2.window :

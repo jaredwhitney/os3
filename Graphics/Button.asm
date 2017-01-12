@@ -9,6 +9,7 @@ Button_onClick		equ Component_CLASS_SIZE+4
 Button_backingColor	equ Component_CLASS_SIZE+8
 
 Button.Create :	; String str, Func onclick, int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [Button.Create.retval]
 	pop dword [Button.Create.h]
 	pop dword [Button.Create.w]
@@ -50,6 +51,7 @@ Button.Create :	; String str, Func onclick, int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [Button.Create.retval]
+	methodTraceLeave
 	ret
 Button.Create.retval :
 	dd 0x0
@@ -67,13 +69,16 @@ Button.Create.text :
 	dd 0x0
 	
 Button.SetText : 	; Text in eax, Button in ebx
+	methodTraceEnter
 	pusha
 		mov [ebx+Button_text], eax
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 	
 Button.Render :	; Button in ebx
+	methodTraceEnter
 	pusha
 	
 			mov edx, ebx
@@ -144,10 +149,12 @@ Button.Render :	; Button in ebx
 		cmp ecx, 0
 			jg Button.Render.loop
 	popa
+	methodTraceLeave
 	ret
 Button.Render.startpos :
 	dd 0x0
 Button.onMouseEvent :
+	methodTraceEnter
 	cmp dword [Component.mouseEventType], MOUSE_NOBTN
 		je .ret
 	pusha
@@ -155,4 +162,5 @@ Button.onMouseEvent :
 		call eax
 	popa
 	.ret :
+	methodTraceLeave
 	ret

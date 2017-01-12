@@ -1,4 +1,5 @@
 PromptBox.PromptForString :	; String title, String message, String callback
+	methodTraceEnter
 	enter 0, 0
 		;pusha
 		push dword [ebp+16]
@@ -43,6 +44,7 @@ PromptBox.PromptForString :	; String title, String message, String callback
 		call Grouping.Add
 		;popa
 	leave
+	methodTraceLeave
 	ret 12
 PromptBox.hasResponse :
 	dd 0x0
@@ -55,7 +57,9 @@ PromptBox.callback :
 PromptBox.STR_DONE :
 	db "DONE", 0
 PromptBox.doCallback :
+		methodTraceEnter
 		call dword [PromptBox.callback]
 		call WindowGrouping.closeCallback
+		methodTraceLeave
 	ret
 	

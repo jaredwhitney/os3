@@ -1,4 +1,5 @@
 L3gx.clearImage :	; L3gxImage image, int color
+	methodTraceEnter
 	pop dword [clearImage.retval]
 	pop dword [clearImage.color]
 	pop dword [clearImage.image]
@@ -54,6 +55,7 @@ L3gx.clearImage :	; L3gxImage image, int color
 	clearImage_ret :
 	popa
 	push dword [clearImage.retval]
+	methodTraceLeave
 	ret
 clearImage.retval :
 	dd 0x0

@@ -9,6 +9,7 @@ Grouping_subcomponent	equ Component_CLASS_SIZE+4
 Grouping_backingColor	equ Component_CLASS_SIZE+8
 
 Grouping.Create :	; int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [Grouping.Create.retval]
 	pop dword [Grouping.Create.h]
 	pop dword [Grouping.Create.w]
@@ -48,6 +49,7 @@ Grouping.Create :	; int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [Grouping.Create.retval]
+	methodTraceLeave
 	ret
 Grouping.Create.retval :
 	dd 0x0
@@ -60,6 +62,7 @@ Grouping.Create.w :
 Grouping.Create.h :
 	dd 0x0
 Grouping.Add :	; Component in eax, Grouping in ebx
+	methodTraceEnter
 	pusha
 		mov ecx, [ebx+Grouping_subcomponent]	; get the head of the list
 		mov [eax+Component_nextLinked], ecx	; new component points to the rest of the list
@@ -72,8 +75,10 @@ Grouping.Add :	; Component in eax, Grouping in ebx
 		call Component.RequestUpdate
 		pop ebx
 	popa
+	methodTraceLeave
 	ret
 Grouping.Remove :	; Component in eax, Grouping in ebx
+	methodTraceEnter
 	pusha
 		mov ecx, [ebx+Grouping_subcomponent]
 		cmp ecx, 0x0
@@ -102,19 +107,25 @@ Grouping.Remove :	; Component in eax, Grouping in ebx
 		call Component.RequestUpdate
 	Grouping.Remove.ret :
 	popa
+	methodTraceLeave
 	ret
 Grouping.BringToFront :	; Component in eax, Grouping in ebx
+	methodTraceEnter
 	pusha
 		call Grouping.Remove
 		call Grouping.Add
 	popa
+	methodTraceLeave
 	ret
 Grouping.MoveToDepth :	; Component in eax, Grouping in ebx, depth in ecx
+	methodTraceEnter
 	pusha
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [NEEDS TO BE REWORKED TO WORK WITH subcomponent]
+	methodTraceEnter
 	push eax
 	push ebx
 	push ecx
@@ -132,6 +143,7 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [N
 	pop ecx
 	pop ebx
 	pop eax
+	methodTraceLeave
 	ret
 ;Grouping.DoUpdate :	; Grouping in ebx
 ;pusha
@@ -139,6 +151,7 @@ Grouping.GetDepth :	; Component in eax, Grouping in ebx, returns depth in edx [N
 ;popa
 ;ret
 Grouping.Render :	; Grouping in ebx
+	methodTraceEnter
 	pusha
 	
 		mov edx, ebx	; edx always points to Grouping
@@ -182,9 +195,11 @@ Grouping.Render :	; Grouping in ebx
 			
 		mov dword [edx+Grouping_renderFlag], FALSE
 	Grouping.Render.ret :
+	methodTraceLeave
 	popa
 	ret
 Grouping.RenderSub :
+	methodTraceEnter
 	cmp dword [ebx+Component_transparent], FALSE
 		je Grouping.RenderSub_fast
 	pusha
@@ -234,6 +249,7 @@ Grouping.RenderSub :
 		call Image.copyRegionWithTransparency
 	Grouping.RenderSub.ret :
 	popa
+	methodTraceLeave
 	ret
 Grouping.RenderSub_fast :
 	pusha
@@ -283,9 +299,11 @@ Grouping.RenderSub_fast :
 		call Image.copyRegion
 	Grouping.RenderSub_fast.ret :
 	popa
+	methodTraceLeave
 	ret
 
 Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
+	methodTraceEnter
 	pusha
 		mov ecx, [eax+Window_windowbuffer]
 		mov [ebx+Grouping_image], ecx
@@ -299,8 +317,10 @@ Grouping.updateFitToHostWindow :	; Window in eax, Grouping in ebx
 		mov cx, [eax+Window_ypos]
 		mov [ebx+Grouping_y], ecx
 	popa
+	methodTraceLeave
 	ret
 Grouping.passthroughMouseEvent :	; Grouping in ebx
+	methodTraceEnter
 	pusha
 		;mov dword [ebx+Grouping_backingColor], 0xFF00FF00
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found call Component.HandleMouseEvent on it
@@ -338,6 +358,7 @@ Grouping.passthroughMouseEvent :	; Grouping in ebx
 		call Component.HandleMouseEvent
 	Grouping.passthroughMouseEvent.ret :
 	popa
+	methodTraceLeave
 	ret
 GROUPING_CLICKED_STR :
 	db "A grouping was clicked!", 0
@@ -345,6 +366,7 @@ GROUPING_SUB_CLICKED_STR :
 	db "A subcomponent of a grouping was clicked!", 0
 
 Grouping.Free :	; Grouping in ebx
+	methodTraceEnter
 	pusha
 		mov edx, ebx
 		mov ebx, [edx+Grouping_subcomponent]
@@ -363,6 +385,7 @@ Grouping.Free :	; Grouping in ebx
 		mov ebx, edx
 		call Guppy2.free
 	popa
+	methodTraceLeave
 	ret
 
 

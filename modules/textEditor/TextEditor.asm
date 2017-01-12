@@ -7,12 +7,14 @@ TextEditor.BINDING_RAWTEXT :
 	dd TextEditor.mainFromConsoleFile
 	dd null
 TextEditor.init :
+	methodTraceEnter
 	pusha
 		push dword TextEditor.COMMAND_RUN
 		call iConsole2.RegisterCommand
 		push dword TextEditor.BINDING_RAWTEXT
 		call iConsole2.RegisterFiletypeBinding
 	popa
+	methodTraceLeave
 	ret
 TextEditor.STR_TEXTEDITORNAME :
 	db "textedit", 0x0
@@ -20,6 +22,7 @@ TextEditor.STR_RAWTEXTTYPE :
 	db "rawtext", 0x0
 
 TextEditor.main :
+	methodTraceEnter
 	pusha
 		push dword TextEditor.placeholderTitle
 		push dword 0*4
@@ -63,6 +66,7 @@ TextEditor.main :
 		call Grouping.Add
 		
 	popa
+	methodTraceLeave
 	ret
 TextEditor.placeholderTitle :
 	db "TextEditor- Untitled", 0x0
@@ -74,15 +78,18 @@ TextEditor.text  :
 	dd 0x0
 
 TextEditor.mainFromConsoleFile :
+	methodTraceEnter
 	pusha
 		mov eax, iConsole2.commandStore
 		mov [FileChooser.fileName], eax
 		call TextEditor.main
 		call TextEditor.loadFile
 	popa
+	methodTraceLeave
 	ret
 
 TextEditor.loadFile :
+	methodTraceEnter
 	pusha
 		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
@@ -102,9 +109,11 @@ TextEditor.loadFile :
 		mov eax, [ecx+WindowGrouping_title]
 		mov dword [eax], TextEditor.fileTitle
 	popa
+	methodTraceLeave
 	ret
 	
 TextEditor.saveFile :
+	methodTraceEnter
 	pusha
 		mov eax, [FileChooser.fileName]
 		call Minnow4.getFilePointer
@@ -127,13 +136,16 @@ TextEditor.saveFile :
 		mov eax, [ecx+WindowGrouping_title]
 		mov dword [eax], TextEditor.fileTitle
 	popa
+	methodTraceLeave
 	ret
 
 TextEditor.doSaveFile :
+	methodTraceEnter
 		push dword .savePromptTitle
 		push dword .saveButtonMessage
 		push dword TextEditor.saveFile
 		call FileChooser.Prompt
+	methodTraceLeave
 	ret
 	.savePromptTitle :
 		db "Save a File", 0
@@ -141,10 +153,12 @@ TextEditor.doSaveFile :
 		db "Save", 0x0
 
 TextEditor.doLoadFile :
+	methodTraceEnter
 		push dword .loadPromptTitle
 		push dword .loadButtonMessage
 		push dword TextEditor.loadFile
 		call FileChooser.Prompt
+	methodTraceLeave
 	ret
 .loadPromptTitle :
 	db "Open a File", 0
@@ -152,9 +166,11 @@ TextEditor.doLoadFile :
 	db "Open", 0
 	
 TextEditor.keyHandlerFunc :
+	methodTraceEnter
 	pusha
 		call TextArea.onKeyboardEvent.handle
 	popa
+	methodTraceLeave
 	ret
 TextEditor.callbackFunc :
 	dd 0x0

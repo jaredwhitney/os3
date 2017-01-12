@@ -1,4 +1,5 @@
 DolphinConfig.proccessFile :
+	methodTraceEnter
 	pusha
 		mov eax, DolphinConfig.STR_FILE_NAME
 		call Minnow4.getFilePointer
@@ -61,6 +62,7 @@ DolphinConfig.proccessFile :
 		; should deal with it maybe being multiple blocks long here!!
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 DolphinConfig.STR_FILE_NAME :
 	db "D2CFG.rawtext", 0x0
@@ -76,14 +78,17 @@ DolphinConfig.PREFIX_WINDOWTRIM_COLOR :
 	db "WINDOW_TRIM_COLOR", 0
 
 DolphinConfig.skipWhitespace :
+	methodTraceEnter
 	cmp byte [ebx], ' '
 		jne .ret
 	inc ebx
 	jmp DolphinConfig.skipWhitespace
 	.ret :
+	methodTraceLeave
 	ret
 
 DolphinConfig.wordEquals :
+	methodTraceEnter
 	push ebx
 	push ecx
 	
@@ -100,14 +105,17 @@ DolphinConfig.wordEquals :
 	mov eax, TRUE
 	pop ecx
 	pop ebx
+	methodTraceLeave
 	ret
 	.retfalse :
 	mov eax, FALSE
 	pop ecx
 	pop ebx
+	methodTraceLeave
 	ret
 	
 DolphinConfig.colorFromString :
+	methodTraceEnter
 	push eax
 	push ebx
 	push ecx
@@ -135,6 +143,7 @@ DolphinConfig.colorFromString :
 	pop ecx
 	pop ebx
 	pop eax
+	methodTraceLeave
 	ret
 .color :
 	dd 0x0

@@ -11,6 +11,7 @@ Textarea_scrolls			equ Component_CLASS_SIZE+12
 Textarea_customKeyHandler	equ Component_CLASS_SIZE+16
 
 TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
+	methodTraceEnter
 	pop dword [TextArea.Create.retval]
 	pop dword [TextArea.Create.scrolls]
 	pop dword [TextArea.Create.h]
@@ -60,6 +61,7 @@ TextArea.Create :	; int buflen, int x, int y, int w, int h, bool[as int] scrolls
 	pop ebx
 	pop eax
 	push dword [TextArea.Create.retval]
+	methodTraceLeave
 	ret
 TextArea.Create.retval :
 	dd 0x0
@@ -76,6 +78,7 @@ TextArea.Create.len :
 TextArea.Create.scrolls :
 	dd 0x0
 TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOULD BE DRAWN OUTSIDE THE TEXTAREA]
+	methodTraceEnter
 	pusha
 			push ebx
 				mov edx, ebx
@@ -162,10 +165,12 @@ TextArea.Render :	; textarea in ebx [NEED TO MAKE THIS NOT RENDER TEXT THAT WOUL
 		cmp ecx, 0
 			jg TextArea.Render.loop
 	popa
+	methodTraceLeave
 	ret
 TextArea.Render.aret :
 	popa
 	popa
+	methodTraceLeave
 	ret
 TextArea.Render.dest :
 	dd 0x0
@@ -176,6 +181,7 @@ TextArea.Render.flipTo :
 TextArea.Render.maxPos :
 	dd 0x0
 TextArea.Render.calcFlips :
+	methodTraceEnter
 	pusha
 		mov edx, [TextArea.Render.flipTo]
 		mov [TextArea.Render.dest], edx
@@ -188,18 +194,22 @@ TextArea.Render.calcFlips :
 		add edx, eax
 		mov [TextArea.Render.flipTo], edx
 	popa
+	methodTraceLeave
 	ret
 TextArea.SetText :	; text in eax, textarea in ebx
+	methodTraceEnter
 	pusha
 		mov ecx, [ebx+Textarea_text]
 		mov byte [ecx], 0x0
 		mov dword [ebx+Textarea_cursorPos], 0
 		call TextArea.InsertText
 	popa
+	methodTraceLeave
 	ret
 TextArea.SetText.obj :
 	dd 0x0
 TextArea.AppendText :	; text in eax, textarea in ebx
+	methodTraceEnter
 	pusha
 		mov edx, eax
 		push edx
@@ -218,8 +228,10 @@ TextArea.AppendText :	; text in eax, textarea in ebx
 			jg .loop
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 TextArea.InsertText :	; text in eax, textarea in ebx
+	methodTraceEnter
 	pusha
 		mov edx, eax
 		push edx
@@ -238,18 +250,22 @@ TextArea.InsertText :	; text in eax, textarea in ebx
 			jg .loop
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 
 TextArea.CursorToEnd :
+	methodTraceEnter
 	pusha
 		mov ecx, ebx
 		mov ebx, [ecx+Textarea_text]
 		call String.getLength
 		mov [ecx+Textarea_cursorPos], edx
 	popa
+	methodTraceLeave
 	ret
 	
 TextArea.InsertChar :	; char in al, textarea in ebx
+	methodTraceEnter
 	pusha
 		mov ecx, ebx
 		mov ebx, [ebx+Textarea_text]
@@ -259,6 +275,7 @@ TextArea.InsertChar :	; char in al, textarea in ebx
 		mov ebx, ecx
 		call TextArea.AppendChar
 		popa
+		methodTraceLeave
 		ret
 		.insertChar :
 		mov ebx, [ecx+Textarea_text]	; ebx is the buffer
@@ -281,8 +298,10 @@ TextArea.InsertChar :	; char in al, textarea in ebx
 				sub edx, 1
 				mov [edx], al
 			pop edx
+	methodTraceLeave
 	ret
 TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra text from being rendered]
+	methodTraceEnter
 	cmp dword [ebx+Textarea_scrolls], 0xFF
 		je TextArea.AppendCharScrolling
 	pusha
@@ -302,8 +321,10 @@ TextArea.AppendChar :	; char in al, textarea in ebx [version that stops extra te
 		sub ecx, 1
 		mov [ecx], al
 	popa
+	methodTraceLeave
 	ret
 TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrolls the buffer]
+	methodTraceEnter
 	pusha
 		mov ecx, [ebx+Textarea_len]
 		push ebx
@@ -348,14 +369,18 @@ TextArea.AppendCharScrolling :	; char in al, textarea in ebx [version that scrol
 		sub ecx, 1
 		mov [ecx], al
 	popa
+	methodTraceLeave
 	ret
 TextArea.getMaxUsablePos :	; TextArea in ebx, returns in ecx
+	methodTraceEnter
 		mov ecx, [ebx+Textarea_h]
 		sub ecx, FONTHEIGHT-1
 		imul ecx, [ebx+Textarea_w]
 		sub ecx, FONTWIDTH
+	methodTraceLeave
 	ret
 TextArea.getNextCharPos :	; TextArea in ebx, returns in edx
+	methodTraceEnter
 	pusha
 		push ebx
 			mov ebx, [ebx+Textarea_text]
@@ -402,8 +427,10 @@ TextArea.getNextCharPos :	; TextArea in ebx, returns in edx
 	popa
 	mov edx, [TextArea.RenderProto.dest]
 	;sub edx, [ebx+Textarea_image]
+	methodTraceLeave
 	ret
 TextArea.RenderProto.calcFlips :
+	methodTraceEnter
 	pusha
 		mov edx, [TextArea.RenderProto.flipTo]
 		mov [TextArea.RenderProto.dest], edx
@@ -416,6 +443,7 @@ TextArea.RenderProto.calcFlips :
 		add edx, eax
 		mov [TextArea.RenderProto.flipTo], edx
 	popa
+	methodTraceLeave
 	ret
 
 TextArea.RenderProto.dest :
@@ -426,12 +454,15 @@ TextArea.RenderProto.flipTo :
 	dd 0x0
 
 TextArea.onKeyboardEvent :
+	methodTraceEnter
 	pusha
 		call dword [ebx+Textarea_customKeyHandler]
 	popa
+	methodTraceLeave
 	ret
 	
 TextArea.onKeyboardEvent.handle :
+	methodTraceEnter
 	pusha
 		mov al, [Component.keyChar]
 		cmp al, 0xff
@@ -443,6 +474,7 @@ TextArea.onKeyboardEvent.handle :
 		call TextArea.InsertChar
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 TextArea.onKeyboardEvent.handleBackspace :
 		push ebx
@@ -485,6 +517,7 @@ TextArea.onKeyboardEvent.handleBackspace :
 		pop ebx
 		call Component.RequestUpdate
 	popa
+	methodTraceLeave
 	ret
 	TextArea.onKeyboardEvent.handleBackspace.textarea :
 		dd 0x0
@@ -492,13 +525,16 @@ TextArea.onKeyboardEvent.handleBackspace :
 TextArea.onKeyboardEvent.incCursor :
 		inc dword [ebx+Textarea_cursorPos]
 	popa
+	methodTraceLeave
 	ret
 TextArea.onKeyboardEvent.decCursor :
 		dec dword [ebx+Textarea_cursorPos]
 	popa
+	methodTraceLeave
 	ret
 
 TextArea.Free :
+	methodTraceEnter
 	pusha
 		mov edx, ebx
 		mov ebx, [edx+Component_image]	; free self image
@@ -508,6 +544,7 @@ TextArea.Free :
 		mov ebx, edx			; free self
 		call Guppy2.free
 	popa
+	methodTraceLeave
 	ret
 	
 ; Also make TextAreaScrollable (TextArea with scroll functions that modify which parts of the buffer are displayed at any given time)

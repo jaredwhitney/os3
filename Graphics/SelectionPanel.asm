@@ -5,6 +5,7 @@ SelectionPanel_selectColor			equ Component_CLASS_SIZE+12
 SelectionPanel_selectedComponent	equ Component_CLASS_SIZE+16
 
 SelectionPanel.Create :	; int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [SelectionPanel.Create.retval]
 	pop dword [SelectionPanel.Create.h]
 	pop dword [SelectionPanel.Create.w]
@@ -46,6 +47,7 @@ SelectionPanel.Create :	; int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [SelectionPanel.Create.retval]
+	methodTraceLeave
 	ret
 SelectionPanel.Create.x :
 	dd 0x0
@@ -62,14 +64,19 @@ SelectionPanel.Free :
 	ret
 
 SelectionPanel.Add :
+	methodTraceEnter
 	call Grouping.Add
+	methodTraceLeave
 	ret
 
 SelectionPanel.Remove :
+	methodTraceEnter
 	call Grouping.Remove
+	methodTraceLeave
 	ret
 	
 SelectionPanel.Render :
+	methodTraceEnter
 	pusha
 		
 		mov edx, ebx
@@ -114,8 +121,10 @@ SelectionPanel.Render :
 		mov dword [edx+SelectionPanel_renderFlag], FALSE
 	SelectionPanel.Render.ret :
 	popa
+	methodTraceLeave
 	ret
 SelectionPanel.RenderSub :
+	methodTraceEnter
 	pusha
 		call Component.Render
 			
@@ -180,9 +189,11 @@ SelectionPanel.RenderSub :
 		SelectionPanel.Render.nos2 :
 		;;
 	popa
+	methodTraceLeave
 	ret
 	
 SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
+	methodTraceEnter
 	pusha
 		; Check to see if any subcomponent exists where x<=mousex<=x+width && y<=mousey<=y+width, if one is found set it as the selected Component
 		push ebx
@@ -216,8 +227,10 @@ SelectionPanel.HandleMouseEvent :	; SelectionPanel in ebx
 		mov ebx, ecx
 		call Component.RequestUpdate
 		popa
+		methodTraceLeave
 		ret
 	SelectionPanel.HandleMouseEvent.ret :
 	pop ecx
 	popa
+	methodTraceLeave
 	ret

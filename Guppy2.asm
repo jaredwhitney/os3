@@ -1,10 +1,17 @@
 Guppy2.TABLE_POSITION	equ 0xAA0000	; use same actual # as in Guppy
+
 Debug.methodTraceStackBase :
 	dd 0xA80000
 Debug.methodTraceStack :
 	dd 0xA80000
+	
+Debug.methodTraceStackBase2 :
+	dd 0xA90000
+Debug.methodTraceStack2 :
+	dd 0xA90000
 
 Guppy2.init :
+	methodTraceEnter
 	pusha
 		
 		mov eax, Guppy2.TABLE_POSITION
@@ -28,6 +35,16 @@ Guppy2.init :
 		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
 		call Guppy2.setBlock
 		
+		mov eax, Debug.methodTraceStackBase
+		mov ebx, 0x10000
+		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
+		call Guppy2.setBlock
+		
+		mov eax, Debug.methodTraceStackBase2
+		mov ebx, 0x10000
+		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
+		call Guppy2.setBlock
+		
 		push dword Guppy2.COMMAND_PRINT_BLOCKS
 		call iConsole2.RegisterCommand
 		
@@ -38,9 +55,11 @@ Guppy2.init :
 		call iConsole2.RegisterCommand
 		
 	popa
+	methodTraceLeave
 	ret
 
 Guppy2.proccessMemoryMap :	; dword 0x3050-4 = size, 0x3050 on = list
+	methodTraceEnter
 	pusha
 		mov edx, [0x3050-4]
 		mov ecx, 0x3050
@@ -60,9 +79,11 @@ Guppy2.proccessMemoryMap :	; dword 0x3050-4 = size, 0x3050 on = list
 		jmp .loop
 		.done :
 	popa
+	methodTraceLeave
 	ret
 
 Guppy2.malloc :	; ebx = size : ebx = pos
+	methodTraceEnter
 	push ecx
 	push eax
 	push edx
@@ -81,11 +102,13 @@ Guppy2.malloc :	; ebx = size : ebx = pos
 	pop edx
 	pop eax
 	pop ecx
+	methodTraceLeave
 	ret
 	.size :
 		dd 0x0
 
 Guppy2.mallocPageAligned :	; ebx = size : ebx = pos
+	methodTraceEnter
 	push ecx	; WHICH IS BROKEN SOMEHOW D:
 	push eax
 		cmp ebx, 0
@@ -106,11 +129,13 @@ Guppy2.mallocPageAligned :	; ebx = size : ebx = pos
 	.kret :
 	pop eax
 	pop ecx
+	methodTraceLeave
 	ret
 	.size :
 		dd 0x0
 
 Guppy2.free :	; ebx = pos
+	methodTraceEnter
 	pusha
 		mov eax, [Guppy2.tableBase]
 		.loop :
@@ -125,9 +150,11 @@ Guppy2.free :	; ebx = pos
 		call Guppy2.markFreeAndMerge ;call Guppy2.deleteNode
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 Guppy2.getRegionEntry :	; ecx=loc : ecx=entry
+	methodTraceEnter
 	push eax
 	push edx
 		mov eax, [Guppy2.tableBase]
@@ -148,6 +175,7 @@ Guppy2.getRegionEntry :	; ecx=loc : ecx=entry
 		mov ecx, eax
 	pop edx
 	pop eax
+	methodTraceLeave
 	ret
 
 Guppy2.COMMAND_MALLOC_TEST :
@@ -157,10 +185,12 @@ Guppy2.COMMAND_MALLOC_TEST :
 	.mallocStr :
 		db "G2mallocTest", 0
 	Guppy2.mallocTest :
+		methodTraceEnter
 		pusha
 			mov ebx, 500
 			call Guppy2.malloc
 		popa
+		methodTraceLeave
 		ret
 
 Guppy2.COMMAND_FREE_TEST :
@@ -170,10 +200,12 @@ Guppy2.COMMAND_FREE_TEST :
 	.freeStr :
 		db "G2freeTest", 0
 	Guppy2.freeTest :
+		methodTraceEnter
 		pusha
 			mov ebx, 0xAB0000
 			call Guppy2.free
 		popa
+		methodTraceLeave
 		ret
 Guppy2.COMMAND_PRINT_BLOCKS :
 	dd .printBlocksStr
@@ -183,6 +215,7 @@ Guppy2.COMMAND_PRINT_BLOCKS :
 		db "G2printBlocks", 0
 
 Guppy2.printBlocks :
+	methodTraceEnter
 	pusha
 		mov eax, [Guppy2.tableBase]
 	;;	mov edx, 2
@@ -252,6 +285,7 @@ Guppy2.printBlocks :
 		cmp eax, null
 			jne .loop
 	popa
+	methodTraceLeave
 	ret
 	.BLOCK_IN_USE :
 		db "Allocated space", 0
@@ -277,6 +311,7 @@ Guppy2.printBlocks :
 		db newline, 0
 
 Guppy2.getFreeMemoryRegion :	; size in ebx : eax
+	methodTraceEnter
 		mov eax, [Guppy2.tableBase]
 		.loop :
 		cmp dword [eax+Guppy2.Entry_size], null
@@ -293,9 +328,11 @@ Guppy2.getFreeMemoryRegion :	; size in ebx : eax
 		.foundFreeSpace :
 		mov eax, [eax+Guppy2.Entry_pos]
 	.ret :
+	methodTraceLeave
 	ret
 
 Guppy2.getFreeMemorySize :	; : ecx
+	methodTraceEnter
 	push eax
 		xor ecx, ecx
 		mov eax, [Guppy2.tableBase]
@@ -311,21 +348,27 @@ Guppy2.getFreeMemorySize :	; : ecx
 			jne .loop
 	.ret :
 	pop eax
+	methodTraceLeave
 	ret
 
 Guppy2.setBlock :
+	methodTraceEnter
 	pusha
 		call Guppy2.setBlockMain
 		call Guppy2.runOverlapTests
 	popa
+	methodTraceLeave
 	ret
 Guppy2.setBlockNoChecks :
+	methodTraceEnter
 	pusha
 		call Guppy2.setBlockMain
 	popa
+	methodTraceLeave
 	ret
 
 Guppy2.setBlockMain :
+	methodTraceEnter
 		
 		mov edx, ecx
 		
@@ -355,9 +398,11 @@ Guppy2.setBlockMain :
 		mov [Guppy2.tableBase], ecx
 		.linkDone :
 		
+	methodTraceLeave
 	ret
 
 Guppy2.runOverlapTests : ; Traverse the list and modify or delete conflicting entries
+	methodTraceEnter
 		mov eax, [Guppy2.tableBase]
 		mov eax, [eax+Guppy2.Entry_nextPointer]
 		mov ecx, [.start]
@@ -423,6 +468,7 @@ Guppy2.runOverlapTests : ; Traverse the list and modify or delete conflicting en
 		
 		
 	.ret :
+	methodTraceLeave
 	ret
 	.start :
 		dd 0x0
@@ -431,6 +477,7 @@ Guppy2.runOverlapTests : ; Traverse the list and modify or delete conflicting en
 
 ; eax is the node, Guppy2.setBlock.start, Guppy2.setBlock.end
 Guppy2.handleCase2 :
+	methodTraceEnter
 	pusha
 		mov ebx, eax
 		call Guppy2.deleteNode
@@ -438,10 +485,12 @@ Guppy2.handleCase2 :
 		push dword .s
 		call iConsole2.Echo
 	popa
+	methodTraceLeave
 	ret
 	.s :
 		db "Case 2 allocation.", newline, 0
 Guppy2.handleCase3 :
+	methodTraceEnter
 	pusha
 		
 		; Handles the part before
@@ -461,10 +510,12 @@ Guppy2.handleCase3 :
 ;		push dword .s
 ;		call iConsole2.Echo
 	popa
+	methodTraceLeave
 	ret
 ;	.s :
 ;		db "Case 3 allocation.", newline, 0
 Guppy2.handleCase4 :
+	methodTraceEnter
 	pusha
 		mov edx, [Guppy2.runOverlapTests.end]
 		sub edx, [eax+Guppy2.Entry_pos]
@@ -476,10 +527,12 @@ Guppy2.handleCase4 :
 ;		push dword .s
 ;		call iConsole2.Echo
 	popa
+	methodTraceLeave
 	ret
 ;	.s :
 ;		db "Case 4 allocation.", newline, 0
 Guppy2.handleCase5 :
+	methodTraceEnter
 	pusha
 		mov edx, [eax+Guppy2.Entry_pos]
 		add edx, [eax+Guppy2.Entry_size]
@@ -489,11 +542,13 @@ Guppy2.handleCase5 :
 ;		push dword .s
 ;		call iConsole2.Echo
 	popa
+	methodTraceLeave
 	ret
 ;	.s :
 ;		db "Case 5 allocation.", newline, 0
 
 Guppy2.deleteNode :	; node in ebx
+	methodTraceEnter
 	pusha
 	;	call SysHaltScreen.show
 		mov edx, [ebx+Guppy2.Entry_nextPointer]
@@ -523,9 +578,11 @@ Guppy2.deleteNode :	; node in ebx
 		mov [eax+Guppy2.Entry_nextPointer], edx
 	.ret :
 	popa
+	methodTraceLeave
 	ret
 
 Guppy2.getFirstOpenSlot :	; : ecx
+	methodTraceEnter
 	push eax
 		mov eax, Guppy2.TABLE_POSITION
 		.loop :
@@ -536,9 +593,11 @@ Guppy2.getFirstOpenSlot :	; : ecx
 		.foundFreeSlot :
 		mov ecx, eax
 	pop eax
+	methodTraceLeave
 	ret
 
 Guppy2.markFreeAndMerge :
+	methodTraceEnter
 	pusha
 		; ebx is node to merge into others, eax select from all
 		mov eax, [Guppy2.tableBase]
@@ -575,17 +634,20 @@ Guppy2.markFreeAndMerge :
 		mov dword [ebx+Guppy2.Entry_type], Guppy2_Entry.TYPE_FREE
 		.kret :
 	popa
+	methodTraceLeave
 	ret
 	.counter :
 		dd 0x0
 
 Guppy2.throwFatalError :
+	methodTraceEnter
 	pusha
-		mov eax, SysHaltScreen.RESET
+		mov eax, SysHaltScreen.KILL
 		mov ebx, GUPPY2_FATALERROR
 		mov ecx, 4
 		call SysHaltScreen.show
 	popa
+	methodTraceLeave
 	ret
 GUPPY2_FATALERROR :
 	db "[Guppy2] Fatal Error.", 0

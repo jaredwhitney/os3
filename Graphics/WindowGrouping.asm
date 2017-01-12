@@ -11,6 +11,7 @@ WindowGrouping_title		equ Component_CLASS_SIZE+32
 WindowGrouping_onClose		equ Component_CLASS_SIZE+36
 
 WindowGrouping.Create :	; String title, int x, int y, int w, int h
+	methodTraceEnter
 	pop dword [WindowGrouping.Create.retval]
 	pop dword [WindowGrouping.Create.h]
 	pop dword [WindowGrouping.Create.w]
@@ -154,9 +155,11 @@ WindowGrouping.Create :	; String title, int x, int y, int w, int h
 	pop ebx
 	pop eax
 	push dword [WindowGrouping.Create.retval]
+	methodTraceLeave
 	ret
 	
 WindowGrouping.closeCallback :	; Button in ebx
+	methodTraceEnter
 	pusha
 		mov eax, ebx
 		WindowGrouping.closeCallback.findWindowLoop :
@@ -179,9 +182,11 @@ WindowGrouping.closeCallback :	; Button in ebx
 		call Component.Free
 		
 	popa
+	methodTraceLeave
 	ret
 
 WindowGrouping.RegisterCloseCallback :	; subcomponent in ebx, func in eax
+	methodTraceEnter
 	pusha
 		mov edx, eax
 		mov eax, ebx
@@ -195,9 +200,11 @@ WindowGrouping.RegisterCloseCallback :	; subcomponent in ebx, func in eax
 		.foundWindow :
 		mov [eax+WindowGrouping_onClose], edx
 	popa
+	methodTraceLeave
 	ret
 		
 WindowGrouping.passthroughMouseEvent :
+	methodTraceEnter
 	cmp dword [Component.mouseEventType], MOUSE_NOBTN
 		je .goon
 	pusha
@@ -228,9 +235,11 @@ WindowGrouping.passthroughMouseEvent :
 	popa
 	.goon :
 	call Grouping.passthroughMouseEvent
+	methodTraceLeave
 	ret
 
 TitleBar.passthroughMouseEvent :	; Grouping in ebx
+	methodTraceEnter
 	pusha
 		mov ebx, [ebx+Grouping_subcomponent]
 		jmp TitleBar.passthroughMouseEvent.beginLoop
@@ -263,6 +272,7 @@ TitleBar.passthroughMouseEvent :	; Grouping in ebx
 		call Component.HandleMouseEvent
 	TitleBar.passthroughMouseEvent.ret :
 	popa
+	methodTraceLeave
 	ret
 TitleBar.passthroughMouseEvent.gocheck :
 		cmp dword [Component.mouseEventType], MOUSE_NOBTN
@@ -292,6 +302,7 @@ TitleBar.passthroughMouseEvent.yoffs :
 	dd 0x0
 
 WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
+	methodTraceEnter
 	pusha
 		cmp eax, 0x0
 			jge WindowGrouping.moveWindow.noXworry
@@ -324,9 +335,11 @@ WindowGrouping.moveWindow :	; x pos in eax, y pos in ebx
 		mov [eax+Component_y], ecx
 	WindowGrouping.moveWindow.ret :
 	popa
+	methodTraceLeave
 	ret
 
 WindowGrouping.getBoundingWindow :	; component in ebx
+	methodTraceEnter
 	push eax
 	push ebx
 		.findWindowLoop :
@@ -349,6 +362,7 @@ WindowGrouping.getBoundingWindow :	; component in ebx
 	.ret :
 	pop ebx
 	pop eax
+	methodTraceLeave
 	ret
 	
 WindowGrouping.lastWin :

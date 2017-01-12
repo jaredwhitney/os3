@@ -21,6 +21,7 @@ endstring equ 0x0
 ;ret
 
 TextHandler.drawCharFromBitmap :	; ebx contains char to draw
+methodTraceEnter
 pusha
 ;mov [TextHandler.selectedColor], ah
 mov dx, 0x0
@@ -68,9 +69,11 @@ mov ecx, [TextHandler.charpos]
 		add ecx, eax
 mov [TextHandler.charpos], ecx
 popa
+methodTraceLeave
 ret
 
 TextHandler.drawSolidBacking :
+methodTraceEnter
 pusha
 mov dl, [TextHandler.solidChar]
 cmp dl, 0x0
@@ -86,9 +89,11 @@ call TextHandler.drawRow
 	pop ecx
 TextHandler.drawSolidBacking.ret :
 popa
+methodTraceLeave
 ret
 
 TextHandler.drawRow :	; ah contains row
+	methodTraceEnter
 	pusha
 	mov ebx, [TextHandler.charpos]
 		;sub ebx, [bstor]
@@ -165,9 +170,11 @@ TextHandler.drawRow :	; ah contains row
 	pop eax
 	mov [TextHandler.charpos], ecx
 	popa
+methodTraceLeave
 ret
 
 TextHandler.newline :
+methodTraceEnter
 ;mov eax, [TextHandler.charpos]
 ;mov bx, 0x0
 ;mov [eax], bx
@@ -185,17 +192,21 @@ mul ebx
 add eax, [Dolphin.SCREEN_BUFFER]
 mov [TextHandler.charpos], eax
 
+methodTraceLeave
 ret
 
 TextHandler.drawChar :		; char in ax
+methodTraceEnter
 pusha
 call TextHandler.getCharBitmap
 call TextHandler.drawCharFromBitmap
 popa
+methodTraceLeave
 ret
 
 
 TextHandler.getCharBitmap :
+methodTraceEnter
 mov ebx, Font.bitmaps
 mov edx, Font.order
 graphicsgetposloop :
@@ -210,6 +221,7 @@ je graphicsgetposret
 jmp graphicsgetposloop
 
 graphicsgetposret :
+methodTraceLeave
 ret
 
 		

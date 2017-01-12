@@ -28,6 +28,7 @@ PS2_PORT2_INT_FLAG	equ 0b00000010
 PS2_P2CLKDSBL_FLAG	equ 0b00100000
 
 ps2.init :
+methodTraceEnter
 pusha
 
 	; Disable all ps2 devices
@@ -114,61 +115,77 @@ pusha
 	call mouse.init	; should not be done here...
 	
 popa
+methodTraceLeave
 ret
 
 ps2firstrep :
 db 0x0
 
 ps2.discardAllData :
+methodTraceEnter
 	in al, PS2_STATUS_PORT
 	test al, PS2_OUTB_FULL_FLAG
 		jz ps2.discardAllData.ret
 	in al, PS2_DATA_PORT
 	jmp ps2.discardAllData
 ps2.discardAllData.ret :
+methodTraceLeave
 ret
 
 ps2.readConfigByte :
+methodTraceEnter
 	call ps2.waitForWrite
 	mov al, PS2_READ_CONFIG
 	out PS2_COMMAND_PORT, al
 	call ps2.waitForData
 	in al, PS2_DATA_PORT
+methodTraceLeave
 ret
 
 ps2.waitForData :
+methodTraceEnter
 	in al, PS2_STATUS_PORT
 	test al, PS2_OUTB_FULL_FLAG
 		jz ps2.waitForData
+methodTraceLeave
 ret
 
 ps2.waitForWrite :
+methodTraceEnter
 	in al, PS2_STATUS_PORT
 	test al, PS2_INPB_FULL_FLAG
 		jnz ps2.waitForWrite
+methodTraceLeave
 ret
 
 ps2.waitForACK :
+methodTraceEnter
 	mov al, PS2_ACK
 	call ps2.waitForResponse
+methodTraceLeave
 ret
 
 ps2.waitForResponse :
+methodTraceEnter
 	mov bl, al
 	ps2.waitForResponse.loop :
 	in al, PS2_DATA_PORT
 	cmp al, bl
 		jne ps2.waitForResponse.loop
+methodTraceLeave
 ret
 
 ps2.commandPort1 :	; is this right?
+methodTraceEnter
 push ax
 	call ps2.waitForWrite
 	out PS2_DATA_PORT, al
 pop ax
+methodTraceLeave
 ret
 
 ps2.commandPort2 :
+methodTraceEnter
 push ax
 	mov ah, al
 	call ps2.waitForWrite
@@ -178,6 +195,7 @@ push ax
 	mov al, ah
 	out PS2_DATA_PORT, al
 pop ax
+methodTraceLeave
 ret
 
 ps2.sw_selftestFail :
@@ -185,6 +203,7 @@ ps2.sw_selftestFail :
 		mov ebx, PS2.SELFTEST_FAILMSG
 		mov ecx, 5
 		call SysHaltScreen.show
+methodTraceLeave
 popa
 ret
 
@@ -193,6 +212,7 @@ ps2.sw_singlePortController :
 		mov ebx, PS2.SINGLEPORT_MSG
 		mov ecx, 3
 		call SysHaltScreen.show
+methodTraceLeave
 popa
 ret
 
@@ -201,6 +221,7 @@ ps2.sw_test1fail :
 		mov ebx, PS2.PORT1_FAILMSG
 		mov ecx, 5
 		call SysHaltScreen.show
+methodTraceLeave
 popa
 ret
 
@@ -209,6 +230,7 @@ ps2.sw_test2fail :
 		mov ebx, PS2.PORT2_FAILMSG
 		mov ecx, 3
 		call SysHaltScreen.show
+methodTraceLeave
 popa
 ret
 
@@ -217,10 +239,12 @@ ps2.sw_timeout :
 		mov ebx, PS2.TIMEOUT_MSG
 		mov ecx, 5
 		call SysHaltScreen.show
+methodTraceLeave
 popa
 ret
 
 ps2.resetCPU :
+methodTraceEnter
 call ps2.waitForWrite
 mov al, PS2_RESET_CPU
 out PS2_COMMAND_PORT, al
@@ -228,6 +252,7 @@ mov eax, SysHaltScreen.WARN
 mov ebx, PS2.RESET_FAILMSG
 mov ecx, 10
 call SysHaltScreen.show
+methodTraceLeave
 ret
 
 PS2.RESET_FAILMSG :

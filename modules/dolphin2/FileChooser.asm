@@ -1,4 +1,5 @@
 FileChooser.Prompt :	; String title, String buttonText, String callback
+	methodTraceEnter
 	enter 0, 0
 		
 		mov eax, [ebp+8]
@@ -49,6 +50,7 @@ FileChooser.Prompt :	; String title, String buttonText, String callback
 		call FileChooser.loadFiles
 		
 	leave
+	methodTraceLeave
 	ret 12
 	.win :
 		dd 0x0
@@ -59,6 +61,7 @@ FileChooser.Prompt :	; String title, String buttonText, String callback
 	.createFileStr :
 		db "New File...", 0
 FileChooser.doCallback :
+	methodTraceEnter
 	pusha
 	
 		mov eax, [FileChooser.Prompt.panel]
@@ -73,9 +76,11 @@ FileChooser.doCallback :
 		call WindowGrouping.closeCallback
 	
 	popa
+	methodTraceLeave
 	ret
 
 FileChooser.goPromptFileCreation :
+	methodTraceEnter
 	pusha
 		
 		push dword .createAfileStr
@@ -84,6 +89,7 @@ FileChooser.goPromptFileCreation :
 		call PromptBox.PromptForString
 		
 	popa
+	methodTraceLeave
 	ret
 	.createAfileStr :
 		db "New file...", 0x0
@@ -91,6 +97,7 @@ FileChooser.goPromptFileCreation :
 		db "File Name: ", 0x0
 	
 FileChooser.createAndReloadFiles :
+	methodTraceEnter
 	pusha
 		
 		mov eax, [PromptBox.response]
@@ -108,9 +115,11 @@ FileChooser.createAndReloadFiles :
 		call FileChooser.loadFiles
 		
 	popa
+	methodTraceLeave
 	ret
 
 FileChooser.loadFiles :
+	methodTraceEnter
 	pusha
 		mov dword [.x], 0*4
 		mov dword [.y], 0
@@ -162,6 +171,7 @@ FileChooser.loadFiles :
 			jne .outerLoop
 	.kret :
 	popa
+	methodTraceLeave
 	ret
 	.x :
 		dd 0x0

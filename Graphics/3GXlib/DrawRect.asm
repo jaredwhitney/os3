@@ -1,4 +1,5 @@
 L3gx.lineRect :	; L3gxImage image, int x, int y, int width, int height, int Color
+	methodTraceEnter
 	pop dword [lineRect.retval]
 	pop dword [lineRect.color]
 	pop dword [lineRect.h]
@@ -62,6 +63,7 @@ L3gx.lineRect :	; L3gxImage image, int x, int y, int width, int height, int Colo
 			jg lineRect.loop2
 	popa
 	push dword [lineRect.retval]
+	methodTraceLeave
 	ret
 lineRect.retval :
 	dd 0x0
@@ -81,6 +83,7 @@ lineRect.workingLoc :
 	dd 0x0
 
 L3gx.fillRect :	; L3gxImage image, int x, int y, int w, int h, int Color
+	methodTraceEnter
 	pop dword [fillRect.retval]
 	pop dword [fillRect.color]
 	pop dword [fillRect.h]
@@ -156,6 +159,7 @@ L3gx.fillRect :	; L3gxImage image, int x, int y, int w, int h, int Color
 	popa
 	.ret :
 	push dword [fillRect.retval]
+	methodTraceLeave
 	ret
 fillRect.retval :
 	dd 0x0
@@ -222,4 +226,5 @@ L3gx.fillNarrowRect :
 	.ret :
 	popa
 	push dword [fillRect.retval]
+	methodTraceLeave
 	ret

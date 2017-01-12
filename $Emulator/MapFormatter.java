@@ -15,18 +15,29 @@ public class MapFormatter
 		{
 			line = line.substring(16, line.length()).trim();
 			String[] parts = line.split("\\Q  \\E");
+			if (parts[1].substring(0, 3).equals("..@"))
+			{
+				lines[num] = "";
+				continue;
+			}
 			out.println("dd 0x" + parts[0]);
 			out.println("dd __traceString" + num);
 			lines[num] = parts[1];
 			num++;
 		}
+		out.println("dd 0xFFFFFFFF");
+		out.println("dd __traceString" + num);
 		num = 0;
 		out.println("Debug.methodTraceStringTable :");
 		for (String line : lines)
 		{
+			if (line.length()<1 || line.charAt(0)==' ')
+				continue;
 			out.println("__traceString" + num + " :");
 			out.println("db \"" + line + "\", 0");
 			num++;
 		}
+		out.println("__traceString" + num + " :");
+		out.println("db \"[TRACE_MISSING]\", 0");
 	}
 }
