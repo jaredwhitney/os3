@@ -1,10 +1,18 @@
-echo Running miscelaneous tasks...
 date > build_time.log
-echo Assembling code...
-nasm -o kernel.bin -f bin ../boot/stage2.asm
-nasm -o boot.bin -f bin ../boot/boot.asm
-read -n1 -r -p "Press any key to build image..."
+
+echo '; FILE CLEARED FOR PRE-BUILD' > map.asm
+echo 'Debug.methodTraceLookupTable : ' >> map.asm
+echo 'Debug.methodTraceStringTable : ' >> map.asm
+
+nasm -o boot.bin -f bin ../newboot/boot.asm
+nasm -o kernel.bin -f bin ../newboot/kernelLoader.asm
+
+read -n1 -r -p "Press any key to continue . . ."
+
+java MapFormatter > map.asm
+
+nasm.exe -o kernel.bin -f bin ../newboot/kernelLoader.asm
+
+read -n1 -r -p "Press any key to continue . . ."
+
 cat boot.bin kernel.bin > os.img
-echo
-read -n1 -r -p "Press any key to launch bochs..."
-bochs -f run.bxrc
