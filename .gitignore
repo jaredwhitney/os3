@@ -217,7 +217,8 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-_not os code/~DO NOT SYNC/DadCard.asm
+_not os code/~DO NOT SYNC/
 $Emulator/os.img
-kernel/kernel.asm
+$Emulator/map.asm
+$Emulator/labels.map
 *.path
