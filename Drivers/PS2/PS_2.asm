@@ -144,17 +144,19 @@ ret
 
 ps2.waitForData :
 methodTraceEnter
+	ps2.waitForDataLoop :
 	in al, PS2_STATUS_PORT
 	test al, PS2_OUTB_FULL_FLAG
-		jz ps2.waitForData
+		jz ps2.waitForDataLoop
 methodTraceLeave
 ret
 
 ps2.waitForWrite :
 methodTraceEnter
+	ps2.waitForWriteLoop :
 	in al, PS2_STATUS_PORT
 	test al, PS2_INPB_FULL_FLAG
-		jnz ps2.waitForWrite
+		jnz ps2.waitForWriteLoop
 methodTraceLeave
 ret
 

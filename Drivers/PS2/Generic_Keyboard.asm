@@ -138,7 +138,7 @@ methodTraceEnter
 		methodTraceLeave
 		ret
 KeyManager.shiftSpecialCases :
-	db '`', '~', '1', '!', '2', '@', '3', '#', '4', '$', '5', '%', '6', '^', '7', '&', '8', '*', '9', '(', '0', ')', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', "'", '"', ',', '<', '.', '>', '/', '?', '\', '|', 0x0, 0x0
+	db '`', '~', '1', '!', '2', '@', '3', '#', '4', '$', '5', '%', '6', '^', '7', '&', '8', '*', '9', '(', '0', ')', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', "'", '"', ',', '<', '.', '>', '/', '?', '\', '|', ';', ':', '/', '?', 0x0, 0x0
 
 KeyManager.keyPress :	; key in bl
 methodTraceEnter
@@ -312,6 +312,9 @@ KeyManager.toChar :
 	cmp bl, 0x39
 	mov al, ' '
 	je KeyManager.toChar.ret
+	cmp bl, 0x35
+	mov al, '/'
+	je KeyManager.toChar.ret
 	cmp bl, 0x34
 	mov al, '.'
 	je KeyManager.toChar.ret
@@ -362,6 +365,9 @@ KeyManager.toChar :
 	je KeyManager.toChar.ret
 	cmp bl, 0x28
 	mov al, "'"
+	je KeyManager.toChar.ret
+	cmp bl, 0x27
+	mov al, ";"
 	je KeyManager.toChar.ret
 	cmp bl, 0x0E	; backspace
 	mov al, 0xff

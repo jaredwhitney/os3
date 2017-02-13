@@ -347,6 +347,7 @@ ImageEditor.mainFromConsoleFile :
 	
 ImageEditor.promptLoadFile :
 	methodTraceEnter
+		push dword iConsole2.currentFolder
 		push dword .promptLoadTitle
 		push dword .promptLoadMessage
 		push dword ImageEditor.loadFile
@@ -360,20 +361,18 @@ ImageEditor.promptLoadFile :
 ImageEditor.loadFile :
 	methodTraceEnter
 	pusha
-		mov ebx, 200*200*4+8;[Graphics.SCREEN_WIDTH]
+		mov ebx, 200*200*4;+8;[Graphics.SCREEN_WIDTH]
 		;imul ebx, [Graphics.SCREEN_HEIGHT]
 		call ProgramManager.reserveMemory
-		add ebx, 8
+	;	add ebx, 8
 		mov edx, [ImageEditor.image]
 		mov [edx+Image_source], ebx
 		
-		mov eax, [FileChooser.fileName]
-		call Minnow4.getFilePointer
-		mov ecx, [ImageEditor.image]
-		mov ecx, [ecx+Image_source]
-		mov edx, 200*200*4;[Graphics.SCREEN_WIDTH]
+		mov eax, [FileChooser.file]
+		mov ecx, 200*200*4;+8;[Graphics.SCREEN_WIDTH]
+		mov edx, 8
 		;imul edx, [Graphics.SCREEN_HEIGHT]
-		call Minnow4.readBuffer
+		call Minnow5.readBuffer
 		
 		; should resize the window etx here
 		
@@ -382,6 +381,7 @@ ImageEditor.loadFile :
 	ret
 ImageEditor.promptSaveFile :
 	methodTraceEnter
+		push dword iConsole2.currentFolder
 		push dword .promptSaveTitle
 		push dword .promptSaveMessage
 		push dword ImageEditor.saveFile
@@ -395,27 +395,24 @@ ImageEditor.promptSaveFile :
 ImageEditor.saveFile :
 	methodTraceEnter
 	pusha
-		mov edx, [ImageEditor.image]
-		mov eax, [edx+Image_source]
-		sub eax, 8
-		mov ecx, [edx+Image_sw]
-		shr ecx, 2	; so its in pixels
-		mov [eax], ecx
-		mov ebx, [edx+Image_sh]
-		mov [eax+4], ebx
-		imul ecx, ebx
-		shl ecx, 2
-		add ecx, 8	; ecx is the size of the buffer
-		mov edx, ecx
-		mov ecx, eax
-		mov eax, [FileChooser.fileName]
-		call Minnow4.getFilePointer
-		cmp ebx, Minnow4.SUCCESS
-			je .dontMake
-		mov eax, [FileChooser.fileName]
-		call Minnow4.createFile
-		.dontMake :
-		call Minnow4.writeBuffer
+;		mov edx, [ImageEditor.image]
+;		mov eax, [edx+Image_source]
+;		sub eax, 8
+;		mov ecx, [edx+Image_sw]
+;		shr ecx, 2	; so its in pixels
+;		mov [eax], ecx
+;		mov ebx, [edx+Image_sh]
+;		mov [eax+4], ebx
+;		imul ecx, ebx
+;		shl ecx, 2
+;		add ecx, 8	; ecx is the size of the buffer
+;		mov ebx, eax
+		mov eax, [FileChooser.file]
+				mov ebx, [ImageEditor.image]
+				mov ebx, [ebx+Image_source]
+				mov ecx, 200*200*4
+		mov edx, 8
+		call Minnow5.writeBuffer
 	popa
 	methodTraceLeave
 	ret
@@ -585,7 +582,8 @@ ImageEditor.drawStroke :
 		mov ecx, [eax+Image_h]
 		shr ecx, 2
 		mov eax, [eax+Image_source]
-		call L3gxImage.FromBuffer
+		call L3gxImage.FromBuffer	; get the L3gxImage
+		
 		push ecx
 		mov edx, [Component.mouseEventX]
 		shr edx, 2
@@ -595,6 +593,9 @@ ImageEditor.drawStroke :
 		push dword [ImageEditor.brushSize]
 		push dword [ImageEditor.color]
 		call L3gx.fillRect
+		
+		mov ebx, ecx
+		call Guppy2.free	; free the L3gxImage
 		
 		mov ebx, [ImageEditor.image]
 		call Component.RequestUpdate

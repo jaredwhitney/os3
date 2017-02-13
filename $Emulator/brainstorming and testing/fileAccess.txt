@@ -1,0 +1,29 @@
+files names look like this::
+
+"Os3 Boot Disk:boot/logs/daemonHandler.rawtext"
+HD:main/cat.rawimage
+
+file access methods::
+
+getSize(file)
+
+readBuffer(file,buffer,size)
+writeBuffer(file,buffer,size)
+
+getWriteStream(file,append?)
+getReadStream(file)
+
+streamSeek(stream,pos)
+streamGetPos(stream)
+
+streamWriteByte(stream,dat)
+streamWriteWord(stream,dat)
+streamWriteDword(stream,dat)
+streamWriteString(stream,dat)
+
+streamReadByte(stream,buf)
+streamReadWord(stream,buf)
+streamReadDword(stream,buf)
+streamReadString(stream,buffer,delim)
+
+if any of the read buffers are null, they will be allocated

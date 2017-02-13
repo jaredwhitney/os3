@@ -324,6 +324,13 @@ realModeAtaLoad :	; this will not work properly on Bochs! (add in workaround)
 		mov ah, 0x42
 		int 0x13
 	ret
+realModeAtaSave :	; this will not work properly on Bochs! (add in workaround)
+		mov di, 0x0
+		mov si, rmATAdata
+		mov dl, 0x80
+		mov ah, 0x43
+		int 0x13
+	ret
 
 rmATAdata :
 	db 0x10
@@ -367,5 +374,38 @@ realMode.ATAwrite :
 %include "..\newboot\rmexec.asm"
 %include "..\kernel\kernel.asm"
 
-
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad code to the nearest sector
 KERNEL_END :
+
+dd "MINFS5.0"
+dd 0xDEADD15C
+dd null
+dd 0x30
+dd 0xFFFFFFFF
+dd 1
+dd Minnow5.ATTRIB_NO_WRITE
+db "Os3_Boot", 0
+
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad to the nearest sector
+dd "MINFS5.0"
+dd 2
+dd 0
+dd 0x3A
+dd 0
+dd null
+dd Minnow5.ATTRIB_NO_WRITE | Minnow5.ATTRIB_DELETE_PROTECTED
+db "boot", 0
+
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad to the nearest sector
+dd "MINFS5.0"
+dd null
+dd 0
+dd 0x3A
+dd 0
+dd null
+dd Minnow5.ATTRIB_NO_WRITE | Minnow5.ATTRIB_DELETE_PROTECTED
+db "root", 0
+
+
+times ((($-$$)/0x200+1)*0x200)-($-$$) db 0
+times 0x20000 dq 0

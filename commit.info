@@ -2,26 +2,26 @@ Updates this commit:
 
 	TYP DESCRIPTION
 	-------------------
-	 +  Add Guppy2 (new memory manager, allows for allocation of arbitrarily sized blocks of RAM and supports deallocation)
-	 *  Update Guppy.malloc and ProgramManager.reserveMemory to point to Guppy2.malloc
-	 *  Replace Guppy.malloc with Guppy2.mallocPageAligned as needed
-	 +  Add Catfish (notification manager)
-	 +  Add BF Parser
-	 +  Add convenience methods to return from functions called by iConsole2 with a variable number of arguments
-	 *  Update the background image of Dolphin2's login screen to a gradient image
-	 +  Add VisualMemoryMap (display a graphical map of allocated memory by type)
-	 *  Update folder names to be case-consistant with includes
-	 *  Update include path seperators to forward slashes (used to be backslashes)
-	 +  Create build script for Linux
-	 +  Begin working on file renaming [breaks filesystem atm]
-	 +  Create WinMan and begin translating all Dolphin2 to generic WinMan calls
-	 *  Fix a problem with calculating the blue color of transparent pixels when being composited
-	 +  Add the freeFunc parameter to Components
-	 +  Add translation from keycode to character for the square bracket keys
+	 +  Add support for 4 more keyboard inputs (';', ':', '/', '?')
+	 +	Add the ability to parse hexadecimal numbers from Strings
+	 +  Add HexEditor (currently only displays sectors from the detected AHCI drive)
+	 +	Add Minnow5 (a new, actually functional this time, filesystem)
+	 *	Update iConsole2 to use Minnow5, add commands to reflect this
+	 *	Make iConsole2 EchoDec display a negative sign if needed
+	 *	Fix iConsole2 not allowing backspaces after running the clear command
+	 *	Update FileChooser to use Minnow5 (is still unable to swap directories)
+	 *	Update TextEditor to use Minnow5
+	 *	Make TextEditor use an appropriate buffer size when writing out to a file
+	 *	Update ImageEditor to use Minnow5
+	 *	Update bfParse to use Minnow5
+	 *	Stop ps2 waitForData and waitForWrite from trashing the debug call stacks
+	 -	Temporarily disable 'FiletypeBinding's
+	 -	Remove time delay on boot
+	 -	Disable paging
+	 
 
 Issues affected by this commit:
 
 	NUM   ACTION     DESCRIPTION
 	--------------------------------
-	#14   RESOLVED   Memory Deallocation [feature request]
-	#21   RESOLVED   Reserved Memory [Priority: High]
+	

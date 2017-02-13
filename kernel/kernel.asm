@@ -22,21 +22,21 @@ methodTraceEnter
 	
 	; Initialize kernel modules
 		call kernel.initModules
-	
+		
 	; Display the text mode welcome message if needed
 		call kernel.checkRunTextModeInit
 	
 	; Initialize the AHCI Driver
 		call ATA_DETECT	; NEEDS TRANSITION TO GUPPY2
-
+;
 	; Set up the OrcaHLL console and memory workaround (deprecated)
 ;;		call kernel.OrcaHLLsetup_memhack
 	
 	; Initialize the USB Driver
 		; call EHCI.findDevice
-	cli
-	call betterPaging.init
-	sti
+;	cli
+;	call betterPaging.init
+;	sti
 	
 	; Enable the FPU
 		call FPU.enable
@@ -47,10 +47,6 @@ methodTraceEnter
 	; Workaround to make KeyManager report keypresses (...)
 		mov al, [Dolphin.currentWindow]
 		mov [Dolphin.activeWindow], al
-	
-	; Pause for 1000 clock tics (needed workaround or will not boot)
-		mov eax, 1000
-		;call System.sleep
 	
 	; Set up and run the windowing system (does not return).
 		call console.test
@@ -258,9 +254,3 @@ FPU.enable :
 ; Includes
 
 	%include "../$Emulator/StandardIncludes.asm"
-
-	
-; File Padding
-
-	times ((($-$$)/0x200+1)*0x200)-($-$$) db 0	; pad the file to the nearest sector
-

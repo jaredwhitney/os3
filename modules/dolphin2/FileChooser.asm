@@ -1,9 +1,22 @@
-FileChooser.Prompt :	; String title, String buttonText, String callback
+FileChooser.Prompt :	; file base, String title, String buttonText, String callback
 	methodTraceEnter
 	enter 0, 0
+	
+		cmp dword [FileChooser.nameBuffer], null
+			jne .noAlloc
+		mov ebx, 0x1000
+		call Guppy2.malloc
+		mov [FileChooser.nameBuffer], ebx
+		.noAlloc :
 		
 		mov eax, [ebp+8]
 		mov [FileChooser.callback], eax
+		
+		mov eax, [ebp+20]
+		mov ebx, [eax+0x0]
+		mov [FileChooser.workingFolder+0x0], ebx
+		mov ebx, [eax+0x4]
+		mov [FileChooser.workingFolder+0x4], ebx
 	
 		push dword [ebp+16]
 		push dword 0*4
@@ -51,7 +64,7 @@ FileChooser.Prompt :	; String title, String buttonText, String callback
 		
 	leave
 	methodTraceLeave
-	ret 12
+	ret 16
 	.win :
 		dd 0x0
 	.panel :
@@ -68,11 +81,14 @@ FileChooser.doCallback :
 		mov eax, [eax+SelectionPanel_selectedComponent]
 		add eax, Button_text
 		mov eax, [eax]
-		mov [FileChooser.fileName], eax
+		
+		mov ebx, FileChooser.workingFolder
+		call Minnow5.byName
+		mov [FileChooser.file], ebx
 		
 		call dword [FileChooser.callback]
 		
-		mov eax, [FileChooser.Prompt.win]
+		mov ebx, [FileChooser.Prompt.win]
 		call WindowGrouping.closeCallback
 	
 	popa
@@ -100,8 +116,10 @@ FileChooser.createAndReloadFiles :
 	methodTraceEnter
 	pusha
 		
-		mov eax, [PromptBox.response]
-		call Minnow4.createFile
+		mov eax, FileChooser.workingFolder
+		mov ebx, [PromptBox.response]
+		mov ecx, null
+		call Minnow5.makeFile
 		
 		mov ebx, [FileChooser.Prompt.panel]
 		.clearLoop :
@@ -121,27 +139,27 @@ FileChooser.createAndReloadFiles :
 FileChooser.loadFiles :
 	methodTraceEnter
 	pusha
+		
+		mov eax, [FileChooser.workingFolder+0x4]
+		mov ebx, [FileChooser.workingFolder+0x0]
+		call Minnow5.getInner
+		
+		cmp eax, 0
+			je .kret
+			
+		mov ecx, [FileChooser.nameBuffer]
+		
 		mov dword [.x], 0*4
 		mov dword [.y], 0
-		mov eax, 0x0
 		.outerLoop :
-		call Minnow4.readFileBlock
-		push ecx
-		add ecx, 200-Minnow4.BLOCK_DESCRIPTOR_SIZE
-		mov dword [.threshold], ecx
-		pop ecx
-		.innerLoop :
+		
+		; read file (get ebx = file name)
+		mov ebx, [FileChooser.workingFolder+0x0]
+		call Minnow5.getBlockName
 		mov ebx, ecx
-		cmp byte [ecx], null
-			jne .notMissing
-		add ecx, 1
-		cmp ecx, [.threshold]
-			jae .goNextOuter
-		jmp .innerLoop	; should have a threshold to check against!
-		.notMissing :
+		
 		call String.getLength
 		add ecx, edx
-		add ecx, 4
 		;
 			pusha
 			push ebx
@@ -163,11 +181,9 @@ FileChooser.loadFiles :
 			cmp dword [.y], 250-(FONTHEIGHT+5)
 				jg .kret
 		;
-		cmp ecx, [.threshold]
-			jb .innerLoop
-		.goNextOuter :
-		call Minnow4.getNextFileBlock
-		cmp eax, 0x0
+		mov ebx, [FileChooser.workingFolder+0x0]
+		call Minnow5.getNext
+		cmp eax, null
 			jne .outerLoop
 	.kret :
 	popa
@@ -179,8 +195,12 @@ FileChooser.loadFiles :
 		dd 0x0
 	.threshold :
 		dd 0x0
-	
-FileChooser.fileName :
+
+FileChooser.workingFolder :
+	dq 0x0
+FileChooser.file :
 	dd 0x0
 FileChooser.callback :
+	dd 0x0
+FileChooser.nameBuffer :
 	dd 0x0

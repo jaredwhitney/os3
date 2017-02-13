@@ -15,7 +15,7 @@ Guppy2.init :
 	pusha
 		
 		mov eax, Guppy2.TABLE_POSITION
-		mov ebx, 0x20000
+		mov ebx, 0x10000
 		call Buffer.clear
 		
 		mov eax, 0x0
@@ -30,18 +30,8 @@ Guppy2.init :
 		
 ;		call Guppy2.proccessMemoryMap	; no memory map present atm
 		
-		mov eax, Guppy2.TABLE_POSITION
-		mov ebx, 0x10000
-		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
-		call Guppy2.setBlock
-		
-		mov eax, Debug.methodTraceStackBase
-		mov ebx, 0x10000
-		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
-		call Guppy2.setBlock
-		
-		mov eax, Debug.methodTraceStackBase2
-		mov ebx, 0x10000
+		mov eax, [Debug.methodTraceStackBase]
+		mov ebx, 0x30000
 		mov ecx, Guppy2_Entry.TYPE_SYSTEM_RESERVED
 		call Guppy2.setBlock
 		
@@ -49,9 +39,6 @@ Guppy2.init :
 		call iConsole2.RegisterCommand
 		
 		push dword Guppy2.COMMAND_MALLOC_TEST
-		call iConsole2.RegisterCommand
-		
-		push dword Guppy2.COMMAND_FREE_TEST
 		call iConsole2.RegisterCommand
 		
 	popa
@@ -183,30 +170,77 @@ Guppy2.COMMAND_MALLOC_TEST :
 	dd Guppy2.mallocTest
 	dd null
 	.mallocStr :
-		db "G2mallocTest", 0
+		db "mallocTest", 0
 	Guppy2.mallocTest :
 		methodTraceEnter
 		pusha
-			mov ebx, 500
+			mov ebx, 0x100000
 			call Guppy2.malloc
-		popa
-		methodTraceLeave
-		ret
-
-Guppy2.COMMAND_FREE_TEST :
-	dd .freeStr
-	dd Guppy2.freeTest
-	dd null
-	.freeStr :
-		db "G2freeTest", 0
-	Guppy2.freeTest :
-		methodTraceEnter
-		pusha
-			mov ebx, 0xAB0000
+			mov [.l1], ebx
+	;		mov ebx, 0x100000
+	;		call Guppy2.malloc
+	;		mov [.l2], ebx
+	;		mov ebx, 0x100000
+	;		call Guppy2.mallocPageAligned
+	;		mov [.l3], ebx
+	;		mov ebx, 0x7
+	;		call Guppy2.malloc
+	;		mov [.s1], ebx
+	;		mov ebx, 0x9D
+	;		call Guppy2.malloc;PageAligned
+	;		mov [.s2], ebx
+	;		mov ebx, 0xABCDEF0
+	;		call Guppy2.malloc
+	;		mov [.l4], ebx
+			
+			mov dword [.l1+0xC7654], 0xDEADF145
+		;	mov dword [.l2+0x7654], 0xDEADF145
+		;	mov dword [.l3+0xFFFFC], 0xDEADF145
+		;	mov dword [.l4], 0xDEADF145
+		;	mov dword [.s1+3], 0x0BA5ED07
+		;	mov dword [.s2+0xCDEF0], 0x0BA5ED07
+			
+;			cmp dword [.l1+0xC7654], 0xDEADF145
+;				jne kernel.halt
+;			cmp dword [.l2+0x7654], 0xDEADF145
+;				jne kernel.halt
+;		;	cmp dword [.l3+0xFFFFC], 0xDEADF145
+;		;		jne kernel.halt
+;			cmp dword [.l4], 0xDEADF145
+;				jne kernel.halt
+;			cmp dword [.s1+3], 0x0BA5ED07
+;				jne kernel.halt
+;		;	cmp dword [.s2+0xCDEF0], 0x0BA5ED07
+;		;		jne kernel.halt
+			
+	;		mov ebx, [.l3]
+	;		call Guppy2.free
+	;		mov ebx, [.s2]
+	;		call Guppy2.free
+			mov ebx, [.l1]
 			call Guppy2.free
+	;		mov ebx, [.l4]
+	;		call Guppy2.free
+	;		mov ebx, [.s1]
+	;		call Guppy2.free
+	;		mov ebx, [.l2]
+	;		call Guppy2.free
 		popa
 		methodTraceLeave
 		ret
+	.l1 :
+		dd 0x0
+	.l2 :
+		dd 0x0
+	.l3 :
+		dd 0x0
+	.l4 :
+		dd 0x0
+	.s1 :
+		dd 0x0
+	.s2 :
+		dd 0x0
+
 Guppy2.COMMAND_PRINT_BLOCKS :
 	dd .printBlocksStr
 	dd Guppy2.printBlocks

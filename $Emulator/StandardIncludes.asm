@@ -77,6 +77,7 @@
 		%include "../modules/simpleRender/SimpleRender.asm"
 		%include "../modules/systemMemoryMap/SystemMemoryMap.asm"
 		%include "../modules/bfParse/bfParse.asm"
+		%include "../modules/hexEditor/HexEditor.asm"
 	
 	;  Program Loader Includes	;
 		%include "../kernel/ProgramLoader.asm"	; depricated in part
@@ -101,9 +102,10 @@
 		%include "../Drivers/HDD/AHCI_DMAWRITE.asm"
 	
 	;  MinnowFS Includes	;
-		%include "../Tools/System/Minnow2.asm"	; depricated
+		;%include "../Tools/System/Minnow2.asm"	; depricated
 		%include "../Tools/System/Minnow3.asm"	; depricated
 		%include "../Tools/System/Minnow4.asm"
+		%include "../Tools/System/Minnow5.asm"
 
 
 ; SYSTEM MISC

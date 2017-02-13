@@ -198,8 +198,6 @@ pusha
 
 	mov byte [INTERRUPT_DISABLE], 0xFF
 	
-	call Minnow4.init
-	
 	;mov eax, [os_imageDataBaseLBA]
 	;xor ebx, ebx
 	;mov edx, 1024*4*768
@@ -218,8 +216,12 @@ pusha
 		call Catfish.init
 		call SystemMemoryMap.init
 		call BFCK.init
+		call HexEditor.init
 	
 	call WinMan.ShowLoginScreen
+	
+	call Minnow5.preinit
+	call Minnow5.init
 	
 	GoDoLoop :
 	
@@ -258,12 +260,7 @@ pusha
 popa
 methodTraceLeave
 ret
-consoletest_title :
-	db "Window Test", 0
-consoletest_text :
-	db "This is some sample text that should be displayed in the test window.", 0
-consoletest_type :
-	db "Text", 0
+
 ; SimpleRender.init :
 	; pusha
 		; push SimpleRender.windowTitle

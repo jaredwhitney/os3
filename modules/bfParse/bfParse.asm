@@ -39,8 +39,13 @@ BFCK.parse :
 		call iConsole2.Echo
 			; need to read in the file with its name at [ebp+8]
 		mov eax, [ebp+8]
-		call Minnow4.getFilePointer
-		cmp ebx, Minnow4.FILE_NOT_FOUND
+		mov ebx, [iConsole2.currentFolder+0x0]
+		mov [.file+0x0], ebx
+		mov ebx, [iConsole2.currentFolder+0x4]
+		mov [.file+0x4], ebx
+		mov ebx, .file
+		call Minnow5.byName
+		cmp dword [ebx+0x4], -1
 			jne .allGood
 		push dword .fileNotFound
 		call iConsole2.Echo
@@ -48,11 +53,12 @@ BFCK.parse :
 		.allGood :
 		mov ebx, 1000	; only run up to 1000 chars for now
 		call Guppy2.malloc
-		mov ecx, ebx
-		mov edx, 1000
-		call Minnow4.readBuffer
+		mov eax, .file
+		mov ecx, 1000
+		mov edx, 0
+		call Minnow5.readBuffer
 			; then set [ebp+8] to point to the file data in memory
-		mov [ebp+8], ecx
+		mov [ebp+8], ebx
 		.keepGoingPre :
 		mov ebx, 1000
 		call Guppy2.malloc
@@ -173,6 +179,8 @@ BFCK.parse :
 		db "[WARN] Executing files is currently in development.", newline, 0
 	.fileNotFound :
 		db "[ERROR] File not found.", newline, 0
+	.file :
+		dq 0x0
 
 BFCK.keyGetter :
 	pusha

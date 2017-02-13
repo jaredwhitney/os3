@@ -71,7 +71,8 @@ rmeBackToPmode :
 	mov gs, ax
 	mov ss, ax
 	mov esp, [rmeStackSave]
-	call loadIDT
+	call loadIDT	; should also re-init ps/2?
+;	call ps2.init
 	jmp realModeExec.ret
 
 rmeDisablePIC :

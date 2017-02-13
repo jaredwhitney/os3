@@ -2,6 +2,14 @@ iConsole2.Init :
 	methodTraceEnter
 	pusha
 		
+		mov ebx, 0x1000
+		call Guppy2.malloc
+		mov [iConsole2.currentFolderNameBuffer], ebx
+		
+		mov ebx, 0x1000
+		call Guppy2.malloc
+		mov [iConsole2.tempBuffer], ebx
+		
 		push iConsole2.windowTitle
 		push dword 0*4
 		push dword 0
@@ -47,7 +55,22 @@ iConsole2.Init :
 		push dword iConsole2.COMMAND_HELP
 		call iConsole2.RegisterCommand
 		
-		push dword iConsole2.COMMAND_PRINT_ARGNUM
+		push dword iConsole2.COMMAND_CD
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_LIST_HERE
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_MAKE_FOLDER
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_DELETE_FILE
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_RENAME_FILE
+		call iConsole2.RegisterCommand
+		
+		push dword iConsole2.COMMAND_GUPPY5_TEST
 		call iConsole2.RegisterCommand
 		
 	popa
@@ -313,6 +336,20 @@ iConsole2.PrintPrompt :
 	methodTraceEnter
 	pusha
 		
+		mov al, 0x0A	; newline
+		mov ebx, [iConsole2.text]
+		call TextArea.InsertChar
+		
+		cmp dword [iConsole2.currentFolder+0x0], -1
+			je .noPrintFolderName
+		mov eax, iConsole2.currentFolder
+		mov ebx, [iConsole2.currentFolderNameBuffer]
+		call Minnow5.getPathString
+		mov eax, [iConsole2.text]
+		xchg eax, ebx
+		call TextArea.InsertText
+		.noPrintFolderName :
+		
 		mov ebx, [iConsole2.text]
 		mov eax, iConsole2.prompt
 		call TextArea.InsertText
@@ -401,6 +438,11 @@ iConsole2.EchoDec :
 	methodTraceEnter
 	enter 0, 0
 	pusha
+		test dword [ebp+8], 1<<31
+			jz .noNeg
+		push dword .charNeg
+		call iConsole2.EchoChar
+		.noNeg :
 		mov eax, .strdata
 		mov ebx, 12
 		call Buffer.clear
@@ -419,6 +461,8 @@ iConsole2.EchoDec :
 		times 3 dd 0
 	.dat :
 		times 3 dd 0
+	.charNeg :
+		db '-'
 iConsole2.STR_ECHO_DEC :
 	dd "edec", 0
 
@@ -453,7 +497,8 @@ iConsole2.ClearScreen :
 	methodTraceEnter
 	enter 0, 0
 		mov ebx, iConsole2.BUFFER_SIZE
-		mov eax, [iConsole2.text] 
+		mov eax, [iConsole2.text]
+		mov dword [eax+Textarea_cursorPos], 0
 		mov eax, [eax+Textarea_text]
 		call Buffer.clear
 	leave
@@ -475,7 +520,7 @@ iConsole2.DisplayHelp :
 		mov ecx, eax
 		mov eax, [eax+command_name]
 		call TextArea.InsertText
-		mov eax, iConsole2.DisplayHelp.STR_SEPERATOR
+		mov eax, iConsole2.STR_SEPERATOR
 		call TextArea.InsertText
 		mov eax, [ecx+command_nextLink]
 		cmp eax, null
@@ -483,14 +528,176 @@ iConsole2.DisplayHelp :
 	leave
 	methodTraceLeave
 	ret 0
-iConsole2.DisplayHelp.STR_SEPERATOR :
-	db ",", newline, null
+iConsole2.STR_SEPERATOR :
+	db ", ", newline, null
 iConsole2.STR_HELP :
 	db "help", 0
+
+iConsole2.COMMAND_CD :
+	dd .str
+	dd iConsole2.ChangeDirectory
+	dd null
+	.str :
+		db "cd", 0
+iConsole2.ChangeDirectory :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, [ebp+8]
+		mov ebx, iConsole2.currentFolder
+		mov ecx, [ebx+0x0]
+		mov edx, [ebx+0x4]
+		call Minnow5.byName
+		cmp dword [iConsole2.currentFolder+0x0], -1
+			je .needsFix
+		cmp dword [iConsole2.currentFolder+0x4], -1
+			jne .noFix
+		.needsFix :
+		mov [iConsole2.currentFolder+0x0], ecx
+		mov [iConsole2.currentFolder+0x4], edx
+		push dword .errorStr
+		call iConsole2.Echo
+	.noFix :
+	popa
+	leave
+	methodTraceLeave
+	ret 4
+.errorStr :
+	db "The specified location could not be found.", 0
+
+iConsole2.COMMAND_LIST_HERE :
+	dd .str
+	dd iConsole2.ListHere
+	dd null
+	.str :
+		db "ld", 0
+iConsole2.ListHere :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, [iConsole2.currentFolder+0x4]
+		mov ebx, [iConsole2.currentFolder+0x0]
+		call Minnow5.getInner
+		cmp eax, null
+			je .noloop
+		.loop :
+		mov ecx, [iConsole2.tempBuffer]
+		call Minnow5.getBlockName
+		push ecx
+		call iConsole2.Echo
+		push iConsole2.STR_SEPERATOR
+		call iConsole2.Echo
+		call Minnow5.getNext
+		cmp eax, null
+			jne .loop
+	.noloop :
+	popa
+	leave
+	methodTraceLeave
+	ret 0
+
+iConsole2.COMMAND_MAKE_FOLDER :
+	dd .str
+	dd iConsole2.MakeFolder
+	dd null
+	.str :
+		db "mkd", 0
+iConsole2.MakeFolder :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, iConsole2.currentFolder
+		mov ebx, [ebp+8]
+		mov ecx, null
+		call Minnow5.makeFolder	; qword buffer (file) in eax, nameptr in ebx, attribs in ecx, returns eax = folderptr
+	popa
+	leave
+	methodTraceLeave
+	ret 4
+
+iConsole2.COMMAND_DELETE_FILE :
+	dd .str
+	dd iConsole2.DeleteFile
+	dd null
+	.str :
+		db "del", 0
+iConsole2.DeleteFile :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, [iConsole2.currentFolder+0x0]
+		mov [iConsole2.workingFile+0x0], eax
+		mov eax, [iConsole2.currentFolder+0x4]
+		mov [iConsole2.workingFile+0x4], eax
+		mov eax, [ebp+8]
+		mov ebx, iConsole2.workingFile
+		call Minnow5.byName
+		mov eax, iConsole2.workingFile
+		call Minnow5.deleteFile
+	popa
+	leave
+	methodTraceLeave
+	ret 4
+
+iConsole2.COMMAND_RENAME_FILE :
+	dd .str
+	dd iConsole2.RenameFile
+	dd null
+	.str :
+		db "ren", 0
+iConsole2.RenameFile :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, [iConsole2.currentFolder+0x0]
+		mov [iConsole2.workingFile+0x0], eax
+		mov eax, [iConsole2.currentFolder+0x4]
+		mov [iConsole2.workingFile+0x4], eax
+		mov eax, [ebp+12]
+		mov ebx, iConsole2.workingFile
+		call Minnow5.byName
+		mov eax, iConsole2.workingFile
+		mov ebx, [ebp+8]
+		call Minnow5.nameFile
+	popa
+	leave
+	methodTraceLeave
+	ret 8
+
+iConsole2.COMMAND_GUPPY5_TEST :
+	dd .str
+	dd iConsole2.DoGuppy5Test
+	dd null
+	.str :
+		db "5test", 0
+iConsole2.DoGuppy5Test :
+	methodTraceEnter
+	enter 0, 0
+	pusha
+		mov eax, [iConsole2.currentFolder+0x0]
+		mov [iConsole2.workingFile+0x0], eax
+		mov eax, [iConsole2.currentFolder+0x4]
+		mov [iConsole2.workingFile+0x4], eax
+
+		mov eax, [ebp+8]
+		mov ebx, iConsole2.workingFile
+		call Minnow5.byName
+		
+		mov eax, [iConsole2.currentFolder+0x4]
+		mov ebx, [iConsole2.currentFolder+0x0]
+		call Minnow5.getSize
+		PUSH eax
+		call iConsole2.EchoDec
+		
+	popa
+	leave
+	methodTraceLeave
+	ret 4
 
 iConsole2.RegisterCommand :	; Command command
 	methodTraceEnter
 	enter 0, 0
+	pusha
 		mov eax, [ebp+8]
 		mov ebx, [iConsole2.commandBase]
 		cmp ebx, 0
@@ -501,7 +708,7 @@ iConsole2.RegisterCommand :	; Command command
 		cmp ebx, null
 			jne .loop
 		mov [ecx+command_nextLink], eax
-	
+	popa
 	leave
 	methodTraceLeave
 	ret 4
@@ -538,6 +745,15 @@ iConsole2.window :
 	dd 0x0
 iConsole2.text :
 	dd 0x0
+iConsole2.currentFolder :
+	dd -1
+	dd null
+iConsole2.workingFile :
+	dq 0
+iConsole2.currentFolderNameBuffer :
+	dd 0x0
+iConsole2.tempBuffer :
+	dd 0x0
 iConsole2.windowTitle :
 	db "Console", 0
 iConsole2.welcomeText :
@@ -545,7 +761,7 @@ iConsole2.welcomeText :
 	incbin "../$Emulator/build_time.log"
 	db 0
 iConsole2.prompt :
-	db 0x0A, "> ", 0
+	db "> ", 0
 iConsole2.commandStart :
 	dd 0x0
 iConsole2.invalidCommand :

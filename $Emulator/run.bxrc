@@ -5,5 +5,5 @@ vga: extension=vbe, update_freq=10
 pci: enabled=1, chipset=i440fx
 clock: sync=none, time0=local, rtc_sync=0
 vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
-memory: guest=1024, host=1024
+memory: guest=2048, host=1024
 panic: action=report
